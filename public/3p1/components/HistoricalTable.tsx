@@ -121,7 +121,7 @@ export const HistoricalTable: React.FC<HistoricalTableProps> = ({ data, onUpdate
       <DataColorLegend />
       
       {/* Tableau historique */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
+      <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200" data-demo="historical-table">
       <table className="min-w-full text-xs sm:text-sm text-right">
         <thead className="bg-slate-100 text-gray-600 font-semibold uppercase text-[10px] sm:text-xs border-b-2 border-slate-200">
           <tr>

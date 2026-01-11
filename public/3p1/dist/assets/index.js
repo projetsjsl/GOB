@@ -9312,7 +9312,7 @@ Cliquez pour modifier manuellement. La modification marquera cette valeur comme 
 const HistoricalTable = ({ data, onUpdateRow }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 sm:mb-6 print-break-inside-avoid", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(DataColorLegend, {}),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto bg-white rounded-lg shadow border border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "min-w-full text-xs sm:text-sm text-right", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto bg-white rounded-lg shadow border border-gray-200", "data-demo": "historical-table", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "min-w-full text-xs sm:text-sm text-right", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("thead", { className: "bg-slate-100 text-gray-600 font-semibold uppercase text-[10px] sm:text-xs border-b-2 border-slate-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 sm:px-3 py-2 sm:py-3 text-left sticky left-0 bg-slate-100 z-10 cursor-help", title: "Année fiscale\\n\\nAnnée de référence pour les données financières.\\n\\nLes données sont organisées par année fiscale complète.", children: "Année" }),
@@ -34959,7 +34959,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
         return "bg-yellow-500";
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-900 text-white flex flex-col h-full border-r border-slate-800 shadow-xl w-full", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-900 text-white flex flex-col h-full border-r border-slate-800 shadow-xl w-full", "data-demo": "sidebar", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 sm:p-4 border-b border-slate-800 bg-slate-950 cursor-help", title: "Finance Pro 3p1\\n\\nApplication d'analyse fondamentale pour la gestion de portefeuille.\\n\\nFonctionnalités:\\n• Analyse de valorisation sur 5 ans\\n• Triangulation de la valeur (4 métriques)\\n• KPI Dashboard multi-tickers\\n• Snapshots et historique\\n• Synchronisation avec FMP API", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-blue-400 font-bold text-base sm:text-lg", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -41178,6 +41178,269 @@ class ErrorBoundary extends reactExports.Component {
     return this.props.children;
   }
 }
+const InteractiveDemo = ({ onClose, onSelectTicker }) => {
+  const [currentStep, setCurrentStep] = reactExports.useState(1);
+  const [highlightRect, setHighlightRect] = reactExports.useState(null);
+  const overlayRef = reactExports.useRef(null);
+  const stepConfig = {
+    1: {
+      title: "Étape 1: Sélectionner un ticker",
+      description: "Commencez par choisir un titre dans la barre latérale gauche. Vous pouvez rechercher par symbole (ex: AAPL) ou par nom d'entreprise.",
+      highlightSelector: '[data-demo="sidebar"]',
+      elementDescription: "La sidebar contient tous vos tickers. Utilisez la barre de recherche pour trouver rapidement un titre.",
+      icon: ForwardRef$h,
+      color: "blue"
+    },
+    2: {
+      title: "Étape 2: Explorer les données historiques",
+      description: "Une fois un ticker sélectionné, vous verrez ses données financières historiques dans le tableau principal. Les couleurs indiquent la source des données (vert = FMP vérifié, bleu = FMP ajusté, orange = manuel, gris = calculé).",
+      highlightSelector: '[data-demo="historical-table"]',
+      elementDescription: "Le tableau affiche les données annuelles: prix, bénéfices, dividendes, etc. Cliquez sur une cellule pour la modifier. Consultez la légende des couleurs au-dessus du tableau.",
+      icon: ForwardRef$5,
+      color: "green"
+    },
+    3: {
+      title: "Étape 3: Utiliser les fonctionnalités avancées",
+      description: "Explorez les graphiques de valorisation, les métriques additionnelles, et synchronisez les données depuis l'API pour obtenir les informations les plus récentes.",
+      highlightSelector: '[data-demo="features"]',
+      elementDescription: "Les onglets en haut permettent d'accéder aux graphiques, métriques, et autres analyses. Le bouton de synchronisation met à jour les données depuis l'API.",
+      icon: ForwardRef$c,
+      color: "purple"
+    }
+  };
+  const currentConfig = stepConfig[currentStep];
+  const Icon = currentConfig.icon;
+  reactExports.useEffect(() => {
+    const updateHighlight = () => {
+      const element = document.querySelector(currentConfig.highlightSelector);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        setHighlightRect({
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height
+        });
+        element.classList.add("demo-highlight");
+      } else {
+        setHighlightRect(null);
+      }
+    };
+    updateHighlight();
+    window.addEventListener("scroll", updateHighlight, true);
+    window.addEventListener("resize", updateHighlight);
+    return () => {
+      window.removeEventListener("scroll", updateHighlight, true);
+      window.removeEventListener("resize", updateHighlight);
+      const element = document.querySelector(currentConfig.highlightSelector);
+      if (element) {
+        element.classList.remove("demo-highlight");
+      }
+    };
+  }, [currentStep, currentConfig.highlightSelector]);
+  const handleNext = () => {
+    if (currentStep < 3) {
+      setCurrentStep((prev) => prev + 1);
+    } else {
+      onClose();
+    }
+  };
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+  const handleSkip = () => {
+    onClose();
+  };
+  const handleSelectTicker = () => {
+    if (onSelectTicker) {
+      onSelectTicker();
+    }
+    if (currentStep === 1) {
+      handleNext();
+    }
+  };
+  const getClipPath = () => {
+    if (!highlightRect) {
+      return "polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%)";
+    }
+    const { top, left, width, height } = highlightRect;
+    const padding = 12;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    return `polygon(
+      0% 0%, 
+      0% 100%, 
+      ${Math.max(0, left - padding)}px 100%, 
+      ${Math.max(0, left - padding)}px ${Math.max(0, top - padding)}px, 
+      ${Math.min(viewportWidth, left + width + padding)}px ${Math.max(0, top - padding)}px, 
+      ${Math.min(viewportWidth, left + width + padding)}px ${Math.min(viewportHeight, top + height + padding)}px, 
+      ${Math.max(0, left - padding)}px ${Math.min(viewportHeight, top + height + padding)}px, 
+      ${Math.max(0, left - padding)}px 100%, 
+      100% 100%, 
+      100% 0%
+    )`;
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        ref: overlayRef,
+        className: "fixed inset-0 bg-black/70 z-[9998] pointer-events-auto transition-all duration-300",
+        style: {
+          clipPath: getClipPath(),
+          WebkitClipPath: getClipPath()
+        }
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[9999] w-full max-w-2xl mx-4 pointer-events-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "bg-white rounded-2xl shadow-2xl border-4 p-6 sm:p-8",
+        style: {
+          borderColor: currentStep === 1 ? "#3b82f6" : currentStep === 2 ? "#10b981" : "#a855f7"
+        },
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  className: "p-3 rounded-xl",
+                  style: {
+                    backgroundColor: currentStep === 1 ? "#dbeafe" : currentStep === 2 ? "#d1fae5" : "#f3e8ff"
+                  },
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Icon,
+                    {
+                      className: "w-8 h-8",
+                      style: {
+                        color: currentStep === 1 ? "#2563eb" : currentStep === 2 ? "#059669" : "#9333ea"
+                      }
+                    }
+                  )
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-semibold text-gray-500", children: [
+                    "Étape ",
+                    currentStep,
+                    " sur 3"
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex gap-1", children: [1, 2, 3].map((step) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      className: "w-2 h-2 rounded-full",
+                      style: {
+                        backgroundColor: step === currentStep ? step === 1 ? "#3b82f6" : step === 2 ? "#10b981" : "#a855f7" : step < currentStep ? "#9ca3af" : "#e5e7eb"
+                      }
+                    },
+                    step
+                  )) })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "h3",
+                  {
+                    className: "text-xl sm:text-2xl font-bold",
+                    style: {
+                      color: currentStep === 1 ? "#1e40af" : currentStep === 2 ? "#047857" : "#7e22ce"
+                    },
+                    children: currentConfig.title
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: handleSkip,
+                className: "text-gray-400 hover:text-gray-600 transition-colors",
+                title: "Fermer le guide",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-6 h-6" })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-6", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-700 text-base sm:text-lg mb-4 leading-relaxed", children: currentConfig.description }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "p-4 rounded-r-lg border-l-4",
+                style: {
+                  backgroundColor: currentStep === 1 ? "#eff6ff" : currentStep === 2 ? "#f0fdf4" : "#faf5ff",
+                  borderColor: currentStep === 1 ? "#3b82f6" : currentStep === 2 ? "#10b981" : "#a855f7"
+                },
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-700", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "💡 Astuce:" }),
+                  " ",
+                  currentConfig.elementDescription
+                ] })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "button",
+              {
+                onClick: handlePrevious,
+                disabled: currentStep === 1,
+                className: `flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${currentStep === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$y, { className: "w-5 h-5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Précédent" })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+              currentStep === 1 && onSelectTicker && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "button",
+                {
+                  onClick: handleSelectTicker,
+                  className: "flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-5 h-5" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Ouvrir la sidebar" })
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "button",
+                {
+                  onClick: handleNext,
+                  className: "flex items-center gap-2 px-6 py-2 rounded-lg font-semibold transition-colors text-white",
+                  style: {
+                    backgroundColor: currentStep === 3 ? "#16a34a" : currentStep === 1 ? "#2563eb" : "#059669"
+                  },
+                  onMouseEnter: (e) => {
+                    e.currentTarget.style.opacity = "0.9";
+                  },
+                  onMouseLeave: (e) => {
+                    e.currentTarget.style.opacity = "1";
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: currentStep === 3 ? "Commencer" : "Suivant" }),
+                    currentStep < 3 && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-5 h-5" })
+                  ]
+                }
+              )
+            ] })
+          ] })
+        ]
+      }
+    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("style", { children: `
+        .demo-highlight {
+          position: relative;
+          z-index: 9999 !important;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3) !important;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+        }
+      ` })
+  ] });
+};
 function calculateTargetPrices(data, assumptions) {
   const baseYearData = data.find((d) => d.year === assumptions.baseYear) || data[data.length - 1];
   const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
@@ -56430,6 +56693,7 @@ function App() {
     console.log("   - Bouton ⚙️ Settings fonctionnel");
   }, []);
   const [showLanding, setShowLanding] = reactExports.useState(true);
+  const [showDemo, setShowDemo] = reactExports.useState(false);
   const [library, setLibrary] = reactExports.useState({});
   const [activeId, setActiveId] = reactExports.useState("");
   const [isInitialized, setIsInitialized] = reactExports.useState(false);
@@ -59769,7 +60033,14 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
   ] }) : null;
   if (!isInitialized) return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-screen text-slate-500", children: "Chargement..." });
   if (showLanding) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx(LandingPage, { onGetStarted: () => setShowLanding(false) });
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(LandingPage, { onGetStarted: () => {
+      setShowLanding(false);
+      setTimeout(() => {
+        if (!activeId || Object.keys(library).length === 0) {
+          setShowDemo(true);
+        }
+      }, 500);
+    } });
   }
   if (showAdmin) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed inset-0 z-50 bg-slate-900 pointer-events-auto", children: [
@@ -59785,6 +60056,15 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
     ] });
   }
   const profile = library[activeId] || DEFAULT_PROFILE;
+  reactExports.useEffect(() => {
+    const profileInfo = profile.info;
+    if (!showLanding && !showDemo && (!activeId || profileInfo.name === "Chargement...")) {
+      const timer = setTimeout(() => {
+        setShowDemo(true);
+      }, 1e3);
+      return () => clearTimeout(timer);
+    }
+  }, [showLanding, activeId, profile.info.name, showDemo, profile]);
   const handleUpdateProfile = (id, updates) => {
     setLibrary((prev) => {
       if (!prev[id]) return prev;
@@ -59949,7 +60229,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
             onUpdateProfile: handleUpdateProfile,
             onOpenSettings: () => setIsSettingsOpen(true)
           }
-        ) }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6", children: [
+        ) }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6", "data-demo": "features", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-3 order-2 lg:order-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2 px-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-700 flex items-center gap-2", children: [
@@ -60246,6 +60526,15 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           }
         },
         isSyncing: isAdvancedSyncForBulk ? isBulkSyncing : isLoading
+      }
+    ),
+    showDemo && (!activeId || profile.info.name === "Chargement...") && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      InteractiveDemo,
+      {
+        onClose: () => setShowDemo(false),
+        onSelectTicker: () => {
+          setIsSidebarOpen(true);
+        }
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(

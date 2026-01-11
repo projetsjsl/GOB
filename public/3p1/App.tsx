@@ -21,6 +21,7 @@ import { NotificationManager } from './components/Notification';
 import { SyncProgressBar } from './components/SyncProgressBar';
 import { LandingPage } from './components/LandingPage';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { InteractiveDemo } from './components/InteractiveDemo';
 import { AnnualData, Assumptions, CompanyInfo, Recommendation, AnalysisProfile } from './types';
 import { calculateRowRatios, calculateAverage, projectFutureValue, formatCurrency, formatPercent, calculateCAGR, calculateRecommendation, autoFillAssumptionsFromFMPData, isMutualFund, calculateHistoricalGrowth } from './utils/calculations';
 import { detectOutlierMetrics } from './utils/outlierDetection';
@@ -150,6 +151,7 @@ export default function App() {
 
     // --- GLOBAL STATE & PERSISTENCE ---
     const [showLanding, setShowLanding] = useState(true); // Show landing page by default
+    const [showDemo, setShowDemo] = useState(false); // Show interactive demo
     const [library, setLibrary] = useState<Record<string, AnalysisProfile>>({});
     const [activeId, setActiveId] = useState<string>('');
     const [isInitialized, setIsInitialized] = useState(false);
@@ -4489,7 +4491,15 @@ export default function App() {
 
     // Show landing page on first visit
     if (showLanding) {
-        return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+        return <LandingPage onGetStarted={() => {
+            setShowLanding(false);
+            // Afficher le démo après la landing page si aucun ticker n'est sélectionné
+            setTimeout(() => {
+                if (!activeId || Object.keys(library).length === 0) {
+                    setShowDemo(true);
+                }
+            }, 500);
+        }} />;
     }
 
     if (showAdmin) {
@@ -4513,6 +4523,18 @@ export default function App() {
     }
 
     const profile = library[activeId] || DEFAULT_PROFILE; // Ensure profile is always available
+    
+    // Afficher le démo si aucun ticker n'est sélectionné ou si les données ne sont pas chargées
+    useEffect(() => {
+        const profileInfo = profile.info;
+        if (!showLanding && !showDemo && (!activeId || profileInfo.name === 'Chargement...')) {
+            // Attendre un peu pour que l'interface se charge
+            const timer = setTimeout(() => {
+                setShowDemo(true);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [showLanding, activeId, profile.info.name, showDemo, profile]);
 
     // Handler générique pour mettre à jour un profil complet (utilisé par KPIDashboard)
     const handleUpdateProfile = (id: string, updates: Partial<AnalysisProfile>) => {
@@ -4704,7 +4726,7 @@ export default function App() {
                                 </Suspense>
                             </ErrorBoundary>
                         ) : (
-                            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6" data-demo="features">
 
                                 {/* LEFT COLUMN - MAIN DATA */}
                                 <div className="lg:col-span-3 order-2 lg:order-1">
@@ -4989,6 +5011,16 @@ export default function App() {
                 }}
                 isSyncing={isAdvancedSyncForBulk ? isBulkSyncing : isLoading}
             />
+
+            {/* Interactive Demo */}
+            {showDemo && (!activeId || profile.info.name === 'Chargement...') && (
+                <InteractiveDemo
+                    onClose={() => setShowDemo(false)}
+                    onSelectTicker={() => {
+                        setIsSidebarOpen(true);
+                    }}
+                />
+            )}
 
             {/* Restore Data Dialog */}
             <RestoreDataDialog

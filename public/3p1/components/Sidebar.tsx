@@ -264,7 +264,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
   };
 
   return (
-    <div className="bg-slate-900 text-white flex flex-col h-full border-r border-slate-800 shadow-xl w-full">
+    <div className="bg-slate-900 text-white flex flex-col h-full border-r border-slate-800 shadow-xl w-full" data-demo="sidebar">
       {/* App Title */}
       <div className="p-3 sm:p-4 border-b border-slate-800 bg-slate-950 cursor-help" title="Finance Pro 3p1\n\nApplication d'analyse fondamentale pour la gestion de portefeuille.\n\nFonctionnalités:\n• Analyse de valorisation sur 5 ans\n• Triangulation de la valeur (4 métriques)\n• KPI Dashboard multi-tickers\n• Snapshots et historique\n• Synchronisation avec FMP API">
         <div className="flex items-center gap-2 text-blue-400 font-bold text-base sm:text-lg">
