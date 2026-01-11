@@ -189,9 +189,15 @@ export const IntelliStocksTab: React.FC<TabProps> = memo((props) => {
         API_BASE_URL = '',
         selectedStock: selectedStockProp,
         setSelectedStock: setSelectedStockProp,
-        LucideIcon: LucideIconProp
+        LucideIcon: LucideIconProp,
+        emmaPopulateWatchlist
     } = props;
                 const apiBase = API_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+
+                // Safe fallback for emmaPopulateJLab function
+                const emmaPopulateJLab = emmaPopulateWatchlist ||
+                    (typeof window !== 'undefined' ? (window as any).emmaPopulateJLab : undefined) ||
+                    (() => console.log('📋 Emma Populate JLab - Feature coming soon'));
                 const [time, setTime] = useState(new Date());
                 const [internalSelectedStock, setInternalSelectedStock] = useState(selectedStockProp || 'AAPL');
                 const [timeframe, setTimeframe] = useState('1D');
