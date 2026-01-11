@@ -14,21 +14,50 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
     
     <!-- Tailwind CSS -->
-    <link rel="stylesheet" href="css/tailwind.css">
-    <!-- Note: tailwind.config supprimé car le CSS compilé contient déjà les styles personnalisés -->
-    <style>
-        /* Custom styles pour login.html - les classes Tailwind sont déjà dans tailwind.css */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Outfit"', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: {
+                            50: '#fbf7eb',
+                            100: '#f5ecd0',
+                            200: '#ebdcb6',
+                            300: '#dfbc6e',
+                            400: '#d9a843',
+                            500: '#d08f23',
+                            600: '#b46f19',
+                            700: '#905316',
+                            800: '#754316',
+                            900: '#613816',
+                        },
+                        dark: {
+                            900: '#050505',
+                            800: '#0a0a0a',
+                            700: '#121212',
+                            600: '#1a1a1a',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
         }
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        .animate-pulse-slow {
-            animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-    </style>
+    </script>
 
     <!-- 💾 SAFE STORAGE WRAPPER (Critical for Login) -->
     <script>
@@ -150,7 +179,7 @@
     </div>
 
     <!-- Main Container -->
-    <div class="glass-panel w-full max-w-md p-8 md:p-10 rounded-3xl relative z-10 mx-4 animate-float" style="max-width: 420px;">
+    <div class="glass-panel w-full max-w-[420px] p-8 md:p-10 rounded-3xl relative z-10 mx-4 animate-float">
         
         <!-- Header -->
         <div class="text-center mb-10">
@@ -309,81 +338,22 @@
                 errorMessage.classList.add('hidden');
 
                 try {
-                    const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
-                    const apiEndpoints = ['/api/auth'];
-                    if (isLocalhost) {
-                        apiEndpoints.push('http://127.0.0.1:3001/api/auth');
-                        apiEndpoints.push('http://localhost:3001/api/auth');
+                    const response = await fetch('/api/auth', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'login', username, password })
+                    });
+
+                    // Check for JSON response
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error("Réponse serveur invalide (non-JSON)");
                     }
 
-                    const tryLogin = async (url) => {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 15000);
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ action: 'login', username, password }),
-                            signal: controller.signal
-                        });
-                        clearTimeout(timeoutId);
+                    const data = await response.json();
 
-                        const contentType = response.headers.get('content-type') || '';
-                        if (!contentType.includes('application/json')) {
-                            const raw = await response.text();
-                            const snippet = raw ? raw.replace(/\s+/g, ' ').slice(0, 160) : '';
-                            throw new Error(`Réponse serveur invalide (status ${response.status})${snippet ? `: ${snippet}` : ''}`);
-                        }
-
-                        const data = await response.json();
-                        if (!response.ok || !data.success) {
-                            throw new Error(data.error || 'Identifiants incorrects');
-                        }
-                        return data;
-                    };
-
-                    let data = null;
-                    let lastError = null;
-                    for (const url of apiEndpoints) {
-                        try {
-                            data = await tryLogin(url);
-                            break;
-                        } catch (error) {
-                            lastError = error;
-                        }
-                    }
-
-                    if (!data) {
-                        if (isLocalhost) {
-                            const mockUser = {
-                                username: username || 'admin',
-                                role: 'admin',
-                                display_name: username || 'Admin Test',
-                                permissions: {
-                                    view_dashboard: true,
-                                    view_emma: true,
-                                    save_conversations: true,
-                                    view_own_history: true,
-                                    view_all_history: true
-                                }
-                            };
-                            const mockData = JSON.stringify(mockUser);
-                            try {
-                                if (window.__nativeSessionStorage) {
-                                    window.__nativeSessionStorage.setItem('gob-user', mockData);
-                                } else {
-                                    sessionStorage.setItem('gob-user', mockData);
-                                }
-                            } catch (e) {
-                                console.error('Storage write failed:', e);
-                                throw new Error("Impossible de sauvegarder la session (Storage bloqué)");
-                            }
-                            console.warn('⚠️ Mode local: session simulée (API indisponible)');
-                            window.location.href = '/beta-combined-dashboard.html?local=1';
-                            return;
-                        }
-
-                        const hint = 'Erreur serveur. Réessayez ou contactez un admin.';
-                        throw new Error(`${lastError?.message || 'Connexion échouée'}. ${hint}`);
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.error || 'Identifiants incorrects');
                     }
 
                     // --- Success ---
@@ -420,9 +390,7 @@
                     console.error('Login error:', error);
                     loginBtn.disabled = false;
                     loginBtn.innerHTML = '<span>Accéder au Portail</span><i class="iconoir-arrow-right"></i>';
-                    errorText.textContent = error.name === 'AbortError'
-                        ? 'Délai d\'attente dépassé, réessayez.'
-                        : error.message;
+                    errorText.textContent = error.message;
                     errorMessage.classList.remove('hidden');
                     
                     // Shake animation for error
