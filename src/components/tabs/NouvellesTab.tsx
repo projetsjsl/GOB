@@ -147,7 +147,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                 setIsLoadingNews(false);
             });
         }
-    }, [newsData.length, fetchNews, loading]); // Se déclenche quand newsData change ou au montage
+    }, [newsData, fetchNews, loading, isLoadingNews]); // Se déclenche quand newsData change ou au montage
     
     // BUG #1 FIX: Pagination et lazy loading pour éviter freeze
     const [displayedCount, setDisplayedCount] = useState(20); // Limiter à 20 articles initialement

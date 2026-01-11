@@ -335,6 +335,17 @@ export const BetaCombinedDashboard: React.FC = () => {
         return () => clearTimeout(timeoutId);
     }, [tickers, initialLoadComplete, fetchLatestNewsForTickers]);
 
+    // Get LucideIcon from window (available globally)
+    const LucideIcon = useMemo(() => {
+        if (typeof window !== 'undefined') {
+            return (window as any).LucideIcon || (window as any).IconoirIcon || 
+                   (({ name, className = '' }: { name: string; className?: string }) => 
+                       <span className={className}>{name}</span>);
+        }
+        return (({ name, className = '' }: { name: string; className?: string }) => 
+                <span className={className}>{name}</span>);
+    }, []);
+
     // Memoize tabProps to prevent unnecessary re-renders of children
     const tabProps = useMemo(() => ({
         isDarkMode,
@@ -388,14 +399,16 @@ export const BetaCombinedDashboard: React.FC = () => {
         showTemperatureEditor,
         setShowTemperatureEditor,
         showLengthEditor,
-        setShowLengthEditor
+        setShowLengthEditor,
+        LucideIcon
     }), [
         isDarkMode, tickers, stockData, newsData, tickerLatestNews, tickerMoveReasons,
         loading, lastUpdate, initialLoadComplete, API_BASE_URL, fetchStockData, showMessage,
         getCompanyLogo, emmaPopulateWatchlist, fetchNews, fetchLatestNewsForTickers,
         loadTickersFromSupabase, refreshAllStocks, seekingAlphaData, seekingAlphaStockData,
         selectedStock, teamTickers, watchlistTickers, apiStatus, processLog, emmaConnected,
-        prefillMessage, autoSend, showPromptEditor, showTemperatureEditor, showLengthEditor
+        prefillMessage, autoSend, showPromptEditor, showTemperatureEditor, showLengthEditor,
+        LucideIcon
     ]);
 
     // Debounced window sync - only updates window object every 100ms max

@@ -2497,7 +2497,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         };
 
         // Actualités via endpoint unifié (FMP, Finnhub, Finviz, RSS) - AMÉLIORÉ avec sources québécoises
-        const fetchNews = async () => {
+        const fetchNews = async (context = 'general', limit = 100) => {
+            const newsContextToUse = context || newsContext || 'general';
+            const limitToUse = limit || 100;
             addLog('📰 Démarrage récupération actualités via endpoint unifié...', 'info');
 
             // Vérifier d'abord les données préchargées depuis la page de login
@@ -2550,11 +2552,11 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
             try {
                 // Utiliser l'endpoint unifié qui agrège toutes les sources avec déduplication et scoring
-                addLog(`🔍 Récupération depuis endpoint unifié (contexte: ${newsContext})...`, 'info');
+                addLog(`🔍 Récupération depuis endpoint unifié (contexte: ${newsContextToUse})...`, 'info');
 
                 // ✅ FIX BUG-017: Timeout réduit à 8s (au lieu de 10s) pour éviter les timeouts
                 const response = await fetchWithTimeoutAndRetry(
-                    `${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=100&context=${newsContext}`,
+                    `${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=${limitToUse}&context=${newsContextToUse}`,
                     {},
                     8000, // 8 secondes max (recommandation rapport externe: 5-8s)
                     1
@@ -2590,7 +2592,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
                     setNewsData(sortedNews);
                     setFilteredNews(sortedNews);
-                    addLog(`✅ ${sortedNews.length} actualités chargées depuis ${data.sources?.join(', ') || 'sources multiples'} (contexte: ${newsContext})`, 'success');
+                    addLog(`✅ ${sortedNews.length} actualités chargées depuis ${data.sources?.join(', ') || 'sources multiples'} (contexte: ${newsContextToUse})`, 'success');
 
                     // Sauvegarder dans le cache Supabase (write-through)
                     try {
@@ -7490,7 +7492,11 @@ STRUCTURE JSON OBLIGATOIRE:
                             {loading ? 'Actualisation...' : 'Actualiser Stocks'}
                         </button>
                         <button
-                            onClick={fetchNews}
+                            onClick={() => {
+                                if (typeof fetchNews === 'function') {
+                                    fetchNews('general', 100);
+                                }
+                            }}
                             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                         >
                             Actualiser News
@@ -23924,6 +23930,9 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
         // COMPOSANT NOUVELLES
         // ============================================================================
         const NouvellesTab = () => {
+            // ✅ FIX: Accéder aux variables du scope parent
+            const LucideIcon = typeof window !== 'undefined' ? (window.LucideIcon || window.IconoirIcon) : (({ name, className = '' }) => <span className={className}>{name}</span>);
+            
             const [localFrenchOnly, setLocalFrenchOnly] = useState(false);
             const [selectedSource, setSelectedSource] = useState('all'); // Filtre source
             const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marché
@@ -23934,24 +23943,19 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
             // ✅ FIX: Charger les news automatiquement si vides quand l'onglet devient actif
             React.useEffect(() => {
                 if (activeTab === 'nouvelles-main' || activeTab === 'nouvelles') {
-                    if (!newsData || newsData.length === 0) {
+                    if ((!newsData || newsData.length === 0) && typeof fetchNews === 'function' && !loading && !isLoadingNews) {
                         console.log('📰 NouvellesTab: newsData vide, chargement automatique...');
                         setIsLoadingNews(true);
-                        // Utiliser fetchNews du scope parent
-                        if (typeof fetchNews === 'function') {
-                            fetchNews().then(() => {
-                                setIsLoadingNews(false);
-                            }).catch(err => {
-                                console.error('Erreur chargement news:', err);
-                                setIsLoadingNews(false);
-                            });
-                        } else {
-                            console.warn('⚠️ fetchNews non disponible dans NouvellesTab');
+                        // Utiliser fetchNews du scope parent avec paramètres
+                        fetchNews('general', 100).then(() => {
                             setIsLoadingNews(false);
-                        }
+                        }).catch(err => {
+                            console.error('Erreur chargement news:', err);
+                            setIsLoadingNews(false);
+                        });
                     }
                 }
-            }, [activeTab, newsData]);
+            }, [activeTab, newsData, fetchNews, loading, isLoadingNews]);
 
             // Listes de filtres
             const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
@@ -24159,7 +24163,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 🇫🇷 Français {localFrenchOnly && '✓'}
                             </button>
                             <button
-                                onClick={fetchNews}
+                                onClick={() => {
+                                    if (typeof fetchNews === 'function') {
+                                        fetchNews('general', 100);
+                                    }
+                                }}
                                 disabled={loading}
                                 className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 ${isDarkMode
                                     ? 'bg-gray-800 hover:bg-gray-700 text-white'
@@ -24423,7 +24431,11 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                 <button
                                     onClick={() => {
                                         setIsLoadingNews(true);
-                                        fetchNews().then(() => setIsLoadingNews(false)).catch(() => setIsLoadingNews(false));
+                                        if (typeof fetchNews === 'function') {
+                                            fetchNews('general', 100).then(() => setIsLoadingNews(false)).catch(() => setIsLoadingNews(false));
+                                        } else {
+                                            setIsLoadingNews(false);
+                                        }
                                     }}
                                     className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
                                         isDarkMode
@@ -24436,8 +24448,13 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                             </div>
                         ) : (
                             localFilteredNews.map((article, index) => {
-                                const newsIconData = getNewsIcon(article.title, article.description, article.sentiment);
-                                const credibility = getSourceCredibility(article.source?.name);
+                                // ✅ FIX: Utiliser les fonctions helper du scope parent
+                                const newsIconData = typeof getNewsIcon === 'function' 
+                                    ? getNewsIcon(article.title, article.description, article.sentiment)
+                                    : { icon: 'Newspaper', color: 'text-gray-500' };
+                                const credibility = typeof getSourceCredibility === 'function'
+                                    ? getSourceCredibility(article.source?.name)
+                                    : 50;
 
                                 return (
                                     <div
@@ -24469,17 +24486,17 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                                 : 'text-blue-600 hover:text-blue-700'
                                                                 }`}
                                                         >
-                                                            {cleanText(article.title)}
+                                                            {typeof cleanText === 'function' ? cleanText(article.title) : (article.title || '')}
                                                         </a>
                                                     ) : (
-                                                        cleanText(article.title)
+                                                        typeof cleanText === 'function' ? cleanText(article.title) : (article.title || '')
                                                     )}
                                                 </h3>
 
                                                 {/* Description */}
                                                 <p className={`text-base mb-4 leading-relaxed transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                     }`}>
-                                                    {cleanText(article.description)}
+                                                    {typeof cleanText === 'function' ? cleanText(article.description) : (article.description || '')}
                                                 </p>
 
                                                 {/* Métadonnées */}
@@ -24503,14 +24520,14 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                                                     </span>
 
                                                     {/* Badge français */}
-                                                    {isFrenchArticle(article) && (
+                                                    {typeof isFrenchArticle === 'function' && isFrenchArticle(article) && (
                                                         <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30">
                                                             🇫🇷 FR
                                                         </span>
                                                     )}
 
                                                     {/* Bouton Résumé avec Emma */}
-                                                    {article.url && (
+                                                    {article.url && typeof summarizeWithEmma === 'function' && (
                                                         <button
                                                             onClick={() => summarizeWithEmma(article.url, article.title)}
                                                             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 hover:scale-105 ${isDarkMode
@@ -24535,6 +24552,10 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                 </div>
             );
         };
+        
+        // ✅ FIX: S'assurer que NouvellesTab a accès aux fonctions helper via closure
+        // Les fonctions isFrenchArticle, cleanText, getNewsIcon, getSourceCredibility, summarizeWithEmma
+        // sont déjà définies dans le scope parent de BetaCombinedDashboard et sont accessibles via closure
 
         // Exposer NouvellesTab globalement pour DashboardGridWrapper
         window.NouvellesTab = NouvellesTab;
