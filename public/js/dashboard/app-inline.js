@@ -23891,6 +23891,12 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
 
             // Filtrer les nouvelles à l'affichage avec système de fallback intelligent
             React.useEffect(() => {
+                // ✅ FIX: Vérifier que newsData existe et est un tableau
+                if (!newsData || !Array.isArray(newsData)) {
+                    setLocalFilteredNews([]);
+                    return;
+                }
+                
                 let filtered = newsData;
                 let hasExactMatches = true;
 
@@ -28344,7 +28350,16 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     {activeTab === 'marches-nouvelles' && <NouvellesTab key={`marches-nouvelles-${tabMountKeys['nouvelles'] || 0}`} />}
 
                     {/* NOUVELLES Main Tab */}
-                    {activeTab === 'nouvelles-main' && <NouvellesTab key={`nouvelles-main-${tabMountKeys['nouvelles'] || 0}`} />}
+                    {activeTab === 'nouvelles-main' && (
+                        typeof window.NouvellesTab !== 'undefined' ? (
+                            <window.NouvellesTab key={`nouvelles-main-${tabMountKeys['nouvelles'] || 0}`} />
+                        ) : (
+                            <div className="p-10 text-center">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                                <p className="text-gray-400">Chargement de NouvellesTab...</p>
+                            </div>
+                        )
+                    )}
 
                     {/* TITRES Sub-tabs */}
                     {activeTab === 'titres-portfolio' && <StocksNewsTab tickerSource="portfolio" />}

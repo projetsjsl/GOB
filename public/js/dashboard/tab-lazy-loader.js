@@ -48,6 +48,7 @@
         'marches-yield': '/js/dashboard/components/tabs/YieldCurveTab.js',
         'marches-nouvelles': '/js/dashboard/components/tabs/StocksNewsTab.js',
         'nouvelles': '/js/dashboard/components/tabs/StocksNewsTab.js',
+        'nouvelles-main': null, // NouvellesTab est déjà dans app-inline.js, pas besoin de charger
         
         // Titres tabs
         'stocks-news': '/js/dashboard/components/tabs/StocksNewsTab.js',
@@ -91,6 +92,12 @@
      */
     function loadTabScript(tabId) {
         const scriptPath = TAB_SCRIPTS[tabId];
+        
+        // Si scriptPath est null, le composant est déjà disponible (ex: dans app-inline.js)
+        if (scriptPath === null) {
+            console.log(`[LazyLoader] Tab ${tabId} already available (no script needed)`);
+            return Promise.resolve();
+        }
         
         if (!scriptPath) {
             console.log(`[LazyLoader] No script mapping for tab: ${tabId}`);
