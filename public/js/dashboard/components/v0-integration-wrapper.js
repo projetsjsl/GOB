@@ -76,7 +76,23 @@
             if (!dep) return reject(new Error(`Dépendance inconnue: ${name}`));
             if (window[dep.global]) return resolve(window[dep.global]);
             if (loadingState.dependencies[name] === 'loading') {
-                const check = setInterval(() => { if (window[dep.global]) { clearInterval(check); resolve(window[dep.global]); } }, 100);
+                // OPTIMIZATION: Use requestAnimationFrame instead of 100ms interval
+                let rafId = null;
+                let lastCheck = Date.now();
+                const checkInterval = 200; // Increased from 100ms to 200ms
+                const checkDependency = () => {
+                    const now = Date.now();
+                    if (now - lastCheck >= checkInterval) {
+                        if (window[dep.global]) {
+                            if (rafId) cancelAnimationFrame(rafId);
+                            resolve(window[dep.global]);
+                            return;
+                        }
+                        lastCheck = now;
+                    }
+                    rafId = requestAnimationFrame(checkDependency);
+                };
+                rafId = requestAnimationFrame(checkDependency);
                 return;
             }
             loadingState.dependencies[name] = 'loading';

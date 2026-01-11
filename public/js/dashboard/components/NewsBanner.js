@@ -73,10 +73,24 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
 
     useEffect(() => {
         if (!isVisible || news.length === 0 || isPaused) return;
-        const timer = setInterval(() => {
-            setTimeRemaining((prev) => prev <= 0.1 ? 5 : prev - 0.1);
-        }, 100);
-        return () => clearInterval(timer);
+        // OPTIMIZATION: Use requestAnimationFrame for smoother updates, fallback to 200ms interval
+        let rafId = null;
+        let lastUpdate = Date.now();
+        const updateInterval = 200; // Reduced from 100ms to 200ms for better performance
+        
+        const updateTimer = () => {
+            const now = Date.now();
+            if (now - lastUpdate >= updateInterval) {
+                setTimeRemaining((prev) => prev <= 0.1 ? 5 : prev - 0.1);
+                lastUpdate = now;
+            }
+            rafId = requestAnimationFrame(updateTimer);
+        };
+        
+        rafId = requestAnimationFrame(updateTimer);
+        return () => {
+            if (rafId) cancelAnimationFrame(rafId);
+        };
     }, [isVisible, news.length, isPaused, currentNewsIndex]);
 
     useEffect(() => {
