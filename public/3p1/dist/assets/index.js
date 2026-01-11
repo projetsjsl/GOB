@@ -9151,6 +9151,77 @@ Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap && inf
     ] })
   ] });
 };
+const DataColorLegend = () => {
+  const [isExpanded, setIsExpanded] = reactExports.useState(true);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white rounded-lg shadow border border-gray-200 mb-3 sm:mb-4 p-3 sm:p-4", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "button",
+      {
+        onClick: () => setIsExpanded(!isExpanded),
+        className: "w-full flex items-center justify-between text-left",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-5 h-5 text-blue-600" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm sm:text-base font-semibold text-gray-700", children: "Légende des couleurs des données" })
+          ] }),
+          isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-5 h-5 text-gray-500" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-5 h-5 text-gray-500" })
+        ]
+      }
+    ),
+    isExpanded && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-green-100 border-2 border-green-400 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-700 font-bold text-xs", children: "✓" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-green-800 text-sm mb-1", children: "Fond VERT" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-green-700", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données FMP vérifiées" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+              `Données récupérées directement depuis l'API FMP, non modifiées. Ces données sont considérées comme "officielles" et vérifiées.`
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-blue-100 border-2 border-blue-400 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-blue-700 font-bold text-xs", children: "~" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-blue-800 text-sm mb-1", children: "Fond BLEU" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données FMP ajustées" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+              "Données provenant de FMP mais ajustées/mergées avec des valeurs existantes. Ces données ne sont pas 100% vérifiées car elles ont été modifiées lors du merge."
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-orange-100 border-2 border-orange-400 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-700 font-bold text-xs", children: "✎" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-orange-800 text-sm mb-1", children: "Fond ORANGE" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-orange-700", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données manuelles" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+              "Valeur modifiée manuellement par l'utilisateur. Les modifications manuelles sont préservées lors de la synchronisation."
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-gray-100 border-2 border-gray-400 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 font-bold text-xs", children: "=" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-gray-800 text-sm mb-1", children: "Fond GRIS" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-700", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données calculées" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
+              "Valeur calculée automatiquement (ratios P/E, P/CF, P/BV, rendements, etc.). Ces données ne proviennent pas directement de FMP."
+            ] })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 p-2 bg-blue-50 border-l-4 border-blue-400 rounded", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-800", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "💡 Note:" }),
+        " Cliquez sur une cellule avec fond vert ou bleu pour la modifier. La modification marquera automatiquement la valeur comme manuelle (fond orange)."
+      ] }) })
+    ] })
+  ] });
+};
 const EditableCell = ({ value, onCommit, min: min2 = -Infinity, id, autoFetched = false, dataSource }) => {
   const [localValue, setLocalValue] = reactExports.useState(value.toString());
   const actualDataSource = dataSource || (autoFetched ? "fmp-adjusted" : "manual");
@@ -9239,88 +9310,91 @@ Cliquez pour modifier manuellement. La modification marquera cette valeur comme 
   );
 };
 const HistoricalTable = ({ data, onUpdateRow }) => {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto bg-white rounded-lg shadow border border-gray-200 mb-4 sm:mb-6 print-break-inside-avoid", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "min-w-full text-xs sm:text-sm text-right", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("thead", { className: "bg-slate-100 text-gray-600 font-semibold uppercase text-[10px] sm:text-xs border-b-2 border-slate-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 sm:px-3 py-2 sm:py-3 text-left sticky left-0 bg-slate-100 z-10 cursor-help", title: "Année fiscale\\n\\nAnnée de référence pour les données financières.\\n\\nLes données sont organisées par année fiscale complète.", children: "Année" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-blue-50 text-blue-800 cursor-help", colSpan: 2, title: "Prix de l'action\\n\\n• Prix Haut: Prix maximum observé durant l'année\\n• Prix Bas: Prix minimum observé durant l'année\\n\\nSource: FMP API (historical-price-full)\\n\\nUtilisés pour:\\n• Calcul des ratios P/E, P/CF, P/BV\\n• Calcul du Yield\\n• Détermination du prix plancher historique", children: "Prix" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-green-50 text-green-800 cursor-help", colSpan: 3, title: "Cash Flow par Action (CFA)\\n\\nFlux de trésorerie opérationnel par action.\\n\\nSource: FMP API (cash-flow-statement)\\n\\n• CF/Act: Cash Flow par action (éditable)\\n• P/CF (H): Ratio Prix/Cash Flow au prix haut\\n• P/CF (B): Ratio Prix/Cash Flow au prix bas\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode P/CF)\\n• Évaluation de la génération de cash", children: "Cash Flow" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-yellow-50 text-yellow-800 cursor-help", colSpan: 2, title: "Dividendes par Action\\n\\nSomme des dividendes versés par année fiscale.\\n\\nSource: FMP API (key-metrics + financial-growth)\\n\\n• Div/Act: Dividende par action (éditable)\\n• Rend. %: Rendement en dividendes (Div / Prix Bas)\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode Yield)\\n• Calcul du rendement total (incluant dividendes)", children: "Dividendes" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-purple-50 text-purple-800 cursor-help", colSpan: 3, title: "Valeur Comptable par Action (BV)\\n\\nValeur comptable (actif net) par action.\\n\\nSource: FMP API (balance-sheet-statement)\\n\\n• Val/Act: Book Value par action (éditable)\\n• P/BV (H): Ratio Prix/Valeur Comptable au prix haut\\n• P/BV (B): Ratio Prix/Valeur Comptable au prix bas\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode P/BV)\\n• Évaluation de la valeur intrinsèque", children: "Valeur Comptable (BV)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-red-50 text-red-800 cursor-help", colSpan: 3, title: "Bénéfice par Action (EPS)\\n\\nBénéfice net par action (données annuelles auditées).\\n\\nSource: FMP API (income-statement)\\n\\n• EPS: Earnings per Share (éditable)\\n• P/E (H): Ratio Prix/Bénéfice au prix haut\\n• P/E (B): Ratio Prix/Bénéfice au prix bas\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode P/E)\\n• Calcul du JPEGY\\n• Évaluation principale", children: "Earnings (EPS)" })
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 sm:mb-6 print-break-inside-avoid", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(DataColorLegend, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto bg-white rounded-lg shadow border border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "min-w-full text-xs sm:text-sm text-right", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("thead", { className: "bg-slate-100 text-gray-600 font-semibold uppercase text-[10px] sm:text-xs border-b-2 border-slate-200", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 sm:px-3 py-2 sm:py-3 text-left sticky left-0 bg-slate-100 z-10 cursor-help", title: "Année fiscale\\n\\nAnnée de référence pour les données financières.\\n\\nLes données sont organisées par année fiscale complète.", children: "Année" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-blue-50 text-blue-800 cursor-help", colSpan: 2, title: "Prix de l'action\\n\\n• Prix Haut: Prix maximum observé durant l'année\\n• Prix Bas: Prix minimum observé durant l'année\\n\\nSource: FMP API (historical-price-full)\\n\\nUtilisés pour:\\n• Calcul des ratios P/E, P/CF, P/BV\\n• Calcul du Yield\\n• Détermination du prix plancher historique", children: "Prix" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-green-50 text-green-800 cursor-help", colSpan: 3, title: "Cash Flow par Action (CFA)\\n\\nFlux de trésorerie opérationnel par action.\\n\\nSource: FMP API (cash-flow-statement)\\n\\n• CF/Act: Cash Flow par action (éditable)\\n• P/CF (H): Ratio Prix/Cash Flow au prix haut\\n• P/CF (B): Ratio Prix/Cash Flow au prix bas\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode P/CF)\\n• Évaluation de la génération de cash", children: "Cash Flow" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-yellow-50 text-yellow-800 cursor-help", colSpan: 2, title: "Dividendes par Action\\n\\nSomme des dividendes versés par année fiscale.\\n\\nSource: FMP API (key-metrics + financial-growth)\\n\\n• Div/Act: Dividende par action (éditable)\\n• Rend. %: Rendement en dividendes (Div / Prix Bas)\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode Yield)\\n• Calcul du rendement total (incluant dividendes)", children: "Dividendes" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-purple-50 text-purple-800 cursor-help", colSpan: 3, title: "Valeur Comptable par Action (BV)\\n\\nValeur comptable (actif net) par action.\\n\\nSource: FMP API (balance-sheet-statement)\\n\\n• Val/Act: Book Value par action (éditable)\\n• P/BV (H): Ratio Prix/Valeur Comptable au prix haut\\n• P/BV (B): Ratio Prix/Valeur Comptable au prix bas\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode P/BV)\\n• Évaluation de la valeur intrinsèque", children: "Valeur Comptable (BV)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-red-50 text-red-800 cursor-help", colSpan: 3, title: "Bénéfice par Action (EPS)\\n\\nBénéfice net par action (données annuelles auditées).\\n\\nSource: FMP API (income-statement)\\n\\n• EPS: Earnings per Share (éditable)\\n• P/E (H): Ratio Prix/Bénéfice au prix haut\\n• P/E (B): Ratio Prix/Bénéfice au prix bas\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode P/E)\\n• Calcul du JPEGY\\n• Évaluation principale", children: "Earnings (EPS)" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "text-[9px] sm:text-[10px] text-gray-500", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 sm:px-3 py-1 text-left sticky left-0 bg-slate-100 z-10" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-1 bg-blue-50/50 cursor-help", title: "Prix Haut\\n\\nPrix maximum observé durant l'année.\\nSource: FMP API (historical-price-full)", children: "Haut" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-1 bg-blue-50/50 cursor-help", title: "Prix Bas\\n\\nPrix minimum observé durant l'année.\\nSource: FMP API (historical-price-full)", children: "Bas" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "Cash Flow par Action (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).", children: "CF/Act" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "P/CF au Prix Haut\\n\\nCalculé: Prix Haut / Cash Flow par Action\\n\\nRatio calculé automatiquement.", children: "P/CF (H)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "P/CF au Prix Bas\\n\\nCalculé: Prix Bas / Cash Flow par Action\\n\\nRatio calculé automatiquement.", children: "P/CF (B)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-yellow-50/50 cursor-help", title: "Dividende par Action (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).", children: "Div/Act" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-yellow-50/50 cursor-help", title: "Rendement en Dividendes (%)\\n\\nCalculé: (Dividende / Prix Bas) × 100\\n\\nRatio calculé automatiquement.", children: "Rend. %" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "Book Value par Action (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).", children: "Val/Act" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "P/BV au Prix Haut\\n\\nCalculé: Prix Haut / Book Value par Action\\n\\nRatio calculé automatiquement.", children: "P/BV (H)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "P/BV au Prix Bas\\n\\nCalculé: Prix Bas / Book Value par Action\\n\\nRatio calculé automatiquement.", children: "P/BV (B)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "Earnings per Share (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).", children: "EPS" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "P/E au Prix Haut\\n\\nCalculé: Prix Haut / Earnings per Share\\n\\nRatio calculé automatiquement.", children: "P/E (H)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "P/E au Prix Bas\\n\\nCalculé: Prix Bas / Earnings per Share\\n\\nRatio calculé automatiquement.", children: "P/E (B)" })
+        ] })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "text-[9px] sm:text-[10px] text-gray-500", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 sm:px-3 py-1 text-left sticky left-0 bg-slate-100 z-10" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-1 bg-blue-50/50 cursor-help", title: "Prix Haut\\n\\nPrix maximum observé durant l'année.\\nSource: FMP API (historical-price-full)", children: "Haut" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-1 bg-blue-50/50 cursor-help", title: "Prix Bas\\n\\nPrix minimum observé durant l'année.\\nSource: FMP API (historical-price-full)", children: "Bas" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "Cash Flow par Action (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).", children: "CF/Act" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "P/CF au Prix Haut\\n\\nCalculé: Prix Haut / Cash Flow par Action\\n\\nRatio calculé automatiquement.", children: "P/CF (H)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "P/CF au Prix Bas\\n\\nCalculé: Prix Bas / Cash Flow par Action\\n\\nRatio calculé automatiquement.", children: "P/CF (B)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-yellow-50/50 cursor-help", title: "Dividende par Action (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).", children: "Div/Act" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-yellow-50/50 cursor-help", title: "Rendement en Dividendes (%)\\n\\nCalculé: (Dividende / Prix Bas) × 100\\n\\nRatio calculé automatiquement.", children: "Rend. %" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "Book Value par Action (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).", children: "Val/Act" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "P/BV au Prix Haut\\n\\nCalculé: Prix Haut / Book Value par Action\\n\\nRatio calculé automatiquement.", children: "P/BV (H)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "P/BV au Prix Bas\\n\\nCalculé: Prix Bas / Book Value par Action\\n\\nRatio calculé automatiquement.", children: "P/BV (B)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "Earnings per Share (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).", children: "EPS" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "P/E au Prix Haut\\n\\nCalculé: Prix Haut / Earnings per Share\\n\\nRatio calculé automatiquement.", children: "P/E (H)" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "P/E au Prix Bas\\n\\nCalculé: Prix Bas / Earnings per Share\\n\\nRatio calculé automatiquement.", children: "P/E (B)" })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { className: "divide-y divide-gray-100", children: data.map((row, idx) => {
-      const ratios = calculateRowRatios(row);
-      const isFuture = row.year >= (/* @__PURE__ */ new Date()).getFullYear() + 1;
-      const rowClass = isFuture ? "bg-slate-50 italic" : "hover:bg-gray-50";
-      return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: rowClass, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 sm:px-3 py-1.5 sm:py-2 font-bold text-left text-gray-700 sticky left-0 bg-white border-r z-10 text-xs sm:text-sm", children: row.year }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-1.5 sm:px-2 py-1.5 sm:py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceHigh-${idx}`, value: row.priceHigh, onCommit: (v) => onUpdateRow(idx, "priceHigh", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceLow-${idx}`, value: row.priceLow, onCommit: (v) => onUpdateRow(idx, "priceLow", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-green-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-cashFlowPerShare-${idx}`, value: row.cashFlowPerShare, onCommit: (v) => onUpdateRow(idx, "cashFlowPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/CF au Prix Haut: ${ratios.pcfHigh.toFixed(1)}x
+      /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { className: "divide-y divide-gray-100", children: data.map((row, idx) => {
+        const ratios = calculateRowRatios(row);
+        const isFuture = row.year >= (/* @__PURE__ */ new Date()).getFullYear() + 1;
+        const rowClass = isFuture ? "bg-slate-50 italic" : "hover:bg-gray-50";
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: rowClass, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 sm:px-3 py-1.5 sm:py-2 font-bold text-left text-gray-700 sticky left-0 bg-white border-r z-10 text-xs sm:text-sm", children: row.year }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-1.5 sm:px-2 py-1.5 sm:py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceHigh-${idx}`, value: row.priceHigh, onCommit: (v) => onUpdateRow(idx, "priceHigh", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-blue-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceLow-${idx}`, value: row.priceLow, onCommit: (v) => onUpdateRow(idx, "priceLow", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-green-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-cashFlowPerShare-${idx}`, value: row.cashFlowPerShare, onCommit: (v) => onUpdateRow(idx, "cashFlowPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/CF au Prix Haut: ${ratios.pcfHigh.toFixed(1)}x
 
 Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
 
 = ${ratios.pcfHigh.toFixed(1)}x`, children: ratios.pcfHigh.toFixed(1) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `P/CF au Prix Bas: ${ratios.pcfLow.toFixed(1)}x
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `P/CF au Prix Bas: ${ratios.pcfLow.toFixed(1)}x
 
 Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
 
 = ${ratios.pcfLow.toFixed(1)}x`, children: ratios.pcfLow.toFixed(1) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-yellow-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-dividendPerShare-${idx}`, value: row.dividendPerShare, onCommit: (v) => onUpdateRow(idx, "dividendPerShare", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `Rendement au Prix Bas: ${ratios.yieldHigh.toFixed(2)}%
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-yellow-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-dividendPerShare-${idx}`, value: row.dividendPerShare, onCommit: (v) => onUpdateRow(idx, "dividendPerShare", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `Rendement au Prix Bas: ${ratios.yieldHigh.toFixed(2)}%
 
 Calculé: (Dividende (${row.dividendPerShare.toFixed(2)}) / Prix Bas (${row.priceLow.toFixed(2)})) × 100
 
 = ${ratios.yieldHigh.toFixed(2)}%
 
 Le rendement est calculé au prix bas pour obtenir le rendement maximum.`, children: [
-          ratios.yieldHigh.toFixed(2),
-          "%"
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-purple-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-bookValuePerShare-${idx}`, value: row.bookValuePerShare, onCommit: (v) => onUpdateRow(idx, "bookValuePerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/BV au Prix Haut: ${ratios.pbvHigh.toFixed(1)}x
+            ratios.yieldHigh.toFixed(2),
+            "%"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-purple-50/30 border-r", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-bookValuePerShare-${idx}`, value: row.bookValuePerShare, onCommit: (v) => onUpdateRow(idx, "bookValuePerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/BV au Prix Haut: ${ratios.pbvHigh.toFixed(1)}x
 
 Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
 
 = ${ratios.pbvHigh.toFixed(1)}x`, children: ratios.pbvHigh.toFixed(1) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `P/BV au Prix Bas: ${ratios.pbvLow.toFixed(1)}x
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `P/BV au Prix Bas: ${ratios.pbvLow.toFixed(1)}x
 
 Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
 
 = ${ratios.pbvLow.toFixed(1)}x`, children: ratios.pbvLow.toFixed(1) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-red-50/30 border-r font-medium", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-earningsPerShare-${idx}`, value: row.earningsPerShare, onCommit: (v) => onUpdateRow(idx, "earningsPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/E au Prix Haut: ${ratios.peHigh.toFixed(1)}x
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 bg-red-50/30 border-r font-medium", children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-earningsPerShare-${idx}`, value: row.earningsPerShare, onCommit: (v) => onUpdateRow(idx, "earningsPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/E au Prix Haut: ${ratios.peHigh.toFixed(1)}x
 
 Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})
 
 = ${ratios.peHigh.toFixed(1)}x`, children: ratios.peHigh.toFixed(1) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/E au Prix Bas: ${ratios.peLow.toFixed(1)}x
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/E au Prix Bas: ${ratios.peLow.toFixed(1)}x
 
 Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})
 
 = ${ratios.peLow.toFixed(1)}x`, children: ratios.peLow.toFixed(1) })
-      ] }, row.year);
-    }) })
-  ] }) });
+        ] }, row.year);
+      }) })
+    ] }) })
+  ] });
 };
 function r(e) {
   var t, f, n = "";

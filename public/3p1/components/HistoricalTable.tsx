@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AnnualData } from '../types';
 import { calculateRowRatios } from '../utils/calculations';
+import { DataColorLegend } from './DataColorLegend';
 
 interface HistoricalTableProps {
   data: AnnualData[];
@@ -115,7 +116,12 @@ const EditableCell: React.FC<{
 export const HistoricalTable: React.FC<HistoricalTableProps> = ({ data, onUpdateRow }) => {
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200 mb-4 sm:mb-6 print-break-inside-avoid">
+    <div className="mb-4 sm:mb-6 print-break-inside-avoid">
+      {/* Légende des couleurs */}
+      <DataColorLegend />
+      
+      {/* Tableau historique */}
+      <div className="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
       <table className="min-w-full text-xs sm:text-sm text-right">
         <thead className="bg-slate-100 text-gray-600 font-semibold uppercase text-[10px] sm:text-xs border-b-2 border-slate-200">
           <tr>
@@ -189,6 +195,7 @@ export const HistoricalTable: React.FC<HistoricalTableProps> = ({ data, onUpdate
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };
