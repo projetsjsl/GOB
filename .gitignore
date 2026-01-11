@@ -8,6 +8,10 @@ yarn-error.log*
 dist/
 build/
 
+# Babel compiled files (generated during build)
+*.compiled.js
+public/js/dashboard/app-inline.compiled.js
+
 # Exception: Include compiled 3p1 assets for Vercel
 !public/3p1/dist/
 !public/3p1/dist/**
