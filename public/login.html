@@ -49,6 +49,7 @@
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     },
                     keyframes: {
                         float: {
@@ -108,10 +109,29 @@
 
         .glass-panel {
             background: rgba(18, 18, 18, 0.6);
-            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .pulse-delay {
+            animation-delay: 2s;
+        }
+
+        /* Message containers - hidden by default, flex when shown */
+        #caps-lock-warning,
+        #error-message,
+        #success-message {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #caps-lock-warning:not(.hidden),
+        #error-message:not(.hidden),
+        #success-message:not(.hidden) {
+            display: flex;
         }
 
         .input-gradient-border {
@@ -177,7 +197,7 @@
     <!-- Background Decor -->
     <div class="fixed inset-0 pointer-events-none z-0">
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gold-600/10 rounded-full blur-[100px] animate-pulse-slow"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px] animate-pulse-slow pulse-delay"></div>
     </div>
 
     <!-- Main Container -->
