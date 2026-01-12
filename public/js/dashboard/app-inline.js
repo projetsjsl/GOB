@@ -766,6 +766,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'yield-curve': { main: 'marches', sub: 'marches-yield' },
         'marches-nouvelles': { main: 'marches', sub: 'marches-nouvelles' }, // Keep for backwards compatibility
         'nouvelles': { main: 'nouvelles', sub: 'nouvelles-main' },
+        'nouvelles-main': { main: 'nouvelles', sub: 'nouvelles-main' },
+        'titres-stocks': { main: 'titres', sub: 'titres-portfolio' },
         'stocks-news': { main: 'titres', sub: 'titres-portfolio' },
         'dans-watchlist': { main: 'titres', sub: 'titres-watchlist' },
         'finance-pro': { main: 'titres', sub: 'titres-3p1' },
@@ -781,8 +783,9 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         'groupchat': { main: 'emma', sub: 'emma-group' },
         'terminal-emmaia': { main: 'emma', sub: 'emma-terminal' },
         'emmaia': { main: 'emma', sub: 'emma-live' },
-        'finvox': { main: 'emma', sub: 'emma-finvox' }
-        // Tests mappings removed
+        'finvox': { main: 'emma', sub: 'emma-finvox' },
+        // Legacy calendar mapping
+        'investing-calendar': { main: 'marches', sub: 'marches-calendar' }
     };
 
     // Default sub-tab for each main tab
@@ -28510,6 +28513,7 @@ Prête à accompagner l'équipe dans leurs décisions d'investissement ?`;
                     )}
 
                     {/* TITRES Sub-tabs */}
+                    {activeTab === 'titres-stocks' && <StocksNewsTab tickerSource="portfolio" />}
                     {activeTab === 'titres-portfolio' && <StocksNewsTab tickerSource="portfolio" />}
                     {activeTab === 'titres-watchlist' && <StocksNewsTab tickerSource="watchlist" />}
                     {activeTab === 'titres-seeking' && <SeekingAlphaTab

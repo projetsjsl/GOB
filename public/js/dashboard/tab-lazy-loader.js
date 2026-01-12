@@ -52,6 +52,7 @@
         
         // Titres tabs
         'stocks-news': '/js/dashboard/components/tabs/StocksNewsTab.js',
+        'titres-stocks': '/js/dashboard/components/tabs/StocksNewsTab.js',  // Alias for titres-portfolio
         'titres-portfolio': '/js/dashboard/components/tabs/StocksNewsTab.js',
         'titres-watchlist': '/js/dashboard/components/tabs/StocksNewsTab.js',  // Uses StocksNewsTab with watchlist view
         'seeking-alpha': '/js/dashboard/components/tabs/SeekingAlphaTab.js',

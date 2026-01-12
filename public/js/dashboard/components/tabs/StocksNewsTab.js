@@ -52,6 +52,9 @@ const StocksNewsTab = (props) => {
         const safeSetActiveTab = typeof setActiveTab === 'function' ? setActiveTab : () => {};
         const safeSetSelectedStock = typeof setSelectedStock === 'function' ? setSelectedStock : () => {};
 
+        // Extract tickerSource from props with fallback to 'portfolio'
+        const tickerSource = props.tickerSource ?? 'portfolio';
+
         // Fonction pour extraire la raison du mouvement depuis les news
         const extractMoveReason = (ticker, changePercent) => {
             // PRIORITÉ 1: Utiliser l'explication "Why Is It Moving?" de Finviz si disponible

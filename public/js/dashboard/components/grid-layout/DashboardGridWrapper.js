@@ -1149,9 +1149,12 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
             // Component-specific props
             const componentProps = {};
             if (config.component === 'StocksNewsTab' || config.component === 'SeekingAlphaTab') {
+                // Determine tickerSource from widget ID
+                const tickerSource = item.i === 'titres-watchlist' ? 'watchlist' : 'portfolio';
                 Object.assign(componentProps, {
                     tickers, stockData, newsData, loading, lastUpdate, selectedStock, setSelectedStock,
-                    loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers, getCompanyLogo
+                    loadTickersFromSupabase, fetchNews, refreshAllStocks, fetchLatestNewsForTickers, getCompanyLogo,
+                    tickerSource
                 });
                 if (config.component === 'SeekingAlphaTab') {
                     Object.assign(componentProps, {
