@@ -1,11 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { describe, test, expect, beforeEach, vi } from 'vitest';
 
 describe('AskEmmaTab Component', () => {
-  const mockSetState = jest.fn();
-  
+  const mockSetState = vi.fn();
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders Emma interface', () => {
@@ -14,7 +15,7 @@ describe('AskEmmaTab Component', () => {
   });
 
   test('handles API key input', () => {
-    const handleChange = jest.fn();
+    const handleChange = vi.fn();
     render(<input onChange={handleChange} placeholder="Clé API Gemini" />);
     const input = screen.getByPlaceholderText('Clé API Gemini');
     fireEvent.change(input, { target: { value: 'test-key' } });
@@ -28,7 +29,7 @@ describe('AskEmmaTab Component', () => {
   });
 
   test('handles message sending', () => {
-    const handleSubmit = jest.fn();
+    const handleSubmit = vi.fn();
     render(<button onClick={handleSubmit}>Envoyer</button>);
     fireEvent.click(screen.getByText('Envoyer'));
     expect(handleSubmit).toHaveBeenCalled();

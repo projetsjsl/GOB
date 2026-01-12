@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { describe, test, expect, vi } from 'vitest';
 
 describe('Briefing History Component', () => {
   const mockBriefing = {
@@ -28,7 +29,7 @@ describe('Briefing History Component', () => {
   });
 
   test('handles view button click', () => {
-    const handleView = jest.fn();
+    const handleView = vi.fn();
     render(<button onClick={handleView}>👁️ Voir</button>);
     fireEvent.click(screen.getByText('👁️ Voir'));
     expect(handleView).toHaveBeenCalled();

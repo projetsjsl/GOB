@@ -40,6 +40,14 @@
   const originalError = console.error;
   const originalDebug = console.debug;
 
+  // Map des méthodes originales pour éviter la récursion infinie
+  const originalMethods = {
+    log: originalLog,
+    warn: originalWarn,
+    error: originalError,
+    debug: originalDebug
+  };
+
   // Fonction pour logger conditionnel
   function conditionalLog(level, args) {
     if (isProduction) {
@@ -54,9 +62,9 @@
       // Sinon, ne rien logger en production
       return;
     }
-    
-    // En développement, logger normalement
-    const method = console[level] || originalLog;
+
+    // En développement, utiliser la méthode ORIGINALE (pas l'overridée)
+    const method = originalMethods[level] || originalLog;
     method.apply(console, args);
   }
 

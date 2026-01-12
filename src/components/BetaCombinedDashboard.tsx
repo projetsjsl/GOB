@@ -70,7 +70,7 @@ export const BetaCombinedDashboard: React.FC = () => {
 
     // Fonction utilitaire: afficher message toast - memoized
     const showMessage = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
-        if (process.env.NODE_ENV === 'development') {
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
             console.log(`[${type.toUpperCase()}] ${message}`);
         }
     }, []);
@@ -82,7 +82,7 @@ export const BetaCombinedDashboard: React.FC = () => {
 
     // Fonction utilitaire: Emma populate watchlist (placeholder) - memoized
     const emmaPopulateWatchlist = useCallback(async () => {
-        if (process.env.NODE_ENV === 'development') {
+        if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
             console.log('Emma populate watchlist appelé');
         }
     }, []);

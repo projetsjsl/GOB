@@ -1,6 +1,40 @@
 // @ts-nocheck
-import React, { useState, useEffect, memo, useRef, useMemo } from 'react';
+import React, { useState, useEffect, memo, useRef, useMemo, useCallback } from 'react';
 import type { TabProps } from '../../types';
+
+// ✅ FIX: Move helper functions OUTSIDE component to prevent recreating them on every render
+const isFrenchArticle = (article: any) => {
+    const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
+    const frenchIndicators = ['le ', 'la ', 'les ', 'un ', 'une ', 'des ', 'du ', 'de la ', 'au ', 'aux ',
+        'est ', 'sont ', 'pour ', 'dans ', 'avec ', 'sur ', 'par ', 'qui ', 'que ',
+        'québec', 'montréal', 'canada', 'français', 'économie', 'marchés'];
+    return frenchIndicators.some(indicator => text.includes(indicator));
+};
+
+const matchesSource = (articleSource: string, selected: string) => {
+    if (!articleSource || !selected) return false;
+    const source = articleSource.toLowerCase();
+    const sel = selected.toLowerCase();
+
+    const sourceVariations: Record<string, string[]> = {
+        'bloomberg': ['bloomberg', 'bloomberg.com', 'bloomberg news'],
+        'reuters': ['reuters', 'reuters.com', 'thomson reuters'],
+        'wsj': ['wsj', 'wall street journal', 'the wall street journal', 'wsj.com'],
+        'cnbc': ['cnbc', 'cnbc.com'],
+        'marketwatch': ['marketwatch', 'marketwatch.com', 'market watch'],
+        'la presse': ['la presse', 'lapresse', 'lapresse.ca', 'presse'],
+        'les affaires': ['les affaires', 'lesaffaires', 'lesaffaires.com', 'affaires']
+    };
+
+    if (source.includes(sel) || sel.includes(source)) return true;
+
+    const variations = sourceVariations[sel];
+    if (variations) {
+        return variations.some(variation => source.includes(variation));
+    }
+
+    return false;
+};
 
 // Ground News Expandable Section Component
 const GroundNewsSection: React.FC<{ isDarkMode: boolean; LucideIcon: any }> = ({ isDarkMode, LucideIcon }) => {
@@ -119,10 +153,25 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         LucideIcon: LucideIconProp
     } = props;
 
-    const newsData = newsDataProp;
+    // ✅ FREEZE FIX: Simple reference to newsData prop
+    const newsData = newsDataProp || [];
+
     const LucideIcon = LucideIconProp || (({ name, className = '' }) => (
         <span className={className}>{name}</span>
     ));
+
+    // ✅ FREEZE FIX: Defer rendering until component is mounted
+    const [isMounted, setIsMounted] = useState(false);
+    // ✅ FREEZE FIX: Only load news when user explicitly requests it
+    const [userRequestedLoad, setUserRequestedLoad] = useState(false);
+
+    useEffect(() => {
+        // Use setTimeout to ensure we don't block the main thread
+        const timeoutId = setTimeout(() => {
+            setIsMounted(true);
+        }, 100); // Small delay to allow UI to stabilize
+        return () => clearTimeout(timeoutId);
+    }, []);
 
     // Sub-tabs state
     const [activeSubTab, setActiveSubTab] = useState<'all' | 'french' | 'by-source' | 'by-market' | 'ground'>('all');
@@ -135,51 +184,46 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     const [isApproximateMatch, setIsApproximateMatch] = useState(false);
     const [isLoadingNews, setIsLoadingNews] = useState(false);
 
-    // ✅ FIX: Charger les news automatiquement si vides au montage ou quand newsData change
-    // Use newsData.length instead of newsData to prevent infinite loops
+    // ✅ FIX: Use ref to prevent multiple fetches and avoid dependency issues
+    const hasFetchedRef = useRef(false);
+
+    // ✅ FREEZE FIX: Disabled auto-loading - user must click button to load news
+    // This prevents the freeze that was occurring on initial mount
+    /*
     useEffect(() => {
-        if ((!newsData || newsData.length === 0) && fetchNews && !loading && !isLoadingNews) {
-            console.log('📰 NouvellesTab: newsData vide, chargement automatique...');
-            setIsLoadingNews(true);
-            fetchNews('general', 100).then(() => {
-                setIsLoadingNews(false);
-            }).catch(err => {
-                console.error('Erreur chargement news:', err);
-                setIsLoadingNews(false);
-            });
-        }
-    }, [newsData.length, fetchNews, loading, isLoadingNews]); // Use length to prevent infinite loops
+        if (hasFetchedRef.current) return;
+        if (newsData && newsData.length > 0) return;
+        if (!fetchNews || loading) return;
+
+        hasFetchedRef.current = true;
+        setIsLoadingNews(true);
+        fetchNews('general', 100).then(() => setIsLoadingNews(false)).catch(() => setIsLoadingNews(false));
+    }, []);
+    */
     
     // BUG #1 FIX: Pagination et lazy loading pour éviter freeze
-    const [displayedCount, setDisplayedCount] = useState(20); // Limiter à 20 articles initialement
+    // ✅ FREEZE FIX: Reduced initial count from 20 to 10 to prevent heavy rendering
+    const [displayedCount, setDisplayedCount] = useState(10);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const loadMoreRef = useRef<HTMLDivElement>(null);
-    const ARTICLES_PER_PAGE = 20;
+    const ARTICLES_PER_PAGE = 10; // Reduced from 20
 
     // Listes de filtres
     const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
     const markets = ['US', 'Canada', 'Europe', 'Asie'];
     const themes = ['Tech', 'Finance', 'Énergie', 'Santé', 'Crypto', 'IA'];
 
-    // Fonction pour détecter si un article est en français
-    const isFrenchArticle = (article: any) => {
-        const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
-        const frenchIndicators = ['le ', 'la ', 'les ', 'un ', 'une ', 'des ', 'du ', 'de la ', 'au ', 'aux ', 
-            'est ', 'sont ', 'pour ', 'dans ', 'avec ', 'sur ', 'par ', 'qui ', 'que ', 
-            'québec', 'montréal', 'canada', 'français', 'économie', 'marchés'];
-        return frenchIndicators.some(indicator => text.includes(indicator));
-    };
+    // isFrenchArticle and matchesSource moved outside component to prevent recreation
 
-    // Fonction pour nettoyer le texte
-    const cleanText = (text: string) => {
+    // ✅ FREEZE FIX: Memoize helper functions used in render loop
+    const cleanText = useCallback((text: string) => {
         if (!text) return '';
         return text.replace(/\[.*?\]/g, '').trim();
-    };
+    }, []);
 
-    // Fonction pour obtenir l'icône de news
-    const getNewsIcon = (title: string, description: string, sentiment?: string) => {
+    const getNewsIcon = useCallback((title: string, description: string, sentiment?: string) => {
         const text = ((title || '') + ' ' + (description || '')).toLowerCase();
-        
+
         if (text.includes('crypto') || text.includes('bitcoin') || text.includes('ethereum')) {
             return { icon: 'Bitcoin', color: 'text-orange-500' };
         }
@@ -199,46 +243,19 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
             return { icon: 'TrendingDown', color: 'text-red-500' };
         }
         return { icon: 'Newspaper', color: 'text-gray-500' };
-    };
+    }, []);
 
-    // Fonction pour obtenir la crédibilité de la source
-    const getSourceCredibility = (sourceName?: string) => {
+    const getSourceCredibility = useCallback((sourceName?: string) => {
         if (!sourceName) return 50;
         const source = sourceName.toLowerCase();
         const highCredibility = ['bloomberg', 'reuters', 'wsj', 'wall street journal', 'financial times', 'cnbc'];
         const mediumCredibility = ['marketwatch', 'yahoo finance', 'seeking alpha', 'investopedia'];
-        
+
         if (highCredibility.some(s => source.includes(s))) return 100;
         if (mediumCredibility.some(s => source.includes(s))) return 85;
         if (source.includes('la presse') || source.includes('les affaires')) return 90;
         return 70;
-    };
-
-    // Fonction pour détecter la source avec variations de noms
-    const matchesSource = (articleSource: string, selected: string) => {
-        if (!articleSource || !selected) return false;
-        const source = articleSource.toLowerCase();
-        const sel = selected.toLowerCase();
-        
-        const sourceVariations: Record<string, string[]> = {
-            'bloomberg': ['bloomberg', 'bloomberg.com', 'bloomberg news'],
-            'reuters': ['reuters', 'reuters.com', 'thomson reuters'],
-            'wsj': ['wsj', 'wall street journal', 'the wall street journal', 'wsj.com'],
-            'cnbc': ['cnbc', 'cnbc.com'],
-            'marketwatch': ['marketwatch', 'marketwatch.com', 'market watch'],
-            'la presse': ['la presse', 'lapresse', 'lapresse.ca', 'presse'],
-            'les affaires': ['les affaires', 'lesaffaires', 'lesaffaires.com', 'affaires']
-        };
-        
-        if (source.includes(sel) || sel.includes(source)) return true;
-        
-        const variations = sourceVariations[sel];
-        if (variations) {
-            return variations.some(variation => source.includes(variation));
-        }
-        
-        return false;
-    };
+    }, []);
 
     // Fonction pour résumer avec Emma
     const summarizeWithEmma = (url: string, title: string) => {
@@ -349,19 +366,31 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         }
 
         return { filtered, isApproximate: !hasExactMatches };
-    }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme, isFrenchArticle, matchesSource]);
+    // ✅ FIX: Removed isFrenchArticle and matchesSource from deps - they're now stable outside component
+    }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme]);
 
     // Mettre à jour les states depuis le résultat mémorisé
+    // ✅ FREEZE FIX: Use React.startTransition to prevent blocking the main thread
     useEffect(() => {
-        setLocalFilteredNews(filteredNewsResult.filtered);
-        setIsApproximateMatch(filteredNewsResult.isApproximate);
-        // BUG #1 FIX: Réinitialiser le compteur d'affichage quand les filtres changent
-        setDisplayedCount(ARTICLES_PER_PAGE);
+        // Use startTransition to mark this as a non-urgent update
+        const updateStates = () => {
+            setLocalFilteredNews(filteredNewsResult.filtered);
+            setIsApproximateMatch(filteredNewsResult.isApproximate);
+            // BUG #1 FIX: Réinitialiser le compteur d'affichage quand les filtres changent
+            setDisplayedCount(ARTICLES_PER_PAGE);
+        };
+
+        if (typeof React.startTransition === 'function') {
+            React.startTransition(updateStates);
+        } else {
+            updateStates();
+        }
     }, [filteredNewsResult]);
 
     // BUG #1 FIX: Intersection Observer pour lazy loading automatique
     useEffect(() => {
-        if (!loadMoreRef.current || displayedCount >= localFilteredNews.length) return;
+        const currentRef = loadMoreRef.current; // ✅ FIX: Store ref value before using in cleanup
+        if (!currentRef || displayedCount >= localFilteredNews.length) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -377,12 +406,11 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
             { threshold: 0.1, rootMargin: '200px' }
         );
 
-        observer.observe(loadMoreRef.current);
+        observer.observe(currentRef);
 
         return () => {
-            if (loadMoreRef.current) {
-                observer.unobserve(loadMoreRef.current);
-            }
+            // ✅ FIX: Use stored ref value in cleanup instead of loadMoreRef.current
+            observer.unobserve(currentRef);
         };
     }, [displayedCount, localFilteredNews.length, isLoadingMore]);
 
@@ -427,6 +455,63 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                 break;
         }
     }, [activeSubTab]);
+
+    // ✅ FREEZE FIX: Show loading skeleton until component is mounted
+    if (!isMounted) {
+        return (
+            <div className="space-y-6 animate-pulse">
+                <div className={`h-10 w-64 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+                <div className={`h-32 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+                <div className={`h-48 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+            </div>
+        );
+    }
+
+    // ✅ FREEZE FIX: Show prompt to load news if not yet requested and no data
+    if (!userRequestedLoad && (!newsData || newsData.length === 0) && !loading && !isLoadingNews) {
+        return (
+            <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                    <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        📰 Nouvelles Financières
+                    </h2>
+                </div>
+                <div className={`p-8 rounded-xl text-center ${
+                    isDarkMode
+                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
+                        : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+                }`}>
+                    <LucideIcon name="Newspaper" className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
+                    <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                        Charger les actualités
+                    </h3>
+                    <p className={`mb-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Cliquez sur le bouton ci-dessous pour charger les dernières actualités financières.
+                    </p>
+                    <button
+                        onClick={() => {
+                            setUserRequestedLoad(true);
+                            if (fetchNews) {
+                                setIsLoadingNews(true);
+                                fetchNews('general', 100).then(() => {
+                                    setIsLoadingNews(false);
+                                }).catch(() => {
+                                    setIsLoadingNews(false);
+                                });
+                            }
+                        }}
+                        className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 ${
+                            isDarkMode
+                                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30'
+                                : 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                        }`}
+                    >
+                        🔄 Charger les actualités
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

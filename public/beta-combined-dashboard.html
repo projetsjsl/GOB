@@ -643,7 +643,8 @@
             // Message informatif sur les avertissements de production
             // Note: Babel Standalone is used intentionally for this standalone file
             // For production optimization, consider precompiling with: npm run build:babel
-            if (process.env.NODE_ENV === 'production') {
+            // FIX: Check if process is defined before using it (browser compatibility)
+            if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'production') {
                 console.log('ℹ️ Production mode: Consider using precompiled scripts for better performance');
             }
         });
