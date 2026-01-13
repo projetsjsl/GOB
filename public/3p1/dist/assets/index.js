@@ -37832,14 +37832,14 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
   const growthPlusYield = (assumptions.growthRateEPS || 0) + safeBaseYieldVal;
   let jpegy = null;
   if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
-    const rawJPEGY = safeBasePE / growthPlusYield;
+    const rawJPEGY = growthPlusYield / safeBasePE;
     if (isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100) {
       jpegy = rawJPEGY;
     }
   }
   let forwardJpegy = null;
   if (growthPlusYield > 0.01 && forwardPE > 0 && forwardPE <= 1e3 && hasValidEPS) {
-    const rawForwardJPEGY = forwardPE / growthPlusYield;
+    const rawForwardJPEGY = growthPlusYield / forwardPE;
     if (isFinite(rawForwardJPEGY) && rawForwardJPEGY >= 0 && rawForwardJPEGY <= 100) {
       forwardJpegy = rawForwardJPEGY;
     }
@@ -57549,14 +57549,19 @@ function App() {
   const [showAdmin, setShowAdmin] = reactExports.useState(false);
   const [showDataExplorer, setShowDataExplorer] = reactExports.useState(false);
   const [isRepairing, setIsRepairing] = reactExports.useState(null);
-  const [guardrailConfig, setGuardrailConfig] = reactExports.useState(() => loadConfig());
+  const [guardrailConfig, setGuardrailConfig] = reactExports.useState(DEFAULT_CONFIG);
   const [isSettingsOpen, setIsSettingsOpen] = reactExports.useState(false);
   const [isReportsOpen, setIsReportsOpen] = reactExports.useState(false);
+  reactExports.useEffect(() => {
+    loadConfig().then(setGuardrailConfig).catch(console.error);
+  }, []);
   const handleSettingsClose = () => {
     setIsSettingsOpen(false);
-    setGuardrailConfig(loadConfig());
-    invalidateValidationSettingsCache();
-    showNotification("Paramètres de validation mis à jour", "success");
+    loadConfig().then((config2) => {
+      setGuardrailConfig(config2);
+      invalidateValidationSettingsCache();
+      showNotification("Paramètres de validation mis à jour", "success");
+    }).catch(console.error);
   };
   reactExports.useEffect(() => {
     const handleKeyDown = (e) => {

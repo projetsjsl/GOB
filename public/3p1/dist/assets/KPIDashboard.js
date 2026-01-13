@@ -1467,7 +1467,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       const growthPlusYield = (profile.assumptions.growthRateEPS || 0) + safeBaseYield;
       let jpegy = null;
       if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
-        const rawJPEGY = safeBasePE / growthPlusYield;
+        const rawJPEGY = growthPlusYield / safeBasePE;
         if (isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100) {
           jpegy = rawJPEGY;
         }

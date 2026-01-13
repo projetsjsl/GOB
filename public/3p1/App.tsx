@@ -222,9 +222,15 @@ export default function App() {
     const [isRepairing, setIsRepairing] = useState<string | null>(null);
 
     // --- CONFIG SYSTEM ---
-    const [guardrailConfig, setGuardrailConfig] = useState<GuardrailConfig>(() => loadConfig());
+    // BUG FIX: loadConfig() is async - use DEFAULT_CONFIG as initial state
+    const [guardrailConfig, setGuardrailConfig] = useState<GuardrailConfig>(DEFAULT_CONFIG);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isReportsOpen, setIsReportsOpen] = useState(false);
+
+    // Load async config on mount
+    useEffect(() => {
+        loadConfig().then(setGuardrailConfig).catch(console.error);
+    }, []);
 
     const handleSaveConfig = (newConfig: GuardrailConfig) => {
         setGuardrailConfig(newConfig);
@@ -234,11 +240,13 @@ export default function App() {
 
     const handleSettingsClose = () => {
         setIsSettingsOpen(false);
-        // Reload guardrail config after settings are saved
-        setGuardrailConfig(loadConfig());
-        // Invalider le cache pour recharger les nouveaux paramètres
-        invalidateValidationSettingsCache();
-        showNotification('Paramètres de validation mis à jour', 'success');
+        // Reload guardrail config after settings are saved (async)
+        loadConfig().then(config => {
+            setGuardrailConfig(config);
+            // Invalider le cache pour recharger les nouveaux paramètres
+            invalidateValidationSettingsCache();
+            showNotification('Paramètres de validation mis à jour', 'success');
+        }).catch(console.error);
     };
 
     // Keyboard shortcut to toggle admin (Ctrl+Shift+A)
