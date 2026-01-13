@@ -618,3 +618,351 @@ export const rejectPlaceholderData = (
 
   return null; // Valid
 };
+
+/**
+ * S1-VALID-003: Detect and flag outlier values using statistical methods
+ * Uses 3 standard deviations as threshold
+ *
+ * @param values - Array of numeric values
+ * @returns Indices of outliers
+ */
+export const detectStatisticalOutliers = (values: number[]): number[] => {
+  if (!values || values.length < 3) return [];
+
+  const validValues = values.filter(v => isFinite(v));
+  if (validValues.length < 3) return [];
+
+  const mean = validValues.reduce((sum, val) => sum + val, 0) / validValues.length;
+  const variance = validValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / validValues.length;
+  const stdDev = Math.sqrt(variance);
+
+  const outlierIndices: number[] = [];
+  values.forEach((value, index) => {
+    if (isFinite(value)) {
+      const zScore = Math.abs((value - mean) / stdDev);
+      if (zScore > 3) {
+        outlierIndices.push(index);
+      }
+    }
+  });
+
+  return outlierIndices;
+};
+
+/**
+ * S1-VALID-007: Flag suspicious growth rates (>100% YoY)
+ *
+ * @param data - Historical annual data
+ * @param metricKey - Key of metric to check
+ * @returns Array of suspicious years
+ */
+export const flagSuspiciousGrowthRates = (
+  data: AnnualData[],
+  metricKey: keyof AnnualData
+): { year: number; growthRate: number }[] => {
+  if (!data || data.length < 2) return [];
+
+  const sorted = [...data].sort((a, b) => Number(a.year) - Number(b.year));
+  const suspicious: { year: number; growthRate: number }[] = [];
+
+  for (let i = 1; i < sorted.length; i++) {
+    const prevValue = Number(sorted[i - 1][metricKey]);
+    const currentValue = Number(sorted[i][metricKey]);
+
+    if (prevValue > 0 && currentValue > 0) {
+      const growthRate = ((currentValue - prevValue) / prevValue) * 100;
+
+      if (Math.abs(growthRate) > 100) {
+        suspicious.push({
+          year: sorted[i].year,
+          growthRate
+        });
+      }
+    }
+  }
+
+  return suspicious;
+};
+
+/**
+ * S1-VALID-009: Check for duplicate ticker entries
+ *
+ * @param profiles - Array of analysis profiles
+ * @returns Array of duplicate symbols
+ */
+export const detectDuplicateTickers = (
+  profiles: { id: string; info: { symbol: string } }[]
+): string[] => {
+  const symbolCounts = new Map<string, number>();
+
+  profiles.forEach(profile => {
+    const symbol = profile.info?.symbol?.toUpperCase().trim();
+    if (symbol) {
+      symbolCounts.set(symbol, (symbolCounts.get(symbol) || 0) + 1);
+    }
+  });
+
+  return Array.from(symbolCounts.entries())
+    .filter(([_, count]) => count > 1)
+    .map(([symbol, _]) => symbol);
+};
+
+/**
+ * S1-VALID-011: Flag stale prices (>5 days old on weekdays)
+ *
+ * @param lastUpdateDate - Last price update date
+ * @param currentDate - Current date (for testing purposes)
+ * @returns true if price is stale
+ */
+export const isPriceStale = (
+  lastUpdateDate: Date,
+  currentDate: Date = new Date()
+): boolean => {
+  const daysSinceUpdate = (currentDate.getTime() - lastUpdateDate.getTime()) / (1000 * 60 * 60 * 24);
+
+  // Check if current date is a weekday
+  const currentDay = currentDate.getDay();
+  const isWeekday = currentDay >= 1 && currentDay <= 5;
+
+  // On weekdays, prices older than 5 days are stale
+  // On weekends, allow up to 7 days
+  const staleDays = isWeekday ? 5 : 7;
+
+  return daysSinceUpdate > staleDays;
+};
+
+/**
+ * S1-VALID-013: Check for split-adjusted data consistency
+ * Detects sudden price jumps that might indicate missing split adjustments
+ *
+ * @param data - Historical price data
+ * @returns Array of potential split issues
+ */
+export const detectPotentialSplits = (
+  data: AnnualData[]
+): { year: number; priceRatio: number }[] => {
+  if (!data || data.length < 2) return [];
+
+  const sorted = [...data].sort((a, b) => Number(a.year) - Number(b.year));
+  const potentialSplits: { year: number; priceRatio: number }[] = [];
+
+  for (let i = 1; i < sorted.length; i++) {
+    const prevPrice = (sorted[i - 1].priceHigh + sorted[i - 1].priceLow) / 2;
+    const currentPrice = (sorted[i].priceHigh + sorted[i].priceLow) / 2;
+
+    if (prevPrice > 0 && currentPrice > 0) {
+      const ratio = currentPrice / prevPrice;
+
+      // Check for 2:1, 3:1, or 1:2 splits (ratio ~0.5, ~0.33, or ~2.0)
+      if (ratio < 0.6 || ratio > 1.8) {
+        potentialSplits.push({
+          year: sorted[i].year,
+          priceRatio: ratio
+        });
+      }
+    }
+  }
+
+  return potentialSplits;
+};
+
+/**
+ * S1-VALID-015: Flag companies with data gaps >2 years
+ *
+ * @param data - Historical annual data
+ * @returns Array of gap periods
+ */
+export const detectDataGaps = (
+  data: AnnualData[]
+): { fromYear: number; toYear: number; gapYears: number }[] => {
+  if (!data || data.length < 2) return [];
+
+  const sorted = [...data].sort((a, b) => Number(a.year) - Number(b.year));
+  const gaps: { fromYear: number; toYear: number; gapYears: number }[] = [];
+
+  for (let i = 1; i < sorted.length; i++) {
+    const gapYears = sorted[i].year - sorted[i - 1].year - 1;
+
+    if (gapYears > 2) {
+      gaps.push({
+        fromYear: sorted[i - 1].year,
+        toYear: sorted[i].year,
+        gapYears
+      });
+    }
+  }
+
+  return gaps;
+};
+
+/**
+ * Comprehensive data quality report
+ * Combines all validation checks
+ *
+ * @param data - Historical annual data
+ * @param info - Company info
+ * @param assumptions - Valuation assumptions
+ * @returns Detailed quality report
+ */
+export const generateDataQualityReport = (
+  data: AnnualData[],
+  info: Partial<CompanyInfo>,
+  assumptions: Partial<Assumptions>
+): {
+  overallScore: number; // 0-100
+  issues: {
+    critical: string[];
+    warnings: string[];
+    info: string[];
+  };
+  checks: {
+    name: string;
+    status: 'pass' | 'warning' | 'fail';
+    message: string;
+  }[];
+} => {
+  const critical: string[] = [];
+  const warnings: string[] = [];
+  const infoMessages: string[] = [];
+  const checks: {
+    name: string;
+    status: 'pass' | 'warning' | 'fail';
+    message: string;
+  }[] = [];
+
+  let passedChecks = 0;
+  const totalChecks = 12;
+
+  // Check 1: Sufficient data
+  if (data.length >= 5) {
+    passedChecks++;
+    checks.push({ name: 'Data Quantity', status: 'pass', message: `${data.length} years of data` });
+  } else if (data.length >= 3) {
+    warnings.push(`Only ${data.length} years of data (recommended: 5+)`);
+    checks.push({ name: 'Data Quantity', status: 'warning', message: `${data.length} years (min 5 recommended)` });
+  } else {
+    critical.push(`Insufficient data: ${data.length} years (minimum 3 required)`);
+    checks.push({ name: 'Data Quantity', status: 'fail', message: `${data.length} years (min 3 required)` });
+  }
+
+  // Check 2: Valid prices
+  const validPrices = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
+  if (validPrices.length === data.length) {
+    passedChecks++;
+    checks.push({ name: 'Price Validity', status: 'pass', message: 'All prices valid' });
+  } else {
+    critical.push(`${data.length - validPrices.length} years have invalid prices`);
+    checks.push({ name: 'Price Validity', status: 'fail', message: `${data.length - validPrices.length} invalid` });
+  }
+
+  // Check 3: Outliers
+  const epsOutliers = detectStatisticalOutliers(data.map(d => d.earningsPerShare));
+  if (epsOutliers.length === 0) {
+    passedChecks++;
+    checks.push({ name: 'EPS Outliers', status: 'pass', message: 'No outliers detected' });
+  } else {
+    warnings.push(`${epsOutliers.length} EPS outliers detected`);
+    checks.push({ name: 'EPS Outliers', status: 'warning', message: `${epsOutliers.length} outliers` });
+  }
+
+  // Check 4: Suspicious growth rates
+  const suspiciousEPS = flagSuspiciousGrowthRates(data, 'earningsPerShare');
+  if (suspiciousEPS.length === 0) {
+    passedChecks++;
+    checks.push({ name: 'Growth Rates', status: 'pass', message: 'All growth rates reasonable' });
+  } else {
+    warnings.push(`${suspiciousEPS.length} suspicious EPS growth rates (>100% YoY)`);
+    checks.push({ name: 'Growth Rates', status: 'warning', message: `${suspiciousEPS.length} suspicious` });
+  }
+
+  // Check 5: Data gaps
+  const gaps = detectDataGaps(data);
+  if (gaps.length === 0) {
+    passedChecks++;
+    checks.push({ name: 'Data Continuity', status: 'pass', message: 'No significant gaps' });
+  } else {
+    warnings.push(`${gaps.length} data gaps >2 years detected`);
+    checks.push({ name: 'Data Continuity', status: 'warning', message: `${gaps.length} gaps found` });
+  }
+
+  // Check 6: Potential splits
+  const splits = detectPotentialSplits(data);
+  if (splits.length === 0) {
+    passedChecks++;
+    checks.push({ name: 'Split Adjustments', status: 'pass', message: 'No split issues detected' });
+  } else {
+    infoMessages.push(`${splits.length} potential stock splits detected`);
+    checks.push({ name: 'Split Adjustments', status: 'warning', message: `${splits.length} potential splits` });
+  }
+
+  // Check 7: Company info complete
+  const infoValid = validateCompanyInfo(info);
+  if (infoValid.isValid) {
+    passedChecks++;
+    checks.push({ name: 'Company Info', status: 'pass', message: 'Complete' });
+  } else {
+    critical.push(...infoValid.errors);
+    warnings.push(...infoValid.warnings);
+    checks.push({ name: 'Company Info', status: 'fail', message: 'Incomplete or invalid' });
+  }
+
+  // Check 8: Assumptions valid
+  const assumptionsValid = validateAssumptions(assumptions);
+  if (assumptionsValid.isValid) {
+    passedChecks++;
+    checks.push({ name: 'Assumptions', status: 'pass', message: 'Valid' });
+  } else {
+    warnings.push(...assumptionsValid.warnings);
+    checks.push({ name: 'Assumptions', status: 'warning', message: 'Some issues found' });
+  }
+
+  // Check 9: Current price valid
+  if (isValidPrice(assumptions.currentPrice)) {
+    passedChecks++;
+    checks.push({ name: 'Current Price', status: 'pass', message: `$${assumptions.currentPrice?.toFixed(2)}` });
+  } else {
+    critical.push('Invalid or missing current price');
+    checks.push({ name: 'Current Price', status: 'fail', message: 'Invalid' });
+  }
+
+  // Check 10: Positive book value
+  const negativeBookValues = data.filter(d => d.bookValuePerShare <= 0).length;
+  if (negativeBookValues === 0) {
+    passedChecks++;
+    checks.push({ name: 'Book Value', status: 'pass', message: 'All positive' });
+  } else {
+    warnings.push(`${negativeBookValues} years with negative book value`);
+    checks.push({ name: 'Book Value', status: 'warning', message: `${negativeBookValues} negative` });
+  }
+
+  // Check 11: Positive cash flow
+  const negativeCashFlow = data.filter(d => d.cashFlowPerShare <= 0).length;
+  if (negativeCashFlow === 0) {
+    passedChecks++;
+    checks.push({ name: 'Cash Flow', status: 'pass', message: 'All positive' });
+  } else {
+    warnings.push(`${negativeCashFlow} years with negative cash flow`);
+    checks.push({ name: 'Cash Flow', status: 'warning', message: `${negativeCashFlow} negative` });
+  }
+
+  // Check 12: Real FMP data
+  if (isRealFMPData(data)) {
+    passedChecks++;
+    checks.push({ name: 'Data Source', status: 'pass', message: 'FMP verified' });
+  } else {
+    warnings.push('Data may not be from FMP or is incomplete');
+    checks.push({ name: 'Data Source', status: 'warning', message: 'Not verified' });
+  }
+
+  const overallScore = Math.round((passedChecks / totalChecks) * 100);
+
+  return {
+    overallScore,
+    issues: {
+      critical,
+      warnings,
+      info: infoMessages
+    },
+    checks
+  };
+};
