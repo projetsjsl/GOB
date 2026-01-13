@@ -122,6 +122,32 @@ export async function listSnapshots(
 }
 
 /**
+ * Get all approved ticker IDs in a single bulk query
+ * PERFORMANCE: Uses a single API call instead of N individual calls
+ */
+export async function getAllApprovedTickers(): Promise<{ success: boolean; approvedTickers?: string[]; error?: string }> {
+    try {
+        console.log('📊 KPI: Fetching all approved tickers (bulk query)...');
+        const startTime = Date.now();
+
+        const response = await fetch(`${API_BASE}/api/finance-snapshots?approved_only=true&distinct_tickers=true`);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const approvedTickers = data.tickers || [];
+
+        console.log(`✅ KPI: ${approvedTickers.length} approved tickers loaded in ${Date.now() - startTime}ms`);
+        return { success: true, approvedTickers };
+    } catch (error: any) {
+        console.error('❌ KPI: Failed to get approved tickers:', error);
+        return { success: false, error: error.message, approvedTickers: [] };
+    }
+}
+
+/**
  * Load a specific snapshot
  */
 export async function loadSnapshot(

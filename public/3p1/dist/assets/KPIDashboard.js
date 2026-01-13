@@ -1,4 +1,4 @@
-import { r as reactExports, c as calculateRecommendation, j as jsxRuntimeExports, F as ForwardRef$5, a as ForwardRef$6, b as ForwardRef$7, d as ForwardRef$8, e as ForwardRef$9, f as ForwardRef$a, g as ForwardRef$b, h as ForwardRef$c, i as ForwardRef$d, k as ForwardRef$e, R as React, l as ForwardRef$f, m as ForwardRef$g, n as ForwardRef$h, A as AdditionalMetrics, E as EvaluationDetails, o as ForwardRef$i, p as listSnapshots } from "./index.js";
+import { r as reactExports, c as calculateRecommendation, j as jsxRuntimeExports, F as ForwardRef$5, a as ForwardRef$6, b as ForwardRef$7, d as ForwardRef$8, e as ForwardRef$9, f as ForwardRef$a, g as ForwardRef$b, h as ForwardRef$c, i as ForwardRef$d, k as ForwardRef$e, R as React, l as ForwardRef$f, m as ForwardRef$g, n as ForwardRef$h, A as AdditionalMetrics, E as EvaluationDetails, o as ForwardRef$i, p as getAllApprovedTickers } from "./index.js";
 function ArrowsPointingOutIcon({
   title,
   titleId,
@@ -1638,45 +1638,32 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       const now = Date.now();
       const currentProfileIds = profiles.map((p) => p.id).sort().join(",");
       if (approvedVersionsCacheRef.current && approvedVersionsCacheRef.current.profileIds === currentProfileIds && now - approvedVersionsCacheRef.current.timestamp < APPROVED_VERSIONS_CACHE_TTL) {
+        console.log("✅ KPI: Using cached approved versions");
         setApprovedVersions(approvedVersionsCacheRef.current.approvedSet);
         setIsLoadingApprovedVersions(false);
         return;
       }
+      console.log(`📊 KPI: Loading approved versions for ${profiles.length} profiles...`);
       setIsLoadingApprovedVersions(true);
-      const approvedSet = /* @__PURE__ */ new Set();
-      const batchSize = 5;
-      let batchCount = 0;
-      for (let i = 0; i < profiles.length; i += batchSize) {
-        const batch = profiles.slice(i, i + batchSize);
-        batchCount++;
-        await Promise.all(
-          batch.map(async (profile) => {
-            try {
-              if (!profile.id) return;
-              const result = await listSnapshots(profile.id, 50);
-              if (result.success && result.snapshots) {
-                const hasApproved = result.snapshots.some(
-                  (snapshot) => snapshot.is_approved === true
-                );
-                if (hasApproved) {
-                  approvedSet.add(profile.id);
-                }
-              }
-            } catch (error) {
-            }
-          })
-        );
-        if (i + batchSize < profiles.length) {
-          const delay = batchCount % 10 === 0 ? 2e3 : 500;
-          await new Promise((resolve) => setTimeout(resolve, delay));
+      try {
+        const bulkResult = await getAllApprovedTickers();
+        if (bulkResult.success && bulkResult.approvedTickers) {
+          const approvedSet = new Set(bulkResult.approvedTickers);
+          approvedVersionsCacheRef.current = {
+            profileIds: currentProfileIds,
+            approvedSet: new Set(approvedSet),
+            timestamp: now
+          };
+          setApprovedVersions(approvedSet);
+          setIsLoadingApprovedVersions(false);
+          console.log(`✅ KPI: Bulk load complete - ${approvedSet.size} approved tickers`);
+          return;
         }
+      } catch (bulkError) {
+        console.warn("⚠️ KPI: Bulk query not available, skipping approved check for performance");
       }
-      approvedVersionsCacheRef.current = {
-        profileIds: currentProfileIds,
-        approvedSet: new Set(approvedSet),
-        timestamp: now
-      };
-      setApprovedVersions(approvedSet);
+      console.log("⚡ KPI: Skipping slow approved check - showing all data immediately");
+      setApprovedVersions(/* @__PURE__ */ new Set());
       setIsLoadingApprovedVersions(false);
     };
     if (profiles.length > 0) {

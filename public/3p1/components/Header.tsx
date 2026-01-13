@@ -84,7 +84,6 @@ export const Header: React.FC<HeaderProps> = ({
           <img
             src={info.logo || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
             alt={`Logo de ${info.name || activeId}`}
-            alt={info.name}
             className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200 cursor-help"
             title={`Logo de ${info.name}\n\nSource: FMP API\n\nChargé via: ${info.logo || 'Non disponible'}`}
             onError={(e) => {

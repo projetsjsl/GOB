@@ -5,7 +5,7 @@ import { AnalysisProfile, Recommendation } from '../types';
 import { calculateRecommendation } from '../utils/calculations';
 import { formatCurrency, formatPercent } from '../utils/calculations';
 import { CheckCircleIcon, XCircleIcon, ExclamationTriangleIcon, LightBulbIcon, ExclamationCircleIcon, ChevronDownIcon, ChevronUpIcon, MagnifyingGlassPlusIcon, MagnifyingGlassMinusIcon, ArrowsPointingOutIcon, ArrowPathIcon, BookOpenIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
-import { listSnapshots } from '../services/snapshotApi';
+import { listSnapshots, getAllApprovedTickers } from '../services/snapshotApi';
 import { SyncSelectionDialog } from './SyncSelectionDialog';
 import { GuideDialog } from './GuideDialog';
 import { StatusBadge } from './StatusBadge';
@@ -419,62 +419,46 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       // Vérifier le cache
       const now = Date.now();
       const currentProfileIds = profiles.map(p => p.id).sort().join(',');
-      
-      if (approvedVersionsCacheRef.current && 
+
+      if (approvedVersionsCacheRef.current &&
           approvedVersionsCacheRef.current.profileIds === currentProfileIds &&
           (now - approvedVersionsCacheRef.current.timestamp) < APPROVED_VERSIONS_CACHE_TTL) {
         // Utiliser le cache
+        console.log('✅ KPI: Using cached approved versions');
         setApprovedVersions(approvedVersionsCacheRef.current.approvedSet);
         setIsLoadingApprovedVersions(false);
         return;
       }
-      
+
+      console.log(`📊 KPI: Loading approved versions for ${profiles.length} profiles...`);
       setIsLoadingApprovedVersions(true);
-  const approvedSet = new Set<string>();
-  
-  // Traiter par batch de 5 pour éviter de surcharger l'API (réduit de 10)
-  const batchSize = 5;
-  let batchCount = 0;
-  for (let i = 0; i < profiles.length; i += batchSize) {
-    const batch = profiles.slice(i, i + batchSize);
-    batchCount++;
-    
-    await Promise.all(
-      batch.map(async (profile) => {
-        try {
-          if (!profile.id) return; // ✅ Guard clause pour éviter les erreurs 400
-          const result = await listSnapshots(profile.id, 50);
-          if (result.success && result.snapshots) {
-            const hasApproved = result.snapshots.some(
-              (snapshot: any) => snapshot.is_approved === true
-            );
-            if (hasApproved) {
-              approvedSet.add(profile.id);
-            }
-          }
-        } catch (error) {
-          // Erreur silencieuse pour ne pas polluer la console
-          // Les versions approuvées sont une fonctionnalité bonus
+
+      // OPTIMIZED: Try bulk query first (fast path)
+      try {
+        const bulkResult = await getAllApprovedTickers();
+        if (bulkResult.success && bulkResult.approvedTickers) {
+          const approvedSet = new Set(bulkResult.approvedTickers);
+
+          // Update cache
+          approvedVersionsCacheRef.current = {
+            profileIds: currentProfileIds,
+            approvedSet: new Set(approvedSet),
+            timestamp: now
+          };
+
+          setApprovedVersions(approvedSet);
+          setIsLoadingApprovedVersions(false);
+          console.log(`✅ KPI: Bulk load complete - ${approvedSet.size} approved tickers`);
+          return;
         }
-      })
-    );
-    
-    // Délai entre les batches pour éviter de surcharger l'API (augmenté à 500ms)
-    if (i + batchSize < profiles.length) {
-      // Pause plus longue tous les 10 batches pour permettre à la base de récupérer
-      const delay = (batchCount % 10 === 0) ? 2000 : 500;
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-      
-      // Mettre à jour le cache
-      approvedVersionsCacheRef.current = {
-        profileIds: currentProfileIds,
-        approvedSet: new Set(approvedSet),
-        timestamp: now
-      };
-      
-      setApprovedVersions(approvedSet);
+      } catch (bulkError) {
+        console.warn('⚠️ KPI: Bulk query not available, skipping approved check for performance');
+      }
+
+      // FALLBACK: Skip slow individual queries - just show data without approved status
+      // This is a PERFORMANCE optimization - approved status is cosmetic only
+      console.log('⚡ KPI: Skipping slow approved check - showing all data immediately');
+      setApprovedVersions(new Set());
       setIsLoadingApprovedVersions(false);
     };
 

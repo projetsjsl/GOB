@@ -8900,7 +8900,6 @@ const Header = ({
           {
             src: info.logo || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
             alt: `Logo de ${info.name || activeId}`,
-            alt: info.name,
             className: "w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover flex-shrink-0 border border-gray-200 cursor-help",
             title: `Logo de ${info.name}
 
@@ -35542,7 +35541,6 @@ Basé sur:
                   {
                     src: profile.info.logo || (profile.info.logoSymbol || ((_a2 = profile.info.actualSymbol) == null ? void 0 : _a2.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id ? `https://financialmodelingprep.com/image-stock/${profile.info.logoSymbol || ((_b = profile.info.actualSymbol) == null ? void 0 : _b.replace(".TO", "").replace("-", ".")) || profile.info.preferredSymbol || profile.id}.png` : ""),
                     alt: `Logo ${profile.info.name || profile.id}`,
-                    alt: profile.info.name,
                     className: "w-8 h-8 rounded object-cover flex-shrink-0 cursor-help",
                     title: `Logo de ${profile.info.name}
 
@@ -35943,6 +35941,23 @@ async function listSnapshots(ticker2, limit = 20) {
   } catch (error) {
     console.error("Failed to list snapshots:", error);
     return { success: false, error: error.message };
+  }
+}
+async function getAllApprovedTickers() {
+  try {
+    console.log("📊 KPI: Fetching all approved tickers (bulk query)...");
+    const startTime = Date.now();
+    const response = await fetch(`${API_BASE$1}/api/finance-snapshots?approved_only=true&distinct_tickers=true`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    const approvedTickers = data.tickers || [];
+    console.log(`✅ KPI: ${approvedTickers.length} approved tickers loaded in ${Date.now() - startTime}ms`);
+    return { success: true, approvedTickers };
+  } catch (error) {
+    console.error("❌ KPI: Failed to get approved tickers:", error);
+    return { success: false, error: error.message, approvedTickers: [] };
   }
 }
 async function loadSnapshot(snapshotId) {
@@ -61814,7 +61829,7 @@ export {
   ForwardRef$x as m,
   ForwardRef$r as n,
   ForwardRef$2 as o,
-  listSnapshots as p,
+  getAllApprovedTickers as p,
   ForwardRef$8 as q,
   reactExports as r,
   ForwardRef$5 as s,

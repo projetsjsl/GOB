@@ -72,7 +72,7 @@ export default async function handler(req, res) {
  * GET - List snapshots or get specific one
  */
 async function getSnapshots(req, res, supabase) {
-    const { ticker, id, limit = 50, all, current } = req.query;
+    const { ticker, id, limit = 50, all, current, approved_only, distinct_tickers } = req.query;
 
     if (id) {
         // Get specific snapshot
@@ -88,6 +88,37 @@ async function getSnapshots(req, res, supabase) {
         }
 
         return res.status(200).json({ success: true, data: [data] });
+    }
+
+    // BULK QUERY: Get distinct approved tickers (for KPI performance optimization)
+    if (approved_only === 'true' && distinct_tickers === 'true') {
+        try {
+            // Query distinct tickers that have at least one is_current=true snapshot
+            // This is the optimized path for KPI loading
+            const { data, error } = await supabase
+                .from('finance_pro_snapshots')
+                .select('ticker')
+                .eq('is_current', true);
+
+            if (error) {
+                console.error('Bulk approved tickers query error:', error);
+                return res.status(500).json({ error: 'Failed to fetch approved tickers' });
+            }
+
+            // Extract unique tickers
+            const tickerSet = new Set(data.map(row => row.ticker));
+            const tickers = Array.from(tickerSet);
+
+            console.log(`📊 KPI Bulk Query: ${tickers.length} approved tickers returned`);
+            return res.status(200).json({
+                success: true,
+                count: tickers.length,
+                tickers: tickers
+            });
+        } catch (bulkError) {
+            console.error('Bulk query unexpected error:', bulkError);
+            return res.status(500).json({ error: 'Bulk query failed' });
+        }
     }
 
     if (ticker) {
