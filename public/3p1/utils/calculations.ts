@@ -44,9 +44,79 @@ export const calculateCAGR = (startValue: number, endValue: number, years: numbe
   if (startValue == null || endValue == null || years == null) return 0;
   if (!isFinite(startValue) || !isFinite(endValue) || !isFinite(years)) return 0;
   if (startValue <= 0 || endValue <= 0 || years <= 0) return 0;
-  
+
   const result = (Math.pow(endValue / startValue, 1 / years) - 1) * 100;
   return isFinite(result) ? result : 0;
+};
+
+/**
+ * S1-CALC-002 & S1-CALC-003: Calculate CAGR for multiple time periods (5, 10, 15 years)
+ * Returns CAGR for all available periods from historical data
+ *
+ * @param data - Annual historical data sorted by year
+ * @param metricKey - Key of the metric to calculate CAGR for
+ * @returns Object with CAGR for different periods
+ */
+export const calculateMultiPeriodCAGR = (
+  data: AnnualData[],
+  metricKey: keyof AnnualData
+): {
+  cagr5y: number | null;
+  cagr10y: number | null;
+  cagr15y: number | null;
+  cagrMax: number | null;
+} => {
+  if (!data || data.length < 2) {
+    return { cagr5y: null, cagr10y: null, cagr15y: null, cagrMax: null };
+  }
+
+  // Sort data by year ascending
+  const sorted = [...data].sort((a, b) => Number(a.year) - Number(b.year));
+  const lastData = sorted[sorted.length - 1];
+  const endValue = Number(lastData[metricKey]);
+
+  // Helper to find the closest valid data point for a target year
+  const findStartPoint = (yearsBack: number): { value: number; years: number } | null => {
+    const targetYear = Number(lastData.year) - yearsBack;
+
+    // Find the closest data point at or before the target year with valid value
+    const candidates = sorted
+      .filter(d => Number(d.year) <= targetYear && Number(d[metricKey]) > 0)
+      .sort((a, b) => Number(b.year) - Number(a.year)); // Descending - get most recent
+
+    if (candidates.length === 0) return null;
+
+    const startData = candidates[0];
+    const startValue = Number(startData[metricKey]);
+    const actualYears = Number(lastData.year) - Number(startData.year);
+
+    if (startValue <= 0 || endValue <= 0 || actualYears < 1) return null;
+
+    return { value: startValue, years: actualYears };
+  };
+
+  // Calculate CAGR for each period
+  const cagr5yData = findStartPoint(5);
+  const cagr10yData = findStartPoint(10);
+  const cagr15yData = findStartPoint(15);
+
+  // Calculate max CAGR (from first valid data point to last)
+  const firstValid = sorted.find(d => Number(d[metricKey]) > 0);
+  let cagrMax: number | null = null;
+  if (firstValid) {
+    const startValue = Number(firstValid[metricKey]);
+    const years = Number(lastData.year) - Number(firstValid.year);
+    if (startValue > 0 && endValue > 0 && years >= 1) {
+      cagrMax = calculateCAGR(startValue, endValue, years);
+    }
+  }
+
+  return {
+    cagr5y: cagr5yData ? calculateCAGR(cagr5yData.value, endValue, cagr5yData.years) : null,
+    cagr10y: cagr10yData ? calculateCAGR(cagr10yData.value, endValue, cagr10yData.years) : null,
+    cagr15y: cagr15yData ? calculateCAGR(cagr15yData.value, endValue, cagr15yData.years) : null,
+    cagrMax
+  };
 };
 
 /**
@@ -111,6 +181,369 @@ export const formatPercent = (val: number) => {
     return 'N/A';
   }
   return new Intl.NumberFormat('fr-CA', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 2 }).format(val / 100);
+};
+
+/**
+ * S1-CALC-004: Calculate Graham Number
+ * Graham Number = √(22.5 × EPS × Book Value Per Share)
+ * Represents Ben Graham's intrinsic value estimate
+ *
+ * @param eps - Earnings Per Share
+ * @param bookValue - Book Value Per Share
+ * @returns Graham Number or 0 if calculation is invalid
+ */
+export const calculateGrahamNumber = (eps: number, bookValue: number): number => {
+  if (eps <= 0 || bookValue <= 0 || !isFinite(eps) || !isFinite(bookValue)) return 0;
+  const result = Math.sqrt(22.5 * eps * bookValue);
+  return isFinite(result) ? result : 0;
+};
+
+/**
+ * S1-CALC-005: Calculate Peter Lynch PEG Ratio
+ * PEG = PE Ratio / EPS Growth Rate
+ * A PEG < 1 suggests the stock is undervalued relative to its growth
+ *
+ * @param peRatio - Current P/E Ratio
+ * @param growthRate - Expected EPS growth rate (%)
+ * @returns PEG ratio or null if invalid
+ */
+export const calculatePEG = (peRatio: number, growthRate: number): number | null => {
+  if (peRatio <= 0 || growthRate <= 0 || !isFinite(peRatio) || !isFinite(growthRate)) return null;
+  const result = peRatio / growthRate;
+  return isFinite(result) && result > 0 && result < 100 ? result : null;
+};
+
+/**
+ * S1-CALC-006: Calculate Discounted Cash Flow (DCF) Valuation
+ * Simple DCF model with terminal value
+ *
+ * @param currentCF - Current Free Cash Flow per share
+ * @param growthRate - Expected growth rate (%)
+ * @param discountRate - Required rate of return (%)
+ * @param terminalGrowth - Terminal growth rate (%) - default 2.5%
+ * @param projectionYears - Number of years to project - default 5
+ * @returns Intrinsic value per share
+ */
+export const calculateDCF = (
+  currentCF: number,
+  growthRate: number,
+  discountRate: number,
+  terminalGrowth: number = 2.5,
+  projectionYears: number = 5
+): number => {
+  if (currentCF <= 0 || discountRate <= 0 || growthRate < -50 || growthRate > 100) return 0;
+  if (!isFinite(currentCF) || !isFinite(growthRate) || !isFinite(discountRate)) return 0;
+  if (terminalGrowth >= discountRate) return 0; // Terminal growth must be less than discount rate
+
+  let presentValue = 0;
+  let cashFlow = currentCF;
+
+  // Project cash flows and discount them
+  for (let year = 1; year <= projectionYears; year++) {
+    cashFlow = cashFlow * (1 + growthRate / 100);
+    const discountFactor = Math.pow(1 + discountRate / 100, year);
+    presentValue += cashFlow / discountFactor;
+  }
+
+  // Terminal value using Gordon Growth Model
+  const terminalCF = cashFlow * (1 + terminalGrowth / 100);
+  const terminalValue = terminalCF / (discountRate / 100 - terminalGrowth / 100);
+  const discountedTerminalValue = terminalValue / Math.pow(1 + discountRate / 100, projectionYears);
+
+  const intrinsicValue = presentValue + discountedTerminalValue;
+  return isFinite(intrinsicValue) && intrinsicValue > 0 ? intrinsicValue : 0;
+};
+
+/**
+ * S1-CALC-007: Calculate Dividend Discount Model (DDM) Valuation
+ * Gordon Growth Model: Value = D₁ / (r - g)
+ * where D₁ = next year's dividend, r = required return, g = growth rate
+ *
+ * @param currentDividend - Current dividend per share
+ * @param growthRate - Expected dividend growth rate (%)
+ * @param requiredReturn - Required rate of return (%)
+ * @returns Intrinsic value per share
+ */
+export const calculateDDM = (
+  currentDividend: number,
+  growthRate: number,
+  requiredReturn: number
+): number => {
+  if (currentDividend <= 0 || requiredReturn <= 0 || growthRate < 0) return 0;
+  if (!isFinite(currentDividend) || !isFinite(growthRate) || !isFinite(requiredReturn)) return 0;
+  if (growthRate >= requiredReturn) return 0; // Growth must be less than required return
+
+  const nextDividend = currentDividend * (1 + growthRate / 100);
+  const intrinsicValue = nextDividend / (requiredReturn / 100 - growthRate / 100);
+
+  return isFinite(intrinsicValue) && intrinsicValue > 0 ? intrinsicValue : 0;
+};
+
+/**
+ * S1-CALC-008: Calculate Margin of Safety
+ * MOS = (Intrinsic Value - Current Price) / Intrinsic Value × 100
+ *
+ * @param intrinsicValue - Estimated intrinsic value
+ * @param currentPrice - Current market price
+ * @returns Margin of safety percentage
+ */
+export const calculateMarginOfSafety = (intrinsicValue: number, currentPrice: number): number => {
+  if (intrinsicValue <= 0 || currentPrice < 0 || !isFinite(intrinsicValue) || !isFinite(currentPrice)) return 0;
+  const mos = ((intrinsicValue - currentPrice) / intrinsicValue) * 100;
+  return isFinite(mos) ? mos : 0;
+};
+
+/**
+ * S1-CALC-010: Calculate Earnings Yield
+ * Earnings Yield = EPS / Price = 1 / PE Ratio
+ *
+ * @param eps - Earnings Per Share
+ * @param price - Current Price
+ * @returns Earnings yield as percentage
+ */
+export const calculateEarningsYield = (eps: number, price: number): number => {
+  if (eps <= 0 || price <= 0 || !isFinite(eps) || !isFinite(price)) return 0;
+  const yield_ = (eps / price) * 100;
+  return isFinite(yield_) ? yield_ : 0;
+};
+
+/**
+ * S1-CALC-011: Calculate Free Cash Flow Yield
+ * FCF Yield = Free Cash Flow per Share / Price
+ *
+ * @param fcfPerShare - Free Cash Flow per Share
+ * @param price - Current Price
+ * @returns FCF yield as percentage
+ */
+export const calculateFCFYield = (fcfPerShare: number, price: number): number => {
+  if (fcfPerShare <= 0 || price <= 0 || !isFinite(fcfPerShare) || !isFinite(price)) return 0;
+  const yield_ = (fcfPerShare / price) * 100;
+  return isFinite(yield_) ? yield_ : 0;
+};
+
+/**
+ * S1-CALC-012: Calculate ROIC (Return on Invested Capital)
+ * ROIC = NOPAT / Invested Capital
+ * Approximation: ROIC ≈ Operating Income × (1 - Tax Rate) / (Total Assets - Current Liabilities)
+ *
+ * @param operatingIncome - Operating income
+ * @param taxRate - Effective tax rate (%)
+ * @param totalAssets - Total assets
+ * @param currentLiabilities - Current liabilities
+ * @returns ROIC as percentage
+ */
+export const calculateROIC = (
+  operatingIncome: number,
+  taxRate: number,
+  totalAssets: number,
+  currentLiabilities: number
+): number => {
+  if (operatingIncome <= 0 || totalAssets <= 0 || currentLiabilities < 0) return 0;
+  if (!isFinite(operatingIncome) || !isFinite(taxRate) || !isFinite(totalAssets) || !isFinite(currentLiabilities)) return 0;
+
+  const nopat = operatingIncome * (1 - taxRate / 100);
+  const investedCapital = totalAssets - currentLiabilities;
+
+  if (investedCapital <= 0) return 0;
+
+  const roic = (nopat / investedCapital) * 100;
+  return isFinite(roic) ? roic : 0;
+};
+
+/**
+ * S1-CALC-013: ROE Decomposition (DuPont Analysis)
+ * ROE = Net Profit Margin × Asset Turnover × Equity Multiplier
+ * ROE = (Net Income / Revenue) × (Revenue / Assets) × (Assets / Equity)
+ *
+ * @param netIncome - Net income
+ * @param revenue - Total revenue
+ * @param totalAssets - Total assets
+ * @param equity - Shareholders' equity
+ * @returns DuPont analysis components
+ */
+export const calculateDuPontROE = (
+  netIncome: number,
+  revenue: number,
+  totalAssets: number,
+  equity: number
+): {
+  roe: number;
+  netProfitMargin: number;
+  assetTurnover: number;
+  equityMultiplier: number;
+} => {
+  const result = {
+    roe: 0,
+    netProfitMargin: 0,
+    assetTurnover: 0,
+    equityMultiplier: 0
+  };
+
+  if (revenue <= 0 || totalAssets <= 0 || equity <= 0) return result;
+  if (!isFinite(netIncome) || !isFinite(revenue) || !isFinite(totalAssets) || !isFinite(equity)) return result;
+
+  result.netProfitMargin = (netIncome / revenue) * 100;
+  result.assetTurnover = revenue / totalAssets;
+  result.equityMultiplier = totalAssets / equity;
+  result.roe = (netIncome / equity) * 100;
+
+  return result;
+};
+
+/**
+ * S1-CALC-014: Debt-to-Equity Ratio Trend Analysis
+ * Calculates D/E ratio and analyzes trend over time
+ *
+ * @param data - Historical financial data with debt and equity info
+ * @returns Current D/E and trend
+ */
+export const calculateDebtToEquityTrend = (
+  data: { totalDebt: number; equity: number; year: number }[]
+): {
+  current: number;
+  average: number;
+  trend: 'improving' | 'stable' | 'deteriorating';
+} => {
+  if (!data || data.length === 0) {
+    return { current: 0, average: 0, trend: 'stable' };
+  }
+
+  const validData = data.filter(d => d.equity > 0 && isFinite(d.totalDebt) && isFinite(d.equity));
+  if (validData.length === 0) {
+    return { current: 0, average: 0, trend: 'stable' };
+  }
+
+  const deRatios = validData.map(d => d.totalDebt / d.equity);
+  const current = deRatios[deRatios.length - 1] || 0;
+  const average = deRatios.reduce((sum, val) => sum + val, 0) / deRatios.length;
+
+  // Determine trend: compare recent 3 years vs older data
+  let trend: 'improving' | 'stable' | 'deteriorating' = 'stable';
+  if (deRatios.length >= 3) {
+    const recent = deRatios.slice(-3).reduce((sum, val) => sum + val, 0) / 3;
+    const older = deRatios.slice(0, -3).reduce((sum, val) => sum + val, 0) / Math.max(1, deRatios.length - 3);
+    if (recent < older * 0.9) trend = 'improving'; // 10% reduction
+    else if (recent > older * 1.1) trend = 'deteriorating'; // 10% increase
+  }
+
+  return { current, average, trend };
+};
+
+/**
+ * S1-CALC-015: Interest Coverage Ratio
+ * Interest Coverage = EBIT / Interest Expense
+ * Measures ability to pay interest on debt
+ *
+ * @param ebit - Earnings Before Interest and Taxes
+ * @param interestExpense - Interest expense
+ * @returns Interest coverage ratio
+ */
+export const calculateInterestCoverage = (ebit: number, interestExpense: number): number => {
+  if (ebit <= 0 || interestExpense <= 0 || !isFinite(ebit) || !isFinite(interestExpense)) return 0;
+  const coverage = ebit / interestExpense;
+  return isFinite(coverage) ? coverage : 0;
+};
+
+/**
+ * S1-CALC-016: Payout Ratio Trend Analysis
+ * Payout Ratio = Dividends / Net Income
+ * Analyzes sustainability of dividend payments
+ *
+ * @param data - Historical dividend and earnings data
+ * @returns Current payout ratio and trend
+ */
+export const calculatePayoutRatioTrend = (
+  data: AnnualData[]
+): {
+  current: number;
+  average: number;
+  sustainable: boolean;
+} => {
+  if (!data || data.length === 0) {
+    return { current: 0, average: 0, sustainable: false };
+  }
+
+  const validData = data.filter(d => d.earningsPerShare > 0 && d.dividendPerShare >= 0);
+  if (validData.length === 0) {
+    return { current: 0, average: 0, sustainable: false };
+  }
+
+  const payoutRatios = validData.map(d => (d.dividendPerShare / d.earningsPerShare) * 100);
+  const current = payoutRatios[payoutRatios.length - 1] || 0;
+  const average = payoutRatios.reduce((sum, val) => sum + val, 0) / payoutRatios.length;
+
+  // Sustainable if current payout is < 80% and average < 70%
+  const sustainable = current < 80 && average < 70;
+
+  return { current, average, sustainable };
+};
+
+/**
+ * S1-CALC-017: Dividend Growth Rate
+ * Calculates CAGR of dividends over specified period
+ *
+ * @param data - Historical dividend data
+ * @param years - Number of years to look back (default 5)
+ * @returns Dividend growth rate (CAGR)
+ */
+export const calculateDividendGrowthRate = (data: AnnualData[], years: number = 5): number => {
+  return calculateHistoricalGrowth(data, 'dividendPerShare', years);
+};
+
+/**
+ * S1-CALC-023: Earnings Quality Score
+ * Composite score based on:
+ * - Cash flow vs earnings ratio
+ * - Accruals ratio
+ * - Consistency of earnings
+ *
+ * @param data - Historical earnings and cash flow data
+ * @returns Quality score 0-100 (higher is better)
+ */
+export const calculateEarningsQuality = (data: AnnualData[]): number => {
+  if (!data || data.length < 3) return 0;
+
+  const validData = data.filter(d => d.earningsPerShare > 0 && d.cashFlowPerShare > 0);
+  if (validData.length < 3) return 0;
+
+  // Factor 1: Cash Flow to Earnings ratio (max 40 points)
+  const cfToEarnings = validData.map(d => d.cashFlowPerShare / d.earningsPerShare);
+  const avgCFtoE = cfToEarnings.reduce((sum, val) => sum + val, 0) / cfToEarnings.length;
+  const cfScore = Math.min(40, avgCFtoE * 40); // 1.0 ratio = 40 points
+
+  // Factor 2: Earnings consistency (max 40 points)
+  const epsValues = validData.map(d => d.earningsPerShare);
+  const epsGrowthRates = [];
+  for (let i = 1; i < epsValues.length; i++) {
+    const growth = (epsValues[i] - epsValues[i - 1]) / epsValues[i - 1];
+    epsGrowthRates.push(growth);
+  }
+  const avgGrowth = epsGrowthRates.reduce((sum, val) => sum + val, 0) / epsGrowthRates.length;
+  const variance = epsGrowthRates.reduce((sum, val) => sum + Math.pow(val - avgGrowth, 2), 0) / epsGrowthRates.length;
+  const stdDev = Math.sqrt(variance);
+  const consistencyScore = Math.max(0, 40 - stdDev * 100); // Lower volatility = higher score
+
+  // Factor 3: Positive earnings trend (max 20 points)
+  const recentEPS = epsValues.slice(-3);
+  const trendScore = recentEPS.every((val, i) => i === 0 || val >= recentEPS[i - 1]) ? 20 : 0;
+
+  const totalScore = cfScore + consistencyScore + trendScore;
+  return Math.min(100, Math.max(0, totalScore));
+};
+
+/**
+ * S1-CALC-024: Cash Conversion Rate
+ * Cash Conversion = Operating Cash Flow / Net Income
+ * Measures how efficiently earnings are converted to cash
+ *
+ * @param operatingCashFlow - Operating cash flow
+ * @param netIncome - Net income
+ * @returns Cash conversion ratio
+ */
+export const calculateCashConversion = (operatingCashFlow: number, netIncome: number): number => {
+  if (netIncome <= 0 || !isFinite(operatingCashFlow) || !isFinite(netIncome)) return 0;
+  const conversion = (operatingCashFlow / netIncome) * 100;
+  return isFinite(conversion) ? conversion : 0;
 };
 
 /**

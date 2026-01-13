@@ -34,30 +34,31 @@ export const AdditionalMetrics: React.FC<AdditionalMetricsProps> = ({ data, assu
 
     // Calcul JPEGY (Jean-Sebastien's Price to Earning adjusted for Growth and Yield)
     // MÊME LOGIQUE QUE KPIDashboard pour cohérence
-    // JPEGY = P/E / (Growth % + Yield %)
+    // JPEGY = (Growth % + Yield %) / P/E
     const hasValidEPS = baseEPS > 0.01 && isFinite(baseEPS);
     const safeBasePE = hasValidEPS && assumptions.currentPrice > 0 && currentPE > 0 && currentPE <= config.ratios.pe.max * 10 ? currentPE : 0;
     const safeBaseYield = Math.max(0, Math.min(currentYield, 50)); // Keep yield hardcap at 50% for JPEGY sanity or use config? Using config.ratios.yield.max seems safer but JPEGY often allows higher yield impact. Let's stick to safe hardcap for JPEGY or config max * 2.
-    // Actually, user wants configuration. Let's use config.ratios.yield.max but maybe multiplied if JPEGY allows outlier yields. 
+    // Actually, user wants configuration. Let's use config.ratios.yield.max but maybe multiplied if JPEGY allows outlier yields.
     // For now, let's just use the config limit for consistency.
     const safeYieldLimit = config.ratios.yield.max * 2.5; // Allow a bit more for "current" outlier yield before breaking JPEGY
     const safeBaseYieldVal = Math.max(0, Math.min(currentYield, safeYieldLimit));
     const growthPlusYield = (assumptions.growthRateEPS || 0) + safeBaseYieldVal;
-    
-    // JPEGY: valider que growthPlusYield > 0.01 ET que basePE est valide
+
+    // JPEGY: (EPS_Growth + Dividend_Yield) / PE_Ratio
+    // valider que growthPlusYield > 0.01 ET que basePE est valide
     // Retourner null si impossible à calculer (au lieu de 0)
     let jpegy: number | null = null;
     if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
-      const rawJPEGY = safeBasePE / growthPlusYield;
+      const rawJPEGY = growthPlusYield / safeBasePE;
       if (isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100) {
         jpegy = rawJPEGY;
       }
     }
-    
+
     // Forward JPEGY avec même validation
     let forwardJpegy: number | null = null;
     if (growthPlusYield > 0.01 && forwardPE > 0 && forwardPE <= 1000 && hasValidEPS) {
-      const rawForwardJPEGY = forwardPE / growthPlusYield;
+      const rawForwardJPEGY = growthPlusYield / forwardPE;
       if (isFinite(rawForwardJPEGY) && rawForwardJPEGY >= 0 && rawForwardJPEGY <= 100) {
         forwardJpegy = rawForwardJPEGY;
       }

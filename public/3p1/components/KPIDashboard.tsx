@@ -177,11 +177,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       
       const growthPlusYield = (profile.assumptions.growthRateEPS || 0) + safeBaseYield;
       
-      // JPEGY: valider que growthPlusYield > 0.01 ET que basePE est valide
+      // JPEGY: (EPS_Growth + Dividend_Yield) / PE_Ratio
+      // valider que growthPlusYield > 0.01 ET que basePE est valide
       // Retourner null si impossible à calculer (au lieu de 0)
       let jpegy: number | null = null;
       if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
-        const rawJPEGY = safeBasePE / growthPlusYield;
+        const rawJPEGY = growthPlusYield / safeBasePE;
         if (isFinite(rawJPEGY) && rawJPEGY >= 0 && rawJPEGY <= 100) {
           jpegy = rawJPEGY;
         }
