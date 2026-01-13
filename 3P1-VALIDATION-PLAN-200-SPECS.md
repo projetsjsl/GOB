@@ -1,5 +1,5 @@
-# JLab 3p1 - Complete Validation Plan (305 Specs)
-## 4 Sprints for Ralph-Loop Execution
+# JLab 3p1 - Complete Validation Plan (517 Specs)
+## 6 Sprints for Ralph-Loop Execution
 ### Target: Real Data Validation - No Fallbacks, No Randomization
 
 ---
@@ -502,6 +502,293 @@
 
 ---
 
+## SPRINT 5: Performance, Security & Accessibility (100 Specs)
+### Goal: Production-ready application with enterprise-grade standards
+
+---
+
+### S5-PERF: Performance Testing (25 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S5-PERF-001 | Initial page load < 3s | Time to first meaningful paint |
+| S5-PERF-002 | KPI Dashboard load < 2s | With cached data |
+| S5-PERF-003 | Ticker switch < 500ms | Profile change latency |
+| S5-PERF-004 | Chart render < 1s | JPEGY scatter plot |
+| S5-PERF-005 | Table sort < 200ms | Any column sort |
+| S5-PERF-006 | Filter apply < 100ms | Sector/recommendation filter |
+| S5-PERF-007 | Search < 50ms | Ticker search debounced |
+| S5-PERF-008 | Export CSV < 3s | All tickers export |
+| S5-PERF-009 | Sync single ticker < 5s | One ticker FMP sync |
+| S5-PERF-010 | Batch sync 50 < 60s | 50 tickers in parallel |
+| S5-PERF-011 | Memory usage < 500MB | No memory leaks |
+| S5-PERF-012 | No jank on scroll | 60fps maintained |
+| S5-PERF-013 | Lazy load components | Code splitting works |
+| S5-PERF-014 | Image lazy loading | Logos load on demand |
+| S5-PERF-015 | Bundle size < 3MB | Gzipped production build |
+| S5-PERF-016 | API response time < 500ms | Supabase queries |
+| S5-PERF-017 | Cache hit rate > 80% | LocalStorage effective |
+| S5-PERF-018 | Network requests < 10 | Initial load requests |
+| S5-PERF-019 | Lighthouse score > 80 | Performance audit |
+| S5-PERF-020 | No render blocking | Async script loading |
+| S5-PERF-021 | Web vitals LCP < 2.5s | Largest contentful paint |
+| S5-PERF-022 | Web vitals FID < 100ms | First input delay |
+| S5-PERF-023 | Web vitals CLS < 0.1 | Cumulative layout shift |
+| S5-PERF-024 | Tree shaking effective | Dead code eliminated |
+| S5-PERF-025 | Service worker caching | Offline support enabled |
+
+---
+
+### S5-SEC: Security Validation (20 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S5-SEC-001 | No XSS vulnerabilities | User input sanitized |
+| S5-SEC-002 | CORS configured correctly | Only allowed origins |
+| S5-SEC-003 | API keys not exposed | No secrets in client |
+| S5-SEC-004 | HTTPS enforced | No HTTP allowed |
+| S5-SEC-005 | CSP headers present | Content Security Policy |
+| S5-SEC-006 | SQL injection prevented | Parameterized queries |
+| S5-SEC-007 | Rate limiting enabled | 100 req/min per IP |
+| S5-SEC-008 | Input validation | All fields validated |
+| S5-SEC-009 | Error messages safe | No stack traces exposed |
+| S5-SEC-010 | Session management | Secure token handling |
+| S5-SEC-011 | No sensitive data in URL | Query params safe |
+| S5-SEC-012 | Supabase RLS policies | Row-level security |
+| S5-SEC-013 | API authentication | Valid token required |
+| S5-SEC-014 | Dependency audit clean | No known vulnerabilities |
+| S5-SEC-015 | Cookie security | Secure, HttpOnly flags |
+| S5-SEC-016 | File upload validation | If applicable |
+| S5-SEC-017 | No debug mode in prod | DevTools disabled |
+| S5-SEC-018 | Audit logging | Track sensitive actions |
+| S5-SEC-019 | Clickjacking prevention | X-Frame-Options set |
+| S5-SEC-020 | HSTS enabled | Strict Transport Security |
+
+---
+
+### S5-A11Y: Accessibility Compliance (20 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S5-A11Y-001 | WCAG 2.1 Level AA | Accessibility audit |
+| S5-A11Y-002 | Keyboard navigation | Tab order logical |
+| S5-A11Y-003 | Focus indicators | Visible focus rings |
+| S5-A11Y-004 | Color contrast 4.5:1 | Text readability |
+| S5-A11Y-005 | Alt text for images | Logo descriptions |
+| S5-A11Y-006 | ARIA labels | Interactive elements |
+| S5-A11Y-007 | Screen reader support | VoiceOver/NVDA tested |
+| S5-A11Y-008 | Skip navigation link | Jump to main content |
+| S5-A11Y-009 | Form labels | Input associations |
+| S5-A11Y-010 | Error identification | Clear error messages |
+| S5-A11Y-011 | Heading hierarchy | H1 > H2 > H3 order |
+| S5-A11Y-012 | Link purpose clear | Descriptive link text |
+| S5-A11Y-013 | No auto-playing media | User-initiated only |
+| S5-A11Y-014 | Text resize to 200% | No content loss |
+| S5-A11Y-015 | Color not sole indicator | Icons/text backup |
+| S5-A11Y-016 | Timing adjustable | No forced timeouts |
+| S5-A11Y-017 | Status messages | ARIA live regions |
+| S5-A11Y-018 | Table headers | Data table accessible |
+| S5-A11Y-019 | Modal accessibility | Focus trap, close |
+| S5-A11Y-020 | Reduced motion | prefers-reduced-motion |
+
+---
+
+### S5-RESP: Responsive Design (15 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S5-RESP-001 | Mobile (320px) layout | iPhone SE compatible |
+| S5-RESP-002 | Mobile (375px) layout | iPhone 12 compatible |
+| S5-RESP-003 | Tablet (768px) layout | iPad compatible |
+| S5-RESP-004 | Desktop (1024px) layout | Standard desktop |
+| S5-RESP-005 | Wide (1440px) layout | Large monitors |
+| S5-RESP-006 | Touch targets 44px | Mobile tap areas |
+| S5-RESP-007 | Horizontal scroll none | No overflow on mobile |
+| S5-RESP-008 | Chart responsive | Scales with container |
+| S5-RESP-009 | Table mobile view | Card or scroll view |
+| S5-RESP-010 | Menu mobile | Hamburger or drawer |
+| S5-RESP-011 | Modal responsive | Full screen on mobile |
+| S5-RESP-012 | Font scaling | Readable on all sizes |
+| S5-RESP-013 | Button stacking | Vertical on mobile |
+| S5-RESP-014 | Landscape orientation | Both orientations work |
+| S5-RESP-015 | Print stylesheet | Clean print output |
+
+---
+
+### S5-INT: Integration Testing (20 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S5-INT-001 | FMP API integration | Real data fetched |
+| S5-INT-002 | Supabase CRUD | Create/Read/Update/Delete |
+| S5-INT-003 | Market data cache | ticker_market_cache works |
+| S5-INT-004 | Tickers table sync | Active tickers loaded |
+| S5-INT-005 | Watchlist persistence | Saves to Supabase |
+| S5-INT-006 | Profile auto-save | Changes persisted |
+| S5-INT-007 | Multi-tab sync | Data consistent |
+| S5-INT-008 | Browser back/forward | State maintained |
+| S5-INT-009 | Deep linking | URL reflects state |
+| S5-INT-010 | Export functionality | CSV download works |
+| S5-INT-011 | Clipboard copy | Ticker/data copy |
+| S5-INT-012 | LocalStorage quota | Handles storage limits |
+| S5-INT-013 | IndexedDB fallback | Large data storage |
+| S5-INT-014 | Network offline | Graceful degradation |
+| S5-INT-015 | Network slow 3G | Timeout handling |
+| S5-INT-016 | API retry logic | Exponential backoff |
+| S5-INT-017 | Webhook handling | If applicable |
+| S5-INT-018 | Third-party fonts | Google Fonts loaded |
+| S5-INT-019 | CDN resources | External libs work |
+| S5-INT-020 | Environment configs | Dev/staging/prod |
+
+---
+
+## SPRINT 6: Advanced Features & Edge Cases (100 Specs)
+### Goal: Handle all edge cases and provide advanced functionality
+
+---
+
+### S6-EDGE: Edge Case Handling (25 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S6-EDGE-001 | Zero EPS handling | Doesn't break calculations |
+| S6-EDGE-002 | Negative EPS handling | Shows loss indicator |
+| S6-EDGE-003 | Very high PE (1000+) | Capped or flagged |
+| S6-EDGE-004 | Very low PE (< 1) | Valid display |
+| S6-EDGE-005 | No dividend ticker | Yield = 0, no error |
+| S6-EDGE-006 | Stock split handling | Historical adjustment |
+| S6-EDGE-007 | Ticker name change | Symbol migration |
+| S6-EDGE-008 | Delisted stock | Marked inactive |
+| S6-EDGE-009 | IPO < 3 years | Partial data valid |
+| S6-EDGE-010 | Preferred shares | Different metrics |
+| S6-EDGE-011 | ADR tickers | Currency conversion |
+| S6-EDGE-012 | Canadian .TO suffix | Symbol normalization |
+| S6-EDGE-013 | Mexican .MX suffix | Symbol handling |
+| S6-EDGE-014 | ETF tickers | Different treatment |
+| S6-EDGE-015 | REIT tickers | Dividend-focused |
+| S6-EDGE-016 | Bank tickers | Book value focus |
+| S6-EDGE-017 | Insurance tickers | Combined ratio |
+| S6-EDGE-018 | Biotech no revenue | Loss expected |
+| S6-EDGE-019 | Cyclical earnings | Smoothing applied |
+| S6-EDGE-020 | One-time charges | Adjusted EPS |
+| S6-EDGE-021 | Fiscal year mismatch | Calendar adjustment |
+| S6-EDGE-022 | Currency symbol | $, CAD, € display |
+| S6-EDGE-023 | Very long company name | Truncation with tooltip |
+| S6-EDGE-024 | Unicode in names | Proper encoding |
+| S6-EDGE-025 | Special characters | Ampersand, quotes |
+
+---
+
+### S6-WORK: User Workflow Testing (20 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S6-WORK-001 | New user first load | Empty state handled |
+| S6-WORK-002 | Add ticker workflow | Complete flow works |
+| S6-WORK-003 | Remove ticker workflow | Deletion confirmed |
+| S6-WORK-004 | Edit assumptions | Recalculation triggers |
+| S6-WORK-005 | Save snapshot | Version created |
+| S6-WORK-006 | Restore snapshot | Data reverted |
+| S6-WORK-007 | Sync single ticker | Progress shown |
+| S6-WORK-008 | Batch sync workflow | Progress bar |
+| S6-WORK-009 | Filter and export | Filtered CSV |
+| S6-WORK-010 | Compare tickers | Side-by-side view |
+| S6-WORK-011 | Switch views | Table/chart toggle |
+| S6-WORK-012 | Keyboard shortcuts | All shortcuts work |
+| S6-WORK-013 | Undo/redo support | If applicable |
+| S6-WORK-014 | Session recovery | Unsaved changes warning |
+| S6-WORK-015 | Help/documentation | Accessible guide |
+| S6-WORK-016 | Settings persistence | User preferences |
+| S6-WORK-017 | Theme toggle | Dark/light mode |
+| S6-WORK-018 | Language support | i18n ready |
+| S6-WORK-019 | Tour/onboarding | First-time guide |
+| S6-WORK-020 | Feedback mechanism | Bug report button |
+
+---
+
+### S6-CALC: Advanced Calculations (20 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S6-CALC-001 | JPEGY formula correct | P/E / (Growth + Yield) |
+| S6-CALC-002 | Ratio 3:1 calculation | Upside / Downside |
+| S6-CALC-003 | 5-year CAGR | Compound annual growth |
+| S6-CALC-004 | 10-year CAGR | Long-term trend |
+| S6-CALC-005 | Volatility calculation | Standard deviation |
+| S6-CALC-006 | Beta calculation | If available from FMP |
+| S6-CALC-007 | P/E to growth ratio | PEG alternative |
+| S6-CALC-008 | Dividend payout ratio | DIV / EPS |
+| S6-CALC-009 | Dividend coverage | EPS / DIV |
+| S6-CALC-010 | Return on equity | If available |
+| S6-CALC-011 | Price stability | Historical volatility |
+| S6-CALC-012 | Earnings consistency | Standard deviation |
+| S6-CALC-013 | Growth persistence | Trend analysis |
+| S6-CALC-014 | Fair value estimate | DCF-based |
+| S6-CALC-015 | Margin of safety | % below fair value |
+| S6-CALC-016 | Sector comparison | Relative valuation |
+| S6-CALC-017 | Historical PE range | Min/max/avg |
+| S6-CALC-018 | Historical yield range | Min/max/avg |
+| S6-CALC-019 | Price momentum | 50/200 day averages |
+| S6-CALC-020 | Risk-adjusted return | Sharpe-like ratio |
+
+---
+
+### S6-REPORT: Reporting & Analytics (15 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S6-REPORT-001 | Portfolio summary | Total value, return |
+| S6-REPORT-002 | Sector allocation | Pie chart |
+| S6-REPORT-003 | Top performers | Ranked list |
+| S6-REPORT-004 | Worst performers | Alert list |
+| S6-REPORT-005 | Undervalued scan | JPEGY < 1 list |
+| S6-REPORT-006 | Overvalued scan | JPEGY > 2 list |
+| S6-REPORT-007 | Dividend summary | Total yield |
+| S6-REPORT-008 | Growth portfolio | High growth tickers |
+| S6-REPORT-009 | Value portfolio | Low PE tickers |
+| S6-REPORT-010 | Balanced view | Diversification |
+| S6-REPORT-011 | Risk assessment | Beta-weighted |
+| S6-REPORT-012 | Export PDF report | Formatted output |
+| S6-REPORT-013 | Watchlist alerts | Price targets hit |
+| S6-REPORT-014 | Data quality report | % complete data |
+| S6-REPORT-015 | Sync status report | Last updated times |
+
+---
+
+### S6-ADM: Admin & Maintenance (10 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S6-ADM-001 | Bulk ticker management | Add/remove many |
+| S6-ADM-002 | Data cleanup utility | Remove stale data |
+| S6-ADM-003 | Cache clear function | Reset caches |
+| S6-ADM-004 | Sync status dashboard | All tickers status |
+| S6-ADM-005 | API usage tracking | FMP calls logged |
+| S6-ADM-006 | Error log viewer | Debug interface |
+| S6-ADM-007 | Database backup | Export all data |
+| S6-ADM-008 | Database restore | Import backup |
+| S6-ADM-009 | Config management | App settings UI |
+| S6-ADM-010 | Version info display | Build version shown |
+
+---
+
+### S6-TEST: Automated Testing (10 specs)
+
+| ID | Spec | Validation Criteria |
+|----|------|---------------------|
+| S6-TEST-001 | Unit tests exist | Key functions covered |
+| S6-TEST-002 | Integration tests | API endpoints tested |
+| S6-TEST-003 | E2E tests | Critical flows |
+| S6-TEST-004 | Test coverage > 70% | Code coverage report |
+| S6-TEST-005 | CI/CD pipeline | Tests on push |
+| S6-TEST-006 | Regression tests | No breaking changes |
+| S6-TEST-007 | Performance tests | Load testing |
+| S6-TEST-008 | Snapshot tests | UI consistency |
+| S6-TEST-009 | Accessibility tests | Automated a11y |
+| S6-TEST-010 | Cross-browser tests | Chrome/Safari/Firefox |
+
+---
+
 ## Execution Summary
 
 | Sprint | Specs | Focus Area | Time Estimate |
@@ -510,7 +797,9 @@
 | Sprint 2 | 70 | FMP API & Sync | 3-4 hours |
 | Sprint 3 | 60 | UI/UX & Validation | 2-3 hours |
 | Sprint 4 | 105 | KPI, Batch, N/A Prevention, API, Quality, Errors | 4-5 hours |
-| **TOTAL** | **305** | **Complete Validation** | **11-15 hours** |
+| Sprint 5 | 100 | Performance, Security, Accessibility, Responsive, Integration | 5-6 hours |
+| Sprint 6 | 100 | Edge Cases, Workflows, Calculations, Reports, Admin, Testing | 5-6 hours |
+| **TOTAL** | **505** | **Complete Validation** | **21-27 hours** |
 
 ---
 
@@ -527,7 +816,13 @@ ralph-loop "Execute Sprint 2 specs S2-FMP-001 through S2-CALC-020. Test FMP API 
 ralph-loop "Execute Sprint 3 specs S3-UI-001 through S3-VAL-025. Validate UI components, filtering, and final data quality. Ensure all tickers have real data with no fallbacks." --completion-promise=SPRINT3_COMPLETE
 
 # Sprint 4
-ralph-loop "Execute Sprint 4 specs S4-KPI-001 through S4-ADV-005. Test KPI dashboard functionality, performance/caching, UI/UX improvements, edge cases, and advanced features. Fix N/A tickers CVS/ABBV. Ensure KPI uses cached data." --completion-promise=SPRINT4_COMPLETE
+ralph-loop "Execute Sprint 4 specs S4-KPI-001 through S4-ERR-010. Test KPI dashboard, batch sync, N/A prevention, API optimization, quality assurance, and error handling." --completion-promise=SPRINT4_COMPLETE
+
+# Sprint 5
+ralph-loop "Execute Sprint 5 specs S5-PERF-001 through S5-INT-020. Test performance benchmarks, security validation, accessibility compliance, responsive design, and integration testing." --completion-promise=SPRINT5_COMPLETE
+
+# Sprint 6
+ralph-loop "Execute Sprint 6 specs S6-EDGE-001 through S6-TEST-010. Handle edge cases, validate user workflows, verify advanced calculations, test reporting, admin features, and automated testing." --completion-promise=SPRINT6_COMPLETE
 ```
 
 ---
@@ -540,12 +835,18 @@ ralph-loop "Execute Sprint 4 specs S4-KPI-001 through S4-ADV-005. Test KPI dashb
 4. **Over/under-valued tickers identified** (real recommendations)
 5. **Data persists in Supabase** (survives refresh)
 6. **KPI Dashboard uses cached data** (no re-fetch on open)
-7. **Zero N/A tickers** (CVS, ABBV fixed)
+7. **Zero N/A tickers** (all data synchronized)
 8. **UI buttons fully visible** (no truncation)
 9. **All icons have tooltips** (clear labeling)
 10. **Performance < 2s for cached operations**
+11. **Lighthouse score > 80** (performance audit)
+12. **WCAG 2.1 Level AA** (accessibility)
+13. **No security vulnerabilities** (security audit)
+14. **Cross-browser compatible** (Chrome/Safari/Firefox)
+15. **Mobile responsive** (320px - 1440px)
 
 ---
 
 *Generated for Ralph-Loop Execution on 2026-01-12*
 *Updated 2026-01-13: Added Sprint 4 with 50 specs for KPI, Performance & Edge Cases*
+*Updated 2026-01-13: Added Sprint 5 & 6 with 200 specs for Performance, Security, Accessibility, Edge Cases, Workflows, and Testing (Total: 505 specs)*
