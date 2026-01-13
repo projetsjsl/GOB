@@ -61,9 +61,18 @@ export async function saveProfilesBatchToSupabase(
 
   // ✅ Charger la taille du batch depuis Supabase (pas de hardcoding)
   const { getConfigValue } = await import('./appConfigApi');
-  const BATCH_SIZE = await getConfigValue('profile_batch_size');
-  for (let i = 0; i < tickers.length; i += BATCH_SIZE) {
-    const batch = tickers.slice(i, i + BATCH_SIZE);
+  const configuredBatchSize = Number(await getConfigValue('profile_batch_size'));
+  const configuredDelayMs = Number(await getConfigValue('delay_between_batches_ms'));
+  const MAX_CONCURRENT_SAVES = 10;
+  const batchSize = Number.isFinite(configuredBatchSize) && configuredBatchSize > 0
+    ? Math.max(1, Math.min(Math.floor(configuredBatchSize), MAX_CONCURRENT_SAVES))
+    : Math.min(5, MAX_CONCURRENT_SAVES);
+  const batchDelayMs = Number.isFinite(configuredDelayMs) && configuredDelayMs >= 0
+    ? configuredDelayMs
+    : 500;
+
+  for (let i = 0; i < tickers.length; i += batchSize) {
+    const batch = tickers.slice(i, i + batchSize);
 
     await Promise.allSettled(
       batch.map(async (ticker) => {
@@ -81,8 +90,8 @@ export async function saveProfilesBatchToSupabase(
     );
 
     // Petit délai entre batches pour éviter rate limiting
-    if (i + BATCH_SIZE < tickers.length) {
-      await new Promise(resolve => setTimeout(resolve, 500));
+    if (i + batchSize < tickers.length && batchDelayMs > 0) {
+      await new Promise(resolve => setTimeout(resolve, batchDelayMs));
     }
   }
 

@@ -58,12 +58,14 @@ export async function saveSnapshot(
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-            const errorMessage = errorData.error || `HTTP ${response.status}`;
-            
-            // ✅ RETRY: Pour erreurs 500 (Supabase), réessayer automatiquement
-            if (response.status === 500 && retryCount < maxRetries) {
-                const delay = (retryCount + 1) * 1000; // 1s, 2s, 3s...
-                console.warn(`⚠️ Snapshot error 500 for ${ticker}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+            const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}`;
+
+            const shouldRetry = [429, 500, 502, 503, 504].includes(response.status);
+            if (shouldRetry && retryCount < maxRetries) {
+                const baseDelay = 1000 * Math.pow(2, retryCount);
+                const jitter = Math.floor(Math.random() * 200);
+                const delay = baseDelay + jitter;
+                console.warn(`⚠️ Snapshot error ${response.status} for ${ticker}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 return saveSnapshot(ticker, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
             }
@@ -88,7 +90,9 @@ export async function saveSnapshot(
     } catch (error: any) {
         // ✅ RETRY: Pour erreurs réseau/timeout, réessayer automatiquement
         if (retryCount < maxRetries && (error.message?.includes('fetch') || error.message?.includes('timeout'))) {
-            const delay = (retryCount + 1) * 1000;
+            const baseDelay = 1000 * Math.pow(2, retryCount);
+            const jitter = Math.floor(Math.random() * 200);
+            const delay = baseDelay + jitter;
             console.warn(`⚠️ Snapshot network error for ${ticker}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
             await new Promise(resolve => setTimeout(resolve, delay));
             return saveSnapshot(ticker, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);

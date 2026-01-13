@@ -13,13 +13,23 @@
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+const SUPABASE_KEY =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.SUPABASE_KEY ||
+    process.env.SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export default async function handler(req, res) {
     // CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    console.log('[finance-snapshots] Request received', {
+        method: req.method,
+        query: req.query,
+        timestamp: new Date().toISOString()
+    });
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -186,6 +196,12 @@ async function getSnapshots(req, res, supabase) {
     return res.status(400).json({ error: 'Ticker, ID, or all=true required' });
 }
 
+async function createCurrentSnapshotWithRpc(supabase, payload) {
+    return await supabase
+        .rpc('create_current_snapshot', payload)
+        .single();
+}
+
 /**
  * POST - Create new snapshot
  */
@@ -230,21 +246,8 @@ async function createSnapshot(req, res, supabase) {
     }
 
     const cleanTicker = ticker.toUpperCase();
-
-    // If is_current=true, unmark other current snapshots for this ticker
-    // IMPORTANT: Faire cela AVANT l'insertion pour éviter les violations de contrainte unique
-    if (is_current) {
-        const { error: updateError } = await supabase
-            .from('finance_pro_snapshots')
-            .update({ is_current: false })
-            .eq('ticker', cleanTicker)
-            .eq('is_current', true);
-        
-        if (updateError) {
-            console.error(`❌ Error unmarking current snapshots for ${cleanTicker}:`, updateError);
-            // Ne pas bloquer l'insertion, mais logger l'erreur
-        }
-    }
+    const isCurrentValue = is_current !== undefined ? Boolean(is_current) : true;
+    const snapshotDate = new Date().toISOString().split('T')[0];
 
     // Nettoyer annual_data : supprimer les champs non standard et valider les valeurs numériques
     let cleanedAnnualData = [];
@@ -326,8 +329,8 @@ async function createSnapshot(req, res, supabase) {
         profile_id: profile_id || cleanTicker,
         user_id: user_id || null,
         notes: notes || null,
-        snapshot_date: new Date().toISOString().split('T')[0], // Format YYYY-MM-DD pour DATE
-        is_current: is_current !== undefined ? Boolean(is_current) : true,
+        snapshot_date: snapshotDate, // Format YYYY-MM-DD pour DATE
+        is_current: isCurrentValue,
         is_watchlist: is_watchlist !== undefined ? Boolean(is_watchlist) : false,
         auto_fetched: auto_fetched !== undefined ? Boolean(auto_fetched) : false,
         annual_data: cleanedAnnualData, // Utiliser les données nettoyées
@@ -351,45 +354,41 @@ async function createSnapshot(req, res, supabase) {
         });
     }
 
-    // Create snapshot
-    // Retry logic pour gérer les conflits de contrainte unique (is_current)
-    let retryCount = 0;
-    const maxRetries = 3;
-    let data, error;
-    
-    while (retryCount < maxRetries) {
-        const result = await supabase
-            .from('finance_pro_snapshots')
-            .insert([insertData])
-            .select()
-            .single();
-        
-        data = result.data;
-        error = result.error;
-        
-        // Si succès ou erreur non liée à la contrainte unique, sortir
-        if (!error || (error.code !== '23505' && !error.message?.includes('unique'))) {
-            break;
+    if (isCurrentValue) {
+        const { data, error } = await createCurrentSnapshotWithRpc(supabase, {
+            p_ticker: cleanTicker,
+            p_profile_id: insertData.profile_id,
+            p_user_id: insertData.user_id,
+            p_notes: insertData.notes,
+            p_snapshot_date: snapshotDate,
+            p_is_watchlist: insertData.is_watchlist,
+            p_auto_fetched: insertData.auto_fetched,
+            p_annual_data: insertData.annual_data,
+            p_assumptions: insertData.assumptions,
+            p_company_info: insertData.company_info,
+            p_sync_metadata: insertData.sync_metadata ?? null
+        });
+
+        if (error) {
+            console.error(`❌ Create snapshot error for ${cleanTicker}:`, error);
+            return res.status(500).json({ 
+                error: 'Failed to create snapshot',
+                details: error.message,
+                code: error.code,
+                hint: error.hint,
+                ticker: cleanTicker
+            });
         }
-        
-        // Si erreur de contrainte unique sur is_current, réessayer après avoir mis à jour
-        if (error.code === '23505' && is_current && retryCount < maxRetries - 1) {
-            console.warn(`⚠️ Unique constraint violation for ${cleanTicker}, retrying (attempt ${retryCount + 1}/${maxRetries})...`);
-            // S'assurer que tous les autres snapshots sont marqués comme non-current
-            await supabase
-                .from('finance_pro_snapshots')
-                .update({ is_current: false })
-                .eq('ticker', cleanTicker)
-                .eq('is_current', true);
-            
-            // Attendre un peu avant de réessayer (éviter les conditions de course)
-            await new Promise(resolve => setTimeout(resolve, 100 * (retryCount + 1)));
-            retryCount++;
-            continue;
-        }
-        
-        break;
+
+        console.log(`✅ Created snapshot for ${cleanTicker} (version ${data.version})`);
+        return res.status(201).json(data);
     }
+
+    const { data, error } = await supabase
+        .from('finance_pro_snapshots')
+        .insert([insertData])
+        .select()
+        .single();
 
     if (error) {
         console.error(`❌ Create snapshot error for ${cleanTicker}:`, error);
@@ -399,69 +398,6 @@ async function createSnapshot(req, res, supabase) {
             hint: error.hint,
             details: error.details
         });
-        
-        // Si l'erreur est liée à sync_metadata (colonne inexistante), réessayer sans
-        if (error.code === '42703' || (error.message && error.message.includes('sync_metadata'))) {
-            console.warn('⚠️ sync_metadata column not found, retrying without it...');
-            delete insertData.sync_metadata;
-            
-            const { data: retryData, error: retryError } = await supabase
-                .from('finance_pro_snapshots')
-                .insert([insertData])
-                .select()
-                .single();
-            
-            if (retryError) {
-                console.error('Retry create snapshot error:', retryError);
-                return res.status(500).json({ 
-                    error: 'Failed to create snapshot',
-                    details: retryError.message,
-                    code: retryError.code,
-                    hint: retryError.hint
-                });
-            }
-            
-            console.log(`✅ Created snapshot for ${cleanTicker} (version ${retryData.version}) - without sync_metadata`);
-            return res.status(201).json(retryData);
-        }
-        
-        // Si erreur 400, c'est probablement un problème de validation JSON
-        // Essayer de nettoyer encore plus les données
-        if (error.code === '23502' || error.code === '23514' || (error.message && error.message.includes('constraint'))) {
-            console.warn(`⚠️ Validation error for ${cleanTicker}, trying with minimal data...`);
-            
-            // Essayer avec des données minimales pour identifier le problème
-            const minimalData = {
-                ticker: cleanTicker,
-                profile_id: profile_id || cleanTicker,
-                is_current,
-                is_watchlist,
-                auto_fetched,
-                annual_data: cleanedAnnualData.length > 0 ? cleanedAnnualData.slice(0, 1) : cleanedAnnualData, // Un seul élément pour test
-                assumptions: assumptions || {},
-                company_info: company_info || {}
-            };
-            
-            const { data: minimalRetryData, error: minimalRetryError } = await supabase
-                .from('finance_pro_snapshots')
-                .insert([minimalData])
-                .select()
-                .single();
-            
-            if (minimalRetryError) {
-                console.error('Minimal retry also failed:', minimalRetryError);
-                return res.status(500).json({ 
-                    error: 'Failed to create snapshot (validation error)',
-                    details: error.message,
-                    code: error.code,
-                    hint: error.hint,
-                    ticker: cleanTicker
-                });
-            }
-            
-            console.log(`✅ Created snapshot for ${cleanTicker} with minimal data`);
-            return res.status(201).json(minimalRetryData);
-        }
         
         return res.status(500).json({ 
             error: 'Failed to create snapshot',
