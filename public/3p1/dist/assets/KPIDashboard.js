@@ -1861,7 +1861,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
             key = metric.recommendation || "N/A";
             break;
           case "source":
-            key = metric.profile.isWatchlist ?? false ? "Watchlist" : "Portefeuille";
+            key = metric.profile.isWatchlist === true ? "Watchlist" : metric.profile.isWatchlist === false ? "Portefeuille" : "Autres";
             break;
         }
         if (!groups.has(key)) {
@@ -3119,7 +3119,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10", title: "Données invalides ou manquantes", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3 text-white" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 mb-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-xs font-bold ${metric.hasInvalidData ? "line-through opacity-70" : ""}`, children: metric.profile.id }),
-                metric.profile.isWatchlist ?? false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3 text-blue-300", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3 text-yellow-400", title: "Portefeuille" })
+                metric.profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3 text-blue-300", title: "Watchlist" }) : metric.profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3 text-yellow-400", title: "Portefeuille" }) : null
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? "opacity-50" : ""}`, children: metric._isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-5 h-5 text-white/50 animate-spin mb-1" }),
@@ -3166,7 +3166,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                     children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `absolute inset-0 rounded-lg ${metric.hasInvalidData ? "" : getReturnBgClass(metric.totalReturnPercent)}` }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "relative z-10", children: metric.profile.id }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -right-1 z-10", children: metric.profile.isWatchlist ?? false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-blue-300", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-4 h-4 text-yellow-400", title: "Portefeuille" }) }),
+                      metric.profile.isWatchlist !== null && metric.profile.isWatchlist !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -right-1 z-10", children: metric.profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-blue-300", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-4 h-4 text-yellow-400", title: "Portefeuille" }) }),
                       metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10", title: "Données invalides", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3 text-white" }) })
                     ]
                   }
@@ -3174,7 +3174,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `font-bold text-gray-800 ${metric.hasInvalidData ? "line-through opacity-70" : ""}`, children: metric.profile.info.name || metric.profile.id }),
-                    metric.profile.isWatchlist ?? false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-blue-500", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-4 h-4 text-yellow-500", title: "Portefeuille" })
+                    metric.profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-blue-500", title: "Watchlist" }) : metric.profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-4 h-4 text-yellow-500", title: "Portefeuille" }) : null
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: metric.profile.info.sector })
                 ] }),
@@ -3238,7 +3238,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3 text-red-500 absolute -top-1 -left-1" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-0.5", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `font-bold ${metric.hasInvalidData ? "line-through" : ""}`, children: metric.profile.id }),
-                metric.profile.isWatchlist ?? false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-2.5 h-2.5 text-blue-300", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-2.5 h-2.5 text-yellow-400", title: "Portefeuille" })
+                metric.profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-2.5 h-2.5 text-blue-300", title: "Watchlist" }) : metric.profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-2.5 h-2.5 text-yellow-400", title: "Portefeuille" }) : null
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[8px]", children: metric._isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-3 h-3 animate-spin mx-auto" }) : metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A" : `${metric.totalReturnPercent.toFixed(0)}%` })
             ] })
@@ -4390,7 +4390,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 sm:p-3 font-bold text-xs sm:text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5 sm:gap-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: metric.profile.id }),
-                  metric.profile.isWatchlist ?? false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 flex-shrink-0", title: "Portefeuille" })
+                  metric.profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0", title: "Watchlist" }) : metric.profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 flex-shrink-0", title: "Portefeuille" }) : null
                 ] }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 sm:p-3 text-right text-xs sm:text-sm", children: metric._isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1 text-gray-400", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-3 h-3 animate-spin" }),

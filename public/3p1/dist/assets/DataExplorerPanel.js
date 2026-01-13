@@ -23,6 +23,145 @@ function CloudArrowDownIcon({
   }));
 }
 const ForwardRef = /* @__PURE__ */ reactExports.forwardRef(CloudArrowDownIcon);
+const LEVEL_PRIORITY = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3
+};
+const LEVEL_COLORS = {
+  debug: "#6b7280",
+  info: "#3b82f6",
+  warn: "#f59e0b",
+  error: "#ef4444"
+};
+class Logger {
+  constructor() {
+    this.config = {
+      enabled: false,
+      minLevel: "debug",
+      prefix: "3p1"
+    };
+  }
+  shouldLog(level) {
+    if (!this.config.enabled) return false;
+    return LEVEL_PRIORITY[level] >= LEVEL_PRIORITY[this.config.minLevel];
+  }
+  /**
+   * Start a collapsible group for related logs
+   */
+  group(label, collapsed = true) {
+    if (!this.config.enabled) return;
+    const method = collapsed ? "groupCollapsed" : "group";
+    console[method](`%c[${this.config.prefix}] ${label}`, "font-weight: bold; color: #8b5cf6");
+  }
+  /**
+   * End the current group
+   */
+  groupEnd() {
+    if (!this.config.enabled) return;
+    console.groupEnd();
+  }
+  /**
+   * Log with automatic grouping
+   */
+  withGroup(label, fn) {
+    this.group(label);
+    try {
+      return fn();
+    } finally {
+      this.groupEnd();
+    }
+  }
+  /**
+   * Async version of withGroup
+   */
+  async withGroupAsync(label, fn) {
+    this.group(label);
+    try {
+      return await fn();
+    } finally {
+      this.groupEnd();
+    }
+  }
+  debug(message, ...args) {
+    if (!this.shouldLog("debug")) return;
+    console.log(
+      `%c[${this.config.prefix}] %c${message}`,
+      `color: ${LEVEL_COLORS.debug}`,
+      "color: inherit",
+      ...args
+    );
+  }
+  info(message, ...args) {
+    if (!this.shouldLog("info")) return;
+    console.log(
+      `%c[${this.config.prefix}] %c${message}`,
+      `color: ${LEVEL_COLORS.info}; font-weight: bold`,
+      "color: inherit",
+      ...args
+    );
+  }
+  warn(message, ...args) {
+    if (!this.shouldLog("warn")) return;
+    console.warn(
+      `%c[${this.config.prefix}] %c${message}`,
+      `color: ${LEVEL_COLORS.warn}; font-weight: bold`,
+      "color: inherit",
+      ...args
+    );
+  }
+  error(message, ...args) {
+    if (!this.shouldLog("error")) return;
+    console.error(
+      `%c[${this.config.prefix}] %c${message}`,
+      `color: ${LEVEL_COLORS.error}; font-weight: bold`,
+      "color: inherit",
+      ...args
+    );
+  }
+  /**
+   * Log a success message with checkmark
+   */
+  success(message, ...args) {
+    if (!this.config.enabled) return;
+    console.log(
+      `%c[${this.config.prefix}] ✅ %c${message}`,
+      "color: #22c55e; font-weight: bold",
+      "color: inherit",
+      ...args
+    );
+  }
+  /**
+   * Log a table for structured data
+   */
+  table(data, columns) {
+    if (!this.config.enabled) return;
+    if (columns) {
+      console.table(data, columns);
+    } else {
+      console.table(data);
+    }
+  }
+  /**
+   * Time an operation
+   */
+  time(label) {
+    if (!this.config.enabled) return;
+    console.time(`[${this.config.prefix}] ${label}`);
+  }
+  timeEnd(label) {
+    if (!this.config.enabled) return;
+    console.timeEnd(`[${this.config.prefix}] ${label}`);
+  }
+  /**
+   * Configure the logger
+   */
+  configure(options) {
+    this.config = { ...this.config, ...options };
+  }
+}
+const logger = new Logger();
 const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
   const [tables, setTables] = reactExports.useState([]);
   const [selectedTable, setSelectedTable] = reactExports.useState(null);
@@ -207,7 +346,7 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
     const tableConfig = tables.find((t) => t.name === selectedTable);
     const pk = (tableConfig == null ? void 0 : tableConfig.primaryKey) || "id";
     const id = row[pk] || row.id || row.ticker;
-    console.log(`[DataExplorer] Deleting from ${selectedTable}, PK=${pk}, ID=${id}`, row);
+    logger.debug(`Deleting from ${selectedTable}, PK=${pk}, ID=${id}`, row);
     if (!id) {
       addNotification("error", `Impossible de trouver l'ID (clé primaire: ${pk}) pour cet enregistrement`);
       return;
@@ -231,12 +370,12 @@ ID: ${id}`)) return;
         setTableData((prev) => prev.filter((r) => (r[pk] || r.id || r.ticker) !== id));
         loadTables();
       } else {
-        console.error("Delete failed:", result);
+        logger.error("Delete failed:", result);
         addNotification("error", result.error || "Erreur de suppression");
         setError(result.error);
       }
     } catch (e) {
-      console.error("Delete exception:", e);
+      logger.error("Delete exception:", e);
       addNotification("error", e.message);
       setError(e.message);
     } finally {
@@ -348,6 +487,8 @@ ID: ${id}`)) return;
           {
             onClick: onClose,
             className: "p-2 hover:bg-slate-700 rounded-lg transition-colors",
+            "aria-label": "Fermer le panneau",
+            title: "Fermer",
             children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5 text-slate-400" })
           }
         )
@@ -499,7 +640,9 @@ ID: ${id}`)) return;
                 type: "checkbox",
                 checked: selectedRows.size === tableData.length && tableData.length > 0,
                 onChange: selectAllRows,
-                className: "rounded bg-slate-700 border-slate-600"
+                className: "rounded bg-slate-700 border-slate-600",
+                "aria-label": "Sélectionner toutes les lignes",
+                title: "Sélectionner toutes les lignes"
               }
             ) }),
             columns.slice(0, 8).map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -527,7 +670,9 @@ ID: ${id}`)) return;
                     type: "checkbox",
                     checked: selectedRows.has(row.id || row.ticker),
                     onChange: () => toggleRowSelection(row.id || row.ticker),
-                    className: "rounded bg-slate-700 border-slate-600"
+                    className: "rounded bg-slate-700 border-slate-600",
+                    "aria-label": `Sélectionner ${row.ticker || row.id}`,
+                    title: `Sélectionner ${row.ticker || row.id}`
                   }
                 ) }),
                 columns.slice(0, 8).map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-slate-300", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "truncate max-w-[200px]", title: formatValue(row[col.name], col.name), children: formatValue(row[col.name], col.name) }) }, col.name)),
@@ -541,6 +686,7 @@ ID: ${id}`)) return;
                       },
                       className: "p-1 hover:bg-slate-700 rounded text-blue-400 transition-colors",
                       title: "Modifier",
+                      "aria-label": "Modifier cette ligne",
                       children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-4 h-4", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" }) })
                     }
                   ),
@@ -550,6 +696,7 @@ ID: ${id}`)) return;
                       onClick: () => handleSyncFMP(row.ticker),
                       className: "p-1 hover:bg-slate-700 rounded text-green-400 transition-colors",
                       title: "Synchroniser FMP",
+                      "aria-label": `Synchroniser ${row.ticker} depuis FMP`,
                       children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4" })
                     }
                   ),
@@ -559,6 +706,7 @@ ID: ${id}`)) return;
                       onClick: () => handleDeleteRow(row),
                       className: "p-1 hover:bg-slate-700 rounded text-red-400 transition-colors",
                       title: "Supprimer",
+                      "aria-label": "Supprimer cette ligne",
                       children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-4 h-4", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" }) })
                     }
                   )
@@ -683,6 +831,8 @@ ID: ${id}`)) return;
             {
               onClick: () => setNotifications((prev) => prev.filter((x) => x.id !== n.id)),
               className: "ml-4 p-1 hover:bg-black/10 rounded",
+              "aria-label": "Fermer la notification",
+              title: "Fermer",
               children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-4 h-4" })
             }
           )
@@ -743,7 +893,7 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
         setShowTickerResults(true);
       }
     } catch (e) {
-      console.error(e);
+      logger.error("Error:", e);
     }
   };
   const selectTicker = (symbol) => {
@@ -774,7 +924,7 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
         alert("Donnée non trouvée chez FMP pour ce champ.");
       }
     } catch (e) {
-      console.error(e);
+      logger.error("Error:", e);
       alert("Erreur lors de la récupération FMP");
     } finally {
       setLoadingField(null);
@@ -792,7 +942,7 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 z-[60] bg-black/60 flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[80vh]", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 border-b border-slate-700 flex justify-between items-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-white", children: title }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onClose, className: "p-2 hover:bg-slate-700 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onClose, className: "p-2 hover:bg-slate-700 rounded-lg", "aria-label": "Fermer le modal d'édition", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6 overflow-y-auto space-y-4", children: columns.map((col) => {
       if (["id", "created_at", "updated_at"].includes(col.name)) return null;
@@ -811,6 +961,7 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
                 disabled: !!loadingField,
                 className: `flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded transition-colors disabled:opacity-50 ${hasFmpValue ? "bg-green-600/20 text-green-400" : "bg-blue-600/20 text-blue-400 hover:bg-blue-600/30"}`,
                 title: "Récupérer depuis FMP",
+                "aria-label": `Récupérer ${col.name} depuis FMP`,
                 children: [
                   loadingField === col.name ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-3 h-3 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "FMP" })
@@ -873,7 +1024,9 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
               } catch {
               }
             },
-            className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32 focus:border-blue-500 outline-none"
+            className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32 focus:border-blue-500 outline-none",
+            "aria-label": col.name.replace(/_/g, " "),
+            title: `Éditer ${col.name.replace(/_/g, " ")} (format JSON)`
           }
         ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -882,7 +1035,9 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
               type: col.type === "number" || typeof formData[col.name] === "number" ? "number" : "text",
               value: formData[col.name] === null ? "" : formData[col.name],
               onChange: (e) => setFormData({ ...formData, [col.name]: col.type === "number" ? parseFloat(e.target.value) : e.target.value }),
-              className: `w-full bg-slate-900 border-slate-600 rounded-lg p-3 text-white focus:border-blue-500 outline-none border ${hasFmpValue ? "border-green-500/50" : ""}`
+              className: `w-full bg-slate-900 border-slate-600 rounded-lg p-3 text-white focus:border-blue-500 outline-none border ${hasFmpValue ? "border-green-500/50" : ""}`,
+              "aria-label": col.name.replace(/_/g, " "),
+              placeholder: col.name.replace(/_/g, " ")
             }
           ),
           hasFmpValue && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-full left-0 mt-1 z-10 w-full animate-in fade-in slide-in-from-top-1 duration-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800 border border-green-500/50 rounded-lg shadow-xl p-2 flex items-center justify-between gap-3", children: [
@@ -901,6 +1056,8 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
                     setFmpValues(newFmpValues);
                   },
                   className: "p-1 hover:bg-slate-700/50 rounded text-slate-400 hover:text-white",
+                  "aria-label": "Ignorer la suggestion FMP",
+                  title: "Ignorer la suggestion FMP",
                   children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-4 h-4" })
                 }
               ),
