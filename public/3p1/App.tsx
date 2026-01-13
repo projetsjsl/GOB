@@ -569,52 +569,51 @@ export default function App() {
                             // Format direct
                             parsed = saved as Record<string, AnalysisProfile>;
                         }
-                    }
-                }
 
-                    // NETTOYER LES FONDS MUTUELS : Supprimer automatiquement les fonds mutuels existants
-                    const cleaned: Record<string, AnalysisProfile> = {};
-                    const removedMutualFunds: string[] = [];
-                    
-                    for (const [symbol, profile] of Object.entries(parsed)) {
-                        const companyName = (profile as AnalysisProfile)?.info?.name || '';
-                        if (isMutualFund(symbol, companyName)) {
-                            removedMutualFunds.push(symbol);
-                        } else {
-                            cleaned[symbol] = profile as AnalysisProfile;
+                        // NETTOYER LES FONDS MUTUELS : Supprimer automatiquement les fonds mutuels existants
+                        const cleaned: Record<string, AnalysisProfile> = {};
+                        const removedMutualFunds: string[] = [];
+
+                        for (const [symbol, profile] of Object.entries(parsed)) {
+                            const companyName = (profile as AnalysisProfile)?.info?.name || '';
+                            if (isMutualFund(symbol, companyName)) {
+                                removedMutualFunds.push(symbol);
+                            } else {
+                                cleaned[symbol] = profile as AnalysisProfile;
+                            }
                         }
-                    }
-                    
-                    if (removedMutualFunds.length > 0) {
-                        console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement`);
-                        // ✅ Sauvegarder dans Supabase ET cache local
-                        await saveProfiles(cleaned, true);
-                    }
-                    
-                    if (Object.keys(cleaned).length > 0) {
-                        setLibrary(cleaned);
-                        // Sélectionner le premier ticker en ordre alphabétique
-                        const sortedKeys = Object.keys(cleaned).sort((a, b) => 
-                            (cleaned[a].info.preferredSymbol || a).localeCompare(cleaned[b].info.preferredSymbol || b)
-                        );
-                        setActiveId(sortedKeys[0]);
+
+                        if (removedMutualFunds.length > 0) {
+                            console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement`);
+                            // ✅ Sauvegarder dans Supabase ET cache local
+                            await saveProfiles(cleaned, true);
+                        }
+
+                        if (Object.keys(cleaned).length > 0) {
+                            setLibrary(cleaned);
+                            // Sélectionner le premier ticker en ordre alphabétique
+                            const sortedKeys = Object.keys(cleaned).sort((a, b) =>
+                                (cleaned[a].info.preferredSymbol || a).localeCompare(cleaned[b].info.preferredSymbol || b)
+                            );
+                            setActiveId(sortedKeys[0]);
+                        } else {
+                            // ✅ NOUVEAU : Cache vide ou obsolète → Forcer chargement depuis Supabase
+                            console.log('📡 Cache vide ou obsolète - Chargement depuis Supabase...');
+                            setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
+                            setActiveId(DEFAULT_PROFILE.id);
+                            // Marquer pour forcer le chargement depuis Supabase
+                            hasLoadedTickersRef.current = false;
+                            supabaseTickersCacheRef.current = null;
+                        }
                     } else {
-                        // ✅ NOUVEAU : Cache vide ou obsolète → Forcer chargement depuis Supabase
-                        console.log('📡 Cache vide ou obsolète - Chargement depuis Supabase...');
+                        // ✅ NOUVEAU : Aucun cache → Forcer chargement depuis Supabase
+                        console.log('📡 Aucun cache trouvé - Chargement depuis Supabase...');
                         setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                         setActiveId(DEFAULT_PROFILE.id);
                         // Marquer pour forcer le chargement depuis Supabase
                         hasLoadedTickersRef.current = false;
                         supabaseTickersCacheRef.current = null;
                     }
-                } else {
-                    // ✅ NOUVEAU : Aucun cache → Forcer chargement depuis Supabase
-                    console.log('📡 Aucun cache trouvé - Chargement depuis Supabase...');
-                    setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
-                    setActiveId(DEFAULT_PROFILE.id);
-                    // Marquer pour forcer le chargement depuis Supabase
-                    hasLoadedTickersRef.current = false;
-                    supabaseTickersCacheRef.current = null;
                 }
             } catch (e) {
                 console.warn("Storage access failed", e);
@@ -1464,13 +1463,15 @@ export default function App() {
         } else {
             // ⚠️ Profil non trouvé dans la library - peut-être un nouveau ticker ou chargement initial
             // Si c'est un profil squelette ou manquant, on tente de forcer le chargement
-             // Afficher un avertissement si ce n'est pas le profil initial (ACN) ou si on vient de delete
+            // Afficher un avertissement si ce n'est pas le profil initial (ACN) ou si on vient de delete
             // ✅ Vérifier le ticker par défaut depuis Supabase (pas de hardcoding)
-            const { getConfigValue } = await import('./services/appConfigApi');
-            const defaultTicker = await getConfigValue('default_ticker');
-            if (activeId !== defaultTicker && activeId !== '') {
-                 // Ne pas afficher d'erreur tout de suite, cela peut être transitoire
-            }
+            (async () => {
+                const { getConfigValue } = await import('./services/appConfigApi');
+                const defaultTicker = await getConfigValue('default_ticker');
+                if (activeId !== defaultTicker && activeId !== '') {
+                    // Ne pas afficher d'erreur tout de suite, cela peut être transitoire
+                }
+            })();
         }
         
         // ✅ PRIORITÉ CRITIQUE : Si le profil actif est un squelette (vide), le charger IMMÉDIATEMENT
@@ -4874,9 +4875,8 @@ export default function App() {
                      </ErrorBoundary>
             </div>
         </div>
-        </>
-    );
-}
+        );
+    }
 
 
     // Handler générique pour mettre à jour un profil complet (utilisé par KPIDashboard)

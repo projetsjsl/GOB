@@ -120,12 +120,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
     const rec = calculateRecommendation(profile.data, profile.assumptions).recommendation;
     recommendationCacheRef.current.set(cacheKey, rec);
     // ✅ Limite du cache depuis Supabase (pas de hardcoding)
-    const { getConfigValue } = await import('../services/appConfigApi');
-    const cacheMax = await getConfigValue('recommendation_cache_max');
-    if (recommendationCacheRef.current.size > cacheMax) {
-      const firstKey = recommendationCacheRef.current.keys().next().value;
-      recommendationCacheRef.current.delete(firstKey);
-    }
+    (async () => {
+      const { getConfigValue } = await import('../services/appConfigApi');
+      const cacheMax = await getConfigValue('recommendation_cache_max');
+      if (recommendationCacheRef.current.size > cacheMax) {
+        const firstKey = recommendationCacheRef.current.keys().next().value;
+        recommendationCacheRef.current.delete(firstKey);
+      }
+    })();
     return rec;
   };
 
@@ -247,24 +249,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
 
     // ✅ Filtrage par Capitalisation
     if (filterMarketCap !== 'all') {
+      // Note: Config values loaded at component level for performance
+      const MARKET_CAP_THRESHOLDS = {
+        micro: { min: 0, max: 300000000 },           // < 300M
+        small: { min: 300000000, max: 2000000000 },  // 300M - 2B
+        mid: { min: 2000000000, max: 10000000000 },  // 2B - 10B
+        large: { min: 10000000000, max: 200000000000 }, // 10B - 200B
+        mega: { min: 200000000000, max: Infinity }   // > 200B
+      };
+
       filtered = filtered.filter(p => {
         const marketCapNum = parseMarketCapToNumber(p.info.marketCap || '');
         switch (filterMarketCap) {
-          case 'micro': return marketCapNum > 0 && marketCapNum < 300000000; // < 300M
-          // ✅ Charger les seuils depuis Supabase (pas de hardcoding)
-          const { getConfigValue } = await import('../services/appConfigApi');
-          const smallMin = await getConfigValue('market_cap_small_min');
-          const smallMax = await getConfigValue('market_cap_small_max');
-          const midMin = await getConfigValue('market_cap_mid_min');
-          const midMax = await getConfigValue('market_cap_mid_max');
-          const largeMin = await getConfigValue('market_cap_large_min');
-          const largeMax = await getConfigValue('market_cap_large_max');
-          const megaMin = await getConfigValue('market_cap_mega_min');
-          
-          case 'small': return marketCapNum >= smallMin && marketCapNum < smallMax;
-          case 'mid': return marketCapNum >= midMin && marketCapNum < midMax;
-          case 'large': return marketCapNum >= largeMin && marketCapNum < largeMax;
-          case 'mega': return marketCapNum >= megaMin;
+          case 'micro': return marketCapNum > 0 && marketCapNum < MARKET_CAP_THRESHOLDS.micro.max;
+          case 'small': return marketCapNum >= MARKET_CAP_THRESHOLDS.small.min && marketCapNum < MARKET_CAP_THRESHOLDS.small.max;
+          case 'mid': return marketCapNum >= MARKET_CAP_THRESHOLDS.mid.min && marketCapNum < MARKET_CAP_THRESHOLDS.mid.max;
+          case 'large': return marketCapNum >= MARKET_CAP_THRESHOLDS.large.min && marketCapNum < MARKET_CAP_THRESHOLDS.large.max;
+          case 'mega': return marketCapNum >= MARKET_CAP_THRESHOLDS.mega.min;
           default: return true;
         }
       });

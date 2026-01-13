@@ -404,8 +404,8 @@ export const autoFillAssumptionsFromFMPData = (
       const yearsWithDividend = data.filter(d => d.dividendPerShare > 0 && d.priceHigh > 0);
       if (yearsWithDividend.length > 0) {
         const avgYield = yearsWithDividend.reduce((sum, d) => {
-          const yield = (d.dividendPerShare / d.priceHigh) * 100;
-          return sum + yield;
+          const yieldPercent = (d.dividendPerShare / d.priceHigh) * 100;
+          return sum + yieldPercent;
         }, 0) / yearsWithDividend.length;
         
         // Si le yield moyen est raisonnable (0.1% à 20%), utiliser pour estimer le dividende actuel

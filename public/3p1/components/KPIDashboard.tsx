@@ -691,7 +691,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             key = metric.recommendation || 'N/A';
             break;
           case 'source':
-            key = (metric.profile.isWatchlist ?? false) ? 'Watchlist' : 'Portefeuille';
+            key = metric.profile.isWatchlist === true ? 'Watchlist' :
+                  metric.profile.isWatchlist === false ? 'Portefeuille' : 'Autres';
             break;
         }
         if (!groups.has(key)) {
@@ -2037,11 +2038,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       )}
                       <div className="flex items-center gap-1 mb-1">
                         <div className={`text-xs font-bold ${metric.hasInvalidData ? 'line-through opacity-70' : ''}`}>{metric.profile.id}</div>
-                        {(metric.profile.isWatchlist ?? false) ? (
+                        {metric.profile.isWatchlist === true ? (
                           <EyeIcon className="w-3 h-3 text-blue-300" title="Watchlist" />
-                        ) : (
+                        ) : metric.profile.isWatchlist === false ? (
                           <StarIcon className="w-3 h-3 text-yellow-400" title="Portefeuille" />
-                        )}
+                        ) : null}
                       </div>
                       <div className={`text-[10px] font-semibold mb-1 ${metric.hasInvalidData ? 'opacity-50' : ''}`}>
                         {(metric as any)._isLoading ? (
@@ -2103,13 +2104,15 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       >
                         <div className={`absolute inset-0 rounded-lg ${metric.hasInvalidData ? '' : getReturnBgClass(metric.totalReturnPercent)}`} />
                         <span className="relative z-10">{metric.profile.id}</span>
-                        <div className="absolute -top-1 -right-1 z-10">
-                          {(metric.profile.isWatchlist ?? false) ? (
-                            <EyeIcon className="w-4 h-4 text-blue-300" title="Watchlist" />
-                          ) : (
-                            <StarIcon className="w-4 h-4 text-yellow-400" title="Portefeuille" />
-                          )}
-                        </div>
+                        {metric.profile.isWatchlist !== null && metric.profile.isWatchlist !== undefined && (
+                          <div className="absolute -top-1 -right-1 z-10">
+                            {metric.profile.isWatchlist === true ? (
+                              <EyeIcon className="w-4 h-4 text-blue-300" title="Watchlist" />
+                            ) : (
+                              <StarIcon className="w-4 h-4 text-yellow-400" title="Portefeuille" />
+                            )}
+                          </div>
+                        )}
                         {metric.hasInvalidData && (
                           <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10" title="Données invalides">
                             <ExclamationTriangleIcon className="w-3 h-3 text-white" />
@@ -2119,11 +2122,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <div className={`font-bold text-gray-800 ${metric.hasInvalidData ? 'line-through opacity-70' : ''}`}>{metric.profile.info.name || metric.profile.id}</div>
-                          {(metric.profile.isWatchlist ?? false) ? (
+                          {metric.profile.isWatchlist === true ? (
                             <EyeIcon className="w-4 h-4 text-blue-500" title="Watchlist" />
-                          ) : (
+                          ) : metric.profile.isWatchlist === false ? (
                             <StarIcon className="w-4 h-4 text-yellow-500" title="Portefeuille" />
-                          )}
+                          ) : null}
                         </div>
                         <div className="text-xs text-gray-500">{metric.profile.info.sector}</div>
                       </div>
@@ -2215,11 +2218,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       )}
                       <div className="flex items-center gap-0.5">
                         <div className={`font-bold ${metric.hasInvalidData ? 'line-through' : ''}`}>{metric.profile.id}</div>
-                        {(metric.profile.isWatchlist ?? false) ? (
+                        {metric.profile.isWatchlist === true ? (
                           <EyeIcon className="w-2.5 h-2.5 text-blue-300" title="Watchlist" />
-                        ) : (
+                        ) : metric.profile.isWatchlist === false ? (
                           <StarIcon className="w-2.5 h-2.5 text-yellow-400" title="Portefeuille" />
-                        )}
+                        ) : null}
                       </div>
                       <div className="text-[8px]">
                         {(metric as any)._isLoading ? <ArrowPathIcon className="w-3 h-3 animate-spin mx-auto" /> : (metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A' : `${metric.totalReturnPercent.toFixed(0)}%`)}
@@ -3545,11 +3548,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   <td className="p-2 sm:p-3 font-bold text-xs sm:text-sm">
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="truncate">{metric.profile.id}</span>
-                      {(metric.profile.isWatchlist ?? false) ? (
+                      {metric.profile.isWatchlist === true ? (
                         <EyeIcon className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500 flex-shrink-0" title="Watchlist" />
-                      ) : (
+                      ) : metric.profile.isWatchlist === false ? (
                         <StarIcon className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 flex-shrink-0" title="Portefeuille" />
-                      )}
+                      ) : null}
                     </div>
                   </td>
                   <td className="p-2 sm:p-3 text-right text-xs sm:text-sm">
