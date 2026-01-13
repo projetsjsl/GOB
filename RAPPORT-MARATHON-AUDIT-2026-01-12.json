@@ -1,0 +1,281 @@
+{
+  "startTime": "2026-01-11T15:21:19.891Z",
+  "baseUrl": "https://gob-4knmhj42s-projetsjsls-projects.vercel.app",
+  "bugs": [
+    {
+      "id": "BUG-1",
+      "severity": "high",
+      "title": "Error detected on Login Page",
+      "description": "Page content suggests an error state. Body text length: 7182",
+      "steps": [
+        "Navigate to https://gob-4knmhj42s-projetsjsls-projects.vercel.app/login.html",
+        "Check page content"
+      ],
+      "location": "/login.html",
+      "screenshot": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144884960-error-detected-login-page.png",
+      "timestamp": "2026-01-11T15:21:25.077Z"
+    },
+    {
+      "id": "BUG-2",
+      "severity": "medium",
+      "title": "Tab not found: Stocks & News",
+      "description": "Could not find navigation element for tab: Stocks & News (stocks-news)",
+      "steps": [
+        "Navigate to dashboard",
+        "Look for tab: Stocks & News"
+      ],
+      "location": "beta-combined-dashboard.html#stocks-news",
+      "screenshot": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144902616-tab-missing-stocks-news.png",
+      "timestamp": "2026-01-11T15:21:42.823Z"
+    },
+    {
+      "id": "BUG-3",
+      "severity": "medium",
+      "title": "Tab not found: Finance Pro",
+      "description": "Could not find navigation element for tab: Finance Pro (finance-pro)",
+      "steps": [
+        "Navigate to dashboard",
+        "Look for tab: Finance Pro"
+      ],
+      "location": "beta-combined-dashboard.html#finance-pro",
+      "screenshot": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144903859-tab-missing-finance-pro.png",
+      "timestamp": "2026-01-11T15:21:43.949Z"
+    },
+    {
+      "id": "BUG-4",
+      "severity": "high",
+      "title": "Tab test failed: Nouvelles",
+      "description": "Error testing tab Nouvelles: locator.count: Target page, context or browser has been closed",
+      "steps": [
+        "Click tab Nouvelles",
+        "Error: locator.count: Target page, context or browser has been closed"
+      ],
+      "location": "beta-combined-dashboard.html#nouvelles",
+      "screenshot": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768221712471-tab-error-nouvelles.png",
+      "timestamp": "2026-01-12T12:41:52.475Z"
+    }
+  ],
+  "errors": [
+    {
+      "page": "Login Page",
+      "message": "[BABEL] Note: The code generator has deoptimised the styling of /https:/gob-4knmhj42s-projetsjsls-projects.vercel.app/js/dashboard/app-inline.js?v=3.2 as it exceeds the max of 500KB.",
+      "timestamp": 1768144891670
+    },
+    {
+      "page": "Beta Dashboard",
+      "message": "[BABEL] Note: The code generator has deoptimised the styling of /https:/gob-4knmhj42s-projetsjsls-projects.vercel.app/js/dashboard/app-inline.js?v=3.2 as it exceeds the max of 500KB.",
+      "timestamp": 1768144891670
+    },
+    {
+      "page": "Login Page",
+      "message": "Failed to read the 'localStorage' property from 'Window': The document is sandboxed and lacks the 'allow-same-origin' flag.",
+      "stack": "SecurityError: Failed to read the 'localStorage' property from 'Window': The document is sandboxed and lacks the 'allow-same-origin' flag.\n    at <anonymous>:5:11\n    at <anonymous>:6:7",
+      "timestamp": 1768144905193
+    },
+    {
+      "page": "Beta Dashboard",
+      "message": "Failed to read the 'localStorage' property from 'Window': The document is sandboxed and lacks the 'allow-same-origin' flag.",
+      "stack": "SecurityError: Failed to read the 'localStorage' property from 'Window': The document is sandboxed and lacks the 'allow-same-origin' flag.\n    at <anonymous>:5:11\n    at <anonymous>:6:7",
+      "timestamp": 1768144905193
+    }
+  ],
+  "warnings": [
+    {
+      "page": "Login Page",
+      "message": "cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation",
+      "timestamp": 1768144881034
+    },
+    {
+      "page": "Login Page",
+      "message": "cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation",
+      "timestamp": 1768144887928
+    },
+    {
+      "page": "Beta Dashboard",
+      "message": "cdn.tailwindcss.com should not be used in production. To use Tailwind CSS in production, install it as a PostCSS plugin or use the Tailwind CLI: https://tailwindcss.com/docs/installation",
+      "timestamp": 1768144887928
+    },
+    {
+      "page": "Login Page",
+      "message": "[Roles] Aucun utilisateur connecté, using admin fallback",
+      "timestamp": 1768144888099
+    },
+    {
+      "page": "Beta Dashboard",
+      "message": "[Roles] Aucun utilisateur connecté, using admin fallback",
+      "timestamp": 1768144888099
+    },
+    {
+      "page": "Login Page",
+      "message": "You are using the in-browser Babel transformer. Be sure to precompile your scripts for production - https://babeljs.io/docs/setup/",
+      "timestamp": 1768144888107
+    },
+    {
+      "page": "Beta Dashboard",
+      "message": "You are using the in-browser Babel transformer. Be sure to precompile your scripts for production - https://babeljs.io/docs/setup/",
+      "timestamp": 1768144888107
+    },
+    {
+      "page": "Login Page",
+      "message": "[MissingComponent] FinanceProPanel not loaded yet, waiting for app-inline.js...",
+      "timestamp": 1768144905054
+    },
+    {
+      "page": "Beta Dashboard",
+      "message": "[MissingComponent] FinanceProPanel not loaded yet, waiting for app-inline.js...",
+      "timestamp": 1768144905054
+    }
+  ],
+  "networkErrors": [
+    {
+      "page": "Login Page",
+      "url": "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Source+Sans+Pro:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Avenir+Next:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&family=Georgia:wght@400;700&display=swap",
+      "error": "net::ERR_BLOCKED_BY_ORB",
+      "timestamp": 1768144887177
+    },
+    {
+      "page": "Beta Dashboard",
+      "url": "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Source+Sans+Pro:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Avenir+Next:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&family=Georgia:wght@400;700&display=swap",
+      "error": "net::ERR_BLOCKED_BY_ORB",
+      "timestamp": 1768144887177
+    },
+    {
+      "page": "Login Page",
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=Georgia:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap",
+      "error": "net::ERR_BLOCKED_BY_ORB",
+      "timestamp": 1768144887203
+    },
+    {
+      "page": "Beta Dashboard",
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=Georgia:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap",
+      "error": "net::ERR_BLOCKED_BY_ORB",
+      "timestamp": 1768144887203
+    },
+    {
+      "page": "Login Page",
+      "url": "https://widget-sheriff.tradingview-widget.com/sheriff/api/v1/rules/search?origin=https%3A%2F%2Fgob-4knmhj42s-projetsjsls-projects.vercel.app",
+      "error": "net::ERR_ABORTED",
+      "timestamp": 1768144892463
+    },
+    {
+      "page": "Beta Dashboard",
+      "url": "https://widget-sheriff.tradingview-widget.com/sheriff/api/v1/rules/search?origin=https%3A%2F%2Fgob-4knmhj42s-projetsjsls-projects.vercel.app",
+      "error": "net::ERR_ABORTED",
+      "timestamp": 1768144892463
+    },
+    {
+      "page": "Login Page",
+      "url": "https://widget-sheriff.tradingview-widget.com/sheriff/api/v1/rules/search?origin=https%3A%2F%2Fgob-4knmhj42s-projetsjsls-projects.vercel.app",
+      "error": "net::ERR_ABORTED",
+      "timestamp": 1768144893214
+    },
+    {
+      "page": "Beta Dashboard",
+      "url": "https://widget-sheriff.tradingview-widget.com/sheriff/api/v1/rules/search?origin=https%3A%2F%2Fgob-4knmhj42s-projetsjsls-projects.vercel.app",
+      "error": "net::ERR_ABORTED",
+      "timestamp": 1768144893214
+    },
+    {
+      "page": "Login Page",
+      "url": "https://gob-4knmhj42s-projetsjsls-projects.vercel.app/finvox-build/index.html",
+      "error": "net::ERR_ABORTED",
+      "timestamp": 1768170864556
+    },
+    {
+      "page": "Beta Dashboard",
+      "url": "https://gob-4knmhj42s-projetsjsls-projects.vercel.app/finvox-build/index.html",
+      "error": "net::ERR_ABORTED",
+      "timestamp": 1768170864556
+    },
+    {
+      "page": "Login Page",
+      "url": "https://gob-4knmhj42s-projetsjsls-projects.vercel.app/emmaia-build/index.html",
+      "error": "net::ERR_ABORTED",
+      "timestamp": 1768170864561
+    },
+    {
+      "page": "Beta Dashboard",
+      "url": "https://gob-4knmhj42s-projetsjsls-projects.vercel.app/emmaia-build/index.html",
+      "error": "net::ERR_ABORTED",
+      "timestamp": 1768170864561
+    }
+  ],
+  "uiIssues": [],
+  "calculationIssues": [],
+  "performanceIssues": [],
+  "screenshots": [
+    {
+      "page": "Login Page",
+      "path": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144884669-initial-login-page.png",
+      "type": "initial"
+    },
+    {
+      "page": "Beta Dashboard",
+      "path": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144897096-initial-beta-dashboard.png",
+      "type": "initial"
+    },
+    {
+      "page": "Beta Dashboard",
+      "path": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144898821-responsive-desktop-large-beta-dashboard.png",
+      "type": "responsive",
+      "viewport": "Desktop Large"
+    },
+    {
+      "page": "Beta Dashboard",
+      "path": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144900067-responsive-desktop-medium-beta-dashboard.png",
+      "type": "responsive",
+      "viewport": "Desktop Medium"
+    },
+    {
+      "page": "Beta Dashboard",
+      "path": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144901284-responsive-tablet-beta-dashboard.png",
+      "type": "responsive",
+      "viewport": "Tablet"
+    },
+    {
+      "page": "Beta Dashboard",
+      "path": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144902484-responsive-mobile-beta-dashboard.png",
+      "type": "responsive",
+      "viewport": "Mobile"
+    },
+    {
+      "tab": "nouvelles",
+      "path": "/Users/projetsjsl/Documents/GitHub/GOB/bug-screenshots/1768144923977-tab-nouvelles.png",
+      "type": "tab"
+    }
+  ],
+  "pagesTested": [
+    {
+      "name": "Login Page",
+      "url": "/login.html",
+      "errors": 0,
+      "warnings": 1,
+      "networkErrors": 0,
+      "success": true
+    },
+    {
+      "name": "Beta Dashboard",
+      "url": "/beta-combined-dashboard.html",
+      "errors": 1,
+      "warnings": 3,
+      "networkErrors": 4,
+      "success": false
+    }
+  ],
+  "tabsTested": [],
+  "summary": {
+    "totalBugs": 4,
+    "criticalBugs": 0,
+    "highPriorityBugs": 2,
+    "mediumPriorityBugs": 2,
+    "lowPriorityBugs": 0,
+    "totalErrors": 4,
+    "totalWarnings": 9,
+    "totalNetworkErrors": 12
+  },
+  "fatalError": {
+    "message": "locator.all: Target page, context or browser has been closed",
+    "stack": "locator.all: Target page, context or browser has been closed\n    at testCalculations (/Users/projetsjsl/Documents/GitHub/GOB/marathon-audit-3h.mjs:432:127)\n    at runMarathonAudit (/Users/projetsjsl/Documents/GitHub/GOB/marathon-audit-3h.mjs:519:31)",
+    "timestamp": "2026-01-12T12:41:52.480Z"
+  }
+}
