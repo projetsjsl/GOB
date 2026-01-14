@@ -199,16 +199,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       const projectFutureValue = (current: number, rate: number, years: number): number => {
         // Valider les entrées
         if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
-        // Limiter le taux de croissance à un maximum raisonnable (50% par an)
-        const safeRate = Math.max(-50, Math.min(rate, 50));
+        // Limiter le taux de croissance à 12% max (réaliste pour 5 ans = 1.76x)
+        const safeRate = Math.max(-20, Math.min(rate, 12));
         return current * Math.pow(1 + safeRate / 100, years);
       };
 
-      // Valider et limiter les taux de croissance
-      const safeGrowthEPS = Math.max(-50, Math.min(profile.assumptions.growthRateEPS || 0, 50));
-      const safeGrowthCF = Math.max(-50, Math.min(profile.assumptions.growthRateCF || 0, 50));
-      const safeGrowthBV = Math.max(-50, Math.min(profile.assumptions.growthRateBV || 0, 50));
-      const safeGrowthDiv = Math.max(-50, Math.min(profile.assumptions.growthRateDiv || 0, 50));
+      // Valider et limiter les taux de croissance (max 12% = croissance réaliste soutenable)
+      const safeGrowthEPS = Math.max(-20, Math.min(profile.assumptions.growthRateEPS || 0, 12));
+      const safeGrowthCF = Math.max(-20, Math.min(profile.assumptions.growthRateCF || 0, 12));
+      const safeGrowthBV = Math.max(-20, Math.min(profile.assumptions.growthRateBV || 0, 12));
+      const safeGrowthDiv = Math.max(-20, Math.min(profile.assumptions.growthRateDiv || 0, 12));
 
       const futureValues = {
         eps: projectFutureValue(baseValues.eps, safeGrowthEPS, 5),
@@ -217,21 +217,21 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         div: projectFutureValue(baseValues.div, safeGrowthDiv, 5)
       };
 
-      // Valider et limiter les ratios cibles (éviter des ratios extrêmes)
-      const safeTargetPE = Math.max(1, Math.min(profile.assumptions.targetPE || 0, 100));
-      const safeTargetPCF = Math.max(1, Math.min(profile.assumptions.targetPCF || 0, 100));
-      const safeTargetPBV = Math.max(0.5, Math.min(profile.assumptions.targetPBV || 0, 50));
-      const safeTargetYield = Math.max(0.1, Math.min(profile.assumptions.targetYield || 0, 20));
+      // Valider et limiter les ratios cibles (limites STRICTES pour rendements réalistes)
+      const safeTargetPE = Math.max(8, Math.min(profile.assumptions.targetPE || 15, 25));
+      const safeTargetPCF = Math.max(5, Math.min(profile.assumptions.targetPCF || 10, 20));
+      const safeTargetPBV = Math.max(0.8, Math.min(profile.assumptions.targetPBV || 2, 5));
+      const safeTargetYield = Math.max(1, Math.min(profile.assumptions.targetYield || 2, 8));
 
       const targets = {
-        eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 100 ? futureValues.eps * safeTargetPE : 0,
-        cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 100 ? futureValues.cf * safeTargetPCF : 0,
-        bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 50 ? futureValues.bv * safeTargetPBV : 0,
-        div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : 0
+        eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 25 ? futureValues.eps * safeTargetPE : 0,
+        cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 20 ? futureValues.cf * safeTargetPCF : 0,
+        bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 5 ? futureValues.bv * safeTargetPBV : 0,
+        div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 8 ? futureValues.div / (safeTargetYield / 100) : 0
       };
 
-      // Valider que les targets sont raisonnables (max 50x le prix actuel pour éviter les valeurs aberrantes)
-      const maxReasonableTarget = currentPrice * 50;
+      // Valider que les targets sont raisonnables (max 2.5x le prix actuel = ~20% CAGR sur 5 ans)
+      const maxReasonableTarget = currentPrice * 2.5;
       const minReasonableTarget = currentPrice * 0.1; // Minimum 10% du prix actuel
       const validTargets = [
         !profile.assumptions.excludeEPS && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
@@ -260,22 +260,28 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       // Limiter totalDividends au maximum raisonnable
       totalDividends = Math.min(totalDividends, maxReasonableDividends);
 
-      // Calculer le rendement total avec validation et limites STRICTES
+      // Calculer le rendement total avec validation et limites TRÈS STRICTES
+      // Max 150% sur 5 ans = ~20% CAGR (réaliste pour bonnes actions)
       let totalReturnPercent = -100; // Par défaut si pas de données valides
       if (currentPrice > 0 && avgTargetPrice > 0 && isFinite(avgTargetPrice) && isFinite(totalDividends) && validTargets.length > 0) {
         const rawReturn = ((avgTargetPrice + totalDividends - currentPrice) / currentPrice) * 100;
-        // VALIDATION STRICTE: Vérifier que le calcul est raisonnable
-        if (isFinite(rawReturn) && rawReturn >= -100 && rawReturn <= 1000) {
-          // Vérifier que avgTargetPrice n'est pas aberrant (max 100x le prix actuel)
-          if (avgTargetPrice <= currentPrice * 100 && avgTargetPrice >= currentPrice * 0.1) {
+        // VALIDATION TRÈS STRICTE: Max 150% rendement total (réaliste sur 5 ans)
+        if (isFinite(rawReturn) && rawReturn >= -80 && rawReturn <= 150) {
+          // Vérifier que avgTargetPrice n'est pas aberrant (max 2.5x le prix actuel)
+          if (avgTargetPrice <= currentPrice * 2.5 && avgTargetPrice >= currentPrice * 0.3) {
             totalReturnPercent = rawReturn;
           } else {
-            // Prix cible aberrant, marquer comme invalide
-            totalReturnPercent = -100;
+            // Prix cible aberrant, plafonner au lieu de rejeter
+            totalReturnPercent = Math.min(150, Math.max(-80, rawReturn));
           }
+        } else if (rawReturn > 150) {
+          // Plafonner à 150% (rendement exceptionnel mais pas aberrant)
+          totalReturnPercent = 150;
+        } else if (rawReturn < -80) {
+          // Plafonner à -80% (perte maximale réaliste)
+          totalReturnPercent = -80;
         } else {
-          // Calcul aberrant, marquer comme invalide
-          totalReturnPercent = -100;
+          totalReturnPercent = rawReturn;
         }
       } else if (validTargets.length === 0) {
         // Si aucune métrique valide, retourner -100% pour indiquer données manquantes
@@ -295,8 +301,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         ? Math.max(0, Math.min(100, ((currentPrice - safeAvgLowPrice * 0.9) / currentPrice) * 100))
         : 0;
       
-      const upsidePotential = Math.max(-100, Math.min(1000, totalReturnPercent));
-      const ratio31 = downsideRisk > 0.1 ? Math.max(0, Math.min(100, upsidePotential / downsideRisk)) : 0;
+      const upsidePotential = Math.max(-80, Math.min(150, totalReturnPercent));
+      const ratio31 = downsideRisk > 0.1 ? Math.max(0, Math.min(10, upsidePotential / downsideRisk)) : 0;
 
       // Vérifier si version approuvée (vérifié via useEffect)
       const hasApprovedVersion = approvedVersions.has(profile.id);
@@ -320,8 +326,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         const years = validData[validData.length - 1].year - validData[0].year;
         if (years > 0 && firstEPS > 0 && lastEPS > 0 && isFinite(firstEPS) && isFinite(lastEPS)) {
           const rawGrowth = (Math.pow(lastEPS / firstEPS, 1 / years) - 1) * 100;
-          // Limiter la croissance historique à -50% à +100% par an
-          historicalGrowth = Math.max(-50, Math.min(100, rawGrowth));
+          // Limiter la croissance historique à -20% à +20% par an (réaliste et soutenable)
+          historicalGrowth = Math.max(-20, Math.min(20, rawGrowth));
         }
       }
       
@@ -345,7 +351,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             return sum + (isFinite(diff) ? Math.pow(diff, 2) : 0);
           }, 0) / priceChanges.length
         : 0;
-      const volatility = isFinite(variance) && variance >= 0 ? Math.min(Math.sqrt(variance), 200) : 0; // Limiter à 200%
+      const volatility = isFinite(variance) && variance >= 0 ? Math.min(Math.sqrt(variance), 50) : 0; // Limiter à 50% (réaliste)
 
       // Détecter si les données sont suspectes ou invalides et identifier la cause
       const invalidReason: string[] = [];

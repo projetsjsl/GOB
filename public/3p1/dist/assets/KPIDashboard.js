@@ -1480,30 +1480,30 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       };
       const projectFutureValue = (current, rate, years) => {
         if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
-        const safeRate = Math.max(-50, Math.min(rate, 50));
+        const safeRate = Math.max(-20, Math.min(rate, 12));
         return current * Math.pow(1 + safeRate / 100, years);
       };
-      const safeGrowthEPS = Math.max(-50, Math.min(profile.assumptions.growthRateEPS || 0, 50));
-      const safeGrowthCF = Math.max(-50, Math.min(profile.assumptions.growthRateCF || 0, 50));
-      const safeGrowthBV = Math.max(-50, Math.min(profile.assumptions.growthRateBV || 0, 50));
-      const safeGrowthDiv = Math.max(-50, Math.min(profile.assumptions.growthRateDiv || 0, 50));
+      const safeGrowthEPS = Math.max(-20, Math.min(profile.assumptions.growthRateEPS || 0, 12));
+      const safeGrowthCF = Math.max(-20, Math.min(profile.assumptions.growthRateCF || 0, 12));
+      const safeGrowthBV = Math.max(-20, Math.min(profile.assumptions.growthRateBV || 0, 12));
+      const safeGrowthDiv = Math.max(-20, Math.min(profile.assumptions.growthRateDiv || 0, 12));
       const futureValues = {
         eps: projectFutureValue(baseValues.eps, safeGrowthEPS, 5),
         cf: projectFutureValue(baseValues.cf, safeGrowthCF, 5),
         bv: projectFutureValue(baseValues.bv, safeGrowthBV, 5),
         div: projectFutureValue(baseValues.div, safeGrowthDiv, 5)
       };
-      const safeTargetPE = Math.max(1, Math.min(profile.assumptions.targetPE || 0, 100));
-      const safeTargetPCF = Math.max(1, Math.min(profile.assumptions.targetPCF || 0, 100));
-      const safeTargetPBV = Math.max(0.5, Math.min(profile.assumptions.targetPBV || 0, 50));
-      const safeTargetYield = Math.max(0.1, Math.min(profile.assumptions.targetYield || 0, 20));
+      const safeTargetPE = Math.max(8, Math.min(profile.assumptions.targetPE || 15, 25));
+      const safeTargetPCF = Math.max(5, Math.min(profile.assumptions.targetPCF || 10, 20));
+      const safeTargetPBV = Math.max(0.8, Math.min(profile.assumptions.targetPBV || 2, 5));
+      const safeTargetYield = Math.max(1, Math.min(profile.assumptions.targetYield || 2, 8));
       const targets = {
-        eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 100 ? futureValues.eps * safeTargetPE : 0,
-        cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 100 ? futureValues.cf * safeTargetPCF : 0,
-        bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 50 ? futureValues.bv * safeTargetPBV : 0,
-        div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 20 ? futureValues.div / (safeTargetYield / 100) : 0
+        eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 25 ? futureValues.eps * safeTargetPE : 0,
+        cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 20 ? futureValues.cf * safeTargetPCF : 0,
+        bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 5 ? futureValues.bv * safeTargetPBV : 0,
+        div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 8 ? futureValues.div / (safeTargetYield / 100) : 0
       };
-      const maxReasonableTarget = currentPrice * 50;
+      const maxReasonableTarget = currentPrice * 2.5;
       const minReasonableTarget = currentPrice * 0.1;
       const validTargets = [
         !profile.assumptions.excludeEPS && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
@@ -1527,14 +1527,18 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       let totalReturnPercent = -100;
       if (currentPrice > 0 && avgTargetPrice > 0 && isFinite(avgTargetPrice) && isFinite(totalDividends) && validTargets.length > 0) {
         const rawReturn = (avgTargetPrice + totalDividends - currentPrice) / currentPrice * 100;
-        if (isFinite(rawReturn) && rawReturn >= -100 && rawReturn <= 1e3) {
-          if (avgTargetPrice <= currentPrice * 100 && avgTargetPrice >= currentPrice * 0.1) {
+        if (isFinite(rawReturn) && rawReturn >= -80 && rawReturn <= 150) {
+          if (avgTargetPrice <= currentPrice * 2.5 && avgTargetPrice >= currentPrice * 0.3) {
             totalReturnPercent = rawReturn;
           } else {
-            totalReturnPercent = -100;
+            totalReturnPercent = Math.min(150, Math.max(-80, rawReturn));
           }
+        } else if (rawReturn > 150) {
+          totalReturnPercent = 150;
+        } else if (rawReturn < -80) {
+          totalReturnPercent = -80;
         } else {
-          totalReturnPercent = -100;
+          totalReturnPercent = rawReturn;
         }
       } else if (validTargets.length === 0) {
         totalReturnPercent = -100;
@@ -1543,8 +1547,8 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       const avgLowPrice = validHistory.length > 0 ? validHistory.reduce((sum, d) => sum + d.priceLow, 0) / validHistory.length : currentPrice * 0.7;
       const safeAvgLowPrice = isFinite(avgLowPrice) && avgLowPrice > 0 ? avgLowPrice : currentPrice * 0.7;
       const downsideRisk = currentPrice > 0 && safeAvgLowPrice > 0 ? Math.max(0, Math.min(100, (currentPrice - safeAvgLowPrice * 0.9) / currentPrice * 100)) : 0;
-      const upsidePotential = Math.max(-100, Math.min(1e3, totalReturnPercent));
-      const ratio31 = downsideRisk > 0.1 ? Math.max(0, Math.min(100, upsidePotential / downsideRisk)) : 0;
+      const upsidePotential = Math.max(-80, Math.min(150, totalReturnPercent));
+      const ratio31 = downsideRisk > 0.1 ? Math.max(0, Math.min(10, upsidePotential / downsideRisk)) : 0;
       const hasApprovedVersion = approvedVersions.has(profile.id);
       const currentPE = isFinite(basePE) && basePE >= 0 ? Math.min(basePE, 1e3) : 0;
       const currentPCF = (baseYearData == null ? void 0 : baseYearData.cashFlowPerShare) > 0 && isFinite(baseYearData.cashFlowPerShare) ? Math.min(currentPrice / baseYearData.cashFlowPerShare, 1e3) : 0;
@@ -1558,7 +1562,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
         const years = validData[validData.length - 1].year - validData[0].year;
         if (years > 0 && firstEPS > 0 && lastEPS > 0 && isFinite(firstEPS) && isFinite(lastEPS)) {
           const rawGrowth = (Math.pow(lastEPS / firstEPS, 1 / years) - 1) * 100;
-          historicalGrowth = Math.max(-50, Math.min(100, rawGrowth));
+          historicalGrowth = Math.max(-20, Math.min(20, rawGrowth));
         }
       }
       const priceChanges = [];
@@ -1575,7 +1579,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
         const diff = change - avgChange;
         return sum + (isFinite(diff) ? Math.pow(diff, 2) : 0);
       }, 0) / priceChanges.length : 0;
-      const volatility = isFinite(variance) && variance >= 0 ? Math.min(Math.sqrt(variance), 200) : 0;
+      const volatility = isFinite(variance) && variance >= 0 ? Math.min(Math.sqrt(variance), 50) : 0;
       const invalidReason = [];
       const hasEmptyData = profile.data.length === 1 && profile.data[0].earningsPerShare === 0 && profile.data[0].cashFlowPerShare === 0 && profile.data[0].bookValuePerShare === 0 && (profile.assumptions.currentPrice === 100 || profile.assumptions.currentPrice === 0) && profile.assumptions.currentDividend === 0;
       if (hasEmptyData) {

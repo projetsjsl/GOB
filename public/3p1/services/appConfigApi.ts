@@ -96,16 +96,16 @@ const DEFAULT_CONFIG: AppConfig = {
   market_cap_large_max: 200000000000,
   market_cap_mega_min: 200000000000,
   recommendation_cache_max: 1000,
-  guardrail_growth_min: -50,
-  guardrail_growth_max: 100,
-  guardrail_pe_min: 1,
-  guardrail_pe_max: 100,
-  guardrail_pcf_min: 1,
-  guardrail_pcf_max: 100,
-  guardrail_pbv_min: 0.1,
-  guardrail_pbv_max: 50,
-  guardrail_yield_min: 0,
-  guardrail_yield_max: 20
+  guardrail_growth_min: -20,
+  guardrail_growth_max: 12,
+  guardrail_pe_min: 8,
+  guardrail_pe_max: 25,
+  guardrail_pcf_min: 5,
+  guardrail_pcf_max: 20,
+  guardrail_pbv_min: 0.8,
+  guardrail_pbv_max: 5,
+  guardrail_yield_min: 1,
+  guardrail_yield_max: 8
 };
 
 /**

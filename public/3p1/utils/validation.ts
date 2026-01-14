@@ -276,20 +276,20 @@ async function loadValidationSettingsWithCache(): Promise<any> {
     console.warn('Failed to load validation settings, using defaults:', error);
   }
 
-  // Retourner les valeurs par défaut
+  // Retourner les valeurs par défaut (limites STRICTES pour 5 ans)
   return {
     growth_min: -20.00,
-    growth_max: 20.00,
-    target_pe_min: 5.0,
-    target_pe_max: 50.0,
-    target_pcf_min: 3.0,
-    target_pcf_max: 50.0,
-    target_pbv_min: 0.5,
-    target_pbv_max: 10.0,
-    target_yield_min: 0.0,
-    target_yield_max: 15.0,
+    growth_max: 12.00,
+    target_pe_min: 8.0,
+    target_pe_max: 25.0,
+    target_pcf_min: 5.0,
+    target_pcf_max: 20.0,
+    target_pbv_min: 0.8,
+    target_pbv_max: 5.0,
+    target_yield_min: 1.0,
+    target_yield_max: 8.0,
     required_return_min: 5.0,
-    required_return_max: 25.0,
+    required_return_max: 15.0,
     dividend_payout_ratio_min: 0.0,
     dividend_payout_ratio_max: 100.0,
     growth_precision: 2,
@@ -484,20 +484,20 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   };
 
-  // Utiliser les valeurs du cache si disponibles, sinon valeurs par défaut
+  // Utiliser les valeurs du cache si disponibles, sinon valeurs par défaut (limites STRICTES)
   const settings = validationSettingsCache?.settings || {
     growth_min: -20,
-    growth_max: 20,
-    target_pe_min: 5,
-    target_pe_max: 50,
-    target_pcf_min: 3,
-    target_pcf_max: 50,
-    target_pbv_min: 0.5,
-    target_pbv_max: 10,
-    target_yield_min: 0,
-    target_yield_max: 15,
+    growth_max: 12,
+    target_pe_min: 8,
+    target_pe_max: 25,
+    target_pcf_min: 5,
+    target_pcf_max: 20,
+    target_pbv_min: 0.8,
+    target_pbv_max: 5,
+    target_yield_min: 1,
+    target_yield_max: 8,
     required_return_min: 5,
-    required_return_max: 25,
+    required_return_max: 15,
     dividend_payout_ratio_min: 0,
     dividend_payout_ratio_max: 100,
     growth_precision: 2,

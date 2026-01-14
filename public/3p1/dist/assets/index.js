@@ -8412,17 +8412,17 @@ const sanitizeAssumptionsSync = (assumptions) => {
   };
   const settings = (validationSettingsCache == null ? void 0 : validationSettingsCache.settings) || {
     growth_min: -20,
-    growth_max: 20,
-    target_pe_min: 5,
-    target_pe_max: 50,
-    target_pcf_min: 3,
-    target_pcf_max: 50,
-    target_pbv_min: 0.5,
-    target_pbv_max: 10,
-    target_yield_min: 0,
-    target_yield_max: 15,
+    growth_max: 12,
+    target_pe_min: 8,
+    target_pe_max: 25,
+    target_pcf_min: 5,
+    target_pcf_max: 20,
+    target_pbv_min: 0.8,
+    target_pbv_max: 5,
+    target_yield_min: 1,
+    target_yield_max: 8,
     required_return_min: 5,
-    required_return_max: 25,
+    required_return_max: 15,
     dividend_payout_ratio_min: 0,
     dividend_payout_ratio_max: 100,
     growth_precision: 2,
@@ -44399,21 +44399,45 @@ async function loadAllCurrentSnapshotsFromSupabase() {
     console.log(`📦 Using cached snapshots (${allSnapshotsCache.size} tickers, age: ${Math.round((now - allSnapshotsCacheTimestamp) / 1e3)}s)`);
     return allSnapshotsCache;
   }
+  const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
   try {
-    console.log("🚀 Loading ALL current snapshots from Supabase in single API call...");
+    console.log("🚀 Loading ALL current snapshots from Supabase...");
     const startTime = Date.now();
-    const { getConfigValue } = await __vitePreload(async () => {
-      const { getConfigValue: getConfigValue2 } = await import("./appConfigApi.js");
-      return { getConfigValue: getConfigValue2 };
-    }, true ? [] : void 0, import.meta.url);
-    const limit = await getConfigValue("snapshots_limit");
-    const response = await fetch(`/api/finance-snapshots?all=true&current=true&limit=${limit}`);
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
+    let snapshots = [];
+    try {
+      const { getConfigValue } = await __vitePreload(async () => {
+        const { getConfigValue: getConfigValue2 } = await import("./appConfigApi.js");
+        return { getConfigValue: getConfigValue2 };
+      }, true ? [] : void 0, import.meta.url);
+      const limit = await getConfigValue("snapshots_limit");
+      const response = await fetch(`/api/finance-snapshots?all=true&current=true&limit=${limit}`);
+      if (response.ok) {
+        const result = await response.json();
+        snapshots = result.data || result.snapshots || result || [];
+      } else {
+        throw new Error(`API error: ${response.status}`);
+      }
+    } catch (apiError) {
+      console.warn("⚠️ API route failed:", apiError);
+      if (isLocalhost) {
+        console.log("🔄 Localhost détecté - Chargement direct snapshots depuis Supabase...");
+        const { getSupabaseClient: getSupabaseClient2 } = await __vitePreload(async () => {
+          const { getSupabaseClient: getSupabaseClient3 } = await Promise.resolve().then(() => supabase$1);
+          return { getSupabaseClient: getSupabaseClient3 };
+        }, true ? void 0 : void 0, import.meta.url);
+        const supabase2 = getSupabaseClient2();
+        if (supabase2) {
+          const { data, error } = await supabase2.from("finance_pro_snapshots").select("ticker, annual_data, assumptions, company_info, snapshot_date, is_current, auto_fetched").eq("is_current", true).limit(1500);
+          if (!error && data) {
+            snapshots = data;
+            console.log(`✅ ${snapshots.length} snapshots chargés directement depuis Supabase (localhost)`);
+          } else {
+            console.error("❌ Erreur Supabase direct:", error);
+          }
+        }
+      }
     }
-    const result = await response.json();
     const snapshotMap = /* @__PURE__ */ new Map();
-    const snapshots = result.data || result.snapshots || result || [];
     if (Array.isArray(snapshots)) {
       snapshots.forEach((snapshot) => {
         if (snapshot.ticker) {
@@ -44429,7 +44453,7 @@ async function loadAllCurrentSnapshotsFromSupabase() {
       });
     }
     const loadTime = Date.now() - startTime;
-    console.log(`✅ Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms (single API call)`);
+    console.log(`✅ Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms`);
     allSnapshotsCache = snapshotMap;
     allSnapshotsCacheTimestamp = now;
     return snapshotMap;
@@ -61894,6 +61918,7 @@ root.render(
 );
 export {
   AdditionalMetrics as A,
+  supabase$1 as B,
   EvaluationDetails as E,
   ForwardRef$1 as F,
   React as R,

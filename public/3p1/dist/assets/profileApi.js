@@ -1,3 +1,4 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./appConfigApi.js","./index.js","./index.css"])))=>i.map(i=>d[i]);
 import { _ as __vitePreload, y as saveSnapshot } from "./index.js";
 const API_BASE = typeof window !== "undefined" ? window.location.origin : "";
 async function saveProfileToSupabase(profile, notes) {
@@ -39,7 +40,7 @@ async function saveProfilesBatchToSupabase(profiles) {
   const { getConfigValue } = await __vitePreload(async () => {
     const { getConfigValue: getConfigValue2 } = await import("./appConfigApi.js");
     return { getConfigValue: getConfigValue2 };
-  }, true ? [] : void 0, import.meta.url);
+  }, true ? __vite__mapDeps([0,1,2]) : void 0, import.meta.url);
   const configuredBatchSize = Number(await getConfigValue("profile_batch_size"));
   const configuredDelayMs = Number(await getConfigValue("delay_between_batches_ms"));
   const MAX_CONCURRENT_SAVES = 10;
@@ -76,7 +77,7 @@ async function loadAllProfilesFromSupabase() {
     const { getConfigValue } = await __vitePreload(async () => {
       const { getConfigValue: getConfigValue2 } = await import("./appConfigApi.js");
       return { getConfigValue: getConfigValue2 };
-    }, true ? [] : void 0, import.meta.url);
+    }, true ? __vite__mapDeps([0,1,2]) : void 0, import.meta.url);
     const limit = await getConfigValue("snapshots_limit");
     const response = await fetch(`${API_BASE}/api/finance-snapshots?all=true&current=true&limit=${limit}`);
     if (!response.ok) {

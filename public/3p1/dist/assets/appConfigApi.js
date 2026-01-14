@@ -1,39 +1,41 @@
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["./index.js","./index.css"])))=>i.map(i=>d[i]);
+import { _ as __vitePreload } from "./index.js";
 const API_BASE = typeof window !== "undefined" ? window.location.origin : "";
-const REQUIRED_CONFIG_KEYS = [
-  "cache_max_age_ms",
-  "cache_storage_key",
-  "profile_batch_size",
-  "api_batch_size",
-  "sync_batch_size",
-  "delay_between_batches_ms",
-  "max_sync_time_ms",
-  "ticker_timeout_ms",
-  "snapshots_limit",
-  "tickers_limit",
-  "default_ticker",
-  "market_cap_small_min",
-  "market_cap_small_max",
-  "market_cap_mid_min",
-  "market_cap_mid_max",
-  "market_cap_large_min",
-  "market_cap_large_max",
-  "market_cap_mega_min",
-  "recommendation_cache_max",
-  "guardrail_growth_min",
-  "guardrail_growth_max",
-  "guardrail_pe_min",
-  "guardrail_pe_max",
-  "guardrail_pcf_min",
-  "guardrail_pcf_max",
-  "guardrail_pbv_min",
-  "guardrail_pbv_max",
-  "guardrail_yield_min",
-  "guardrail_yield_max"
-];
 let configCache = null;
 let configCacheTimestamp = 0;
 let configCachePromise = null;
 const CONFIG_CACHE_TTL_MS = 5 * 60 * 1e3;
+const DEFAULT_CONFIG = {
+  cache_max_age_ms: 3e5,
+  cache_storage_key: "finance-pro-cache-v2",
+  profile_batch_size: 50,
+  api_batch_size: 10,
+  sync_batch_size: 25,
+  delay_between_batches_ms: 500,
+  max_sync_time_ms: 3e5,
+  ticker_timeout_ms: 1e4,
+  snapshots_limit: 1500,
+  tickers_limit: 1500,
+  default_ticker: "AAPL",
+  market_cap_small_min: 0,
+  market_cap_small_max: 2e9,
+  market_cap_mid_min: 2e9,
+  market_cap_mid_max: 1e10,
+  market_cap_large_min: 1e10,
+  market_cap_large_max: 2e11,
+  market_cap_mega_min: 2e11,
+  recommendation_cache_max: 1e3,
+  guardrail_growth_min: -20,
+  guardrail_growth_max: 12,
+  guardrail_pe_min: 8,
+  guardrail_pe_max: 25,
+  guardrail_pcf_min: 5,
+  guardrail_pcf_max: 20,
+  guardrail_pbv_min: 0.8,
+  guardrail_pbv_max: 5,
+  guardrail_yield_min: 1,
+  guardrail_yield_max: 8
+};
 async function loadAppConfig() {
   const now = Date.now();
   if (configCache && now - configCacheTimestamp < CONFIG_CACHE_TTL_MS) {
@@ -42,18 +44,46 @@ async function loadAppConfig() {
   if (configCachePromise) {
     return configCachePromise;
   }
+  const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
   configCachePromise = (async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/app-config?all=true`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+      let configData = [];
+      try {
+        const response = await fetch(`${API_BASE}/api/app-config?all=true`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && Array.isArray(result.data)) {
+            configData = result.data;
+          }
+        } else {
+          throw new Error(`HTTP ${response.status}`);
+        }
+      } catch (apiError) {
+        console.warn("⚠️ API app-config failed:", apiError);
+        if (isLocalhost) {
+          console.log("🔄 Localhost - Chargement direct config depuis Supabase...");
+          const { getSupabaseClient } = await __vitePreload(async () => {
+            const { getSupabaseClient: getSupabaseClient2 } = await import("./index.js").then((n) => n.B);
+            return { getSupabaseClient: getSupabaseClient2 };
+          }, true ? __vite__mapDeps([0,1]) : void 0, import.meta.url);
+          const supabase = getSupabaseClient();
+          if (supabase) {
+            const { data, error } = await supabase.from("app_config").select("config_key, config_value");
+            if (!error && data) {
+              configData = data;
+              console.log(`✅ ${configData.length} configs chargées directement depuis Supabase`);
+            }
+          }
+        }
       }
-      const result = await response.json();
-      if (!result.success || !Array.isArray(result.data)) {
-        throw new Error("Invalid config response format");
+      if (configData.length === 0) {
+        console.warn("⚠️ Aucune config trouvée, utilisation des valeurs par défaut");
+        configCache = DEFAULT_CONFIG;
+        configCacheTimestamp = now;
+        return DEFAULT_CONFIG;
       }
       const config = {};
-      result.data.forEach((item) => {
+      configData.forEach((item) => {
         if (item.config_key && item.config_value !== void 0) {
           const key = item.config_key;
           if (typeof item.config_value === "string") {
@@ -68,18 +98,16 @@ async function loadAppConfig() {
           }
         }
       });
-      const missingKeys = REQUIRED_CONFIG_KEYS.filter((key) => typeof config[key] === "undefined");
-      if (missingKeys.length > 0) {
-        throw new Error(`Missing config keys: ${missingKeys.join(", ")}`);
-      }
-      const finalConfig = config;
+      const finalConfig = { ...DEFAULT_CONFIG, ...config };
       configCache = finalConfig;
       configCacheTimestamp = now;
       console.log("✅ Configurations chargées depuis Supabase");
       return finalConfig;
     } catch (error) {
       console.error("❌ Erreur chargement configurations depuis Supabase:", error);
-      throw error;
+      configCache = DEFAULT_CONFIG;
+      configCacheTimestamp = now;
+      return DEFAULT_CONFIG;
     } finally {
       configCachePromise = null;
     }
