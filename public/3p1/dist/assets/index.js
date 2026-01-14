@@ -58153,77 +58153,72 @@ Vérifiez votre connexion et réessayez.`,
           }
           return updated;
         });
-        const tickersNeedingLoad = result.tickers.filter((t) => {
-          const symbol = t.ticker.toUpperCase();
-          if (isMutualFund(symbol, t.company_name)) {
-            return false;
-          }
-          return true;
-        });
-        console.log(`📋 Tickers nécessitant chargement: ${tickersNeedingLoad.length} (newTickers: ${newTickers.length})`);
-        if (tickersNeedingLoad.length > 0) {
-          const validTickers2 = tickersNeedingLoad;
+        if (newTickers.length > 0) {
+          const validTickers2 = newTickers.filter((t) => {
+            const symbol = t.ticker.toUpperCase();
+            if (isMutualFund(symbol, t.company_name)) {
+              console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé (exclu automatiquement)`);
+              return false;
+            }
+            return true;
+          });
           if (validTickers2.length === 0) {
             console.log("✅ Aucun ticker valide après filtrage des fonds mutuels");
             setIsLoadingTickers(false);
             return;
           }
+          const skeletonProfiles = {};
+          validTickers2.forEach((supabaseTicker) => {
+            const symbol = supabaseTicker.ticker.toUpperCase();
+            const isWatchlist2 = mapSourceToIsWatchlist(supabaseTicker.source);
+            skeletonProfiles[symbol] = {
+              id: symbol,
+              lastModified: Date.now(),
+              data: [],
+              // Données vides pour l'instant
+              assumptions: {
+                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
+                currentPrice: 0,
+                currentDividend: 0,
+                baseYear: (/* @__PURE__ */ new Date()).getFullYear(),
+                requiredReturn: 10,
+                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                growthRateEPS: void 0,
+                growthRateSales: void 0,
+                growthRateCF: void 0,
+                growthRateBV: void 0,
+                growthRateDiv: void 0,
+                targetPE: void 0,
+                targetPCF: void 0,
+                targetPBV: void 0,
+                targetYield: void 0,
+                dividendPayoutRatio: void 0,
+                excludeEPS: false,
+                excludeCF: false,
+                excludeBV: false,
+                excludeDIV: false
+              },
+              info: {
+                symbol,
+                name: supabaseTicker.company_name || symbol,
+                sector: supabaseTicker.sector || "",
+                securityRank: supabaseTicker.security_rank || "N/A",
+                marketCap: "N/A",
+                earningsPredictability: supabaseTicker.earnings_predictability,
+                priceGrowthPersistence: supabaseTicker.price_growth_persistence,
+                priceStability: supabaseTicker.price_stability,
+                beta: supabaseTicker.beta,
+                preferredSymbol: supabaseTicker.ticker
+              },
+              notes: "",
+              isWatchlist: isWatchlist2,
+              _isSkeleton: true
+              // Flag pour indiquer que c'est un profil incomplet
+            };
+          });
           setLibrary((prev) => {
-            const existingSymbols = new Set(Object.keys(prev));
-            const skeletonProfiles = {};
-            validTickers2.forEach((supabaseTicker) => {
-              const symbol = supabaseTicker.ticker.toUpperCase();
-              if (existingSymbols.has(symbol)) {
-                return;
-              }
-              const isWatchlist2 = mapSourceToIsWatchlist(supabaseTicker.source);
-              skeletonProfiles[symbol] = {
-                id: symbol,
-                lastModified: Date.now(),
-                data: [],
-                // Données vides pour l'instant
-                assumptions: {
-                  // ✅ Seulement les champs requis, pas de valeurs inventées (0)
-                  currentPrice: 0,
-                  currentDividend: 0,
-                  baseYear: (/* @__PURE__ */ new Date()).getFullYear(),
-                  requiredReturn: 10,
-                  // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
-                  growthRateEPS: void 0,
-                  growthRateSales: void 0,
-                  growthRateCF: void 0,
-                  growthRateBV: void 0,
-                  growthRateDiv: void 0,
-                  targetPE: void 0,
-                  targetPCF: void 0,
-                  targetPBV: void 0,
-                  targetYield: void 0,
-                  dividendPayoutRatio: void 0,
-                  excludeEPS: false,
-                  excludeCF: false,
-                  excludeBV: false,
-                  excludeDIV: false
-                },
-                info: {
-                  symbol,
-                  name: supabaseTicker.company_name || symbol,
-                  sector: supabaseTicker.sector || "",
-                  securityRank: supabaseTicker.security_rank || "N/A",
-                  marketCap: "N/A",
-                  earningsPredictability: supabaseTicker.earnings_predictability,
-                  priceGrowthPersistence: supabaseTicker.price_growth_persistence,
-                  priceStability: supabaseTicker.price_stability,
-                  beta: supabaseTicker.beta,
-                  preferredSymbol: supabaseTicker.ticker
-                },
-                notes: "",
-                isWatchlist: isWatchlist2,
-                _isSkeleton: true
-                // Flag pour indiquer que c'est un profil incomplet
-              };
-            });
             const updated = { ...prev, ...skeletonProfiles };
-            console.log(`📊 ${Object.keys(skeletonProfiles).length} nouveaux profils squelettes créés (total library: ${Object.keys(updated).length})`);
+            console.log(`📊 ${Object.keys(skeletonProfiles).length} profils squelettes ajoutés à library (total: ${Object.keys(updated).length})`);
             saveProfiles(updated, false).catch((e) => console.warn("Failed to save profiles:", e));
             return updated;
           });
@@ -58253,19 +58248,6 @@ Vérifiez votre connexion et réessayez.`,
                   if (!supabaseTicker.ticker) return;
                   const symbol = supabaseTicker.ticker.toUpperCase();
                   if (!symbol || symbol.trim() === "") return;
-                  let shouldSkip = false;
-                  setLibrary((prev) => {
-                    var _a3;
-                    const existingProfile = prev[symbol];
-                    if (existingProfile && !existingProfile._isSkeleton && existingProfile.data && existingProfile.data.length > 0 && ((_a3 = existingProfile.assumptions) == null ? void 0 : _a3.currentPrice) > 0) {
-                      shouldSkip = true;
-                    }
-                    return prev;
-                  });
-                  if (shouldSkip) {
-                    processedCount++;
-                    return;
-                  }
                   const markAsInvalid = (reason) => {
                     console.warn(`❌ ${symbol}: ${reason} - Marking as invalid/loaded`);
                     setLibrary((prev) => {
