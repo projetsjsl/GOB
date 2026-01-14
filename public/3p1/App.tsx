@@ -1090,7 +1090,7 @@ export default function App() {
                                         const tickerSymbols = batch.map(t => t.ticker.toUpperCase());
                                         const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
 
-                                        // Mettre à jour les profils avec les données Supabase
+                                        // Mettre à jour les profils avec les données Supabase ou FMP
                                         for (const supabaseTicker of batch) {
                                             const symbol = supabaseTicker.ticker.toUpperCase();
                                             const supabaseResult = supabaseResults[symbol];
@@ -1105,8 +1105,33 @@ export default function App() {
                                                         _isSkeleton: false
                                                     }
                                                 }));
+                                            } else {
+                                                // Pas de données Supabase - charger depuis FMP
+                                                try {
+                                                    const fmpResult = await fetchCompanyData(symbol);
+                                                    if (fmpResult && fmpResult.data && fmpResult.data.length > 0) {
+                                                        setLibrary(prev => ({
+                                                            ...prev,
+                                                            [symbol]: {
+                                                                ...prev[symbol],
+                                                                data: fmpResult.data,
+                                                                assumptions: {
+                                                                    ...prev[symbol]?.assumptions,
+                                                                    currentPrice: fmpResult.currentPrice || 0,
+                                                                    currentDividend: fmpResult.currentDividend || 0
+                                                                },
+                                                                info: {
+                                                                    ...prev[symbol]?.info,
+                                                                    ...fmpResult.info
+                                                                },
+                                                                _isSkeleton: false
+                                                            }
+                                                        }));
+                                                    }
+                                                } catch (e) {
+                                                    console.warn(`❌ FMP fetch failed for ${symbol}:`, e);
+                                                }
                                             }
-                                            // Si pas de données Supabase, laisser le squelette pour chargement FMP ultérieur
                                         }
 
                                         // Délai entre batches

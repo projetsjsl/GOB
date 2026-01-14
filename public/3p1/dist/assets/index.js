@@ -58190,6 +58190,34 @@ Vérifiez votre connexion et réessayez.`,
                             _isSkeleton: false
                           }
                         }));
+                      } else {
+                        try {
+                          const fmpResult = await fetchCompanyData(symbol);
+                          if (fmpResult && fmpResult.data && fmpResult.data.length > 0) {
+                            setLibrary((prev) => {
+                              var _a3, _b2;
+                              return {
+                                ...prev,
+                                [symbol]: {
+                                  ...prev[symbol],
+                                  data: fmpResult.data,
+                                  assumptions: {
+                                    ...(_a3 = prev[symbol]) == null ? void 0 : _a3.assumptions,
+                                    currentPrice: fmpResult.currentPrice || 0,
+                                    currentDividend: fmpResult.currentDividend || 0
+                                  },
+                                  info: {
+                                    ...(_b2 = prev[symbol]) == null ? void 0 : _b2.info,
+                                    ...fmpResult.info
+                                  },
+                                  _isSkeleton: false
+                                }
+                              };
+                            });
+                          }
+                        } catch (e) {
+                          console.warn(`❌ FMP fetch failed for ${symbol}:`, e);
+                        }
                       }
                     }
                     if (i + batchSize < tickersToLoad.length) {
