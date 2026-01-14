@@ -2151,3 +2151,59 @@ const validMetrics = filteredMetrics.filter(m => !m.hasInvalidData && !(m as any
 
 *Session Update by Claude QA Agent - January 13, 2026*
 *Sprint Validation Plan Execution Ongoing*
+
+---
+
+## Session Update - January 13, 2026 19:15
+
+### ROOT CAUSE IDENTIFIED: Circular Save Loop
+
+**Investigation findings**:
+1. When app loads, profiles are fetched from Supabase as "skeleton" profiles
+2. These skeletons are immediately **SAVED BACK** to Supabase via `saveProfiles(updated, true)`
+3. This creates 946 POST requests and 8473 "Snapshot saved" console messages
+4. The save operations block the actual data loading from `loadFMPDataInBackground()`
+5. Result: KPI Dashboard shows 0/1001 because profiles never get their `_isSkeleton` flag set to `false`
+
+### FIX APPLIED (Commit a34ad4d6)
+
+Changed 3 occurrences of `saveProfiles(updated, true)` to `saveProfiles(updated, false)`:
+
+| Line | Context | Change |
+|------|---------|--------|
+| 973 | Migration tickers | `true` → `false` - Don't re-save migrated profiles |
+| 1128 | Skeleton profiles | `true` → `false` - Don't save incomplete skeletons to DB |
+| 1318 | Profile updates from Supabase | `true` → `false` - Don't save already-loaded data back |
+
+**Code comments added**:
+```javascript
+// ✅ Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - données déjà là!)
+// ❌ NE PAS sauvegarder dans Supabase lors du chargement - évite boucle circulaire
+saveProfiles(updated, false).catch(e => console.warn('Failed to save profiles:', e));
+```
+
+### STATUS
+
+| Item | Status |
+|------|--------|
+| Fix coded | ✅ Complete |
+| Build successful | ✅ Pass |
+| Commit pushed | ✅ a34ad4d6 on main |
+| Vercel deployment | ⏳ Pending |
+| Production verification | ⏳ Waiting for deployment |
+
+### SECONDARY ISSUE IDENTIFIED
+
+Even after the fix, `loadFMPDataInBackground()` might not execute:
+- Console shows "✅ 1001 nouveaux profils squelettes créés depuis Supabase" (5x at same timestamp)
+- No "🚀 Démarrage du chargement optimisé" message appears
+- Suggests `requestIdleCallback` scheduling issue or React re-render interference
+
+**Next Steps**:
+1. Verify fix works after Vercel deployment
+2. If still failing, investigate `requestIdleCallback` scheduling
+3. Consider adding debounce/guard to prevent multiple effect executions
+
+---
+
+*Updated by Claude QA Agent - January 13, 2026 19:15*

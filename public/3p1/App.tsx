@@ -1049,18 +1049,27 @@ export default function App() {
                     return updated;
                 });
 
+                // ✅ FIX: Identifier TOUS les tickers qui ont besoin de chargement
+                // Inclure les tickers de newTickers ET les skeletons existants de la migration
+                const tickersNeedingLoad = result.tickers.filter(t => {
+                    const symbol = t.ticker.toUpperCase();
+                    // Exclure les fonds mutuels
+                    if (isMutualFund(symbol, t.company_name)) {
+                        return false;
+                    }
+                    // Inclure si c'est un nouveau ticker OU si c'est un skeleton/vide créé dans migration
+                    // Note: Comme on ne peut pas accéder à library depuis ici, on inclut tous les tickers non-mutual-fund
+                    // La vérification skeleton se fera lors du chargement
+                    return true;
+                });
+
+                console.log(`📋 Tickers nécessitant chargement: ${tickersNeedingLoad.length} (newTickers: ${newTickers.length})`);
+
                 // ✅ OPTIMISATION PERFORMANCE : Créer des profils "squelettes" immédiatement
                 // pour affichage instantané, puis charger les données FMP en arrière-plan
-                if (newTickers.length > 0) {
-                    // Filtrer les fonds mutuels AVANT tout appel API
-                    const validTickers = newTickers.filter(t => {
-                        const symbol = t.ticker.toUpperCase();
-                        if (isMutualFund(symbol, t.company_name)) {
-                            console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé (exclu automatiquement)`);
-                            return false;
-                        }
-                        return true;
-                    });
+                if (tickersNeedingLoad.length > 0) {
+                    // Filtrer les fonds mutuels AVANT tout appel API (déjà fait ci-dessus)
+                    const validTickers = tickersNeedingLoad;
 
                     if (validTickers.length === 0) {
                         console.log('✅ Aucun ticker valide après filtrage des fonds mutuels');
@@ -1068,61 +1077,71 @@ export default function App() {
                         return;
                     }
 
-                    // ✅ ÉTAPE 1 : Créer des profils "squelettes" immédiatement pour affichage instantané
-                    const skeletonProfiles: Record<string, AnalysisProfile> = {};
-                    validTickers.forEach(supabaseTicker => {
-                        const symbol = supabaseTicker.ticker.toUpperCase();
-                        const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
-                        
-                        // ✅ CRITIQUE : Ne pas utiliser INITIAL_ASSUMPTIONS (valeurs à 0) pour les squelettes
-                        skeletonProfiles[symbol] = {
-                            id: symbol,
-                            lastModified: Date.now(),
-                            data: [], // Données vides pour l'instant
-                            assumptions: {
-                                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
-                                currentPrice: 0,
-                                currentDividend: 0,
-                                baseYear: new Date().getFullYear(),
-                                requiredReturn: 10.0,
-                                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
-                                growthRateEPS: undefined,
-                                growthRateSales: undefined,
-                                growthRateCF: undefined,
-                                growthRateBV: undefined,
-                                growthRateDiv: undefined,
-                                targetPE: undefined,
-                                targetPCF: undefined,
-                                targetPBV: undefined,
-                                targetYield: undefined,
-                                dividendPayoutRatio: undefined,
-                                excludeEPS: false,
-                                excludeCF: false,
-                                excludeBV: false,
-                                excludeDIV: false
-                            } as Assumptions,
-                            info: {
-                                symbol: symbol,
-                                name: supabaseTicker.company_name || symbol,
-                                sector: supabaseTicker.sector || '',
-                                securityRank: supabaseTicker.security_rank || 'N/A',
-                                marketCap: 'N/A',
-                                earningsPredictability: supabaseTicker.earnings_predictability,
-                                priceGrowthPersistence: supabaseTicker.price_growth_persistence,
-                                priceStability: supabaseTicker.price_stability,
-                                beta: supabaseTicker.beta,
-                                preferredSymbol: supabaseTicker.ticker
-                            },
-                            notes: '',
-                            isWatchlist,
-                            _isSkeleton: true // Flag pour indiquer que c'est un profil incomplet
-                        };
-                    });
-
+                    // ✅ ÉTAPE 1 : Créer des profils "squelettes" SEULEMENT pour les nouveaux tickers
+                    // Ne pas écraser les profils existants (même les skeletons - ils seront chargés)
                     // Ajouter les profils squelettes immédiatement pour affichage
                     setLibrary(prev => {
+                        const existingSymbols = new Set(Object.keys(prev));
+                        const skeletonProfiles: Record<string, AnalysisProfile> = {};
+
+                        // Créer skeletons UNIQUEMENT pour les tickers pas encore dans library
+                        validTickers.forEach(supabaseTicker => {
+                            const symbol = supabaseTicker.ticker.toUpperCase();
+
+                            // ✅ FIX: Ne créer skeleton que si le profil n'existe pas du tout
+                            if (existingSymbols.has(symbol)) {
+                                return; // Profil existe déjà (skeleton ou complet), ne pas écraser
+                            }
+
+                            const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
+
+                            // ✅ CRITIQUE : Ne pas utiliser INITIAL_ASSUMPTIONS (valeurs à 0) pour les squelettes
+                            skeletonProfiles[symbol] = {
+                                id: symbol,
+                                lastModified: Date.now(),
+                                data: [], // Données vides pour l'instant
+                                assumptions: {
+                                    // ✅ Seulement les champs requis, pas de valeurs inventées (0)
+                                    currentPrice: 0,
+                                    currentDividend: 0,
+                                    baseYear: new Date().getFullYear(),
+                                    requiredReturn: 10.0,
+                                    // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                                    growthRateEPS: undefined,
+                                    growthRateSales: undefined,
+                                    growthRateCF: undefined,
+                                    growthRateBV: undefined,
+                                    growthRateDiv: undefined,
+                                    targetPE: undefined,
+                                    targetPCF: undefined,
+                                    targetPBV: undefined,
+                                    targetYield: undefined,
+                                    dividendPayoutRatio: undefined,
+                                    excludeEPS: false,
+                                    excludeCF: false,
+                                    excludeBV: false,
+                                    excludeDIV: false
+                                } as Assumptions,
+                                info: {
+                                    symbol: symbol,
+                                    name: supabaseTicker.company_name || symbol,
+                                    sector: supabaseTicker.sector || '',
+                                    securityRank: supabaseTicker.security_rank || 'N/A',
+                                    marketCap: 'N/A',
+                                    earningsPredictability: supabaseTicker.earnings_predictability,
+                                    priceGrowthPersistence: supabaseTicker.price_growth_persistence,
+                                    priceStability: supabaseTicker.price_stability,
+                                    beta: supabaseTicker.beta,
+                                    preferredSymbol: supabaseTicker.ticker
+                                },
+                                notes: '',
+                                isWatchlist,
+                                _isSkeleton: true // Flag pour indiquer que c'est un profil incomplet
+                            };
+                        });
+
                         const updated = { ...prev, ...skeletonProfiles };
-                        console.log(`📊 ${Object.keys(skeletonProfiles).length} profils squelettes ajoutés à library (total: ${Object.keys(updated).length})`);
+                        console.log(`📊 ${Object.keys(skeletonProfiles).length} nouveaux profils squelettes créés (total library: ${Object.keys(updated).length})`);
                         // ✅ Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - squelettes temporaires!)
                         // ❌ NE PAS sauvegarder squelettes dans Supabase - données incomplètes
                     saveProfiles(updated, false).catch(e => console.warn('Failed to save profiles:', e));
@@ -1171,10 +1190,30 @@ export default function App() {
 
                                 batch.map(async (supabaseTicker) => {
                                     if (!supabaseTicker.ticker) return; // ✅ Guard clause: Skip invalid tickers
-                                    
+
                                     const symbol = supabaseTicker.ticker.toUpperCase();
                                     if (!symbol || symbol.trim() === '') return; // ✅ Double check
-                                    
+
+                                    // ✅ FIX: Skip profiles that are already loaded (not skeleton)
+                                    // Use a function to get current state from React
+                                    let shouldSkip = false;
+                                    setLibrary(prev => {
+                                        const existingProfile = prev[symbol];
+                                        if (existingProfile &&
+                                            !existingProfile._isSkeleton &&
+                                            existingProfile.data &&
+                                            existingProfile.data.length > 0 &&
+                                            existingProfile.assumptions?.currentPrice > 0) {
+                                            // Profile is complete, skip loading
+                                            shouldSkip = true;
+                                        }
+                                        return prev; // Don't modify state
+                                    });
+                                    if (shouldSkip) {
+                                        processedCount++;
+                                        return;
+                                    }
+
                                     const markAsInvalid = (reason: string) => {
                                         console.warn(`❌ ${symbol}: ${reason} - Marking as invalid/loaded`);
                                         setLibrary(prev => ({
