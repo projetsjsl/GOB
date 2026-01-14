@@ -35898,10 +35898,13 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
-      const errorMessage = errorData.error || `HTTP ${response.status}`;
-      if (response.status === 500 && retryCount < maxRetries) {
-        const delay = (retryCount + 1) * 1e3;
-        console.warn(`⚠️ Snapshot error 500 for ${ticker2}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+      const errorMessage = errorData.error || errorData.message || `HTTP ${response.status}`;
+      const shouldRetry = [429, 500, 502, 503, 504].includes(response.status);
+      if (shouldRetry && retryCount < maxRetries) {
+        const baseDelay = 1e3 * Math.pow(2, retryCount);
+        const jitter = Math.floor(Math.random() * 200);
+        const delay = baseDelay + jitter;
+        console.warn(`⚠️ Snapshot error ${response.status} for ${ticker2}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
         return saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
       }
@@ -35921,7 +35924,9 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
     return { success: true, snapshot };
   } catch (error) {
     if (retryCount < maxRetries && (((_a2 = error.message) == null ? void 0 : _a2.includes("fetch")) || ((_b = error.message) == null ? void 0 : _b.includes("timeout")))) {
-      const delay = (retryCount + 1) * 1e3;
+      const baseDelay = 1e3 * Math.pow(2, retryCount);
+      const jitter = Math.floor(Math.random() * 200);
+      const delay = baseDelay + jitter;
       console.warn(`⚠️ Snapshot network error for ${ticker2}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
       await new Promise((resolve) => setTimeout(resolve, delay));
       return saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
@@ -58084,7 +58089,7 @@ Vérifiez votre connexion et réessayez.`,
             }
             newTickersCount++;
           });
-          saveProfiles(updated, true).catch((e) => console.warn("Failed to save profiles:", e));
+          saveProfiles(updated, false).catch((e) => console.warn("Failed to save profiles:", e));
           if (newTickersCount > 0) {
             console.log(`✅ ${newTickersCount} nouveaux profils squelettes créés depuis Supabase`);
             console.log(`📊 Library après migration: ${Object.keys(updated).length} profils (dont ${Object.keys(updated).filter((k2) => k2 !== DEFAULT_PROFILE.id).length} réels)`);
@@ -58214,7 +58219,7 @@ Vérifiez votre connexion et réessayez.`,
           setLibrary((prev) => {
             const updated = { ...prev, ...skeletonProfiles };
             console.log(`📊 ${Object.keys(skeletonProfiles).length} profils squelettes ajoutés à library (total: ${Object.keys(updated).length})`);
-            saveProfiles(updated, true).catch((e) => console.warn("Failed to save profiles:", e));
+            saveProfiles(updated, false).catch((e) => console.warn("Failed to save profiles:", e));
             return updated;
           });
           setIsLoadingTickers(false);
@@ -58356,7 +58361,7 @@ Vérifiez votre connexion et réessayez.`,
                           _isSkeleton: false
                         }
                       };
-                      saveProfiles(updated, true).catch((e) => console.warn("Failed to save profiles:", e));
+                      saveProfiles(updated, false).catch((e) => console.warn("Failed to save profiles:", e));
                       return updated;
                     });
                     console.log(`✅ ${symbol}: Profil mis à jour depuis ${result2.source === "supabase" ? "Supabase" : "FMP"}`);

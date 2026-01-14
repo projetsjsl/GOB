@@ -968,9 +968,9 @@ export default function App() {
                         newTickersCount++;
                     });
 
-                    // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
-                    // ✅ Sauvegarder dans Supabase ET cache local
-                    saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
+                    // ✅ Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - migration locale)
+                    // ❌ NE PAS sauvegarder dans Supabase lors de migration - données déjà présentes
+                    saveProfiles(updated, false).catch(e => console.warn('Failed to save profiles:', e));
 
                     if (newTickersCount > 0) {
                         console.log(`✅ ${newTickersCount} nouveaux profils squelettes créés depuis Supabase`);
@@ -1123,9 +1123,9 @@ export default function App() {
                     setLibrary(prev => {
                         const updated = { ...prev, ...skeletonProfiles };
                         console.log(`📊 ${Object.keys(skeletonProfiles).length} profils squelettes ajoutés à library (total: ${Object.keys(updated).length})`);
-                        // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
-                        // ✅ Sauvegarder dans Supabase ET cache local
-                    saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
+                        // ✅ Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - squelettes temporaires!)
+                        // ❌ NE PAS sauvegarder squelettes dans Supabase - données incomplètes
+                    saveProfiles(updated, false).catch(e => console.warn('Failed to save profiles:', e));
                         return updated;
                     });
 
@@ -1313,12 +1313,12 @@ export default function App() {
                                                 _isSkeleton: false
                                             }
                                         };
-                                        // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
-                                        // ✅ Sauvegarder dans Supabase ET cache local
-                    saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
+                                        // ✅ NOUVEAU : Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - données déjà là!)
+                                        // ❌ NE PAS sauvegarder dans Supabase lors du chargement - évite boucle circulaire
+                    saveProfiles(updated, false).catch(e => console.warn('Failed to save profiles:', e));
                                         return updated;
                                     });
-                                    
+
                                     console.log(`✅ ${symbol}: Profil mis à jour depuis ${result.source === 'supabase' ? 'Supabase' : 'FMP'}`);
                                     
                                     // Mettre à jour la progression
