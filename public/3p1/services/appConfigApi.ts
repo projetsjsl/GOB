@@ -75,6 +75,39 @@ let configCacheTimestamp: number = 0;
 let configCachePromise: Promise<AppConfig> | null = null;
 const CONFIG_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
+// Valeurs par défaut en cas d'échec de chargement
+const DEFAULT_CONFIG: AppConfig = {
+  cache_max_age_ms: 300000,
+  cache_storage_key: 'finance-pro-cache-v2',
+  profile_batch_size: 50,
+  api_batch_size: 10,
+  sync_batch_size: 25,
+  delay_between_batches_ms: 500,
+  max_sync_time_ms: 300000,
+  ticker_timeout_ms: 10000,
+  snapshots_limit: 1500,
+  tickers_limit: 1500,
+  default_ticker: 'AAPL',
+  market_cap_small_min: 0,
+  market_cap_small_max: 2000000000,
+  market_cap_mid_min: 2000000000,
+  market_cap_mid_max: 10000000000,
+  market_cap_large_min: 10000000000,
+  market_cap_large_max: 200000000000,
+  market_cap_mega_min: 200000000000,
+  recommendation_cache_max: 1000,
+  guardrail_growth_min: -50,
+  guardrail_growth_max: 100,
+  guardrail_pe_min: 1,
+  guardrail_pe_max: 100,
+  guardrail_pcf_min: 1,
+  guardrail_pcf_max: 100,
+  guardrail_pbv_min: 0.1,
+  guardrail_pbv_max: 50,
+  guardrail_yield_min: 0,
+  guardrail_yield_max: 20
+};
+
 /**
  * Charge toutes les configurations depuis Supabase
  */
@@ -89,24 +122,58 @@ export async function loadAppConfig(): Promise<AppConfig> {
     return configCachePromise;
   }
 
+  const isLocalhost = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
   configCachePromise = (async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/app-config?all=true`);
+      let configData: any[] = [];
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+      // ✅ ESSAI 1: API route
+      try {
+        const response = await fetch(`${API_BASE}/api/app-config?all=true`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && Array.isArray(result.data)) {
+            configData = result.data;
+          }
+        } else {
+          throw new Error(`HTTP ${response.status}`);
+        }
+      } catch (apiError) {
+        console.warn('⚠️ API app-config failed:', apiError);
+
+        // ✅ ESSAI 2: Localhost - chargement direct Supabase
+        if (isLocalhost) {
+          console.log('🔄 Localhost - Chargement direct config depuis Supabase...');
+          const { getSupabaseClient } = await import('./supabase');
+          const supabase = getSupabaseClient();
+
+          if (supabase) {
+            const { data, error } = await supabase
+              .from('app_config')
+              .select('config_key, config_value');
+
+            if (!error && data) {
+              configData = data;
+              console.log(`✅ ${configData.length} configs chargées directement depuis Supabase`);
+            }
+          }
+        }
       }
 
-      const result = await response.json();
-
-      if (!result.success || !Array.isArray(result.data)) {
-        throw new Error('Invalid config response format');
+      // Si aucune donnée, utiliser les valeurs par défaut
+      if (configData.length === 0) {
+        console.warn('⚠️ Aucune config trouvée, utilisation des valeurs par défaut');
+        configCache = DEFAULT_CONFIG;
+        configCacheTimestamp = now;
+        return DEFAULT_CONFIG;
       }
 
       // Convertir les configurations JSONB en objet typé
       const config: Partial<AppConfig> = {};
-      
-      result.data.forEach((item: any) => {
+
+      configData.forEach((item: any) => {
         if (item.config_key && item.config_value !== undefined) {
           const key = item.config_key as keyof AppConfig;
           // Convertir les valeurs JSONB en types appropriés
@@ -125,12 +192,8 @@ export async function loadAppConfig(): Promise<AppConfig> {
         }
       });
 
-      const missingKeys = REQUIRED_CONFIG_KEYS.filter((key) => typeof config[key] === 'undefined');
-      if (missingKeys.length > 0) {
-        throw new Error(`Missing config keys: ${missingKeys.join(', ')}`);
-      }
-
-      const finalConfig = config as AppConfig;
+      // Compléter avec les valeurs par défaut si nécessaire
+      const finalConfig = { ...DEFAULT_CONFIG, ...config } as AppConfig;
 
       // Mettre en cache
       configCache = finalConfig;
@@ -140,7 +203,10 @@ export async function loadAppConfig(): Promise<AppConfig> {
       return finalConfig;
     } catch (error: any) {
       console.error('❌ Erreur chargement configurations depuis Supabase:', error);
-      throw error;
+      // Retourner les valeurs par défaut en cas d'erreur
+      configCache = DEFAULT_CONFIG;
+      configCacheTimestamp = now;
+      return DEFAULT_CONFIG;
     } finally {
       configCachePromise = null;
     }

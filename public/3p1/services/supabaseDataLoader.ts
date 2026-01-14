@@ -82,7 +82,7 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 /**
  * Charge TOUS les snapshots actuels depuis Supabase en UN SEUL appel API
  * Utilise ?all=true&current=true pour récupérer tous les snapshots is_current=true
- * 
+ *
  * Cette fonction est le cœur de l'optimisation - au lieu de 1000+ appels API,
  * on fait UN SEUL appel qui charge tout en mémoire
  */
@@ -94,26 +94,55 @@ export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string,
     return allSnapshotsCache;
   }
 
-  try {
-    console.log('🚀 Loading ALL current snapshots from Supabase in single API call...');
-    const startTime = Date.now();
-    
-    // ✅ Limite depuis Supabase (pas de hardcoding)
-    const { getConfigValue } = await import('./appConfigApi');
-    const limit = await getConfigValue('snapshots_limit');
-    const response = await fetch(`/api/finance-snapshots?all=true&current=true&limit=${limit}`);
+  const isLocalhost = typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status} ${response.statusText}`);
+  try {
+    console.log('🚀 Loading ALL current snapshots from Supabase...');
+    const startTime = Date.now();
+
+    let snapshots: any[] = [];
+
+    // ✅ ESSAI 1: API route (production)
+    try {
+      const { getConfigValue } = await import('./appConfigApi');
+      const limit = await getConfigValue('snapshots_limit');
+      const response = await fetch(`/api/finance-snapshots?all=true&current=true&limit=${limit}`);
+
+      if (response.ok) {
+        const result = await response.json();
+        snapshots = result.data || result.snapshots || result || [];
+      } else {
+        throw new Error(`API error: ${response.status}`);
+      }
+    } catch (apiError) {
+      console.warn('⚠️ API route failed:', apiError);
+
+      // ✅ ESSAI 2: Localhost - chargement direct depuis Supabase (contourne HTTP 431)
+      if (isLocalhost) {
+        console.log('🔄 Localhost détecté - Chargement direct snapshots depuis Supabase...');
+        const { getSupabaseClient } = await import('./supabase');
+        const supabase = getSupabaseClient();
+
+        if (supabase) {
+          const { data, error } = await supabase
+            .from('finance_pro_snapshots')
+            .select('ticker, annual_data, assumptions, company_info, snapshot_date, is_current, auto_fetched')
+            .eq('is_current', true)
+            .limit(1500);
+
+          if (!error && data) {
+            snapshots = data;
+            console.log(`✅ ${snapshots.length} snapshots chargés directement depuis Supabase (localhost)`);
+          } else {
+            console.error('❌ Erreur Supabase direct:', error);
+          }
+        }
+      }
     }
 
-    const result = await response.json();
-    
     const snapshotMap = new Map<string, SupabaseSnapshotData>();
-    
-    // L'API retourne { success: true, data: [...] }
-    const snapshots = result.data || result.snapshots || result || [];
-    
+
     if (Array.isArray(snapshots)) {
       snapshots.forEach((snapshot: any) => {
         if (snapshot.ticker) {
@@ -130,12 +159,12 @@ export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string,
     }
 
     const loadTime = Date.now() - startTime;
-    console.log(`✅ Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms (single API call)`);
-    
+    console.log(`✅ Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms`);
+
     // Update cache
     allSnapshotsCache = snapshotMap;
     allSnapshotsCacheTimestamp = now;
-    
+
     return snapshotMap;
   } catch (error) {
     console.error('❌ Error loading all snapshots from Supabase:', error);
