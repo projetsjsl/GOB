@@ -58153,6 +58153,57 @@ Vérifiez votre connexion et réessayez.`,
           }
           return updated;
         });
+        setTimeout(async () => {
+          setLibrary((currentLib) => {
+            const skeletonTickers = Object.entries(currentLib).filter(([symbol, profile2]) => {
+              if (symbol === DEFAULT_PROFILE.id) return false;
+              const p = profile2;
+              return p._isSkeleton === true;
+            }).map(([symbol]) => symbol);
+            if (skeletonTickers.length > 0) {
+              console.log(`🔄 Trouvé ${skeletonTickers.length} squelettes à charger après migration`);
+              const tickersToLoad = result.tickers.filter((t) => {
+                const symbol = t.ticker.toUpperCase();
+                return skeletonTickers.includes(symbol) && !isMutualFund(symbol, t.company_name);
+              });
+              if (tickersToLoad.length > 0) {
+                console.log(`🚀 Démarrage du chargement pour ${tickersToLoad.length} squelettes`);
+                const loadSkeletonsInBackground = async () => {
+                  const batchSize = 10;
+                  const delayBetweenBatches = 1e3;
+                  for (let i = 0; i < tickersToLoad.length; i += batchSize) {
+                    const batch = tickersToLoad.slice(i, i + batchSize);
+                    const batchNum = Math.floor(i / batchSize) + 1;
+                    const totalBatches = Math.ceil(tickersToLoad.length / batchSize);
+                    console.log(`📥 Chargement squelettes batch ${batchNum}/${totalBatches}...`);
+                    const tickerSymbols = batch.map((t) => t.ticker.toUpperCase());
+                    const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
+                    for (const supabaseTicker of batch) {
+                      const symbol = supabaseTicker.ticker.toUpperCase();
+                      const supabaseResult = supabaseResults[symbol];
+                      if (supabaseResult && supabaseResult.data && supabaseResult.data.length > 0) {
+                        setLibrary((prev) => ({
+                          ...prev,
+                          [symbol]: {
+                            ...prev[symbol],
+                            ...supabaseResult,
+                            _isSkeleton: false
+                          }
+                        }));
+                      }
+                    }
+                    if (i + batchSize < tickersToLoad.length) {
+                      await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
+                    }
+                  }
+                  console.log(`✅ Chargement squelettes terminé`);
+                };
+                loadSkeletonsInBackground().catch((e) => console.error("Erreur chargement squelettes:", e));
+              }
+            }
+            return currentLib;
+          });
+        }, 500);
         if (newTickers.length > 0) {
           const validTickers2 = newTickers.filter((t) => {
             const symbol = t.ticker.toUpperCase();

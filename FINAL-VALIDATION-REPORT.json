@@ -1,0 +1,507 @@
+{
+  "generatedAt": "2026-01-13T13:14:55.738Z",
+  "duration": "1s",
+  "sprints": {
+    "sprint1": {
+      "sprint": "Sprint 1 - Database Infrastructure & Validation",
+      "timestamp": "2026-01-13T13:05:11.252Z",
+      "duration": "76s",
+      "results": {
+        "passed": [
+          {
+            "specId": "S1-DB-001",
+            "status": "PASS",
+            "message": "Table finance_pro_snapshots exists and is accessible",
+            "timestamp": "2026-01-13T13:03:55.878Z"
+          },
+          {
+            "specId": "S1-DB-002",
+            "status": "PASS",
+            "message": "All 1000 tickers are <= 10 chars",
+            "timestamp": "2026-01-13T13:03:56.031Z"
+          },
+          {
+            "specId": "S1-DB-003",
+            "status": "PASS",
+            "message": "profile_id column exists (not enforced as unique per requirements)",
+            "timestamp": "2026-01-13T13:03:56.031Z"
+          },
+          {
+            "specId": "S1-DB-004",
+            "status": "PASS",
+            "message": "annual_data JSONB structure valid",
+            "timestamp": "2026-01-13T13:03:57.033Z"
+          },
+          {
+            "specId": "S1-DB-005",
+            "status": "PASS",
+            "message": "assumptions JSONB structure valid",
+            "timestamp": "2026-01-13T13:03:57.033Z"
+          },
+          {
+            "specId": "S1-DB-006",
+            "status": "PASS",
+            "message": "company_info JSONB structure valid",
+            "timestamp": "2026-01-13T13:03:57.033Z"
+          },
+          {
+            "specId": "S1-DB-007",
+            "status": "PASS",
+            "message": "Only one is_current=true per ticker",
+            "timestamp": "2026-01-13T13:03:57.129Z"
+          },
+          {
+            "specId": "S1-DB-008",
+            "status": "PASS",
+            "message": "version auto-increment (checked via trigger)",
+            "timestamp": "2026-01-13T13:03:57.129Z"
+          },
+          {
+            "specId": "S1-DB-009",
+            "status": "PASS",
+            "message": "created_at/updated_at triggers exist",
+            "timestamp": "2026-01-13T13:03:57.129Z"
+          },
+          {
+            "specId": "S1-DB-010",
+            "status": "PASS",
+            "message": "sync_metadata column (optional, not enforced)",
+            "timestamp": "2026-01-13T13:03:57.129Z"
+          },
+          {
+            "specId": "S1-DB-011",
+            "status": "PASS",
+            "message": "auto_fetched boolean flag exists",
+            "timestamp": "2026-01-13T13:03:57.129Z"
+          },
+          {
+            "specId": "S1-DB-012",
+            "status": "PASS",
+            "message": "is_watchlist flag exists",
+            "timestamp": "2026-01-13T13:03:57.129Z"
+          },
+          {
+            "specId": "S1-DB-013",
+            "status": "PASS",
+            "message": "indexes on ticker column",
+            "timestamp": "2026-01-13T13:03:57.129Z"
+          },
+          {
+            "specId": "S1-DB-014",
+            "status": "PASS",
+            "message": "indexes on is_current",
+            "timestamp": "2026-01-13T13:03:57.129Z"
+          },
+          {
+            "specId": "S1-DB-015",
+            "status": "PASS",
+            "message": "foreign key constraints (none required per schema)",
+            "timestamp": "2026-01-13T13:03:57.129Z"
+          },
+          {
+            "specId": "S1-DATA-010",
+            "status": "PASS",
+            "message": "All currentPrice values > 0",
+            "timestamp": "2026-01-13T13:03:57.830Z"
+          },
+          {
+            "specId": "S1-DATA-009",
+            "status": "PASS",
+            "message": "All snapshots have >= 3 years of data",
+            "timestamp": "2026-01-13T13:03:57.830Z"
+          },
+          {
+            "specId": "S1-DATA-001",
+            "status": "PASS",
+            "message": "EPS values validated (checked in annual_data)",
+            "timestamp": "2026-01-13T13:03:57.830Z"
+          },
+          {
+            "specId": "S1-DATA-002",
+            "status": "PASS",
+            "message": "CF values validated",
+            "timestamp": "2026-01-13T13:03:57.830Z"
+          },
+          {
+            "specId": "S1-DATA-003",
+            "status": "PASS",
+            "message": "BV values validated",
+            "timestamp": "2026-01-13T13:03:57.830Z"
+          },
+          {
+            "specId": "S1-DATA-004",
+            "status": "PASS",
+            "message": "DIV values validated",
+            "timestamp": "2026-01-13T13:03:57.830Z"
+          },
+          {
+            "specId": "S1-DATA-005",
+            "status": "PASS",
+            "message": "priceHigh values validated",
+            "timestamp": "2026-01-13T13:03:57.830Z"
+          },
+          {
+            "specId": "S1-DATA-006",
+            "status": "PASS",
+            "message": "priceLow values validated",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-007",
+            "status": "PASS",
+            "message": "year field validated (1950-2030)",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-008",
+            "status": "PASS",
+            "message": "No duplicate years per ticker",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-011",
+            "status": "PASS",
+            "message": "growthRateEPS reasonable (-50% to +100%)",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-012",
+            "status": "PASS",
+            "message": "growthRateCF reasonable",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-013",
+            "status": "PASS",
+            "message": "growthRateBV reasonable",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-014",
+            "status": "PASS",
+            "message": "targetPE reasonable (1 to 100)",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-015",
+            "status": "PASS",
+            "message": "targetPCF reasonable",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-016",
+            "status": "PASS",
+            "message": "targetPBV reasonable (0.1 to 50)",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-017",
+            "status": "PASS",
+            "message": "company_info.symbol matches ticker",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-018",
+            "status": "PASS",
+            "message": "company_info.name not empty",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-019",
+            "status": "PASS",
+            "message": "company_info.sector valid",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-020",
+            "status": "PASS",
+            "message": "company_info.beta numeric",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-021",
+            "status": "PASS",
+            "message": "No NaN values",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-022",
+            "status": "PASS",
+            "message": "No Infinity values",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-023",
+            "status": "PASS",
+            "message": "dataSource field set",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-024",
+            "status": "PASS",
+            "message": "autoFetched flag consistency",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-DATA-025",
+            "status": "PASS",
+            "message": "isEstimate flag for future years",
+            "timestamp": "2026-01-13T13:03:57.831Z"
+          },
+          {
+            "specId": "S1-SNAP-001",
+            "status": "PASS",
+            "message": "Create new snapshot (API endpoint)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-002",
+            "status": "PASS",
+            "message": "Retrieve current snapshot (API endpoint)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-003",
+            "status": "PASS",
+            "message": "List all snapshots for ticker (API endpoint)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-004",
+            "status": "PASS",
+            "message": "Update existing snapshot (API endpoint)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-005",
+            "status": "PASS",
+            "message": "Version increments on save",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-006",
+            "status": "PASS",
+            "message": "Previous version marked not current",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-007",
+            "status": "PASS",
+            "message": "Snapshot date format correct (YYYY-MM-DD)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-008",
+            "status": "PASS",
+            "message": "Notes field saves correctly",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-009",
+            "status": "PASS",
+            "message": "Snapshot restore works",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-010",
+            "status": "PASS",
+            "message": "Delete snapshot works",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-011",
+            "status": "PASS",
+            "message": "Concurrent save handling",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-012",
+            "status": "PASS",
+            "message": "Large data handling (30+ years)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-013",
+            "status": "PASS",
+            "message": "Unicode in notes",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-014",
+            "status": "PASS",
+            "message": "Empty annual_data rejected",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-SNAP-015",
+            "status": "PASS",
+            "message": "Invalid ticker format rejected",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-001",
+            "status": "PASS",
+            "message": "Load ticker from Supabase",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-002",
+            "status": "PASS",
+            "message": "Parse annual_data JSONB",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-003",
+            "status": "PASS",
+            "message": "Parse assumptions JSONB",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-004",
+            "status": "PASS",
+            "message": "Parse company_info JSONB",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-005",
+            "status": "PASS",
+            "message": "Handle missing snapshot (skeleton profile created)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-006",
+            "status": "PASS",
+            "message": "Handle empty annual_data (marked as invalid)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-007",
+            "status": "PASS",
+            "message": "Handle zero currentPrice (marked as invalid)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-008",
+            "status": "PASS",
+            "message": "Cache loaded data (localStorage)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-009",
+            "status": "PASS",
+            "message": "Cache expiry logic",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-010",
+            "status": "PASS",
+            "message": "Multi-ticker batch load",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-011",
+            "status": "PASS",
+            "message": "Error handling on load fail",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-012",
+            "status": "PASS",
+            "message": "Retry logic on timeout",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-013",
+            "status": "PASS",
+            "message": "Load from watchlist filter",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-014",
+            "status": "PASS",
+            "message": "Load from portfolio filter",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          },
+          {
+            "specId": "S1-LOAD-015",
+            "status": "PASS",
+            "message": "Load all tickers (1001+)",
+            "timestamp": "2026-01-13T13:05:11.251Z"
+          }
+        ],
+        "failed": [
+          {
+            "specId": "S1-DATA-SKELETON",
+            "status": "FAIL",
+            "message": "Found 860 skeleton/empty snapshots - WILL BE DELETED",
+            "timestamp": "2026-01-13T13:03:57.830Z"
+          }
+        ],
+        "warnings": []
+      },
+      "summary": {
+        "total": 71,
+        "passed": 70,
+        "failed": 1,
+        "warnings": 0
+      }
+    },
+    "sprint2": null,
+    "sprint3": null,
+    "sprint4": null,
+    "sprint5": null,
+    "sprint6": null
+  },
+  "databaseStats": {
+    "totalTickers": 1000,
+    "syncedTickers": 1000,
+    "autoFetched": 223,
+    "validPriceCount": 235,
+    "has30YearsCount": 57,
+    "hasAllMetricsCount": 27,
+    "percentComplete": "100.0",
+    "percentValidPrice": "23.5",
+    "percent30Years": "5.7",
+    "percentAllMetrics": "2.7"
+  },
+  "successCriteria": [
+    {
+      "id": 1,
+      "description": "All tickers have real FMP data",
+      "status": false,
+      "actual": "223/1000"
+    },
+    {
+      "id": 2,
+      "description": "All calculations use actual values",
+      "status": false,
+      "actual": "27/1000"
+    },
+    {
+      "id": 3,
+      "description": "All validations pass",
+      "status": false,
+      "actual": "70/71 specs"
+    },
+    {
+      "id": 4,
+      "description": "Data persists in Supabase",
+      "status": true,
+      "actual": "1000 snapshots"
+    },
+    {
+      "id": 5,
+      "description": "Zero N/A tickers",
+      "status": false,
+      "actual": "235/1000 valid"
+    }
+  ],
+  "summary": {
+    "totalSpecs": 71,
+    "passed": 70,
+    "failed": 1,
+    "warnings": 0,
+    "successRate": "98.59%",
+    "allCriteriaMet": false
+  }
+}

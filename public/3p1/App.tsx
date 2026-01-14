@@ -1049,6 +1049,84 @@ export default function App() {
                     return updated;
                 });
 
+                // ✅ FIX: Après migration, charger les données pour les profils squelettes
+                // Utiliser setTimeout pour attendre que setLibrary soit terminé
+                setTimeout(async () => {
+                    // Vérifier le state actuel pour trouver les squelettes
+                    setLibrary(currentLib => {
+                        const skeletonTickers = Object.entries(currentLib)
+                            .filter(([symbol, profile]) => {
+                                if (symbol === DEFAULT_PROFILE.id) return false;
+                                const p = profile as any;
+                                return p._isSkeleton === true;
+                            })
+                            .map(([symbol]) => symbol);
+
+                        if (skeletonTickers.length > 0) {
+                            console.log(`🔄 Trouvé ${skeletonTickers.length} squelettes à charger après migration`);
+
+                            // Créer la liste de tickers à partir de result.tickers
+                            const tickersToLoad = result.tickers.filter(t => {
+                                const symbol = t.ticker.toUpperCase();
+                                return skeletonTickers.includes(symbol) && !isMutualFund(symbol, t.company_name);
+                            });
+
+                            if (tickersToLoad.length > 0) {
+                                console.log(`🚀 Démarrage du chargement pour ${tickersToLoad.length} squelettes`);
+
+                                // Charger en petits batches pour éviter les 500 errors
+                                const loadSkeletonsInBackground = async () => {
+                                    const batchSize = 10; // Petit batch pour éviter surcharge
+                                    const delayBetweenBatches = 1000; // 1 seconde entre batches
+
+                                    for (let i = 0; i < tickersToLoad.length; i += batchSize) {
+                                        const batch = tickersToLoad.slice(i, i + batchSize);
+                                        const batchNum = Math.floor(i / batchSize) + 1;
+                                        const totalBatches = Math.ceil(tickersToLoad.length / batchSize);
+
+                                        console.log(`📥 Chargement squelettes batch ${batchNum}/${totalBatches}...`);
+
+                                        // Charger depuis Supabase d'abord
+                                        const tickerSymbols = batch.map(t => t.ticker.toUpperCase());
+                                        const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
+
+                                        // Mettre à jour les profils avec les données Supabase
+                                        for (const supabaseTicker of batch) {
+                                            const symbol = supabaseTicker.ticker.toUpperCase();
+                                            const supabaseResult = supabaseResults[symbol];
+
+                                            if (supabaseResult && supabaseResult.data && supabaseResult.data.length > 0) {
+                                                // Données trouvées dans Supabase
+                                                setLibrary(prev => ({
+                                                    ...prev,
+                                                    [symbol]: {
+                                                        ...prev[symbol],
+                                                        ...supabaseResult,
+                                                        _isSkeleton: false
+                                                    }
+                                                }));
+                                            }
+                                            // Si pas de données Supabase, laisser le squelette pour chargement FMP ultérieur
+                                        }
+
+                                        // Délai entre batches
+                                        if (i + batchSize < tickersToLoad.length) {
+                                            await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+                                        }
+                                    }
+
+                                    console.log(`✅ Chargement squelettes terminé`);
+                                };
+
+                                // Lancer le chargement en arrière-plan
+                                loadSkeletonsInBackground().catch(e => console.error('Erreur chargement squelettes:', e));
+                            }
+                        }
+
+                        return currentLib; // Ne pas modifier le state
+                    });
+                }, 500); // Délai pour s'assurer que setLibrary est terminé
+
                 // ✅ OPTIMISATION PERFORMANCE : Créer des profils "squelettes" immédiatement
                 // pour affichage instantané, puis charger les données FMP en arrière-plan
                 if (newTickers.length > 0) {
