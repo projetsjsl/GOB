@@ -58396,15 +58396,10 @@ Vérifiez votre connexion et réessayez.`,
               });
             }, 2e3);
           };
-          if (typeof requestIdleCallback !== "undefined") {
-            requestIdleCallback(() => {
-              loadFMPDataInBackground();
-            }, { timeout: 2e3 });
-          } else {
-            setTimeout(() => {
-              loadFMPDataInBackground();
-            }, 100);
-          }
+          setTimeout(() => {
+            console.log("⏰ Démarrage du chargement de données après délai...");
+            loadFMPDataInBackground();
+          }, 500);
         } else {
           setIsLoadingTickers(false);
           setSupabaseProgress({

@@ -1360,16 +1360,12 @@ export default function App() {
                         }, 2000);
                     };
 
-                    // Démarrer le chargement en arrière-plan (non-bloquant)
-                    if (typeof requestIdleCallback !== 'undefined') {
-                        requestIdleCallback(() => {
-                            loadFMPDataInBackground();
-                        }, { timeout: 2000 });
-                    } else {
-                        setTimeout(() => {
-                            loadFMPDataInBackground();
-                        }, 100);
-                    }
+                    // ✅ FIX: Appeler directement avec un petit délai pour laisser l'UI se mettre à jour
+                    // requestIdleCallback ne fonctionne pas correctement avec les re-renders React
+                    setTimeout(() => {
+                        console.log('⏰ Démarrage du chargement de données après délai...');
+                        loadFMPDataInBackground();
+                    }, 500);
                 } else {
                     // Aucun nouveau ticker - libérer le loading
                     setIsLoadingTickers(false);
