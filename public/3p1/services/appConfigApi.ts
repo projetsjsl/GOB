@@ -96,15 +96,17 @@ const DEFAULT_CONFIG: AppConfig = {
   market_cap_large_max: 200000000000,
   market_cap_mega_min: 200000000000,
   recommendation_cache_max: 1000,
-  guardrail_growth_min: -20,
-  guardrail_growth_max: 12,
+  // Moderate defaults (balanced sector baseline)
+  // Note: KPIDashboard.tsx applies sector-specific guardrails
+  guardrail_growth_min: -18,
+  guardrail_growth_max: 15,   // Moderate: between value (10%) and growth (18%)
   guardrail_pe_min: 8,
-  guardrail_pe_max: 25,
+  guardrail_pe_max: 30,       // Moderate: between value (20x) and growth (40x)
   guardrail_pcf_min: 5,
-  guardrail_pcf_max: 20,
+  guardrail_pcf_max: 22,      // Moderate: between value (15x) and growth (30x)
   guardrail_pbv_min: 0.8,
   guardrail_pbv_max: 5,
-  guardrail_yield_min: 1,
+  guardrail_yield_min: 0.5,
   guardrail_yield_max: 8
 };
 

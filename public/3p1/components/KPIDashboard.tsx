@@ -13,6 +13,99 @@ import { logger } from '../utils/logger';
 import { AdditionalMetrics } from './AdditionalMetrics';
 import { EvaluationDetails } from './EvaluationDetails';
 
+// ============================================================================
+// SECTOR-BASED GUARDRAILS
+// Different sectors have different valuation characteristics
+// ============================================================================
+
+type SectorCategory = 'growth' | 'value' | 'balanced';
+
+interface SectorGuardrails {
+  growthMin: number;
+  growthMax: number;
+  peMin: number;
+  peMax: number;
+  pcfMin: number;
+  pcfMax: number;
+  pbvMin: number;
+  pbvMax: number;
+  yieldMin: number;
+  yieldMax: number;
+  maxTargetMultiple: number;  // Max target price as multiple of current price
+  maxReturn: number;          // Max 5-year return percentage
+}
+
+// Sector classification
+const GROWTH_SECTORS = ['Technology', 'Communication Services', 'Consumer Discretionary', 'Healthcare'];
+const VALUE_SECTORS = ['Utilities', 'Real Estate', 'Consumer Staples', 'Energy', 'Materials'];
+// Balanced: Financials, Industrials, and anything else
+
+const getSectorCategory = (sector: string | undefined): SectorCategory => {
+  if (!sector) return 'balanced';
+  const normalizedSector = sector.trim();
+
+  if (GROWTH_SECTORS.some(s => normalizedSector.toLowerCase().includes(s.toLowerCase()))) {
+    return 'growth';
+  }
+  if (VALUE_SECTORS.some(s => normalizedSector.toLowerCase().includes(s.toLowerCase()))) {
+    return 'value';
+  }
+  return 'balanced';
+};
+
+// Guardrails by sector category - moderate loosening with sector awareness
+const SECTOR_GUARDRAILS: Record<SectorCategory, SectorGuardrails> = {
+  growth: {
+    growthMin: -20,
+    growthMax: 18,      // Higher growth allowed for tech/healthcare
+    peMin: 10,
+    peMax: 40,          // Growth stocks can have higher P/E
+    pcfMin: 8,
+    pcfMax: 30,         // Higher P/CF for growth
+    pbvMin: 1,
+    pbvMax: 8,          // Higher P/BV for asset-light tech
+    yieldMin: 0,        // Growth stocks may not pay dividends
+    yieldMax: 5,
+    maxTargetMultiple: 3.5,  // Higher upside potential
+    maxReturn: 200           // Higher max return for growth
+  },
+  value: {
+    growthMin: -15,
+    growthMax: 10,      // More conservative growth for value
+    peMin: 6,
+    peMax: 20,          // Lower P/E for value stocks
+    pcfMin: 4,
+    pcfMax: 15,         // Lower P/CF
+    pbvMin: 0.5,
+    pbvMax: 3,          // Lower P/BV - value stocks trade cheaper
+    yieldMin: 1.5,      // Value stocks usually pay dividends
+    yieldMax: 10,       // Higher yields possible (REITs, utilities)
+    maxTargetMultiple: 2,    // More conservative targets
+    maxReturn: 100           // More conservative returns
+  },
+  balanced: {
+    growthMin: -18,
+    growthMax: 15,      // Moderate growth (baseline with loosening)
+    peMin: 8,
+    peMax: 30,          // Moderate P/E range
+    pcfMin: 5,
+    pcfMax: 22,         // Moderate P/CF
+    pbvMin: 0.8,
+    pbvMax: 5,          // Moderate P/BV
+    yieldMin: 0.5,
+    yieldMax: 8,
+    maxTargetMultiple: 3,    // Moderate target multiple
+    maxReturn: 150           // Moderate max return
+  }
+};
+
+const getSectorGuardrails = (sector: string | undefined): SectorGuardrails => {
+  const category = getSectorCategory(sector);
+  return SECTOR_GUARDRAILS[category];
+};
+
+// ============================================================================
+
 interface KPIDashboardProps {
   profiles: AnalysisProfile[];
   currentId: string;
@@ -196,19 +289,22 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         div: Math.max(profile.assumptions.currentDividend || 0, 0)
       };
 
+      // ✅ GET SECTOR-BASED GUARDRAILS
+      const sectorGuardrails = getSectorGuardrails(profile.info?.sector);
+
       const projectFutureValue = (current: number, rate: number, years: number): number => {
         // Valider les entrées
         if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
-        // Limiter le taux de croissance à 12% max (réaliste pour 5 ans = 1.76x)
-        const safeRate = Math.max(-20, Math.min(rate, 12));
+        // Limiter le taux de croissance selon le secteur
+        const safeRate = Math.max(sectorGuardrails.growthMin, Math.min(rate, sectorGuardrails.growthMax));
         return current * Math.pow(1 + safeRate / 100, years);
       };
 
-      // Valider et limiter les taux de croissance (max 12% = croissance réaliste soutenable)
-      const safeGrowthEPS = Math.max(-20, Math.min(profile.assumptions.growthRateEPS || 0, 12));
-      const safeGrowthCF = Math.max(-20, Math.min(profile.assumptions.growthRateCF || 0, 12));
-      const safeGrowthBV = Math.max(-20, Math.min(profile.assumptions.growthRateBV || 0, 12));
-      const safeGrowthDiv = Math.max(-20, Math.min(profile.assumptions.growthRateDiv || 0, 12));
+      // Valider et limiter les taux de croissance selon le secteur
+      const safeGrowthEPS = Math.max(sectorGuardrails.growthMin, Math.min(profile.assumptions.growthRateEPS || 0, sectorGuardrails.growthMax));
+      const safeGrowthCF = Math.max(sectorGuardrails.growthMin, Math.min(profile.assumptions.growthRateCF || 0, sectorGuardrails.growthMax));
+      const safeGrowthBV = Math.max(sectorGuardrails.growthMin, Math.min(profile.assumptions.growthRateBV || 0, sectorGuardrails.growthMax));
+      const safeGrowthDiv = Math.max(sectorGuardrails.growthMin, Math.min(profile.assumptions.growthRateDiv || 0, sectorGuardrails.growthMax));
 
       const futureValues = {
         eps: projectFutureValue(baseValues.eps, safeGrowthEPS, 5),
@@ -217,21 +313,21 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         div: projectFutureValue(baseValues.div, safeGrowthDiv, 5)
       };
 
-      // Valider et limiter les ratios cibles (limites STRICTES pour rendements réalistes)
-      const safeTargetPE = Math.max(8, Math.min(profile.assumptions.targetPE || 15, 25));
-      const safeTargetPCF = Math.max(5, Math.min(profile.assumptions.targetPCF || 10, 20));
-      const safeTargetPBV = Math.max(0.8, Math.min(profile.assumptions.targetPBV || 2, 5));
-      const safeTargetYield = Math.max(1, Math.min(profile.assumptions.targetYield || 2, 8));
+      // Valider et limiter les ratios cibles selon le secteur
+      const safeTargetPE = Math.max(sectorGuardrails.peMin, Math.min(profile.assumptions.targetPE || 15, sectorGuardrails.peMax));
+      const safeTargetPCF = Math.max(sectorGuardrails.pcfMin, Math.min(profile.assumptions.targetPCF || 10, sectorGuardrails.pcfMax));
+      const safeTargetPBV = Math.max(sectorGuardrails.pbvMin, Math.min(profile.assumptions.targetPBV || 2, sectorGuardrails.pbvMax));
+      const safeTargetYield = Math.max(sectorGuardrails.yieldMin, Math.min(profile.assumptions.targetYield || 2, sectorGuardrails.yieldMax));
 
       const targets = {
-        eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= 25 ? futureValues.eps * safeTargetPE : 0,
-        cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= 20 ? futureValues.cf * safeTargetPCF : 0,
-        bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= 5 ? futureValues.bv * safeTargetPBV : 0,
-        div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= 8 ? futureValues.div / (safeTargetYield / 100) : 0
+        eps: futureValues.eps > 0 && safeTargetPE > 0 && safeTargetPE <= sectorGuardrails.peMax ? futureValues.eps * safeTargetPE : 0,
+        cf: futureValues.cf > 0 && safeTargetPCF > 0 && safeTargetPCF <= sectorGuardrails.pcfMax ? futureValues.cf * safeTargetPCF : 0,
+        bv: futureValues.bv > 0 && safeTargetPBV > 0 && safeTargetPBV <= sectorGuardrails.pbvMax ? futureValues.bv * safeTargetPBV : 0,
+        div: futureValues.div > 0 && safeTargetYield > 0 && safeTargetYield <= sectorGuardrails.yieldMax ? futureValues.div / (safeTargetYield / 100) : 0
       };
 
-      // Valider que les targets sont raisonnables (max 2.5x le prix actuel = ~20% CAGR sur 5 ans)
-      const maxReasonableTarget = currentPrice * 2.5;
+      // Valider que les targets sont raisonnables selon le secteur
+      const maxReasonableTarget = currentPrice * sectorGuardrails.maxTargetMultiple;
       const minReasonableTarget = currentPrice * 0.1; // Minimum 10% du prix actuel
       const validTargets = [
         !profile.assumptions.excludeEPS && targets.eps > 0 && targets.eps >= minReasonableTarget && targets.eps <= maxReasonableTarget && isFinite(targets.eps) ? targets.eps : null,
@@ -260,23 +356,23 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       // Limiter totalDividends au maximum raisonnable
       totalDividends = Math.min(totalDividends, maxReasonableDividends);
 
-      // Calculer le rendement total avec validation et limites TRÈS STRICTES
-      // Max 150% sur 5 ans = ~20% CAGR (réaliste pour bonnes actions)
+      // Calculer le rendement total avec validation selon le secteur
+      const maxSectorReturn = sectorGuardrails.maxReturn;
       let totalReturnPercent = -100; // Par défaut si pas de données valides
       if (currentPrice > 0 && avgTargetPrice > 0 && isFinite(avgTargetPrice) && isFinite(totalDividends) && validTargets.length > 0) {
         const rawReturn = ((avgTargetPrice + totalDividends - currentPrice) / currentPrice) * 100;
-        // VALIDATION TRÈS STRICTE: Max 150% rendement total (réaliste sur 5 ans)
-        if (isFinite(rawReturn) && rawReturn >= -80 && rawReturn <= 150) {
-          // Vérifier que avgTargetPrice n'est pas aberrant (max 2.5x le prix actuel)
-          if (avgTargetPrice <= currentPrice * 2.5 && avgTargetPrice >= currentPrice * 0.3) {
+        // Validation selon le secteur
+        if (isFinite(rawReturn) && rawReturn >= -80 && rawReturn <= maxSectorReturn) {
+          // Vérifier que avgTargetPrice n'est pas aberrant selon le secteur
+          if (avgTargetPrice <= currentPrice * sectorGuardrails.maxTargetMultiple && avgTargetPrice >= currentPrice * 0.3) {
             totalReturnPercent = rawReturn;
           } else {
             // Prix cible aberrant, plafonner au lieu de rejeter
-            totalReturnPercent = Math.min(150, Math.max(-80, rawReturn));
+            totalReturnPercent = Math.min(maxSectorReturn, Math.max(-80, rawReturn));
           }
-        } else if (rawReturn > 150) {
-          // Plafonner à 150% (rendement exceptionnel mais pas aberrant)
-          totalReturnPercent = 150;
+        } else if (rawReturn > maxSectorReturn) {
+          // Plafonner au maximum du secteur
+          totalReturnPercent = maxSectorReturn;
         } else if (rawReturn < -80) {
           // Plafonner à -80% (perte maximale réaliste)
           totalReturnPercent = -80;
@@ -293,16 +389,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       const avgLowPrice = validHistory.length > 0
         ? validHistory.reduce((sum, d) => sum + d.priceLow, 0) / validHistory.length
         : currentPrice * 0.7;
-      
+
       // Valider avgLowPrice
       const safeAvgLowPrice = isFinite(avgLowPrice) && avgLowPrice > 0 ? avgLowPrice : currentPrice * 0.7;
-      
+
       const downsideRisk = currentPrice > 0 && safeAvgLowPrice > 0
         ? Math.max(0, Math.min(100, ((currentPrice - safeAvgLowPrice * 0.9) / currentPrice) * 100))
         : 0;
-      
-      const upsidePotential = Math.max(-80, Math.min(150, totalReturnPercent));
-      const ratio31 = downsideRisk > 0.1 ? Math.max(0, Math.min(10, upsidePotential / downsideRisk)) : 0;
+
+      const upsidePotential = Math.max(-80, Math.min(maxSectorReturn, totalReturnPercent));
+      const ratio31 = downsideRisk > 0.1 ? Math.max(0, Math.min(15, upsidePotential / downsideRisk)) : 0;
 
       // Vérifier si version approuvée (vérifié via useEffect)
       const hasApprovedVersion = approvedVersions.has(profile.id);

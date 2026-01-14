@@ -8411,15 +8411,18 @@ const sanitizeAssumptionsSync = (assumptions) => {
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   };
   const settings = (validationSettingsCache == null ? void 0 : validationSettingsCache.settings) || {
-    growth_min: -20,
-    growth_max: 12,
+    growth_min: -18,
+    growth_max: 15,
+    // Moderate: balanced between value (10%) and growth (18%)
     target_pe_min: 8,
-    target_pe_max: 25,
+    target_pe_max: 30,
+    // Moderate: balanced between value (20x) and growth (40x)
     target_pcf_min: 5,
-    target_pcf_max: 20,
+    target_pcf_max: 22,
+    // Moderate: balanced between value (15x) and growth (30x)
     target_pbv_min: 0.8,
     target_pbv_max: 5,
-    target_yield_min: 1,
+    target_yield_min: 0.5,
     target_yield_max: 8,
     required_return_min: 5,
     required_return_max: 15,
