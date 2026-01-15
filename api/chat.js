@@ -8,6 +8,7 @@
  * Canal → /api/chat → User Manager → Conversation Manager → emma-agent → Response → Channel Adapter
  */
 
+import { applyCors } from './_middleware/emma-cors.js';
 import { getOrCreateUserProfile, updateUserProfile } from '../lib/user-manager.js';
 import { getOrCreateConversation, saveConversationTurn, getConversationHistory, formatHistoryForEmma } from '../lib/conversation-manager.js';
 import { adaptForChannel } from '../lib/channel-adapter.js';
@@ -178,14 +179,8 @@ function validateResponseCompleteness(response, analysisType, intentData) {
  * }
  */
 export default async function handler(req, res) {
-  // CORS Headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  const handled = applyCors(req, res);
+  if (handled) return;
 
   if (req.method !== 'POST') {
     return res.status(405).json({

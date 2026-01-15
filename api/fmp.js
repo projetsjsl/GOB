@@ -3,14 +3,11 @@
  * Supports: news, quote, fundamentals, and other endpoints
  */
 
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+import { applyCors } from './_middleware/emma-cors.js';
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+export default async function handler(req, res) {
+  const handled = applyCors(req, res);
+  if (handled) return;
 
   if (req.method !== 'GET') {
     return res.status(405).json({

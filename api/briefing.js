@@ -14,6 +14,7 @@
  * Body: { type: 'morning'|'midday'|'evening', tickers?: string[] }
  */
 
+import { applyCors } from './_middleware/emma-cors.js';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -147,14 +148,8 @@ async function callEmmaAgent(prompt, tickers, briefingType, toolsPriority) {
  * Handler principal
  */
 export default async function handler(req, res) {
-  // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  const handled = applyCors(req, res);
+  if (handled) return;
 
   try {
         // 1. DÉTERMINER LE TYPE DE BRIEFING
@@ -295,4 +290,3 @@ export default async function handler(req, res) {
     });
   }
 }
-

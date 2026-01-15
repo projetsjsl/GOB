@@ -6,6 +6,7 @@
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { applyCors } from './_middleware/emma-cors.js';
 import { fetchMultipleRSSFeeds, getAvailableRSSFeeds } from '../lib/rss-parser.js';
 
 // Charger la config de scoring
@@ -32,13 +33,8 @@ try {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+  const handled = applyCors(req, res);
+  if (handled) return;
 
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Méthode non autorisée' });

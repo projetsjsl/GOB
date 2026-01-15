@@ -26,6 +26,7 @@
  *   });
  */
 
+import { applyCors } from './_middleware/emma-cors.js';
 import { MasterOrchestrator } from '../lib/orchestrator/master-orchestrator.js';
 import { PersonaManager } from '../lib/orchestrator/persona-manager.js';
 import { ModelSelectorAgent } from '../lib/orchestrator/model-selector-agent.js';
@@ -60,14 +61,8 @@ async function ensureInitialized() {
 }
 
 export default async function handler(req, res) {
-    // CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+    const handled = applyCors(req, res);
+    if (handled) return;
 
     await ensureInitialized();
 
