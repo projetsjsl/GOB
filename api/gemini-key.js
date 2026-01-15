@@ -52,10 +52,7 @@ export default async function handler(req, res) {
       keyPreview: keyPreview,
       timestamp: new Date().toISOString(),
       status: 'success',
-      message: 'Clé API Gemini configurée sur le serveur',
-      // Pour les clients qui ont besoin de la clé complète (usage interne sécurisé)
-      // On peut ajouter un paramètre ?full=true avec authentification
-      ...(req.query.full === 'true' ? { apiKey: geminiApiKey } : {})
+      message: 'Clé API Gemini configurée sur le serveur. Utilisez /api/gemini-proxy pour les appels.'
     });
   } catch (error) {
     console.error('❌ Erreur dans gemini-key API:', error);

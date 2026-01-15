@@ -13,7 +13,12 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({
+      success: false,
+      error: 'Method not allowed',
+      allowed: ['GET'],
+      timestamp: new Date().toISOString()
+    });
   }
 
   try {
@@ -342,7 +347,7 @@ export default async function handler(req, res) {
     return res.status(statusCode).json({
       success: false,
       error: errorType,
-      message: error.message,
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
       endpoint: req.query.endpoint || 'unknown',
       fallback: true,
       timestamp: new Date().toISOString()

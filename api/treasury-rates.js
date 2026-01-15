@@ -188,9 +188,10 @@ async function fetchCanadaTreasuryRates() {
 
     try {
         // Bank of Canada API - Use both groups for complete data
+        const fetchWithTimeout = (url) => fetch(url, { signal: AbortSignal.timeout(15000) });
         const [bondsResponse, tbillsResponse] = await Promise.all([
-            fetch('https://www.bankofcanada.ca/valet/observations/group/bond_yields_all/json?recent=5'),
-            fetch('https://www.bankofcanada.ca/valet/observations/group/tbill_all/json?recent=5')
+            fetchWithTimeout('https://www.bankofcanada.ca/valet/observations/group/bond_yields_all/json?recent=5'),
+            fetchWithTimeout('https://www.bankofcanada.ca/valet/observations/group/tbill_all/json?recent=5')
         ]);
 
         // Process bond yields (2Y, 3Y, 5Y, 7Y, 10Y, 30Y)

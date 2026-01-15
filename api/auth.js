@@ -5,11 +5,32 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
+import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 
-// Simple password hashing function using SHA-256
-function hashPassword(password) {
-    return crypto.createHash('sha256').update(password).digest('hex');
+const BCRYPT_ROUNDS = 12;
+
+// Secure password hashing using bcrypt
+async function hashPassword(password) {
+    return bcrypt.hash(password, BCRYPT_ROUNDS);
+}
+
+// Verify password against bcrypt hash (or fallback to SHA-256 for legacy hashes)
+async function verifyPassword(password, hash) {
+    if (hash && hash.startsWith('$2')) {
+        return bcrypt.compare(password, hash);
+    }
+    if (hash && hash.length === 64 && /^[a-f0-9]+$/i.test(hash)) {
+        return crypto.createHash('sha256').update(password).digest('hex') === hash;
+    }
+    return false;
+}
+
+// Helper to filter sensitive fields from user object before returning
+function sanitizeUser(user) {
+    if (!user) return null;
+    const { password_hash, password_display, ...safeUser } = user;
+    return safeUser;
 }
 
 // Initialize Supabase client
@@ -120,10 +141,10 @@ export default async function handler(req, res) {
         let passwordValid = false;
         
         if (user.password_hash) {
-            // Compare with hashed password
-            passwordValid = (hashPassword(password) === user.password_hash);
+            // Compare with hashed password (bcrypt or legacy SHA-256)
+            passwordValid = await verifyPassword(password, user.password_hash);
         } else if (user.password_display) {
-            // Compare with stored plain password
+            // DEPRECATED: Compare with stored plain password (for migration only)
             passwordValid = (password === user.password_display);
         } else {
             // Legacy fallback: password == username
@@ -140,7 +161,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
           success: true,
           message: 'Connexion réussie',
-          user: user
+          user: sanitizeUser(user)
         });
       }
 
@@ -179,7 +200,7 @@ export default async function handler(req, res) {
           });
         }
 
-        return res.status(200).json({ success: true, user: newUser });
+        return res.status(200).json({ success: true, user: sanitizeUser(newUser) });
       }
 
       return res.status(401).json({ success: false, error: 'Utilisateur inconnu' });
@@ -194,7 +215,7 @@ export default async function handler(req, res) {
        const { user } = await findUserInTables(username);
          
        if (!user) return res.status(401).json({ success: false });
-       return res.status(200).json({ success: true, user });
+       return res.status(200).json({ success: true, user: sanitizeUser(user) });
     }
 
 
@@ -243,8 +264,7 @@ export default async function handler(req, res) {
             username: u.username || u.email?.split('@')[0], // Fallback if username missing
             display_name: u.display_name || u.full_name || u.username || 'Utilisateur',
             role: u.role || (u.is_admin ? 'admin' : 'user'),
-            password_display: u.password_display || null, // Include password_display for admin view
-            password_hash: u.password_hash || null // Include password_hash for reference
+            has_password: !!(u.password_hash || u.password_display)
         }));
 
         return res.status(200).json({ success: true, users: formattedUsers });
@@ -268,13 +288,13 @@ export default async function handler(req, res) {
         };
 
         if (initialPassword) {
-            newUserObj.password_hash = hashPassword(initialPassword);
+            newUserObj.password_hash = await hashPassword(initialPassword);
         }
 
         const { data, error } = await supabase.from('users').insert([newUserObj]).select().single();
 
         if (error) return res.status(500).json({ success: false, error: error.message });
-        return res.status(200).json({ success: true, user: data });
+        return res.status(200).json({ success: true, user: sanitizeUser(data) });
     }
 
     // ============================================================
@@ -289,11 +309,8 @@ export default async function handler(req, res) {
         
         // Handle password update separately
         if (updates.password) {
-            updates.password_hash = hashPassword(updates.password);
-            // Keep password_display if provided, otherwise set it to the new password
-            if (!updates.password_display) {
-                updates.password_display = updates.password;
-            }
+            updates.password_hash = await hashPassword(updates.password);
+            updates.password_display = null;
             delete updates.password; // Don't save raw password
         }
         
@@ -303,7 +320,7 @@ export default async function handler(req, res) {
         const { data, error } = await supabase.from('users').update(updateData).eq('id', target_id).select().single();
         
         if (error) return res.status(500).json({ success: false, error: error.message });
-        return res.status(200).json({ success: true, user: data });
+        return res.status(200).json({ success: true, user: sanitizeUser(data) });
     }
 
     // ============================================================

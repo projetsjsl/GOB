@@ -50,10 +50,11 @@ async function ensureInitialized() {
         try {
             const { registerAllAgents } = await import('../lib/orchestrator/agent-registry.js');
             registerAllAgents(orchestrator);
-            agentsRegistered = true;
             console.log('✅ [Orchestrator API] All agents registered');
         } catch (error) {
             console.warn('⚠️ [Orchestrator API] Agent registry not available:', error.message);
+        } finally {
+            agentsRegistered = true;
         }
     }
 }
@@ -237,14 +238,16 @@ export default async function handler(req, res) {
         // Method not allowed
         return res.status(405).json({
             success: false,
-            error: 'Method not allowed. Use GET or POST.'
+            error: 'Method not allowed',
+            allowed: ['GET', 'POST'],
+            timestamp: new Date().toISOString()
         });
 
     } catch (error) {
         console.error('❌ [Orchestrator API] Error:', error);
         return res.status(500).json({
             success: false,
-            error: error.message,
+            error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
             timestamp: new Date().toISOString()
         });
     }

@@ -148,7 +148,9 @@ export default async function handler(req, res) {
     return res.status(500).json({
       success: false,
       error: 'Erreur lors de la récupération des actualités',
-      message: error.message,
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal error',
+      endpoint: '/api/news',
+      query: (req.query.q || req.query.ticker || req.query.symbol || 'general').substring(0, 20),
       timestamp: new Date().toISOString()
     });
   }
@@ -508,4 +510,3 @@ async function fetchRSSNews(feedKeys, limit, query) {
     return [];
   }
 }
-

@@ -48,7 +48,11 @@ async function getInstruments(filters = {}) {
   }
 
   if (search) {
-    query = query.or(`symbol.ilike.%${search}%,name.ilike.%${search}%`);
+    const sanitizedSearch = search
+      .replace(/[%_\\]/g, '\\$&')
+      .replace(/[^\w\s.-]/g, '')
+      .substring(0, 50);
+    query = query.or(`symbol.ilike.%${sanitizedSearch}%,name.ilike.%${sanitizedSearch}%`);
   }
 
   const { data, error, count } = await query;
@@ -393,10 +397,11 @@ export default async function handler(req, res) {
 
     return res.status(200).json(result);
   } catch (error) {
-    console.error('Erreur terminal-data:', error);
-    return res.status(500).json({ 
-      error: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    console.error('❌ Erreur terminal-data:', error);
+    return res.status(500).json({
+      success: false,
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+      timestamp: new Date().toISOString()
     });
   }
 }
