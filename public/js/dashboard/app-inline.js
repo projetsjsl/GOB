@@ -1,4 +1,5 @@
 
+// ROLLBACK OK JS GRID
 // SECURITY: Global fallback for showSlashSuggestions to prevent app crash
 if (typeof window.showSlashSuggestions === "undefined") {
     window.showSlashSuggestions = false;
