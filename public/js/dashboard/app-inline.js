@@ -726,7 +726,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             { id: 'marches-yield', label: 'Courbe Taux', icon: 'TrendingUp', component: 'YieldCurveLiteTab' }
         ],
         'nouvelles': [
-            { id: 'nouvelles-main', label: 'Actualites', icon: 'Newspaper', component: 'NouvellesTab' }
+            { id: 'nouvelles-main', label: 'Actualites', icon: 'Newspaper', component: 'StocksNewsTab' }
         ],
         'titres': [
             { id: 'titres-portfolio', label: 'Mon Portfolio', icon: 'Wallet', component: 'StocksNewsTab:portfolio' },
