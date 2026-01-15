@@ -7,6 +7,7 @@ export default {
     './src/**/*.{js,ts,jsx,tsx}',
     './public/**/*.html',
     './public/js/**/*.js',
+    './public/emmaia-build/**/*.{js,jsx,ts,tsx}',
   ],
   theme: {
     extend: {
