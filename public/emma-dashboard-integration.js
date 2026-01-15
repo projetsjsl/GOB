@@ -261,10 +261,10 @@ class EmmaDashboardIntegration {
     t = t.replace(/^#\s+(.+)$/gm, '<div class="mt-3 mb-1 font-bold text-lg">$1</div>');
 
     // Listes a puces groupees
-    t = t.replace(/(?:^|\n)((?:[--*]\s+.+(?:\n|$))+)/gm, (block) => {
+    t = t.replace(/(?:^|\n)((?:[-*]\s+.+(?:\n|$))+)/gm, (block) => {
       const items = block.trim().split(/\n/)
-        .filter(l => /^[--*]\s+/.test(l))
-        .map(l => l.replace(/^[--*]\s+/, ''))
+        .filter(l => /^[-*]\s+/.test(l))
+        .map(l => l.replace(/^[-*]\s+/, ''))
         .map(x => `<li>${x}</li>`)
         .join('');
       return `\n<ul class="list-disc pl-5 space-y-1">${items}</ul>\n`;

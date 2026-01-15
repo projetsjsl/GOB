@@ -15035,12 +15035,12 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
                 t = t.replace(/^#\s+(.+)$/gm, '<div class="mt-4 mb-2 font-bold text-xl">$1</div>');
 
                 // Blocs de listes a puces (-, -, *) groupes en <ul>
-                t = t.replace(/(?:^|\n)((?:[--*]\s+.+(?:\n|$))+)/gm, (block) => {
+                t = t.replace(/(?:^|\n)((?:[-*]\s+.+(?:\n|$))+)/gm, (block) => {
                     const items = block
                         .trim()
                         .split(/\n/)
-                        .filter(l => /^[--*]\s+/.test(l))
-                        .map(l => l.replace(/^[--*]\s+/, ''))
+                        .filter(l => /^[-*]\s+/.test(l))
+                        .map(l => l.replace(/^[-*]\s+/, ''))
                         .map(txt => `<li class="ml-1">${txt}</li>`) // leger decalage visuel
                         .join('');
                     return `\n<ul class="list-disc pl-5 space-y-1">${items}</ul>\n`;
