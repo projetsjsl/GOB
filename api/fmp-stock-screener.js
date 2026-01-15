@@ -1,14 +1,14 @@
 /**
  * API Proxy pour le Stock Screener FMP Premium
- * Permet de filtrer et découvrir des titres selon multiples critères
+ * Permet de filtrer et decouvrir des titres selon multiples criteres
  * 
  * Premium Features:
- * - Screening multi-critères (P/E, P/B, Yield, Growth, etc.)
+ * - Screening multi-criteres (P/E, P/B, Yield, Growth, etc.)
  * - Filtrage par secteur, industrie, pays, bourse
- * - Découverte automatique de nouveaux tickers
- * - Identification d'opportunités d'investissement
+ * - Decouverte automatique de nouveaux tickers
+ * - Identification d'opportunites d'investissement
  * 
- * Date: 6 décembre 2025
+ * Date: 6 decembre 2025
  */
 
 export default async function handler(req, res) {
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     const FMP_BASE = 'https://financialmodelingprep.com/api/v3';
 
-    // Extraire les paramètres de requête
+    // Extraire les parametres de requete
     const {
         marketCapMoreThan,
         marketCapLowerThan,
@@ -56,12 +56,12 @@ export default async function handler(req, res) {
     } = req.query;
 
     try {
-        // Construire l'URL avec les paramètres
+        // Construire l'URL avec les parametres
         const params = new URLSearchParams();
         params.append('apikey', FMP_KEY);
         params.append('limit', limit.toString());
 
-        // Ajouter les paramètres optionnels
+        // Ajouter les parametres optionnels
         if (marketCapMoreThan) params.append('marketCapMoreThan', marketCapMoreThan);
         if (marketCapLowerThan) params.append('marketCapLowerThan', marketCapLowerThan);
         if (priceMoreThan) params.append('priceMoreThan', priceMoreThan);
@@ -80,15 +80,15 @@ export default async function handler(req, res) {
         if (exchange) params.append('exchange', exchange);
 
         const screenerUrl = `${FMP_BASE}/stock-screener?${params.toString()}`;
-        console.log(`🔍 FMP Stock Screener query: ${screenerUrl.replace(FMP_KEY, '***')}`);
+        console.log(` FMP Stock Screener query: ${screenerUrl.replace(FMP_KEY, '***')}`);
 
         const screenerRes = await fetch(screenerUrl);
 
         if (!screenerRes.ok) {
             const errorText = await screenerRes.text();
-            console.error(`❌ FMP Stock Screener error: ${screenerRes.status} - ${errorText.substring(0, 200)}`);
+            console.error(` FMP Stock Screener error: ${screenerRes.status} - ${errorText.substring(0, 200)}`);
             
-            // ✅ FIX: Gérer les erreurs avec codes HTTP appropriés
+            //  FIX: Gerer les erreurs avec codes HTTP appropries
             let statusCode = screenerRes.status;
             let errorType = 'FMP Stock Screener failed';
             
@@ -108,11 +108,11 @@ export default async function handler(req, res) {
                 message: errorText.substring(0, 200),
                 status: screenerRes.status,
                 suggestion: statusCode === 401 
-                    ? 'Vérifiez FMP_API_KEY dans Vercel'
+                    ? 'Verifiez FMP_API_KEY dans Vercel'
                     : statusCode === 402
-                    ? 'Cet endpoint nécessite un abonnement FMP payant'
+                    ? 'Cet endpoint necessite un abonnement FMP payant'
                     : statusCode === 429
-                    ? 'Limite de requêtes atteinte. Réessayez plus tard.'
+                    ? 'Limite de requetes atteinte. Reessayez plus tard.'
                     : 'Service temporairement indisponible',
                 timestamp: new Date().toISOString()
             });
@@ -120,10 +120,10 @@ export default async function handler(req, res) {
 
         const screenerData = await screenerRes.json();
 
-        // Vérifier si c'est un objet d'erreur
+        // Verifier si c'est un objet d'erreur
         if (screenerData && typeof screenerData === 'object' && !Array.isArray(screenerData)) {
             if (screenerData['Error Message']) {
-                console.error(`❌ FMP Stock Screener Error: ${screenerData['Error Message']}`);
+                console.error(` FMP Stock Screener Error: ${screenerData['Error Message']}`);
                 return res.status(400).json({
                     error: 'FMP Stock Screener error',
                     message: screenerData['Error Message']
@@ -131,16 +131,16 @@ export default async function handler(req, res) {
             }
         }
 
-        // Vérifier que c'est un tableau valide
+        // Verifier que c'est un tableau valide
         if (!Array.isArray(screenerData)) {
-            console.error(`❌ FMP Stock Screener returned invalid data type`);
+            console.error(` FMP Stock Screener returned invalid data type`);
             return res.status(500).json({
                 error: 'Invalid response format',
                 message: 'FMP Stock Screener returned invalid data'
             });
         }
 
-        // Formater les résultats
+        // Formater les resultats
         const formattedResults = screenerData.map(stock => ({
             symbol: stock.symbol,
             name: stock.companyName || stock.name || '',
@@ -162,7 +162,7 @@ export default async function handler(req, res) {
             isActivelyTrading: stock.isActivelyTrading !== undefined ? stock.isActivelyTrading : true
         }));
 
-        console.log(`✅ FMP Stock Screener found ${formattedResults.length} stocks matching criteria`);
+        console.log(` FMP Stock Screener found ${formattedResults.length} stocks matching criteria`);
 
         return res.status(200).json({
             results: formattedResults,

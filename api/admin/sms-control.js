@@ -58,7 +58,7 @@ const importantKeys = [
 const mergeWithProcessEnv = (envObj) => {
   const merged = { ...envObj };
   
-  // Valeurs par défaut si non définies
+  // Valeurs par defaut si non definies
   const defaults = {
     MODE: 'test',
     TEST_MODE: 'true',
@@ -69,7 +69,7 @@ const mergeWithProcessEnv = (envObj) => {
   };
   
   importantKeys.forEach((key) => {
-    // Priorité: envObj → process.env → default
+    // Priorite: envObj -> process.env -> default
     if (!merged[key] && process.env[key]) {
       merged[key] = process.env[key];
     } else if (!merged[key] && defaults[key]) {
@@ -108,7 +108,7 @@ const getServerState = () => ({
 
 const startSmsServer = async (envOverrides = {}) => {
   if (smsServerProcess) {
-    throw new Error('Serveur déjà en cours d\'exécution');
+    throw new Error('Serveur deja en cours d\'execution');
   }
 
   const envFile = await getEnv();
@@ -134,7 +134,7 @@ const startSmsServer = async (envOverrides = {}) => {
   child.stdout.on('data', (data) => log(`[SMS SERVER] ${data}`));
   child.stderr.on('data', (data) => log(`[SMS SERVER][ERR] ${data}`));
   child.on('exit', (code, signal) => {
-    log(`Serveur SMS arrêté (code=${code} signal=${signal})`);
+    log(`Serveur SMS arrete (code=${code} signal=${signal})`);
     smsServerProcess = null;
     smsServerInfo = null;
   });
@@ -159,15 +159,15 @@ const runScenarios = (envOverrides = {}) => new Promise((resolve, reject) => {
   child.stderr.on('data', (data) => { output += data; });
   child.on('exit', (code) => {
     if (code === 0) resolve(output);
-    else reject(new Error(output || `Scénarios terminés avec code ${code}`));
+    else reject(new Error(output || `Scenarios termines avec code ${code}`));
   });
 });
 
 const checkWebhook = async (url) => {
-  if (!url) return { status: 'missing', message: 'URL non définie' };
+  if (!url) return { status: 'missing', message: 'URL non definie' };
   try {
-    // ✅ FIX: Les webhooks n8n ne répondent pas à HEAD, utiliser POST avec payload minimal
-    // Test avec un payload minimal pour vérifier que le webhook existe et répond
+    //  FIX: Les webhooks n8n ne repondent pas a HEAD, utiliser POST avec payload minimal
+    // Test avec un payload minimal pour verifier que le webhook existe et repond
     const testPayload = {
       From: '+15551234567',
       To: '+15559876543',
@@ -181,37 +181,37 @@ const checkWebhook = async (url) => {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: new URLSearchParams(testPayload).toString(),
-      // Timeout court pour éviter d'attendre trop longtemps
+      // Timeout court pour eviter d'attendre trop longtemps
       signal: AbortSignal.timeout(5000)
     });
     
-    // n8n peut retourner 200, 201, ou même 400/500 si le workflow existe mais échoue
+    // n8n peut retourner 200, 201, ou meme 400/500 si le workflow existe mais echoue
     // L'important est que ce n'est PAS 404 (webhook inexistant)
     if (res.status === 404) {
       return { 
         status: 'error', 
-        message: `404 Not Found - Le webhook n'existe pas dans n8n. Vérifiez que le workflow est activé et que le chemin est correct.` 
+        message: `404 Not Found - Le webhook n'existe pas dans n8n. Verifiez que le workflow est active et que le chemin est correct.` 
       };
     }
     
-    // Si on obtient une réponse (même erreur), le webhook existe
+    // Si on obtient une reponse (meme erreur), le webhook existe
     return { 
       status: 'ok', 
       message: `${res.status} ${res.statusText} - Webhook accessible` 
     };
   } catch (error) {
-    // Timeout ou erreur réseau
+    // Timeout ou erreur reseau
     if (error.name === 'AbortError' || error.message.includes('timeout')) {
       return { 
         status: 'error', 
-        message: 'Timeout - Le webhook n\'a pas répondu dans les 5 secondes. Vérifiez que n8n est accessible.' 
+        message: 'Timeout - Le webhook n\'a pas repondu dans les 5 secondes. Verifiez que n8n est accessible.' 
       };
     }
-    // Erreur réseau (n8n inaccessible, DNS, etc.)
+    // Erreur reseau (n8n inaccessible, DNS, etc.)
     if (error.message.includes('fetch failed') || error.code === 'ENOTFOUND') {
       return { 
         status: 'error', 
-        message: `Erreur réseau - Impossible d'atteindre n8n. Vérifiez l'URL: ${url}` 
+        message: `Erreur reseau - Impossible d'atteindre n8n. Verifiez l'URL: ${url}` 
       };
     }
     return { status: 'error', message: error.message };
@@ -270,7 +270,7 @@ const handler = async (req, res) => {
       }
     }
 
-    return res.status(405).json({ success: false, error: 'Méthode non supportée' });
+    return res.status(405).json({ success: false, error: 'Methode non supportee' });
   } catch (error) {
     console.error('[SMS Control] Error:', error);
     return res.status(500).json({ success: false, error: error.message });

@@ -13,7 +13,7 @@ interface RateDecision {
   decision: "hold" | "increase" | "decrease"
 }
 
-// Historique réel des décisions de taux (2024-2025)
+// Historique reel des decisions de taux (2024-2025)
 const rateDecisionsHistory: RateDecision[] = [
   // FED decisions 2024-2025
   { date: "2024-12-18", country: "FED", previousRate: 4.33, newRate: 4.08, change: -0.25, decision: "decrease" },
@@ -38,7 +38,7 @@ const rateDecisionsHistory: RateDecision[] = [
 ]
 
 export function RateDecisionsHistory() {
-  // Trier par date décroissante (plus récentes en premier)
+  // Trier par date decroissante (plus recentes en premier)
   const sortedDecisions = [...rateDecisionsHistory].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   )
@@ -65,7 +65,7 @@ export function RateDecisionsHistory() {
     return (
       <Badge className="bg-slate-500/20 text-slate-400 border-slate-500/30 flex items-center gap-1">
         <Minus className="h-3 w-3" />
-        Inchangé
+        Inchange
       </Badge>
     )
   }
@@ -82,7 +82,7 @@ export function RateDecisionsHistory() {
           })}
         </p>
         <p className="text-xs text-muted-foreground">
-          {decision.previousRate.toFixed(2)}% → {decision.newRate.toFixed(2)}%
+          {decision.previousRate.toFixed(2)}% -> {decision.newRate.toFixed(2)}%
         </p>
       </div>
       <DecisionBadge decision={decision.decision} change={decision.change} />
@@ -95,10 +95,10 @@ export function RateDecisionsHistory() {
       <Card className="bg-slate-900/50 border-blue-500/20">
         <CardHeader>
           <CardTitle className="text-blue-400 flex items-center gap-2">
-            <span className="text-2xl">🇺🇸</span>
-            Historique des Décisions FED
+            <span className="text-2xl"></span>
+            Historique des Decisions FED
           </CardTitle>
-          <CardDescription>Taux directeur des États-Unis (Federal Funds Rate)</CardDescription>
+          <CardDescription>Taux directeur des Etats-Unis (Federal Funds Rate)</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -113,8 +113,8 @@ export function RateDecisionsHistory() {
       <Card className="bg-slate-900/50 border-red-500/20">
         <CardHeader>
           <CardTitle className="text-red-400 flex items-center gap-2">
-            <span className="text-2xl">🇨🇦</span>
-            Historique des Décisions BOC
+            <span className="text-2xl"></span>
+            Historique des Decisions BOC
           </CardTitle>
           <CardDescription>Taux directeur de la Banque du Canada (Policy Rate)</CardDescription>
         </CardHeader>
@@ -127,16 +127,16 @@ export function RateDecisionsHistory() {
         </CardContent>
       </Card>
 
-      {/* Résumé */}
+      {/* Resume */}
       <div className="grid grid-cols-2 gap-4 mt-4">
         <Card className="bg-blue-500/5 border-blue-500/20">
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">Taux FED actuel</p>
             <p className="text-2xl font-bold text-blue-400">{fedDecisions[0].newRate.toFixed(2)}%</p>
             <p className="text-xs text-muted-foreground mt-1">
-              {fedDecisions[0].decision === "decrease" && `↓ ${Math.abs(fedDecisions[0].change).toFixed(2)}%`}
-              {fedDecisions[0].decision === "increase" && `↑ ${fedDecisions[0].change.toFixed(2)}%`}
-              {fedDecisions[0].decision === "hold" && "Inchangé"}
+              {fedDecisions[0].decision === "decrease" && `v ${Math.abs(fedDecisions[0].change).toFixed(2)}%`}
+              {fedDecisions[0].decision === "increase" && `^ ${fedDecisions[0].change.toFixed(2)}%`}
+              {fedDecisions[0].decision === "hold" && "Inchange"}
             </p>
           </CardContent>
         </Card>
@@ -146,9 +146,9 @@ export function RateDecisionsHistory() {
             <p className="text-xs text-muted-foreground">Taux BOC actuel</p>
             <p className="text-2xl font-bold text-red-400">{bocDecisions[0].newRate.toFixed(2)}%</p>
             <p className="text-xs text-muted-foreground mt-1">
-              {bocDecisions[0].decision === "decrease" && `↓ ${Math.abs(bocDecisions[0].change).toFixed(2)}%`}
-              {bocDecisions[0].decision === "increase" && `↑ ${bocDecisions[0].change.toFixed(2)}%`}
-              {bocDecisions[0].decision === "hold" && "Inchangé"}
+              {bocDecisions[0].decision === "decrease" && `v ${Math.abs(bocDecisions[0].change).toFixed(2)}%`}
+              {bocDecisions[0].decision === "increase" && `^ ${bocDecisions[0].change.toFixed(2)}%`}
+              {bocDecisions[0].decision === "hold" && "Inchange"}
             </p>
           </CardContent>
         </Card>

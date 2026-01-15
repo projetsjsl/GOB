@@ -187,7 +187,7 @@ export function calculatePCA(historicalCurves: YieldCurveData[]): PCAResult | nu
   // Simplified eigenvalue approximation (3 components)
   const numComponents = Math.min(3, m)
 
-  // Calculate variance totale et variance expliquée réelle
+  // Calculate variance totale et variance expliquee reelle
   const variance: number[] = []
   for (let i = 0; i < m; i++) {
     variance.push(cov[i][i])

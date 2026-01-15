@@ -1,6 +1,6 @@
 /**
  * API Endpoint pour gestion des redirections Vercel
- * Permet de lire, créer, modifier et supprimer des redirections dans vercel.json
+ * Permet de lire, creer, modifier et supprimer des redirections dans vercel.json
  * Utilise GitHub API pour modifier le fichier
  */
 
@@ -15,7 +15,7 @@ const REPO_NAME = 'GOB';
 const BRANCH = 'main';
 const VERCEL_JSON_PATH = 'vercel.json';
 
-// Fonction pour récupérer vercel.json depuis GitHub
+// Fonction pour recuperer vercel.json depuis GitHub
 async function getVercelConfig() {
   if (!octokit) {
     throw new Error('GitHub token not configured');
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
   try {
     switch (req.method) {
       case 'GET': {
-        // Récupérer toutes les redirections
+        // Recuperer toutes les redirections
         const { config } = await getVercelConfig();
         const redirects = config.redirects || [];
         
@@ -89,7 +89,7 @@ export default async function handler(req, res) {
       }
 
       case 'POST': {
-        // Créer une nouvelle redirection
+        // Creer une nouvelle redirection
         const { source, destination, permanent = false } = req.body;
 
         if (!source || !destination) {
@@ -109,7 +109,7 @@ export default async function handler(req, res) {
 
         const { config, sha } = await getVercelConfig();
 
-        // Vérifier si la redirection existe déjà
+        // Verifier si la redirection existe deja
         if (!config.redirects) {
           config.redirects = [];
         }
@@ -118,7 +118,7 @@ export default async function handler(req, res) {
         if (existingIndex >= 0) {
           return res.status(409).json({
             success: false,
-            error: `Une redirection avec la source "${source}" existe déjà`
+            error: `Une redirection avec la source "${source}" existe deja`
           });
         }
 
@@ -133,12 +133,12 @@ export default async function handler(req, res) {
         const commit = await saveVercelConfig(
           config,
           sha,
-          `Ajout redirection: ${source} → ${destination}`
+          `Ajout redirection: ${source} -> ${destination}`
         );
 
         return res.status(200).json({
           success: true,
-          message: `Redirection ${source} → ${destination} ajoutée avec succès`,
+          message: `Redirection ${source} -> ${destination} ajoutee avec succes`,
           redirect: {
             source,
             destination,
@@ -155,7 +155,7 @@ export default async function handler(req, res) {
         if (!source) {
           return res.status(400).json({
             success: false,
-            error: 'Source est requis pour identifier la redirection à modifier'
+            error: 'Source est requis pour identifier la redirection a modifier'
           });
         }
 
@@ -164,7 +164,7 @@ export default async function handler(req, res) {
         if (!config.redirects) {
           return res.status(404).json({
             success: false,
-            error: 'Aucune redirection trouvée'
+            error: 'Aucune redirection trouvee'
           });
         }
 
@@ -172,11 +172,11 @@ export default async function handler(req, res) {
         if (existingIndex < 0) {
           return res.status(404).json({
             success: false,
-            error: `Redirection avec source "${source}" non trouvée`
+            error: `Redirection avec source "${source}" non trouvee`
           });
         }
 
-        // Mettre à jour la redirection
+        // Mettre a jour la redirection
         const updatedRedirect = {
           ...config.redirects[existingIndex],
           ...(newSource && { source: newSource }),
@@ -184,7 +184,7 @@ export default async function handler(req, res) {
           ...(permanent !== undefined && { permanent: Boolean(permanent) })
         };
 
-        // Vérifier si newSource entre en conflit avec une autre redirection
+        // Verifier si newSource entre en conflit avec une autre redirection
         if (newSource && newSource !== source) {
           const conflictIndex = config.redirects.findIndex(
             (r, i) => r.source === newSource && i !== existingIndex
@@ -192,7 +192,7 @@ export default async function handler(req, res) {
           if (conflictIndex >= 0) {
             return res.status(409).json({
               success: false,
-              error: `Une redirection avec la source "${newSource}" existe déjà`
+              error: `Une redirection avec la source "${newSource}" existe deja`
             });
           }
         }
@@ -203,12 +203,12 @@ export default async function handler(req, res) {
         const commit = await saveVercelConfig(
           config,
           sha,
-          `Modification redirection: ${source}${newSource && newSource !== source ? ` → ${newSource}` : ''}`
+          `Modification redirection: ${source}${newSource && newSource !== source ? ` -> ${newSource}` : ''}`
         );
 
         return res.status(200).json({
           success: true,
-          message: `Redirection modifiée avec succès`,
+          message: `Redirection modifiee avec succes`,
           redirect: updatedRedirect,
           commit: commit.commit.sha
         });
@@ -221,7 +221,7 @@ export default async function handler(req, res) {
         if (!source) {
           return res.status(400).json({
             success: false,
-            error: 'Source est requis pour identifier la redirection à supprimer'
+            error: 'Source est requis pour identifier la redirection a supprimer'
           });
         }
 
@@ -230,7 +230,7 @@ export default async function handler(req, res) {
         if (!config.redirects) {
           return res.status(404).json({
             success: false,
-            error: 'Aucune redirection trouvée'
+            error: 'Aucune redirection trouvee'
           });
         }
 
@@ -238,7 +238,7 @@ export default async function handler(req, res) {
         if (existingIndex < 0) {
           return res.status(404).json({
             success: false,
-            error: `Redirection avec source "${source}" non trouvée`
+            error: `Redirection avec source "${source}" non trouvee`
           });
         }
 
@@ -255,7 +255,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
           success: true,
-          message: `Redirection ${source} supprimée avec succès`,
+          message: `Redirection ${source} supprimee avec succes`,
           redirect: deletedRedirect,
           commit: commit.commit.sha
         });
@@ -264,17 +264,17 @@ export default async function handler(req, res) {
       default:
         return res.status(405).json({
           success: false,
-          error: 'Méthode non autorisée'
+          error: 'Methode non autorisee'
         });
     }
   } catch (error) {
-    console.error('❌ Erreur API admin redirects:', error);
+    console.error(' Erreur API admin redirects:', error);
     
     if (error.message === 'GitHub token not configured') {
       return res.status(500).json({
         success: false,
-        error: 'GitHub token non configuré',
-        message: 'GITHUB_TOKEN doit être configuré dans les variables d\'environnement Vercel'
+        error: 'GitHub token non configure',
+        message: 'GITHUB_TOKEN doit etre configure dans les variables d\'environnement Vercel'
       });
     }
 

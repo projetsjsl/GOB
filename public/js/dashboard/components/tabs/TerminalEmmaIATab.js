@@ -1,15 +1,15 @@
 /**
  * Component: TerminalEmmaIATab
- * Intégration iframe du Terminal Emma IA dans le Dashboard
+ * Integration iframe du Terminal Emma IA dans le Dashboard
  * 
- * Ce composant charge la page Terminal Emma IA via iframe pour l'intégrer
+ * Ce composant charge la page Terminal Emma IA via iframe pour l'integrer
  * dans le dashboard sans ouvrir une nouvelle page.
  * 
  * Le Terminal Emma IA fournit :
- * - Dashboard marché (indices, heatmap)
+ * - Dashboard marche (indices, heatmap)
  * - Screener & watchlists
  * - Fiche titre avec KPIs
- * - Données FMP Premier via Supabase
+ * - Donnees FMP Premier via Supabase
  */
 
 const { useState } = React;
@@ -19,7 +19,7 @@ const TerminalEmmaIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
     const [error, setError] = useState(null);
 
     const handleIframeLoad = () => {
-        void('Terminal Emma IA iframe chargé avec succès');
+        void('Terminal Emma IA iframe charge avec succes');
         setIsLoading(false);
         setError(null);
     };
@@ -57,7 +57,7 @@ const TerminalEmmaIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
                         </h3>
                         <div className="flex items-center gap-2 text-sm text-gray-400 justify-center">
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                            <span>Chargement du Dashboard Marché</span>
+                            <span>Chargement du Dashboard Marche</span>
                         </div>
                     </div>
                 </div>
@@ -83,7 +83,7 @@ const TerminalEmmaIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
                             className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white rounded-xl font-medium transition-all shadow-lg shadow-red-500/20 hover:shadow-red-500/30 flex items-center gap-2 mx-auto"
                         >
                             <i className="iconoir-refresh"></i>
-                            Réessayer
+                            Reessayer
                         </button>
                     </div>
                 </div>
@@ -103,7 +103,7 @@ const TerminalEmmaIATab = ({ isDarkMode, activeTab, setActiveTab }) => {
                 }}
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}
-                title="Terminal Emma IA - Dashboard Marché & KPIs"
+                title="Terminal Emma IA - Dashboard Marche & KPIs"
                 allow="fullscreen"
                 sandbox="allow-scripts allow-forms allow-popups allow-modals"
             />

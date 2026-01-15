@@ -1,11 +1,11 @@
 /**
- * API Email Design Configuration - Persisté dans Supabase
+ * API Email Design Configuration - Persiste dans Supabase
  *
- * GET  → Récupère la config actuelle
- * POST → Met à jour la config
+ * GET  -> Recupere la config actuelle
+ * POST -> Met a jour la config
  *
- * Stockage: Supabase table `emma_config` (clé: 'email_design')
- * Persiste entre les déploiements Vercel ✅
+ * Stockage: Supabase table `emma_config` (cle: 'email_design')
+ * Persiste entre les deploiements Vercel 
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -15,13 +15,13 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABAS
 
 const CONFIG_KEY = 'email_design';
 
-// Config par défaut si rien en base
+// Config par defaut si rien en base
 const DEFAULT_CONFIG = {
   branding: {
     avatar: { url: '', alt: 'Emma IA', size: 64 },
     logo: { url: '', alt: 'JSLai', width: 150 },
     companyName: 'GOB Apps',
-    tagline: 'Intelligence Financière Propulsée par Emma IA'
+    tagline: 'Intelligence Financiere Propulsee par Emma IA'
   },
   colors: {
     primary: '#6366f1',
@@ -38,8 +38,8 @@ const DEFAULT_CONFIG = {
   footer: {
     showLogo: true,
     showDisclaimer: true,
-    disclaimerText: 'Ce briefing est généré automatiquement par Emma IA à des fins informatives uniquement.',
-    copyrightText: '© 2025 GOB Apps - Tous droits réservés'
+    disclaimerText: 'Ce briefing est genere automatiquement par Emma IA a des fins informatives uniquement.',
+    copyrightText: ' 2025 GOB Apps - Tous droits reserves'
   },
   sms: {
     maxSegments: 10,
@@ -141,13 +141,13 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // GET - Récupérer la config
+  // GET - Recuperer la config
   if (req.method === 'GET') {
     const config = await loadConfig();
     return res.status(200).json(config);
   }
 
-  // POST - Mettre à jour la config
+  // POST - Mettre a jour la config
   if (req.method === 'POST') {
     try {
       const updates = req.body;
@@ -166,7 +166,7 @@ export default async function handler(req, res) {
       if (result.success) {
         return res.status(200).json({
           success: true,
-          message: 'Configuration sauvegardée dans Supabase ✅',
+          message: 'Configuration sauvegardee dans Supabase ',
           config: result.config
         });
       } else {

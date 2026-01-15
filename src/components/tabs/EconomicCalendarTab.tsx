@@ -48,7 +48,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                 const [filterTicker, setFilterTicker] = useState('all'); // For earnings/dividends
                 const [filterTickerGroup, setFilterTickerGroup] = useState('all'); // all, team, watchlist, both
                 const [dateRange, setDateRange] = useState('week'); // today, week, month
-                const [filterLargeCapOnly, setFilterLargeCapOnly] = useState(true); // Par défaut activé pour earnings
+                const [filterLargeCapOnly, setFilterLargeCapOnly] = useState(true); // Par defaut active pour earnings
                 
                 // Liste des tickers Large Cap (S&P 500 principaux)
                 const largeCapTickers = [
@@ -109,9 +109,9 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                 };
 
                 // Debug: Log du chargement du composant
-                console.log('📅 EconomicCalendarTab chargé');
-                console.log('📊 Données init:', calendarData);
-                console.log('🔧 État du composant:', { activeSubTab, loading, error });
+                console.log(' EconomicCalendarTab charge');
+                console.log(' Donnees init:', calendarData);
+                console.log(' Etat du composant:', { activeSubTab, loading, error });
 
                 // Load team and watchlist tickers once on mount (only when props are empty)
                 React.useEffect(() => {
@@ -124,10 +124,10 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
 
                                 if (data.success) {
                                     setTeamTickersState(data.team_tickers || []);
-                                    console.log(`✅ Team tickers loaded: ${data.team_tickers?.length || 0}`);
+                                    console.log(` Team tickers loaded: ${data.team_tickers?.length || 0}`);
                                 }
                             } catch (error) {
-                                console.error('❌ Error loading team tickers:', error);
+                                console.error(' Error loading team tickers:', error);
                             }
                         }
 
@@ -139,16 +139,16 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
 
                                 if (data.tickers && Array.isArray(data.tickers)) {
                                     setWatchlistTickersState(data.tickers);
-                                    console.log(`✅ Watchlist tickers loaded: ${data.tickers.length}`);
+                                    console.log(` Watchlist tickers loaded: ${data.tickers.length}`);
                                 }
                             } catch (error) {
-                                console.error('❌ Error loading watchlist tickers:', error);
+                                console.error(' Error loading watchlist tickers:', error);
                                 // Fallback to localStorage
                                 const savedWatchlist = localStorage.getItem('dans-watchlist');
                                 if (savedWatchlist) {
                                     const tickers = JSON.parse(savedWatchlist);
                                     setWatchlistTickersState(tickers);
-                                    console.log(`📦 Watchlist loaded from localStorage: ${tickers.length}`);
+                                    console.log(` Watchlist loaded from localStorage: ${tickers.length}`);
                                 }
                             }
                         }
@@ -157,18 +157,18 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                     loadTickers();
                 }, [teamTickersProp, watchlistTickersProp]);
 
-                // Charger les données au changement d'onglet
+                // Charger les donnees au changement d'onglet
                 React.useEffect(() => {
                     fetchCalendarData();
                     // Reset ticker filters when switching tabs
                     setFilterTicker('all');
                     setFilterTickerGroup('all');
-                    // Activer le filtre Large Cap par défaut pour earnings uniquement
+                    // Activer le filtre Large Cap par defaut pour earnings uniquement
                     setFilterLargeCapOnly(activeSubTab === 'earnings');
                 }, [activeSubTab]);
 
                 const fetchCalendarData = async () => {
-                    console.log('🔄 fetchCalendarData appelé pour:', activeSubTab);
+                    console.log(' fetchCalendarData appele pour:', activeSubTab);
                     setLoading(true);
                     setError(null);
 
@@ -180,12 +180,12 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
 
                             if (result.success && result.data) {
                                 setCalendarData(result.data);
-                                console.log(`✅ ${result.data.length} earnings calendar days loaded from ${result.source}`);
+                                console.log(` ${result.data.length} earnings calendar days loaded from ${result.source}`);
                                 if (result.fallback_tried) {
-                                    console.log('⚠️ Fallback sources tried:', result.fallback_tried);
+                                    console.log(' Fallback sources tried:', result.fallback_tried);
                                 }
                             } else {
-                                setError('Aucune donnée d\'earnings disponible');
+                                setError('Aucune donnee d\'earnings disponible');
                                 setCalendarData(getFallbackData());
                             }
                         } else if (activeSubTab === 'economic') {
@@ -195,12 +195,12 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
 
                             if (result.success && result.data) {
                                 setCalendarData(result.data);
-                                console.log(`✅ ${result.data.length} economic calendar days loaded from ${result.source}`);
+                                console.log(` ${result.data.length} economic calendar days loaded from ${result.source}`);
                                 if (result.fallback_tried) {
-                                    console.log('⚠️ Fallback sources tried:', result.fallback_tried);
+                                    console.log(' Fallback sources tried:', result.fallback_tried);
                                 }
                             } else {
-                                setError('Aucune donnée économique disponible');
+                                setError('Aucune donnee economique disponible');
                                 setCalendarData(getFallbackData());
                             }
                         } else if (activeSubTab === 'dividends') {
@@ -210,20 +210,20 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
 
                             if (result.success && result.data) {
                                 setCalendarData(result.data);
-                                console.log(`✅ ${result.data.length} dividend events loaded from ${result.source}`);
+                                console.log(` ${result.data.length} dividend events loaded from ${result.source}`);
                                 if (result.fallback_tried) {
-                                    console.log('⚠️ Fallback sources tried:', result.fallback_tried);
+                                    console.log(' Fallback sources tried:', result.fallback_tried);
                                 }
                             } else {
-                                setError('Aucune donnée de dividendes disponible');
+                                setError('Aucune donnee de dividendes disponible');
                                 setCalendarData(getFallbackData());
                             }
                         } else {
                             setCalendarData(getFallbackData());
                         }
                     } catch (err) {
-                        console.error('❌ Erreur fetchCalendarData:', err);
-                        setError(`Impossible de charger les données: ${err.message}`);
+                        console.error(' Erreur fetchCalendarData:', err);
+                        setError(`Impossible de charger les donnees: ${err.message}`);
                         setCalendarData(getFallbackData());
                     } finally {
                         setLoading(false);
@@ -231,7 +231,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                 };
 
                 const handleRefresh = async () => {
-                    console.log('🔄 Actualisation du calendrier...');
+                    console.log(' Actualisation du calendrier...');
                     setIsRefreshing(true);
                     await fetchCalendarData();
                     setTimeout(() => setIsRefreshing(false), 1000);
@@ -264,17 +264,17 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
 
                 const getCurrencyFlag = (currency) => {
                     const flags = {
-                        'USD': '🇺🇸',
-                        'EUR': '🇪🇺',
-                        'GBP': '🇬🇧',
-                        'JPY': '🇯🇵',
-                        'CAD': '🇨🇦',
-                        'AUD': '🇦🇺',
-                        'CHF': '🇨🇭',
-                        'CNY': '🇨🇳',
-                        'NZD': '🇳🇿'
+                        'USD': '',
+                        'EUR': '',
+                        'GBP': '',
+                        'JPY': '',
+                        'CAD': '',
+                        'AUD': '',
+                        'CHF': '',
+                        'CNY': '',
+                        'NZD': ''
                     };
-                    return flags[currency] || '🌍';
+                    return flags[currency] || '';
                 };
 
                 // Helper: Extract ticker symbol from event name (for earnings/dividends)
@@ -289,29 +289,29 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                     // Extract ticker if available (for earnings/dividends)
                     const ticker = extractTicker(event.event);
                     
-                    // 1. Tickers d'équipe (priorité la plus haute)
+                    // 1. Tickers d'equipe (priorite la plus haute)
                     if (ticker && teamTickers.includes(ticker)) {
                         return 1; // Team tickers
                     }
                     
-                    // 2. Données Canada (CAD currency ou ticker .TO)
+                    // 2. Donnees Canada (CAD currency ou ticker .TO)
                     if (event.currency === 'CAD' || (ticker && ticker.endsWith('.TO'))) {
                         return 2; // Canada
                     }
                     
-                    // 3. Données US (USD currency et ticker US)
+                    // 3. Donnees US (USD currency et ticker US)
                     if (event.currency === 'USD' && (!ticker || !ticker.endsWith('.TO'))) {
                         return 3; // US
                     }
                     
-                    // 4. Autres données
+                    // 4. Autres donnees
                     return 4; // Other
                 };
 
                 // Helper: Sort events within a day
                 const sortEvents = (events) => {
                     return [...events].sort((a, b) => {
-                        // First sort by category (team → Canada → US → other)
+                        // First sort by category (team -> Canada -> US -> other)
                         const categoryA = getEventCategory(a);
                         const categoryB = getEventCategory(b);
                         if (categoryA !== categoryB) {
@@ -382,7 +382,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                         return true;
                     });
 
-                    // Sort events: Team tickers → Canada → US → Other
+                    // Sort events: Team tickers -> Canada -> US -> Other
                     const sortedEvents = sortEvents(filteredEvents);
                     
                     return { ...day, events: sortedEvents };
@@ -410,7 +410,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                             {/* Header */}
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="text-2xl">📅</div>
+                                    <div className="text-2xl"></div>
                                     <h2 className="text-2xl font-bold">Calendrier financier</h2>
                                 </div>
                                 <button
@@ -423,7 +423,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                                     }`}
                                 >
                                     <div className={`w-4 h-4 ${loading || isRefreshing ? 'animate-spin' : ''}`}>
-                                        🔄
+                                        
                                     </div>
                                     Actualiser
                                 </button>
@@ -440,7 +440,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                                     <div className="col-span-1 md:col-span-2">
                                         <input
                                             type="text"
-                                            placeholder="🔍 Rechercher un événement..."
+                                            placeholder=" Rechercher un evenement..."
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             className={`w-full px-3 py-2 rounded-md text-sm ${
@@ -470,9 +470,9 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                                                 } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
                                             >
                                                 <option value="all">Tous les titres</option>
-                                                <option value="team">👥 Équipe ({teamTickers.length})</option>
-                                                <option value="watchlist">⭐ Liste de suivi ({watchlistTickers.length})</option>
-                                                <option value="both">🎯 Équipe + Liste ({teamTickers.length + watchlistTickers.length})</option>
+                                                <option value="team"> Equipe ({teamTickers.length})</option>
+                                                <option value="watchlist"> Liste de suivi ({watchlistTickers.length})</option>
+                                                <option value="both"> Equipe + Liste ({teamTickers.length + watchlistTickers.length})</option>
                                             </select>
                                         </div>
                                     )}
@@ -492,7 +492,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                                                     filterTickerGroup !== 'all' ? 'opacity-50 cursor-not-allowed' : ''
                                                 }`}
                                             >
-                                                <option value="all">Sélectionner un ticker ({availableTickers.length})</option>
+                                                <option value="all">Selectionner un ticker ({availableTickers.length})</option>
                                                 {availableTickers.map(ticker => (
                                                     <option key={ticker} value={ticker}>
                                                         {ticker}
@@ -514,9 +514,9 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                                             } border focus:outline-none focus:ring-2 focus:ring-blue-500`}
                                             >
                                                 <option value="all">Tous les impacts</option>
-                                                <option value="3">🔴 Impact élevé</option>
-                                                <option value="2">🟠 Impact moyen</option>
-                                                <option value="1">🟡 Impact faible</option>
+                                                <option value="3"> Impact eleve</option>
+                                                <option value="2"> Impact moyen</option>
+                                                <option value="1"> Impact faible</option>
                                         </select>
                                     </div>
 
@@ -566,34 +566,34 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                                         <span className="text-xs text-gray-400">Filtres actifs :</span>
                                         {activeSubTab === 'earnings' && filterLargeCapOnly && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
-                                                📊 Grandes capitalisations
+                                                 Grandes capitalisations
                                             </span>
                                         )}
                                         {searchQuery && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-gray-900 text-gray-200' : 'bg-gray-700 text-gray-200'}`}>
-                                                Recherche : "{searchQuery}"
+                                                Recherche : "{searchQuery}"
                                             </span>
                                         )}
                                         {filterTickerGroup !== 'all' && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-cyan-900 text-cyan-200' : 'bg-cyan-100 text-cyan-800'}`}>
-                                                {filterTickerGroup === 'team' ? '👥 Tickers équipe' :
-                                                 filterTickerGroup === 'watchlist' ? '⭐ Tickers liste de suivi' :
-                                                 '🎯 Équipe + Liste de suivi'}
+                                                {filterTickerGroup === 'team' ? ' Tickers equipe' :
+                                                 filterTickerGroup === 'watchlist' ? ' Tickers liste de suivi' :
+                                                 ' Equipe + Liste de suivi'}
                                             </span>
                                         )}
                                         {filterTicker !== 'all' && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-purple-900 text-purple-200' : 'bg-purple-100 text-purple-800'}`}>
-                                                Ticker : {filterTicker}
+                                                Ticker : {filterTicker}
                                             </span>
                                         )}
                                         {filterImpact !== 'all' && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800'}`}>
-                                                Impact : {filterImpact === '3' ? 'Élevé' : filterImpact === '2' ? 'Moyen' : 'Faible'}
+                                                Impact : {filterImpact === '3' ? 'Eleve' : filterImpact === '2' ? 'Moyen' : 'Faible'}
                                             </span>
                                         )}
                                         {filterCurrency !== 'all' && (
                                             <span className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800'}`}>
-                                                Devise : {filterCurrency}
+                                                Devise : {filterCurrency}
                                             </span>
                                         )}
                                         <button
@@ -603,11 +603,11 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                                                 setFilterCurrency('all');
                                                 setFilterTicker('all');
                                                 setFilterTickerGroup('all');
-                                                setFilterLargeCapOnly(activeSubTab === 'earnings'); // Réinitialiser à la valeur par défaut selon l'onglet
+                                                setFilterLargeCapOnly(activeSubTab === 'earnings'); // Reinitialiser a la valeur par defaut selon l'onglet
                                             }}
                                             className="text-xs text-red-400 hover:text-red-300 underline"
                                         >
-                                            Réinitialiser
+                                            Reinitialiser
                                         </button>
                                     </div>
                                 )}
@@ -616,7 +616,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                             {/* Message d'erreur */}
                             {error && (
                                 <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-4 text-sm">
-                                    ⚠️ {error}
+                                     {error}
                                 </div>
                             )}
 
@@ -630,7 +630,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                                             : `${isDarkMode ? 'bg-gray-800 text-gray-400 hover:bg-gray-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
                                     }`}
                                 >
-                                    Économique
+                                    Economique
                                 </button>
                                 <button
                                     onClick={() => setActiveSubTab('earnings')}
@@ -657,7 +657,7 @@ export const EconomicCalendarTab: React.FC<TabProps> = (props) => {
                             {/* Contenu */}
                             {loading ? (
                                 <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg p-8 text-center`}>
-                                    <div className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3">🔄</div>
+                                    <div className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-3"></div>
                                     <p className="text-gray-400 text-sm">Loading data...</p>
                                 </div>
                             ) : filteredCalendarData.length === 0 ? (

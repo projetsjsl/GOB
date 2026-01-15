@@ -81,7 +81,7 @@ export async function saveValidationSettings(settings: Partial<ValidationSetting
         }
 
         const savedSettings = await response.json();
-        console.log(`✅ Validation settings saved: ${savedSettings.settings_key}`);
+        console.log(` Validation settings saved: ${savedSettings.settings_key}`);
         
         return { success: true, settings: savedSettings };
     } catch (error: any) {
@@ -121,7 +121,7 @@ export function getDefaultValidationSettings(): ValidationSettings {
         validate_price_range: true,
         price_min_threshold: 0.01,
         price_max_threshold: 100000.00,
-        description: 'Paramètres par défaut',
+        description: 'Parametres par defaut',
         is_active: true
     };
 }

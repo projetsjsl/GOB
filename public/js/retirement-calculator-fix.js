@@ -1,14 +1,14 @@
 /**
- * Script de correction pour les problèmes d'affichage du calculateur de retraite
+ * Script de correction pour les problemes d'affichage du calculateur de retraite
  * - Corrige les valeurs "undefined"
  * - Ajoute les styles manquants pour les cartes
- * - Améliore le formatage des sections
+ * - Ameliore le formatage des sections
  */
 
 (function() {
     'use strict';
 
-    // Attendre que le DOM soit chargé
+    // Attendre que le DOM soit charge
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
@@ -16,7 +16,7 @@
     }
 
     function init() {
-        console.log('🔧 Initialisation des corrections du calculateur de retraite...');
+        console.log(' Initialisation des corrections du calculateur de retraite...');
         
         // Corriger les valeurs undefined
         fixUndefinedValues();
@@ -32,7 +32,7 @@
      * Corriger toutes les valeurs "undefined" dans le DOM
      */
     function fixUndefinedValues() {
-        // Chercher tous les éléments contenant "undefined"
+        // Chercher tous les elements contenant "undefined"
         const walker = document.createTreeWalker(
             document.body,
             NodeFilter.SHOW_TEXT,
@@ -52,11 +52,11 @@
             const parent = textNode.parentElement;
             const originalText = textNode.textContent;
 
-            // Remplacer "undefined" par une valeur par défaut appropriée
+            // Remplacer "undefined" par une valeur par defaut appropriee
             let replacement = 'Non calculable';
             
-            // Détecter le contexte pour un remplacement plus intelligent
-            if (originalText.includes('Âge') || originalText.includes('âge') || originalText.includes('ans')) {
+            // Detecter le contexte pour un remplacement plus intelligent
+            if (originalText.includes('Age') || originalText.includes('age') || originalText.includes('ans')) {
                 replacement = 'N/A';
             } else if (originalText.includes('$') || originalText.includes('montant') || originalText.includes('Montant')) {
                 replacement = '$0';
@@ -69,14 +69,14 @@
             // Remplacer le texte
             textNode.textContent = originalText.replace(/undefined/g, replacement);
             
-            // Ajouter une classe pour indiquer que c'était undefined
+            // Ajouter une classe pour indiquer que c'etait undefined
             if (parent) {
                 parent.classList.add('was-undefined');
             }
         });
 
-        // Corriger spécifiquement l'âge d'indifférence
-        const ageElements = document.querySelectorAll('[class*="age"], [id*="age"], [class*="indifférence"], [id*="indifférence"]');
+        // Corriger specifiquement l'age d'indifference
+        const ageElements = document.querySelectorAll('[class*="age"], [id*="age"], [class*="indifference"], [id*="indifference"]');
         ageElements.forEach(el => {
             if (el.textContent.includes('undefined')) {
                 el.textContent = el.textContent.replace(/undefined/g, 'N/A');
@@ -84,20 +84,20 @@
             }
         });
 
-        console.log(`✅ ${textNodes.length} valeur(s) "undefined" corrigée(s)`);
+        console.log(` ${textNodes.length} valeur(s) "undefined" corrigee(s)`);
     }
 
     /**
-     * S'assurer que les styles CSS sont présents
+     * S'assurer que les styles CSS sont presents
      */
     function ensureCardStyles() {
-        // Vérifier si le fichier CSS est déjà chargé
+        // Verifier si le fichier CSS est deja charge
         const existingLink = document.querySelector('link[href*="retirement-calculator-fix.css"]');
         if (existingLink) {
             return;
         }
 
-        // Créer un élément <style> avec les styles de base
+        // Creer un element <style> avec les styles de base
         const style = document.createElement('style');
         style.id = 'retirement-calculator-fix-styles';
         style.textContent = `
@@ -150,7 +150,7 @@
                 font-weight: 500;
             }
 
-            /* Styles pour les valeurs corrigées */
+            /* Styles pour les valeurs corrigees */
             .was-undefined {
                 border-left: 3px solid #ef4444;
                 background-color: #fef2f2 !important;
@@ -189,7 +189,7 @@
             }
         `;
         document.head.appendChild(style);
-        console.log('✅ Styles CSS ajoutés');
+        console.log(' Styles CSS ajoutes');
     }
 
     /**
@@ -214,7 +214,7 @@
             });
 
             if (shouldFix) {
-                // Délai pour éviter les appels trop fréquents
+                // Delai pour eviter les appels trop frequents
                 setTimeout(fixUndefinedValues, 100);
             }
         });
@@ -225,17 +225,17 @@
             characterData: true
         });
 
-        console.log('✅ Observer DOM activé pour détecter les nouvelles valeurs undefined');
+        console.log(' Observer DOM active pour detecter les nouvelles valeurs undefined');
     }
 
     // Exposer une fonction globale pour forcer la correction
     window.fixRetirementCalculator = function() {
         fixUndefinedValues();
         ensureCardStyles();
-        console.log('🔧 Correction manuelle appliquée');
+        console.log(' Correction manuelle appliquee');
     };
 
-    console.log('✅ Script de correction du calculateur de retraite chargé');
+    console.log(' Script de correction du calculateur de retraite charge');
 })();
 
 

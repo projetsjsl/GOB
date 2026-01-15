@@ -39,7 +39,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ connectionState, onConnect,
             
             {!isConnecting && (
               <span className="absolute -bottom-8 text-sm font-medium text-slate-400 group-hover:text-emerald-400 transition-colors">
-                  Démarrer
+                  Demarrer
               </span>
             )}
         </button>
@@ -54,7 +54,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ connectionState, onConnect,
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25V9m7.5 0v3.75m-7.5-3v3.75m0 0v3.75m0 0h7.5m-7.5 0a9 9 0 00-9-9H3m18 0a9 9 0 01-9 9m9-9h-1.5" />
             </svg>
             <span className="absolute -bottom-8 text-sm font-medium text-slate-400 group-hover:text-red-400 transition-colors">
-                Arrêter
+                Arreter
             </span>
         </button>
       )}

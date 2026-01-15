@@ -1,8 +1,8 @@
 /**
  * Utilitaires pour la gestion des logos d'entreprises
- * Gère les fallbacks et évite les erreurs 404
+ * Gere les fallbacks et evite les erreurs 404
  * 
- * Date: 6 décembre 2025
+ * Date: 6 decembre 2025
  */
 
 export interface LogoFallbackOptions {
@@ -13,14 +13,14 @@ export interface LogoFallbackOptions {
 }
 
 /**
- * Génère toutes les variantes possibles d'URL de logo à essayer
+ * Genere toutes les variantes possibles d'URL de logo a essayer
  */
 export function generateLogoUrls(options: LogoFallbackOptions): string[] {
   const { logoSymbol, actualSymbol, preferredSymbol, symbol } = options;
   
   const variants: string[] = [];
   
-  // Nettoyer les symboles pour générer des variantes
+  // Nettoyer les symboles pour generer des variantes
   const cleanSymbols = [
     logoSymbol,
     actualSymbol,
@@ -28,10 +28,10 @@ export function generateLogoUrls(options: LogoFallbackOptions): string[] {
     symbol
   ].filter(Boolean) as string[];
   
-  // Dédupliquer
+  // Dedupliquer
   const uniqueSymbols = [...new Set(cleanSymbols)];
   
-  // Générer les URLs pour chaque symbole avec toutes les variantes
+  // Generer les URLs pour chaque symbole avec toutes les variantes
   uniqueSymbols.forEach(sym => {
     // 1. Essayer le symbole tel quel (ex: EXE.TO -> EXE.TO.png)
     const rawSym = sym.toUpperCase();
@@ -61,16 +61,16 @@ export function generateLogoUrls(options: LogoFallbackOptions): string[] {
     }
   });
   
-  // Dédupliquer les URLs
+  // Dedupliquer les URLs
   return [...new Set(variants)];
 }
 
-// Cache pour stocker les URLs qui ont échoué (évite de réessayer)
+// Cache pour stocker les URLs qui ont echoue (evite de reessayer)
 const failedLogoUrls = new Set<string>();
 
 /**
- * Gère l'erreur de chargement d'un logo avec fallback automatique
- * Version optimisée : masque immédiatement après 1-2 tentatives pour éviter les 404 répétés
+ * Gere l'erreur de chargement d'un logo avec fallback automatique
+ * Version optimisee : masque immediatement apres 1-2 tentatives pour eviter les 404 repetes
  */
 export function handleLogoError(
   e: React.SyntheticEvent<HTMLImageElement, Event>,
@@ -80,7 +80,7 @@ export function handleLogoError(
   const img = e.currentTarget;
   const currentSrc = img.src;
   
-  // Si cette URL a déjà échoué, masquer immédiatement
+  // Si cette URL a deja echoue, masquer immediatement
   if (failedLogoUrls.has(currentSrc)) {
     img.style.display = 'none';
     img.onerror = null;
@@ -88,10 +88,10 @@ export function handleLogoError(
     return;
   }
   
-  // Marquer cette URL comme ayant échoué
+  // Marquer cette URL comme ayant echoue
   failedLogoUrls.add(currentSrc);
   
-  // Générer toutes les variantes possibles
+  // Generer toutes les variantes possibles
   const urlsToTry = generateLogoUrls(options);
   
   // Extraire le nom du fichier de l'URL actuelle pour comparaison
@@ -107,7 +107,7 @@ export function handleLogoError(
     currentIndex = 0;
   }
   
-  // Essayer maximum 2 URLs avant d'abandonner (pour éviter trop de 404)
+  // Essayer maximum 2 URLs avant d'abandonner (pour eviter trop de 404)
   const maxAttempts = 2;
   const nextIndex = currentIndex + 1;
   
@@ -115,14 +115,14 @@ export function handleLogoError(
     const nextUrl = urlsToTry[nextIndex];
     const nextFileName = nextUrl.split('/').pop() || '';
     
-    // Vérifier qu'on n'a pas déjà essayé cette URL et qu'elle n'a pas déjà échoué
+    // Verifier qu'on n'a pas deja essaye cette URL et qu'elle n'a pas deja echoue
     if (nextFileName !== currentFileName && 
         !currentSrc.includes(nextFileName) && 
         !failedLogoUrls.has(nextUrl)) {
-      // Empêcher l'erreur 404 en définissant onerror avant de changer src
+      // Empecher l'erreur 404 en definissant onerror avant de changer src
       img.onerror = null;
       img.src = nextUrl;
-      // Réinstaller le handler après le prochain frame (optimisé)
+      // Reinstaller le handler apres le prochain frame (optimise)
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           if (img.onerror === null) {
@@ -134,8 +134,8 @@ export function handleLogoError(
     }
   }
   
-  // Si toutes les URLs ont été essayées ou si on a atteint la limite, masquer immédiatement
-  // et empêcher les erreurs répétées
+  // Si toutes les URLs ont ete essayees ou si on a atteint la limite, masquer immediatement
+  // et empecher les erreurs repetees
   img.style.display = 'none';
   img.onerror = null;
   img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // 1x1 transparent pixel
@@ -146,7 +146,7 @@ export function handleLogoError(
 }
 
 /**
- * Crée un handler onError optimisé pour les logos
+ * Cree un handler onError optimise pour les logos
  */
 export function createLogoErrorHandler(
   options: LogoFallbackOptions,
@@ -158,11 +158,11 @@ export function createLogoErrorHandler(
 }
 
 /**
- * Crée un handler onLoad pour réinitialiser les erreurs
+ * Cree un handler onLoad pour reinitialiser les erreurs
  */
 export function createLogoLoadHandler() {
   return (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    // Si le logo charge avec succès, réinitialiser onError
+    // Si le logo charge avec succes, reinitialiser onError
     e.currentTarget.onerror = null;
   };
 }

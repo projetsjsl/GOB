@@ -1,10 +1,10 @@
 /**
  * Styles Globaux pour Composants
  * 
- * Styles partagés entre tous les composants du dashboard
+ * Styles partages entre tous les composants du dashboard
  */
 
-/* Scrollbar personnalisée */
+/* Scrollbar personnalisee */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -38,7 +38,7 @@
     scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
 }
 
-/* Transitions douces pour changement de thème */
+/* Transitions douces pour changement de theme */
 * {
     transition: background-color var(--gob-transition-normal) ease,
                 color var(--gob-transition-normal) ease,

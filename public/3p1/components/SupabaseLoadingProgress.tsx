@@ -19,7 +19,7 @@ export const SupabaseLoadingProgress: React.FC<SupabaseLoadingProgressProps> = (
   const [elapsedTime, setElapsedTime] = useState(0);
   const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<number | null>(null);
 
-  // Calculer le temps écoulé et estimé
+  // Calculer le temps ecoule et estime
   useEffect(() => {
     if (!isLoading || !startTime) {
       setElapsedTime(0);
@@ -31,7 +31,7 @@ export const SupabaseLoadingProgress: React.FC<SupabaseLoadingProgressProps> = (
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
       setElapsedTime(elapsed);
 
-      // Calculer le temps estimé restant basé sur la progression
+      // Calculer le temps estime restant base sur la progression
       if (current > 0 && total > 0) {
         const progress = current / total;
         if (progress > 0) {
@@ -40,7 +40,7 @@ export const SupabaseLoadingProgress: React.FC<SupabaseLoadingProgressProps> = (
           setEstimatedTimeRemaining(remaining);
         }
       }
-    }, 100); // Mise à jour toutes les 100ms pour fluidité
+    }, 100); // Mise a jour toutes les 100ms pour fluidite
 
     return () => clearInterval(interval);
   }, [isLoading, startTime, current, total]);
@@ -66,7 +66,7 @@ export const SupabaseLoadingProgress: React.FC<SupabaseLoadingProgressProps> = (
         <div className="flex items-center gap-2">
           <ClockIcon className="w-5 h-5 text-blue-600 animate-spin" />
           <h3 className="font-semibold text-gray-800">
-            {isLoading ? 'Chargement Supabase' : 'Chargement terminé'}
+            {isLoading ? 'Chargement Supabase' : 'Chargement termine'}
           </h3>
         </div>
         {!isLoading && (
@@ -95,12 +95,12 @@ export const SupabaseLoadingProgress: React.FC<SupabaseLoadingProgressProps> = (
       {/* Informations de temps */}
       <div className="space-y-1 text-xs text-gray-600">
         <div className="flex items-center justify-between">
-          <span>⏱️ Temps écoulé:</span>
+          <span> Temps ecoule:</span>
           <span className="font-semibold text-gray-800">{formatTime(elapsedTime)}</span>
         </div>
         {isLoading && estimatedTimeRemaining !== null && estimatedTimeRemaining > 0 && (
           <div className="flex items-center justify-between">
-            <span>⏳ Temps restant (est.):</span>
+            <span> Temps restant (est.):</span>
             <span className="font-semibold text-gray-800">{formatTime(estimatedTimeRemaining)}</span>
           </div>
         )}
@@ -111,12 +111,12 @@ export const SupabaseLoadingProgress: React.FC<SupabaseLoadingProgressProps> = (
         )}
       </div>
 
-      {/* Détails de progression */}
+      {/* Details de progression */}
       {isLoading && (
         <div className="mt-2 pt-2 border-t border-gray-200">
           <div className="text-xs text-gray-500">
             {current === 0 && 'Initialisation...'}
-            {current > 0 && current < total && `Chargement des données pour ${current} ticker(s)...`}
+            {current > 0 && current < total && `Chargement des donnees pour ${current} ticker(s)...`}
             {current === total && 'Finalisation...'}
           </div>
         </div>

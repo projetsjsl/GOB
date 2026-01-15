@@ -1,5 +1,5 @@
 /**
- * API Endpoint pour gérer les tickers d'équipe
+ * API Endpoint pour gerer les tickers d'equipe
  */
 
 export default async function handler(req, res) {
@@ -31,13 +31,13 @@ export default async function handler(req, res) {
                 return res.status(405).json({ error: 'Method not allowed' });
         }
     } catch (error) {
-        console.error('❌ Team Tickers API Error:', error);
+        console.error(' Team Tickers API Error:', error);
         return res.status(500).json({ error: error.message });
     }
 }
 
 async function handleGet(req, res, supabaseUrl, supabaseKey) {
-    // Récupérer depuis la table unifiée tickers avec source='team' ou 'both'
+    // Recuperer depuis la table unifiee tickers avec source='team' ou 'both'
     const response = await fetch(
         `${supabaseUrl}/rest/v1/tickers?select=*&is_active=eq.true&or=(category.eq.team,category.eq.both)&order=priority.desc,ticker.asc`,
         {
@@ -78,7 +78,7 @@ async function handlePost(req, res, supabaseUrl, supabaseKey) {
 
     const tickerUpper = ticker.toUpperCase();
     
-    // Vérifier si le ticker existe déjà
+    // Verifier si le ticker existe deja
     const checkResponse = await fetch(
         `${supabaseUrl}/rest/v1/tickers?ticker=eq.${tickerUpper}&select=ticker,source`,
         {
@@ -93,7 +93,7 @@ async function handlePost(req, res, supabaseUrl, supabaseKey) {
     if (checkResponse.ok) {
         const existing = await checkResponse.json();
         if (existing.length > 0) {
-            // Si existe déjà, mettre à jour le source si nécessaire
+            // Si existe deja, mettre a jour le source si necessaire
             const existingTicker = existing[0];
             let newCategory = 'team';
             let newCategories = ['team'];
@@ -139,7 +139,7 @@ async function handlePost(req, res, supabaseUrl, supabaseKey) {
         }
     }
 
-    // Insérer nouveau ticker
+    // Inserer nouveau ticker
     const response = await fetch(`${supabaseUrl}/rest/v1/tickers`, {
         method: 'POST',
         headers: {
@@ -185,7 +185,7 @@ async function handleDelete(req, res, supabaseUrl, supabaseKey) {
 
     const tickerUpper = ticker.toUpperCase();
 
-    // Vérifier si le ticker existe et son source
+    // Verifier si le ticker existe et son source
     const checkResponse = await fetch(
         `${supabaseUrl}/rest/v1/tickers?ticker=eq.${tickerUpper}&select=ticker,source`,
         {
@@ -209,7 +209,7 @@ async function handleDelete(req, res, supabaseUrl, supabaseKey) {
 
     const existingTicker = existing[0];
 
-    // Si category est 'both', mettre à jour vers 'watchlist' au lieu de supprimer
+    // Si category est 'both', mettre a jour vers 'watchlist' au lieu de supprimer
     if (existingTicker.category === 'both' || (existingTicker.categories && existingTicker.categories.includes('team') && existingTicker.categories.includes('watchlist'))) {
         const updateResponse = await fetch(
             `${supabaseUrl}/rest/v1/tickers?ticker=eq.${tickerUpper}`,

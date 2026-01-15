@@ -156,7 +156,7 @@ export default async function handler(req, res) {
             results.errors.push(`supabase_finance_snapshots: ${error.message}`);
         }
 
-        // 7. ✅ FIX: Mark ticker as inactive in tickers table (instead of deleting)
+        // 7.  FIX: Mark ticker as inactive in tickers table (instead of deleting)
         // This prevents the ticker from being recreated during sync
         try {
             const { data, error } = await supabase
@@ -190,7 +190,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('❌ Remove Ticker API Error:', error);
+        console.error(' Remove Ticker API Error:', error);
         return res.status(500).json({
             success: false,
             error: 'Internal server error',

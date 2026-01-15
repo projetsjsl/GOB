@@ -1,21 +1,21 @@
 /**
  * Job Batch pour synchroniser UNIQUEMENT LES PRIX FMP vers ticker_price_cache
  * 
- * ⚠️ IMPORTANT : Ce job synchronise UNIQUEMENT les PRIX (pas les ratios/métriques)
- * Les données fondamentales (ratios, métriques) sont récupérées à la demande dans 3p1
+ *  IMPORTANT : Ce job synchronise UNIQUEMENT les PRIX (pas les ratios/metriques)
+ * Les donnees fondamentales (ratios, metriques) sont recuperees a la demande dans 3p1
  * 
  * Ce job :
- * 1. Récupère tous les tickers actifs depuis Supabase (1 requête)
+ * 1. Recupere tous les tickers actifs depuis Supabase (1 requete)
  * 2. Appelle FMP quotes en batch (PRIX UNIQUEMENT - pas de ratios)
- * 3. Upsert massif dans ticker_price_cache (1 requête)
+ * 3. Upsert massif dans ticker_price_cache (1 requete)
  * 
- * Fréquence : UNIQUEMENT quand nécessaire (beta-dashboard ouvert, 3p1 prix)
+ * Frequence : UNIQUEMENT quand necessaire (beta-dashboard ouvert, 3p1 prix)
  * - Option 1 : Cron toutes les 5-15 min (si beta-dashboard toujours ouvert)
- * - Option 2 : Appel manuel depuis le frontend quand nécessaire
+ * - Option 2 : Appel manuel depuis le frontend quand necessaire
  * 
  * Usage:
- * - Appel manuel : POST /api/fmp-batch-sync (recommandé - à la demande)
- * - Cron optionnel : every 15 min (toutes les 15 min si nécessaire)
+ * - Appel manuel : POST /api/fmp-batch-sync (recommande - a la demande)
+ * - Cron optionnel : every 15 min (toutes les 15 min si necessaire)
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -36,12 +36,12 @@ function getSupabaseClient() {
 }
 
 /**
- * Récupère tous les tickers actifs depuis Supabase
+ * Recupere tous les tickers actifs depuis Supabase
  */
 async function getAllActiveTickers() {
   const sb = getSupabaseClient();
   if (!sb) {
-    throw new Error('Supabase n\'est pas initialisé (variables d\'environnement manquantes)');
+    throw new Error('Supabase n\'est pas initialise (variables d\'environnement manquantes)');
   }
 
   const { data, error } = await sb
@@ -58,12 +58,12 @@ async function getAllActiveTickers() {
 }
 
 /**
- * Appelle FMP pour récupérer UNIQUEMENT les quotes (prix, volume, etc.)
- * ⚠️ PAS de ratios/métriques - seulement les prix pour réduire l'egress
- * FMP accepte jusqu'à 100 symboles par requête
+ * Appelle FMP pour recuperer UNIQUEMENT les quotes (prix, volume, etc.)
+ *  PAS de ratios/metriques - seulement les prix pour reduire l'egress
+ * FMP accepte jusqu'a 100 symboles par requete
  */
 async function fetchFMPQuotes(symbols) {
-  // FMP limite à 100 symboles par requête
+  // FMP limite a 100 symboles par requete
   const batchSize = 100;
   const batches = [];
   
@@ -82,7 +82,7 @@ async function fetchFMPQuotes(symbols) {
       const response = await fetch(url);
       
       if (!response.ok) {
-        console.error(`❌ FMP Error pour batch ${batch[0]}-${batch[batch.length-1]}: ${response.status}`);
+        console.error(` FMP Error pour batch ${batch[0]}-${batch[batch.length-1]}: ${response.status}`);
         continue;
       }
 
@@ -91,17 +91,17 @@ async function fetchFMPQuotes(symbols) {
       if (Array.isArray(quotes)) {
         allQuotes.push(...quotes);
       } else if (quotes && quotes.symbol) {
-        // Si un seul résultat, FMP retourne un objet au lieu d'un array
+        // Si un seul resultat, FMP retourne un objet au lieu d'un array
         allQuotes.push(quotes);
       }
 
       // Rate limiting : 300 req/min pour FMP free tier
-      // On fait ~20 req/min max pour être safe
+      // On fait ~20 req/min max pour etre safe
       if (batches.length > 1) {
         await new Promise(resolve => setTimeout(resolve, 3000)); // 3s entre batches
       }
     } catch (error) {
-      console.error(`❌ Erreur fetch FMP batch:`, error);
+      console.error(` Erreur fetch FMP batch:`, error);
       continue;
     }
   }
@@ -110,9 +110,9 @@ async function fetchFMPQuotes(symbols) {
 }
 
 /**
- * ⚠️ SUPPRIMÉ : fetchFMPRatios et combineQuoteAndRatios
- * On synchronise UNIQUEMENT les prix, pas les ratios/métriques
- * Les ratios sont récupérés à la demande dans 3p1 quand nécessaire
+ *  SUPPRIME : fetchFMPRatios et combineQuoteAndRatios
+ * On synchronise UNIQUEMENT les prix, pas les ratios/metriques
+ * Les ratios sont recuperes a la demande dans 3p1 quand necessaire
  */
 
 /**
@@ -120,29 +120,29 @@ async function fetchFMPQuotes(symbols) {
  */
 async function syncAllTickers() {
   const startTime = Date.now();
-  console.log('🔄 Démarrage synchronisation batch FMP...');
+  console.log(' Demarrage synchronisation batch FMP...');
 
   try {
-    // 1. Récupérer tous les tickers actifs (1 requête Supabase)
-    console.log('📋 Récupération des tickers actifs...');
+    // 1. Recuperer tous les tickers actifs (1 requete Supabase)
+    console.log(' Recuperation des tickers actifs...');
     const tickers = await getAllActiveTickers();
-    console.log(`✅ ${tickers.length} tickers actifs trouvés`);
+    console.log(` ${tickers.length} tickers actifs trouves`);
 
     if (tickers.length === 0) {
       return {
         success: true,
-        message: 'Aucun ticker actif à synchroniser',
+        message: 'Aucun ticker actif a synchroniser',
         tickersProcessed: 0
       };
     }
 
-    // 2. Appeler FMP en batch (quelques requêtes max)
+    // 2. Appeler FMP en batch (quelques requetes max)
     // 2. Appeler FMP UNIQUEMENT pour les quotes (prix) - PAS de ratios
-    console.log('📡 Appel FMP pour quotes (PRIX UNIQUEMENT)...');
+    console.log(' Appel FMP pour quotes (PRIX UNIQUEMENT)...');
     const quotes = await fetchFMPQuotes(tickers);
-    console.log(`✅ ${quotes.length} quotes récupérées`);
+    console.log(` ${quotes.length} quotes recuperees`);
 
-    // 3. Formater les données (PRIX UNIQUEMENT - pas de ratios)
+    // 3. Formater les donnees (PRIX UNIQUEMENT - pas de ratios)
     const priceData = quotes.map(quote => {
       // Convert to integers for bigint columns and validate
       const volume = Number.isFinite(quote.volume) ? Math.round(quote.volume) : 0;
@@ -159,11 +159,11 @@ async function syncAllTickers() {
     });
 
     // 4. Upsert en batch dans ticker_price_cache - PRIX UNIQUEMENT
-    console.log('💾 Upsert dans ticker_price_cache (PRIX UNIQUEMENT) par lots...');
+    console.log(' Upsert dans ticker_price_cache (PRIX UNIQUEMENT) par lots...');
     
     const sb = getSupabaseClient();
     if (!sb) {
-      throw new Error('Supabase n\'est pas initialisé');
+      throw new Error('Supabase n\'est pas initialise');
     }
 
     // Taille du lot pour l'upsert Supabase
@@ -179,7 +179,7 @@ async function syncAllTickers() {
       });
 
       if (error) {
-        console.error(`❌ Erreur upsert batch ${i}-${i + batch.length}:`, error.message);
+        console.error(` Erreur upsert batch ${i}-${i + batch.length}:`, error.message);
         failCount += batch.length;
       } else {
         successCount += batch.length;
@@ -187,23 +187,23 @@ async function syncAllTickers() {
     }
 
     if (failCount > 0 && successCount === 0) {
-      throw new Error(`Tous les lots d'upsert ont échoué. Ex: ${failCount} échecs.`);
+      throw new Error(`Tous les lots d'upsert ont echoue. Ex: ${failCount} echecs.`);
     }
 
     const executionTime = Date.now() - startTime;
 
-    console.log(`✅ Synchronisation PRIX terminée: ${priceData.length} tickers en ${executionTime}ms`);
+    console.log(` Synchronisation PRIX terminee: ${priceData.length} tickers en ${executionTime}ms`);
 
     return {
       success: true,
       tickersProcessed: priceData.length,
       executionTimeMs: executionTime,
-      dataType: 'prices_only', // Indique que seuls les prix ont été synchronisés
+      dataType: 'prices_only', // Indique que seuls les prix ont ete synchronises
       timestamp: new Date().toISOString()
     };
 
   } catch (error) {
-    console.error('❌ Erreur synchronisation batch:', error);
+    console.error(' Erreur synchronisation batch:', error);
     return {
       success: false,
       error: error.message,

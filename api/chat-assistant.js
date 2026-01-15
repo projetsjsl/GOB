@@ -1,5 +1,5 @@
 /**
- * API Chat Assistant - Endpoint sécurisé pour le chatbot Emma Config
+ * API Chat Assistant - Endpoint securise pour le chatbot Emma Config
  * Utilise la variable d'environnement GEMINI_API_KEY de Vercel
  */
 
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'Missing message or context' });
         }
 
-        // Récupérer la clé API depuis les variables d'environnement Vercel
+        // Recuperer la cle API depuis les variables d'environnement Vercel
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
         if (!GEMINI_API_KEY) {
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
             },
             {
                 role: 'model',
-                parts: [{ text: 'Compris! Je suis prêt à vous aider avec Emma Config. Quelle est votre question?' }]
+                parts: [{ text: 'Compris! Je suis pret a vous aider avec Emma Config. Quelle est votre question?' }]
             }
         ];
 

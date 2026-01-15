@@ -8,10 +8,10 @@ const API_BASE_URL = (window.location && window.location.origin) ? window.locati
 const GITHUB_REPO = 'projetsjsl/GOB';
 const GITHUB_BRANCH = 'main';
 
-// Version simplifiée de l'API hybride qui fonctionne sans Supabase
+// Version simplifiee de l'API hybride qui fonctionne sans Supabase
 const fetchHybridData = async (symbol, dataType) => {
   try {
-    console.log(`🔄 Récupération ${dataType} pour ${symbol}`);
+    console.log(` Recuperation ${dataType} pour ${symbol}`);
     
     // Utiliser les APIs fonctionnelles avec indicateurs de fallback
     let apiUrl = '';
@@ -22,7 +22,7 @@ const fetchHybridData = async (symbol, dataType) => {
         apiUrl = `/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`;
         break;
       case 'profile':
-        // Utiliser l'API marketdata pour les données de base
+        // Utiliser l'API marketdata pour les donnees de base
         apiUrl = `/api/marketdata?endpoint=fundamentals&symbol=${symbol}&source=auto`;
         break;
       case 'ratios':
@@ -34,7 +34,7 @@ const fetchHybridData = async (symbol, dataType) => {
         apiUrl = `/api/fmp?endpoint=news&symbols=${symbol}&limit=10`;
         break;
       case 'prices':
-        // Utiliser l'API marketdata pour les données intraday (OHLCV 5min)
+        // Utiliser l'API marketdata pour les donnees intraday (OHLCV 5min)
         apiUrl = `/api/marketdata?endpoint=intraday&symbol=${symbol}&interval=5min&outputsize=78`;
         break;
       case 'analyst':
@@ -46,14 +46,14 @@ const fetchHybridData = async (symbol, dataType) => {
         apiUrl = `/api/marketdata?endpoint=earnings&symbol=${symbol}&source=auto`;
         break;
       default:
-        throw new Error(`Type de données non supporté: ${dataType}`);
+        throw new Error(`Type de donnees non supporte: ${dataType}`);
     }
     
-    // Gérer les appels spéciaux - FMP News (GRATUIT)
+    // Gerer les appels speciaux - FMP News (GRATUIT)
     if (dataType === 'news') {
       const response = await fetch(apiUrl);
       if (!response.ok) {
-        throw new Error(`API news échouée: ${response.status}`);
+        throw new Error(`API news echouee: ${response.status}`);
       }
       const data = await response.json();
 
@@ -84,11 +84,11 @@ const fetchHybridData = async (symbol, dataType) => {
     
     const response = await fetch(apiUrl);
     if (!response.ok) {
-      throw new Error(`API ${dataType} échouée: ${response.status}`);
+      throw new Error(`API ${dataType} echouee: ${response.status}`);
     }
     
     const data = await response.json();
-    console.log(`✅ ${dataType} récupéré pour ${symbol}`);
+    console.log(` ${dataType} recupere pour ${symbol}`);
     
     return {
       success: true,
@@ -105,15 +105,15 @@ const fetchHybridData = async (symbol, dataType) => {
     };
     
   } catch (error) {
-    console.error(`❌ Erreur ${dataType} pour ${symbol}:`, error);
+    console.error(` Erreur ${dataType} pour ${symbol}:`, error);
     throw new Error(`Erreur API ${dataType} pour ${symbol}: ${error.message}`);
   }
 };
 
-// Fonction pour charger les données du ticker (sans auto-refresh)
+// Fonction pour charger les donnees du ticker (sans auto-refresh)
 const fetchTickerData = async (API_BASE_URL, setTickerData, addLog) => {
     try {
-        // Vérifier d'abord les données préchargées depuis la page de login
+        // Verifier d'abord les donnees prechargees depuis la page de login
         const preloadedDataStr = sessionStorage.getItem('preloaded-dashboard-data');
         if (preloadedDataStr) {
             try {
@@ -122,13 +122,13 @@ const fetchTickerData = async (API_BASE_URL, setTickerData, addLog) => {
                 const MAX_AGE = 5 * 60 * 1000; // 5 minutes
 
                 if (preloadedData.tickerData && dataAge < MAX_AGE) {
-                    console.log('⚡ Utilisation des données préchargées pour les tickers');
+                    console.log(' Utilisation des donnees prechargees pour les tickers');
                     setTickerData(preloadedData.tickerData);
-                    addLog(`✅ Ticker chargé depuis préchargement: ${preloadedData.tickerData.length} instruments`, 'success');
+                    addLog(` Ticker charge depuis prechargement: ${preloadedData.tickerData.length} instruments`, 'success');
                     return;
                 }
             } catch (e) {
-                console.warn('⚠️ Erreur lecture données préchargées:', e);
+                console.warn(' Erreur lecture donnees prechargees:', e);
             }
         }
 
@@ -158,7 +158,7 @@ const fetchTickerData = async (API_BASE_URL, setTickerData, addLog) => {
             { symbol: '^FVX', name: 'US 5Y', type: 'bond' }
         ];
 
-        // OPTIMISATION: Chargement parallèle au lieu de séquentiel
+        // OPTIMISATION: Chargement parallele au lieu de sequentiel
         const symbolSymbols = symbols.map(s => s.symbol);
         const tickerPromises = symbolSymbols.map(async (symbol, index) => {
             try {
@@ -183,33 +183,33 @@ const fetchTickerData = async (API_BASE_URL, setTickerData, addLog) => {
             return null;
         });
 
-        // Attendre tous les appels en parallèle
+        // Attendre tous les appels en parallele
         const tickerResults = (await Promise.all(tickerPromises)).filter(Boolean);
         setTickerData(tickerResults);
-        addLog(`✅ Ticker chargé: ${tickerResults.length} instruments`, 'success');
+        addLog(` Ticker charge: ${tickerResults.length} instruments`, 'success');
     } catch (error) {
         console.error('Erreur fetchTickerData:', error);
-        addLog(`❌ Erreur ticker: ${error.message}`, 'error');
+        addLog(` Erreur ticker: ${error.message}`, 'error');
     }
 };
 
-// Données Market Data (Finnhub + Alpha Vantage + Yahoo Finance)
+// Donnees Market Data (Finnhub + Alpha Vantage + Yahoo Finance)
 const fetchStockData = async (ticker, API_BASE_URL) => {
     try {
-        // Essayer d'abord la nouvelle API unifiée avec Yahoo Finance (gratuit)
+        // Essayer d'abord la nouvelle API unifiee avec Yahoo Finance (gratuit)
         const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`);
         if (!response.ok) throw new Error(`API error: ${response.status}`);
         return await response.json();
     } catch (error) {
         console.error('Erreur fetch stock data (marketdata):', error?.message || String(error));
-        // Rester sur marketdata; l'API gère déjà ses fallbacks internes
+        // Rester sur marketdata; l'API gere deja ses fallbacks internes
         return null;
     }
 };
 
-// Fonction pour charger les dernières nouvelles Finviz pour tous les tickers
+// Fonction pour charger les dernieres nouvelles Finviz pour tous les tickers
 const fetchFinvizNews = async (tickers, API_BASE_URL, setFinvizNews) => {
-    console.log('📰 Chargement des dernières nouvelles Finviz...');
+    console.log(' Chargement des dernieres nouvelles Finviz...');
 
     const newsPromises = tickers.map(async (ticker) => {
         try {
@@ -234,7 +234,7 @@ const fetchFinvizNews = async (tickers, API_BASE_URL, setFinvizNews) => {
     });
 
     setFinvizNews(newsMap);
-    console.log(`✅ Finviz news loaded for ${Object.keys(newsMap).length} tickers`);
+    console.log(` Finviz news loaded for ${Object.keys(newsMap).length} tickers`);
 };
 
 // Export additional API functions as needed

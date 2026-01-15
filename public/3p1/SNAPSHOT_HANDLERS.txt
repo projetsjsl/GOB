@@ -27,7 +27,7 @@
         setAssumptions(snapshot.assumptions);
         setInfo(snapshot.company_info);
         
-        console.log(`📜 Loaded snapshot v${snapshot.version} from ${snapshot.snapshot_date}`);
+        console.log(` Loaded snapshot v${snapshot.version} from ${snapshot.snapshot_date}`);
     };
 
     // Revert to current version
@@ -48,7 +48,7 @@
 
     // Unlock historical version for editing
     const handleUnlockVersion = () => {
-        if (!confirm('Déverrouiller cette version pour modification? Les changements seront enregistrés sur cette ancienne version.')) {
+        if (!confirm('Deverrouiller cette version pour modification? Les changements seront enregistres sur cette ancienne version.')) {
             return;
         }
         setIsReadOnly(false);
@@ -69,7 +69,7 @@
         );
         
         if (result.success) {
-            alert('✅ Nouvelle version sauvegardée!');
+            alert(' Nouvelle version sauvegardee!');
             // Reset to normal mode
             setCurrentSnapshot(null);
             setIsReadOnly(false);

@@ -3,14 +3,14 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
 
-// Les bibliothèques globales (Chart.js, Recharts, TradingView) sont
-// chargées via CDN dans index.html et disponibles via window
+// Les bibliotheques globales (Chart.js, Recharts, TradingView) sont
+// chargees via CDN dans index.html et disponibles via window
 
-console.log('🚀 Vite + React + TypeScript chargé');
-console.log('📚 Vérification des bibliothèques CDN:');
-console.log('  Chart.js:', typeof Chart !== 'undefined' ? '✅' : '❌');
-console.log('  Recharts:', typeof window.Recharts !== 'undefined' ? '✅' : '❌');
-console.log('  LightweightCharts:', typeof window.LightweightCharts !== 'undefined' ? '✅' : '❌');
+console.log(' Vite + React + TypeScript charge');
+console.log(' Verification des bibliotheques CDN:');
+console.log('  Chart.js:', typeof Chart !== 'undefined' ? '' : '');
+console.log('  Recharts:', typeof window.Recharts !== 'undefined' ? '' : '');
+console.log('  LightweightCharts:', typeof window.LightweightCharts !== 'undefined' ? '' : '');
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

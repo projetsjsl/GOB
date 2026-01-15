@@ -1,11 +1,11 @@
 /**
- * Calcul des métriques de marché avancées
+ * Calcul des metriques de marche avancees
  */
 
 import type { YieldDataPoint } from "./fred-api"
 
 /**
- * Interface pour les métriques de marché
+ * Interface pour les metriques de marche
  */
 export interface MarketMetrics {
   // Spreads
@@ -25,11 +25,11 @@ export interface MarketMetrics {
   stdDeviation: number
   yieldRange: { min: number; max: number }
 
-  // Volatilité
+  // Volatilite
   dayOverDayChange: number
   percentageChange: number
 
-  // Convexité
+  // Convexite
   convexity: number
 
   // Duration
@@ -91,7 +91,7 @@ export function calculateStatistics(points: YieldDataPoint[]): Partial<MarketMet
 }
 
 /**
- * Calculer la convexité (curvature)
+ * Calculer la convexite (curvature)
  */
 export function calculateConvexity(points: YieldDataPoint[]): number {
   if (points.length < 3) return 0
@@ -114,7 +114,7 @@ export function calculateConvexity(points: YieldDataPoint[]): number {
 }
 
 /**
- * Calculer la durée effective
+ * Calculer la duree effective
  */
 export function calculateEffectiveDuration(points: YieldDataPoint[]): number {
   if (points.length < 2) return 0
@@ -128,7 +128,7 @@ export function calculateEffectiveDuration(points: YieldDataPoint[]): number {
 }
 
 /**
- * Calculer toutes les métriques
+ * Calculer toutes les metriques
  */
 export function calculateAllMarketMetrics(
   currentPoints: YieldDataPoint[],

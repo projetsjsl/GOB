@@ -1,6 +1,6 @@
 /**
- * Script pour forcer la mise à jour des sections qui ne s'actualisent pas
- * Déclenche les recalculs et force les re-renders
+ * Script pour forcer la mise a jour des sections qui ne s'actualisent pas
+ * Declenche les recalculs et force les re-renders
  */
 
 (function() {
@@ -11,20 +11,20 @@
     }
     window.__forceUpdateSectionsInitialized = true;
 
-    console.log('🔄 Forçage de la mise à jour des sections...');
+    console.log(' Forcage de la mise a jour des sections...');
     
     // 1. FORCER LE RE-RENDER REACT
     function forceReactUpdate() {
-        // Chercher tous les composants React montés
+        // Chercher tous les composants React montes
         const reactRoots = [];
         
-        // Méthode 1: Chercher les divs avec data-reactroot
+        // Methode 1: Chercher les divs avec data-reactroot
         document.querySelectorAll('[data-reactroot], [data-react-checksum]').forEach(el => {
             const fiber = el._reactInternalInstance || el._reactInternalFiber;
             if (fiber) reactRoots.push(fiber);
         });
         
-        // Méthode 2: Chercher via React DevTools
+        // Methode 2: Chercher via React DevTools
         if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
             const hook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
             if (hook.renderers && hook.renderers.size > 0) {
@@ -36,23 +36,23 @@
             }
         }
         
-        // Méthode 3: Déclencher un événement personnalisé pour forcer le re-render
+        // Methode 3: Declencher un evenement personnalise pour forcer le re-render
         const event = new CustomEvent('forceUpdate', { bubbles: true });
         document.body.dispatchEvent(event);
         
-        // Méthode 4: Modifier un attribut data pour forcer le re-render
+        // Methode 4: Modifier un attribut data pour forcer le re-render
         document.body.setAttribute('data-force-update', Date.now().toString());
         
-        console.log(`✅ ${reactRoots.length} composant(s) React trouvé(s)`);
+        console.log(` ${reactRoots.length} composant(s) React trouve(s)`);
     }
     
-    // 2. DÉCLENCHER LES RECALCULS
+    // 2. DECLENCHER LES RECALCULS
     function triggerRecalculations() {
-        // Chercher tous les inputs qui pourraient déclencher des calculs
+        // Chercher tous les inputs qui pourraient declencher des calculs
         const inputs = document.querySelectorAll('input[type="number"], input[type="text"], select');
         
         inputs.forEach(input => {
-            // Déclencher les événements de changement
+            // Declencher les evenements de changement
             const events = ['input', 'change', 'blur'];
             events.forEach(eventType => {
                 const event = new Event(eventType, { bubbles: true, cancelable: true });
@@ -60,10 +60,10 @@
             });
         });
         
-        console.log(`✅ ${inputs.length} input(s) déclenché(s)`);
+        console.log(` ${inputs.length} input(s) declenche(s)`);
     }
     
-    // 3. FORCER LA MISE À JOUR DES SECTIONS SPÉCIFIQUES
+    // 3. FORCER LA MISE A JOUR DES SECTIONS SPECIFIQUES
     function updateSpecificSections() {
         const sections = [
             '.card',
@@ -75,7 +75,7 @@
             '[id*="result"]',
             '[id*="score"]',
             '[id*="age"]',
-            '[id*="indifférence"]'
+            '[id*="indifference"]'
         ];
         
         sections.forEach(selector => {
@@ -84,13 +84,13 @@
                 // Forcer le re-render en modifiant un attribut
                 el.setAttribute('data-last-update', Date.now().toString());
                 
-                // Déclencher un événement de mise à jour
+                // Declencher un evenement de mise a jour
                 const event = new CustomEvent('sectionUpdate', { bubbles: true });
                 el.dispatchEvent(event);
                 
-                // Si c'est un élément React, essayer de forcer le re-render
+                // Si c'est un element React, essayer de forcer le re-render
                 if (el._reactInternalInstance || el._reactInternalFiber) {
-                    // Déclencher un changement de style pour forcer le re-render
+                    // Declencher un changement de style pour forcer le re-render
                     const originalDisplay = el.style.display;
                     el.style.display = 'none';
                     // Force reflow
@@ -100,7 +100,7 @@
             });
         });
         
-        console.log(`✅ Sections mises à jour`);
+        console.log(` Sections mises a jour`);
     }
     
     // 4. OBSERVER ET RECALCULER AUTOMATIQUEMENT
@@ -159,7 +159,7 @@
             });
         });
         
-        console.log('✅ Observer de recalcul activé');
+        console.log(' Observer de recalcul active');
     }
     
     // 5. FORCER LE RECALCUL DES VALEURS
@@ -179,16 +179,16 @@
             if (typeof window[funcName] === 'function') {
                 try {
                     window[funcName]();
-                    console.log(`✅ Fonction ${funcName}() appelée`);
+                    console.log(` Fonction ${funcName}() appelee`);
                 } catch (e) {
-                    console.warn(`⚠️ Erreur lors de l'appel de ${funcName}:`, e);
+                    console.warn(` Erreur lors de l'appel de ${funcName}:`, e);
                 }
             }
         });
         
         // Chercher les fonctions dans les composants React
         if (window.React && window.ReactDOM) {
-            // Essayer de trouver les composants et déclencher leurs recalculs
+            // Essayer de trouver les composants et declencher leurs recalculs
             const reactElements = document.querySelectorAll('[data-reactroot]');
             reactElements.forEach(el => {
                 const event = new CustomEvent('recalculate', { bubbles: true });
@@ -197,9 +197,9 @@
         }
     }
     
-    // 6. FORCER LA MISE À JOUR VISUELLE
+    // 6. FORCER LA MISE A JOUR VISUELLE
     function forceVisualUpdate() {
-        // Forcer le reflow pour mettre à jour l'affichage
+        // Forcer le reflow pour mettre a jour l'affichage
         const cards = document.querySelectorAll('.card, .recommendation-card, .chart-card, .result-card');
         cards.forEach(card => {
             // Technique de force reflow
@@ -212,11 +212,11 @@
             }, 10);
         });
         
-        console.log(`✅ ${cards.length} carte(s) mise(s) à jour visuellement`);
+        console.log(` ${cards.length} carte(s) mise(s) a jour visuellement`);
     }
     
-    // EXÉCUTER TOUTES LES CORRECTIONS
-    console.log('🔄 Démarrage des mises à jour...');
+    // EXECUTER TOUTES LES CORRECTIONS
+    console.log(' Demarrage des mises a jour...');
     
     forceReactUpdate();
     triggerRecalculations();
@@ -225,15 +225,15 @@
     forceVisualUpdate();
     setupAutoRecalculation();
     
-    // Exposer une fonction globale pour forcer la mise à jour manuellement
+    // Exposer une fonction globale pour forcer la mise a jour manuellement
     window.forceUpdateSections = function() {
-        console.log('🔄 Mise à jour manuelle déclenchée...');
+        console.log(' Mise a jour manuelle declenchee...');
         forceReactUpdate();
         triggerRecalculations();
         updateSpecificSections();
         recalculateValues();
         forceVisualUpdate();
-        console.log('✅ Mise à jour manuelle terminée');
+        console.log(' Mise a jour manuelle terminee');
     };
     
     // Auto-refresh toutes les 2 secondes pendant 10 secondes
@@ -249,8 +249,8 @@
         }
     }, 2000);
     
-    console.log('✅ Script de mise à jour chargé');
-    console.log('💡 Utilisez window.forceUpdateSections() pour forcer une mise à jour manuelle');
+    console.log(' Script de mise a jour charge');
+    console.log(' Utilisez window.forceUpdateSections() pour forcer une mise a jour manuelle');
     
     return {
         forceUpdate: window.forceUpdateSections,

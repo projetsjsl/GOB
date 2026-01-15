@@ -118,7 +118,7 @@ export const TickerSearch: React.FC<TickerSearchProps> = ({ onSelect, onClose })
                 <div className="max-h-96 overflow-y-auto">
                     {results.length === 0 && query.length > 0 && !isLoading && (
                         <div className="p-8 text-center text-gray-500">
-                            Aucun résultat trouvé pour "{query}"
+                            Aucun resultat trouve pour "{query}"
                         </div>
                     )}
 
@@ -159,11 +159,11 @@ export const TickerSearch: React.FC<TickerSearchProps> = ({ onSelect, onClose })
                 {/* Footer Hint */}
                 <div className="px-4 py-2 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <span><kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">↑↓</kbd> Naviguer</span>
-                        <span><kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Enter</kbd> Sélectionner</span>
+                        <span><kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">^v</kbd> Naviguer</span>
+                        <span><kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Enter</kbd> Selectionner</span>
                         <span><kbd className="px-2 py-1 bg-white border border-gray-300 rounded text-xs">Esc</kbd> Fermer</span>
                     </div>
-                    <div>{results.length} résultat{results.length !== 1 ? 's' : ''}</div>
+                    <div>{results.length} resultat{results.length !== 1 ? 's' : ''}</div>
                 </div>
             </div>
         </div>

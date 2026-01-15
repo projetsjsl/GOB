@@ -1,26 +1,26 @@
 /**
  * RSI SCREENER TOOL
- * Identifie les opportunités de trading basées sur RSI extrêmes
+ * Identifie les opportunites de trading basees sur RSI extremes
  *
- * Scanne les marchés internationaux (US, Canada, Europe, etc.) pour:
- * 1. SURVENTE EXTRÊME: RSI(14) ≤ 20 ET RSI(5) ≤ 5
- * 2. SURACHAT EXTRÊME: RSI(14) ≥ 80 ET RSI(5) ≥ 95
+ * Scanne les marches internationaux (US, Canada, Europe, etc.) pour:
+ * 1. SURVENTE EXTREME: RSI(14) <= 20 ET RSI(5) <= 5
+ * 2. SURACHAT EXTREME: RSI(14) >= 80 ET RSI(5) >= 95
  *
  * Architecture:
- * - Multi-marchés (US, CA, UK, DE, FR, etc.)
+ * - Multi-marches (US, CA, UK, DE, FR, etc.)
  * - Filtrage par capitalisation (large cap > $10B)
  * - Calcul RSI(14) et RSI(5) via FMP ou Twelve Data
- * - Résultats triés par intensité RSI
+ * - Resultats tries par intensite RSI
  */
 
 /**
- * Recherche d'actions en zones RSI extrêmes
- * @param {Object} params - Paramètres de recherche
- * @param {string} params.type - Type de recherche: "oversold" (survente), "overbought" (surachat), "both" (défaut)
- * @param {number} params.limit - Nombre max de résultats par catégorie (défaut: 20)
- * @param {Array<string>} params.markets - Marchés à scanner: ["US", "CA", "UK", "FR", "DE"] (défaut: ["US"])
- * @param {string} params.market_cap - Taille minimum: "large" (>$10B), "mid" (>$2B), "all" (défaut: "large")
- * @returns {Promise<Object>} Tickers avec RSI extrêmes
+ * Recherche d'actions en zones RSI extremes
+ * @param {Object} params - Parametres de recherche
+ * @param {string} params.type - Type de recherche: "oversold" (survente), "overbought" (surachat), "both" (defaut)
+ * @param {number} params.limit - Nombre max de resultats par categorie (defaut: 20)
+ * @param {Array<string>} params.markets - Marches a scanner: ["US", "CA", "UK", "FR", "DE"] (defaut: ["US"])
+ * @param {string} params.market_cap - Taille minimum: "large" (>$10B), "mid" (>$2B), "all" (defaut: "large")
+ * @returns {Promise<Object>} Tickers avec RSI extremes
  */
 export async function screenByRSI(params) {
     const {
@@ -30,29 +30,29 @@ export async function screenByRSI(params) {
         market_cap = 'large'
     } = params;
 
-    console.log(`🔍 [RSI Screener] Type: ${type}, Markets: ${markets.join(',')}, Limit: ${limit}`);
+    console.log(` [RSI Screener] Type: ${type}, Markets: ${markets.join(',')}, Limit: ${limit}`);
 
     try {
-        // 1. Récupérer liste de tickers par marché
+        // 1. Recuperer liste de tickers par marche
         const tickers = await _getTickersByMarkets(markets, market_cap);
 
         if (!tickers || tickers.length === 0) {
             return {
                 success: false,
-                error: 'Aucun ticker trouvé pour ces marchés',
+                error: 'Aucun ticker trouve pour ces marches',
                 oversold: [],
                 overbought: []
             };
         }
 
-        console.log(`✅ [RSI Screener] ${tickers.length} tickers à analyser`);
+        console.log(` [RSI Screener] ${tickers.length} tickers a analyser`);
 
         // 2. Calculer RSI(14) et RSI(5) pour chaque ticker
         const rsiData = await _calculateRSIForTickers(tickers);
 
-        console.log(`📊 [RSI Screener] ${rsiData.length} tickers avec données RSI`);
+        console.log(` [RSI Screener] ${rsiData.length} tickers avec donnees RSI`);
 
-        // 3. Filtrer selon critères RSI
+        // 3. Filtrer selon criteres RSI
         const oversold = type === 'oversold' || type === 'both'
             ? _filterOversold(rsiData, limit)
             : [];
@@ -61,7 +61,7 @@ export async function screenByRSI(params) {
             ? _filterOverbought(rsiData, limit)
             : [];
 
-        console.log(`✅ [RSI Screener] Survente: ${oversold.length}, Surachat: ${overbought.length}`);
+        console.log(` [RSI Screener] Survente: ${oversold.length}, Surachat: ${overbought.length}`);
 
         return {
             success: true,
@@ -71,19 +71,19 @@ export async function screenByRSI(params) {
             total_with_data: rsiData.length,
             oversold: {
                 count: oversold.length,
-                criteria: 'RSI(14) ≤ 20 ET RSI(5) ≤ 5',
+                criteria: 'RSI(14) <= 20 ET RSI(5) <= 5',
                 stocks: oversold
             },
             overbought: {
                 count: overbought.length,
-                criteria: 'RSI(14) ≥ 80 ET RSI(5) ≥ 95',
+                criteria: 'RSI(14) >= 80 ET RSI(5) >= 95',
                 stocks: overbought
             },
             timestamp: new Date().toISOString()
         };
 
     } catch (error) {
-        console.error('❌ [RSI Screener] Error:', error.message);
+        console.error(' [RSI Screener] Error:', error.message);
         return {
             success: false,
             error: error.message,
@@ -94,7 +94,7 @@ export async function screenByRSI(params) {
 }
 
 /**
- * Récupère liste de tickers par marchés
+ * Recupere liste de tickers par marches
  */
 async function _getTickersByMarkets(markets, market_cap) {
     const FMP_API_KEY = process.env.FMP_API_KEY;
@@ -106,7 +106,7 @@ async function _getTickersByMarkets(markets, market_cap) {
     const allTickers = [];
     const marketCapMin = market_cap === 'large' ? 10e9 : market_cap === 'mid' ? 2e9 : 0;
 
-    // Mapping des marchés vers exchanges FMP
+    // Mapping des marches vers exchanges FMP
     const marketToExchange = {
         'US': ['NYSE', 'NASDAQ'],
         'CA': ['TSX', 'TSXV'],
@@ -121,7 +121,7 @@ async function _getTickersByMarkets(markets, market_cap) {
 
         for (const exchange of exchanges) {
             try {
-                console.log(`📊 [FMP] Fetching tickers from ${exchange}...`);
+                console.log(` [FMP] Fetching tickers from ${exchange}...`);
 
                 // FMP Stock Screener endpoint
                 const url = `https://financialmodelingprep.com/api/v3/stock-screener?marketCapMoreThan=${marketCapMin}&exchange=${exchange}&limit=100&apikey=${FMP_API_KEY}`;
@@ -129,7 +129,7 @@ async function _getTickersByMarkets(markets, market_cap) {
                 const response = await fetch(url);
 
                 if (!response.ok) {
-                    console.warn(`⚠️ [FMP] ${exchange} error: ${response.status}`);
+                    console.warn(` [FMP] ${exchange} error: ${response.status}`);
                     continue;
                 }
 
@@ -147,24 +147,24 @@ async function _getTickersByMarkets(markets, market_cap) {
                     }));
 
                     allTickers.push(...tickers);
-                    console.log(`✅ [FMP] ${exchange}: ${tickers.length} tickers`);
+                    console.log(` [FMP] ${exchange}: ${tickers.length} tickers`);
                 }
 
                 // Rate limiting (300 calls/min pour FMP)
                 await _sleep(250);
 
             } catch (error) {
-                console.error(`❌ [FMP] ${exchange} error:`, error.message);
+                console.error(` [FMP] ${exchange} error:`, error.message);
             }
         }
     }
 
-    // Dédupliquer par symbol
+    // Dedupliquer par symbol
     const uniqueTickers = Array.from(
         new Map(allTickers.map(t => [t.symbol, t])).values()
     );
 
-    console.log(`✅ [RSI Screener] ${uniqueTickers.length} tickers uniques récupérés`);
+    console.log(` [RSI Screener] ${uniqueTickers.length} tickers uniques recuperes`);
 
     return uniqueTickers;
 }
@@ -176,7 +176,7 @@ async function _calculateRSIForTickers(tickers) {
     const FMP_API_KEY = process.env.FMP_API_KEY;
     const TWELVE_DATA_KEY = process.env.TWELVE_DATA_API_KEY;
 
-    console.log(`📊 [RSI Calculation] Analyzing ${tickers.length} tickers...`);
+    console.log(` [RSI Calculation] Analyzing ${tickers.length} tickers...`);
 
     const results = [];
     const batchSize = 5; // Process 5 at a time to avoid rate limits
@@ -219,7 +219,7 @@ async function _calculateRSIForTickers(tickers) {
                 return null;
 
             } catch (error) {
-                console.warn(`⚠️ [RSI] ${ticker.symbol} error:`, error.message);
+                console.warn(` [RSI] ${ticker.symbol} error:`, error.message);
                 return null;
             }
         });
@@ -232,7 +232,7 @@ async function _calculateRSIForTickers(tickers) {
 
         // Progress log every 20 tickers
         if ((i + batchSize) % 20 === 0) {
-            console.log(`📊 [RSI] Progress: ${Math.min(i + batchSize, tickers.length)}/${tickers.length} (${results.length} with data)`);
+            console.log(` [RSI] Progress: ${Math.min(i + batchSize, tickers.length)}/${tickers.length} (${results.length} with data)`);
         }
     }
 
@@ -240,7 +240,7 @@ async function _calculateRSIForTickers(tickers) {
 }
 
 /**
- * Récupère RSI via Twelve Data
+ * Recupere RSI via Twelve Data
  */
 async function _fetchRSIFromTwelveData(symbol, apiKey) {
     try {
@@ -273,7 +273,7 @@ async function _fetchRSIFromTwelveData(symbol, apiKey) {
 }
 
 /**
- * Récupère RSI via FMP (fallback)
+ * Recupere RSI via FMP (fallback)
  */
 async function _fetchRSIFromFMP(symbol, apiKey) {
     try {
@@ -302,8 +302,8 @@ async function _fetchRSIFromFMP(symbol, apiKey) {
 }
 
 /**
- * Filtre les actions en SURVENTE extrême
- * Critères: RSI(14) ≤ 20 ET RSI(5) ≤ 5
+ * Filtre les actions en SURVENTE extreme
+ * Criteres: RSI(14) <= 20 ET RSI(5) <= 5
  */
 function _filterOversold(rsiData, limit) {
     const filtered = rsiData.filter(stock => {
@@ -326,14 +326,14 @@ function _filterOversold(rsiData, limit) {
         sector: stock.sector,
         rsi14: stock.rsi14.toFixed(2),
         rsi5: stock.rsi5.toFixed(2),
-        signal: 'SURVENTE EXTRÊME',
+        signal: 'SURVENTE EXTREME',
         interpretation: `RSI(14)=${stock.rsi14.toFixed(1)} RSI(5)=${stock.rsi5.toFixed(1)} - Potentiel rebond technique`
     }));
 }
 
 /**
- * Filtre les actions en SURACHAT extrême
- * Critères: RSI(14) ≥ 80 ET RSI(5) ≥ 95
+ * Filtre les actions en SURACHAT extreme
+ * Criteres: RSI(14) >= 80 ET RSI(5) >= 95
  */
 function _filterOverbought(rsiData, limit) {
     const filtered = rsiData.filter(stock => {
@@ -343,7 +343,7 @@ function _filterOverbought(rsiData, limit) {
                stock.rsi5 >= 95;
     });
 
-    // Trier par RSI(5) décroissant (plus haut = plus overbought)
+    // Trier par RSI(5) decroissant (plus haut = plus overbought)
     filtered.sort((a, b) => b.rsi5 - a.rsi5);
 
     return filtered.slice(0, limit).map(stock => ({
@@ -356,7 +356,7 @@ function _filterOverbought(rsiData, limit) {
         sector: stock.sector,
         rsi14: stock.rsi14.toFixed(2),
         rsi5: stock.rsi5.toFixed(2),
-        signal: 'SURACHAT EXTRÊME',
+        signal: 'SURACHAT EXTREME',
         interpretation: `RSI(14)=${stock.rsi14.toFixed(1)} RSI(5)=${stock.rsi5.toFixed(1)} - Potentiel correction`
     }));
 }

@@ -9,16 +9,16 @@
       "url": "https://gobapps.com/images/emma-avatar.png",
       "alt": "Emma IA",
       "size": 64,
-      "description": "Avatar d'Emma affiché dans le header des emails"
+      "description": "Avatar d'Emma affiche dans le header des emails"
     },
     "logo": {
       "url": "https://gobapps.com/images/jslai-logo.png",
-      "alt": "JSLai - Intelligence Financière",
+      "alt": "JSLai - Intelligence Financiere",
       "width": 150,
-      "description": "Logo affiché dans le footer des emails"
+      "description": "Logo affiche dans le footer des emails"
     },
     "companyName": "GOB Apps",
-    "tagline": "Intelligence Financière Propulsée par Emma IA"
+    "tagline": "Intelligence Financiere Propulsee par Emma IA"
   },
 
   "colors": {
@@ -40,18 +40,18 @@
     "showDate": true,
     "showEdition": true,
     "editions": {
-      "morning": { "emoji": "☀️", "label": "ÉDITION MATIN" },
-      "midday": { "emoji": "📊", "label": "ÉDITION MI-JOURNÉE" },
-      "evening": { "emoji": "🌙", "label": "ÉDITION SOIRÉE" }
+      "morning": { "emoji": "", "label": "EDITION MATIN" },
+      "midday": { "emoji": "", "label": "EDITION MI-JOURNEE" },
+      "evening": { "emoji": "", "label": "EDITION SOIREE" }
     }
   },
 
   "footer": {
     "showLogo": true,
     "showDisclaimer": true,
-    "disclaimerText": "Ce briefing est généré automatiquement par Emma IA à des fins informatives uniquement. Il ne constitue pas un conseil en investissement.",
-    "copyrightText": "© 2025 GOB Apps - Tous droits réservés",
-    "unsubscribeText": "Se désabonner",
+    "disclaimerText": "Ce briefing est genere automatiquement par Emma IA a des fins informatives uniquement. Il ne constitue pas un conseil en investissement.",
+    "copyrightText": " 2025 GOB Apps - Tous droits reserves",
+    "unsubscribeText": "Se desabonner",
     "showSocialLinks": false,
     "socialLinks": {
       "linkedin": "",

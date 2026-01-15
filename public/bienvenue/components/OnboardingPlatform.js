@@ -2,10 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { Calendar, Users, CheckCircle2, Circle, Clock, Plus, Edit2, Trash2, Download, Upload, Filter, Search, ChevronDown, ChevronRight, GripVertical, User, Tag, AlertCircle } from 'lucide-react';
 
 const OnboardingPlatform = () => {
-  // État initial avec les données de Caroline
+  // Etat initial avec les donnees de Caroline
   const [employee, setEmployee] = useState({
     name: 'Caroline',
-    role: 'Conseillère en gestion de patrimoine',
+    role: 'Conseillere en gestion de patrimoine',
     startDate: '2025-01-06',
     endDate: '2025-01-31'
   });
@@ -13,7 +13,7 @@ const OnboardingPlatform = () => {
   const [phases, setPhases] = useState([
     {
       id: 1,
-      name: 'Phase 1 : Arrivée au retour des fêtes',
+      name: 'Phase 1 : Arrivee au retour des fetes',
       startDate: '2025-01-06',
       endDate: '2025-01-10',
       description: 'Prise de connaissance des outils et premiers contacts',
@@ -22,7 +22,7 @@ const OnboardingPlatform = () => {
     },
     {
       id: 2,
-      name: 'Phase 2 : Première semaine complète',
+      name: 'Phase 2 : Premiere semaine complete',
       startDate: '2025-01-06',
       endDate: '2025-01-10',
       description: 'Rencontres intensives en rafale',
@@ -40,55 +40,55 @@ const OnboardingPlatform = () => {
     },
     {
       id: 4,
-      name: 'Phase 4 : Autonomisation complète',
+      name: 'Phase 4 : Autonomisation complete',
       startDate: '2025-01-27',
       endDate: '2025-01-31',
-      description: 'Finalisation de l\'intégration',
+      description: 'Finalisation de l\'integration',
       color: '#10B981',
       expanded: true
     }
   ]);
 
   const [resources, setResources] = useState([
-    { id: 1, name: 'Jean-Sébastien', role: 'Planification financière', color: '#EF4444' },
+    { id: 1, name: 'Jean-Sebastien', role: 'Planification financiere', color: '#EF4444' },
     { id: 2, name: 'Jonathan', role: 'Coordination', color: '#F59E0B' },
     { id: 3, name: 'Anne-Marie', role: 'Administration', color: '#8B5CF6' },
-    { id: 4, name: 'Marie-Hélène Lacroix', role: 'Coaching planification', color: '#EC4899' },
-    { id: 5, name: 'Hugo', role: 'Clientèle', color: '#06B6D4' },
+    { id: 4, name: 'Marie-Helene Lacroix', role: 'Coaching planification', color: '#EC4899' },
+    { id: 5, name: 'Hugo', role: 'Clientele', color: '#06B6D4' },
     { id: 6, name: 'Linda', role: 'Support technique', color: '#10B981' },
     { id: 7, name: 'Conseillers', role: 'Mentorat', color: '#6366F1' }
   ]);
 
   const [tasks, setTasks] = useState([
     // Phase 1 - Outils et environnement
-    { id: 1, phaseId: 1, title: 'Confirmation adresse courriel', description: 'Valider que l\'adresse courriel reste inchangée', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-06', category: 'administratif' },
-    { id: 2, phaseId: 1, title: 'Prévoir accès systèmes', description: 'Coordonner avec IT pour accès et portable', assignedTo: [3], status: 'pending', priority: 'high', dueDate: '2025-01-06', category: 'technique' },
+    { id: 1, phaseId: 1, title: 'Confirmation adresse courriel', description: 'Valider que l\'adresse courriel reste inchangee', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-06', category: 'administratif' },
+    { id: 2, phaseId: 1, title: 'Prevoir acces systemes', description: 'Coordonner avec IT pour acces et portable', assignedTo: [3], status: 'pending', priority: 'high', dueDate: '2025-01-06', category: 'technique' },
     { id: 3, phaseId: 1, title: 'Formation Teams et serveur', description: 'Formation sur outils collaboratifs', assignedTo: [3, 6], status: 'pending', priority: 'medium', dueDate: '2025-01-07', category: 'technique' },
     { id: 4, phaseId: 1, title: 'Rencontre processus administratifs', description: 'Comprendre les processus internes avec Anne-Marie', assignedTo: [3], status: 'pending', priority: 'high', dueDate: '2025-01-07', category: 'administratif' },
     { id: 5, phaseId: 1, title: 'Super Lundi - Coaching', description: 'Session de coaching en planification', assignedTo: [3], status: 'pending', priority: 'medium', dueDate: '2025-01-06', category: 'formation' },
-    { id: 6, phaseId: 1, title: 'Formation ouverture de compte', description: 'Processus d\'ouverture et mise à jour', assignedTo: [3], status: 'pending', priority: 'medium', dueDate: '2025-01-08', category: 'formation' },
-    { id: 7, phaseId: 1, title: 'Coaching planification - Session 1', description: 'Première session avec Marie-Hélène', assignedTo: [4], status: 'pending', priority: 'high', dueDate: '2025-01-07', category: 'formation' },
-    { id: 8, phaseId: 1, title: 'Réception documents conformité', description: 'Documents de Jean-Sébastien: conformité, processus, gabarits', assignedTo: [1], status: 'pending', priority: 'high', dueDate: '2025-01-06', category: 'documentation' },
-    { id: 9, phaseId: 1, title: 'Lecture documents préparatoires', description: 'Prendre connaissance des documents envoyés', assignedTo: [], status: 'pending', priority: 'medium', dueDate: '2025-01-09', category: 'auto-formation' },
+    { id: 6, phaseId: 1, title: 'Formation ouverture de compte', description: 'Processus d\'ouverture et mise a jour', assignedTo: [3], status: 'pending', priority: 'medium', dueDate: '2025-01-08', category: 'formation' },
+    { id: 7, phaseId: 1, title: 'Coaching planification - Session 1', description: 'Premiere session avec Marie-Helene', assignedTo: [4], status: 'pending', priority: 'high', dueDate: '2025-01-07', category: 'formation' },
+    { id: 8, phaseId: 1, title: 'Reception documents conformite', description: 'Documents de Jean-Sebastien: conformite, processus, gabarits', assignedTo: [1], status: 'pending', priority: 'high', dueDate: '2025-01-06', category: 'documentation' },
+    { id: 9, phaseId: 1, title: 'Lecture documents preparatoires', description: 'Prendre connaissance des documents envoyes', assignedTo: [], status: 'pending', priority: 'medium', dueDate: '2025-01-09', category: 'auto-formation' },
     { id: 10, phaseId: 1, title: 'Observation rencontre client 1', description: 'Observer une rencontre avec un conseiller', assignedTo: [7], status: 'pending', priority: 'medium', dueDate: '2025-01-08', category: 'immersion' },
-    { id: 11, phaseId: 1, title: 'Rencontre Hugo - Validation clientèle', description: 'Discussion sur la clientèle assignée', assignedTo: [5], status: 'pending', priority: 'high', dueDate: '2025-01-09', category: 'clientèle' },
+    { id: 11, phaseId: 1, title: 'Rencontre Hugo - Validation clientele', description: 'Discussion sur la clientele assignee', assignedTo: [5], status: 'pending', priority: 'high', dueDate: '2025-01-09', category: 'clientele' },
     { id: 12, phaseId: 1, title: 'Information aux conseillers', description: 'Jonathan informe les conseillers de la prise de contact', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-06', category: 'coordination' },
     
     // Phase 2
-    { id: 13, phaseId: 2, title: 'Rencontres intensives intervenants', description: 'Sessions avec tous les intervenants clés', assignedTo: [1, 2, 3, 4], status: 'pending', priority: 'high', dueDate: '2025-01-10', category: 'formation' },
-    { id: 14, phaseId: 2, title: 'Observations rencontres clients', description: 'Assister à plusieurs rencontres', assignedTo: [7], status: 'pending', priority: 'medium', dueDate: '2025-01-10', category: 'immersion' },
-    { id: 15, phaseId: 2, title: 'Réévaluation fin de semaine', description: 'Point de contrôle et ajustements', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-10', category: 'suivi' },
+    { id: 13, phaseId: 2, title: 'Rencontres intensives intervenants', description: 'Sessions avec tous les intervenants cles', assignedTo: [1, 2, 3, 4], status: 'pending', priority: 'high', dueDate: '2025-01-10', category: 'formation' },
+    { id: 14, phaseId: 2, title: 'Observations rencontres clients', description: 'Assister a plusieurs rencontres', assignedTo: [7], status: 'pending', priority: 'medium', dueDate: '2025-01-10', category: 'immersion' },
+    { id: 15, phaseId: 2, title: 'Reevaluation fin de semaine', description: 'Point de controle et ajustements', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-10', category: 'suivi' },
     
     // Phase 3
-    { id: 16, phaseId: 3, title: 'Réalisation entrevues clients', description: 'Commencer à mener des entrevues', assignedTo: [7], status: 'pending', priority: 'high', dueDate: '2025-01-17', category: 'pratique' },
-    { id: 17, phaseId: 3, title: 'Premier dossier planification', description: 'Préparer premier dossier avec Marie-Hélène', assignedTo: [4], status: 'pending', priority: 'high', dueDate: '2025-01-20', category: 'pratique' },
-    { id: 18, phaseId: 3, title: 'Appropriation outils', description: 'Maîtriser tous les outils de travail', assignedTo: [], status: 'pending', priority: 'medium', dueDate: '2025-01-24', category: 'auto-formation' },
-    { id: 19, phaseId: 3, title: 'Briefing conseillers individuels', description: 'Rencontre avec chaque conseiller assigné', assignedTo: [7], status: 'pending', priority: 'high', dueDate: '2025-01-22', category: 'clientèle' },
+    { id: 16, phaseId: 3, title: 'Realisation entrevues clients', description: 'Commencer a mener des entrevues', assignedTo: [7], status: 'pending', priority: 'high', dueDate: '2025-01-17', category: 'pratique' },
+    { id: 17, phaseId: 3, title: 'Premier dossier planification', description: 'Preparer premier dossier avec Marie-Helene', assignedTo: [4], status: 'pending', priority: 'high', dueDate: '2025-01-20', category: 'pratique' },
+    { id: 18, phaseId: 3, title: 'Appropriation outils', description: 'Maitriser tous les outils de travail', assignedTo: [], status: 'pending', priority: 'medium', dueDate: '2025-01-24', category: 'auto-formation' },
+    { id: 19, phaseId: 3, title: 'Briefing conseillers individuels', description: 'Rencontre avec chaque conseiller assigne', assignedTo: [7], status: 'pending', priority: 'high', dueDate: '2025-01-22', category: 'clientele' },
     
     // Phase 4
-    { id: 20, phaseId: 4, title: 'Finalisation discussions conseillers', description: 'Compléter toutes les discussions', assignedTo: [7], status: 'pending', priority: 'high', dueDate: '2025-01-29', category: 'clientèle' },
-    { id: 21, phaseId: 4, title: 'Validation maîtrise outils', description: 'Confirmer l\'autonomie sur les outils', assignedTo: [3, 6], status: 'pending', priority: 'medium', dueDate: '2025-01-30', category: 'validation' },
-    { id: 22, phaseId: 4, title: 'Bilan intégration complet', description: 'Évaluation finale de l\'intégration', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-31', category: 'suivi' }
+    { id: 20, phaseId: 4, title: 'Finalisation discussions conseillers', description: 'Completer toutes les discussions', assignedTo: [7], status: 'pending', priority: 'high', dueDate: '2025-01-29', category: 'clientele' },
+    { id: 21, phaseId: 4, title: 'Validation maitrise outils', description: 'Confirmer l\'autonomie sur les outils', assignedTo: [3, 6], status: 'pending', priority: 'medium', dueDate: '2025-01-30', category: 'validation' },
+    { id: 22, phaseId: 4, title: 'Bilan integration complet', description: 'Evaluation finale de l\'integration', assignedTo: [2], status: 'pending', priority: 'high', dueDate: '2025-01-31', category: 'suivi' }
   ]);
 
   const [viewMode, setViewMode] = useState('timeline');
@@ -130,7 +130,7 @@ const OnboardingPlatform = () => {
     };
   }, [tasks]);
 
-  // Filtrage des tâches
+  // Filtrage des taches
   const filteredTasks = useMemo(() => {
     return tasks.filter(task => {
       const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -157,7 +157,7 @@ const OnboardingPlatform = () => {
   };
 
   const deleteTask = (taskId) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche?')) {
+    if (confirm('Etes-vous sur de vouloir supprimer cette tache?')) {
       setTasks(tasks.filter(t => t.id !== taskId));
     }
   };
@@ -189,7 +189,7 @@ const OnboardingPlatform = () => {
           if (data.phases) setPhases(data.phases);
           if (data.resources) setResources(data.resources);
           if (data.tasks) setTasks(data.tasks);
-          alert('Données importées avec succès!');
+          alert('Donnees importees avec succes!');
         } catch (error) {
           alert('Erreur lors de l\'importation: ' + error.message);
         }
@@ -250,7 +250,7 @@ const OnboardingPlatform = () => {
           <span className={`text-xs px-2 py-1 rounded-full ${statusColors[task.status]} border`}>
             {task.status === 'pending' ? 'En attente' : 
              task.status === 'inProgress' ? 'En cours' : 
-             task.status === 'completed' ? 'Complété' : 'Bloqué'}
+             task.status === 'completed' ? 'Complete' : 'Bloque'}
           </span>
           <span className={`text-xs px-2 py-1 rounded-full ${priorityColors[task.priority]}`}>
             {task.priority === 'high' ? 'Haute' : task.priority === 'medium' ? 'Moyenne' : 'Basse'}
@@ -266,7 +266,7 @@ const OnboardingPlatform = () => {
             </span>
           )}
           <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-            📅 {new Date(task.dueDate).toLocaleDateString('fr-CA')}
+             {new Date(task.dueDate).toLocaleDateString('fr-CA')}
           </span>
         </div>
 
@@ -307,7 +307,7 @@ const OnboardingPlatform = () => {
                     <h3 className="text-lg font-bold" style={{ color: phase.color }}>{phase.name}</h3>
                     <p className="text-sm text-gray-600 mt-1">{phase.description}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {new Date(phase.startDate).toLocaleDateString('fr-CA')} → {new Date(phase.endDate).toLocaleDateString('fr-CA')}
+                      {new Date(phase.startDate).toLocaleDateString('fr-CA')} -> {new Date(phase.endDate).toLocaleDateString('fr-CA')}
                     </p>
                   </div>
                 </div>
@@ -315,7 +315,7 @@ const OnboardingPlatform = () => {
                   <div className="text-2xl font-bold" style={{ color: phase.color }}>
                     {phaseTasks.filter(t => t.status === 'completed').length}/{phaseTasks.length}
                   </div>
-                  <div className="text-xs text-gray-500">tâches complétées</div>
+                  <div className="text-xs text-gray-500">taches completees</div>
                 </div>
               </div>
             </div>
@@ -325,7 +325,7 @@ const OnboardingPlatform = () => {
                 {phaseTasks.length > 0 ? (
                   phaseTasks.map(task => <TaskCard key={task.id} task={task} />)
                 ) : (
-                  <p className="text-gray-500 text-center py-8">Aucune tâche dans cette phase</p>
+                  <p className="text-gray-500 text-center py-8">Aucune tache dans cette phase</p>
                 )}
               </div>
             )}
@@ -339,8 +339,8 @@ const OnboardingPlatform = () => {
     const columns = [
       { id: 'pending', title: 'En attente', color: 'bg-gray-50' },
       { id: 'inProgress', title: 'En cours', color: 'bg-blue-50' },
-      { id: 'completed', title: 'Complété', color: 'bg-green-50' },
-      { id: 'blocked', title: 'Bloqué', color: 'bg-red-50' }
+      { id: 'completed', title: 'Complete', color: 'bg-green-50' },
+      { id: 'blocked', title: 'Bloque', color: 'bg-red-50' }
     ];
 
     return (
@@ -373,10 +373,10 @@ const OnboardingPlatform = () => {
           <thead className="bg-gray-50 border-b-2">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Statut</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tâche</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tache</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Phase</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Priorité</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Assigné à</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Priorite</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Assigne a</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Actions</th>
             </tr>
@@ -467,8 +467,8 @@ const OnboardingPlatform = () => {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold mb-2">Plateforme d'Intégration RH</h1>
-              <p className="text-blue-200 text-lg">Gestion complète de l'intégration des nouveaux employés</p>
+              <h1 className="text-4xl font-bold mb-2">Plateforme d'Integration RH</h1>
+              <p className="text-blue-200 text-lg">Gestion complete de l'integration des nouveaux employes</p>
             </div>
             <div className="text-right">
               <div className="text-5xl font-bold mb-1">{stats.progress}%</div>
@@ -476,11 +476,11 @@ const OnboardingPlatform = () => {
             </div>
           </div>
           
-          {/* Info employé */}
+          {/* Info employe */}
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <div className="text-blue-200 text-sm mb-1">Employé</div>
+                <div className="text-blue-200 text-sm mb-1">Employe</div>
                 <div className="font-semibold text-lg">{employee.name}</div>
               </div>
               <div>
@@ -488,11 +488,11 @@ const OnboardingPlatform = () => {
                 <div className="font-semibold">{employee.role}</div>
               </div>
               <div>
-                <div className="text-blue-200 text-sm mb-1">Début</div>
+                <div className="text-blue-200 text-sm mb-1">Debut</div>
                 <div className="font-semibold">{new Date(employee.startDate).toLocaleDateString('fr-CA')}</div>
               </div>
               <div>
-                <div className="text-blue-200 text-sm mb-1">Fin prévue</div>
+                <div className="text-blue-200 text-sm mb-1">Fin prevue</div>
                 <div className="font-semibold">{new Date(employee.endDate).toLocaleDateString('fr-CA')}</div>
               </div>
             </div>
@@ -505,11 +505,11 @@ const OnboardingPlatform = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-gray-200">
             <div className="text-3xl font-bold text-gray-900">{stats.total}</div>
-            <div className="text-sm text-gray-600">Total tâches</div>
+            <div className="text-sm text-gray-600">Total taches</div>
           </div>
           <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-green-200">
             <div className="text-3xl font-bold text-green-600">{stats.completed}</div>
-            <div className="text-sm text-gray-600">Complétées</div>
+            <div className="text-sm text-gray-600">Completees</div>
           </div>
           <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-blue-200">
             <div className="text-3xl font-bold text-blue-600">{stats.inProgress}</div>
@@ -521,7 +521,7 @@ const OnboardingPlatform = () => {
           </div>
           <div className="bg-white rounded-xl shadow-lg p-4 border-2 border-red-200">
             <div className="text-3xl font-bold text-red-600">{stats.blocked}</div>
-            <div className="text-sm text-gray-600">Bloquées</div>
+            <div className="text-sm text-gray-600">Bloquees</div>
           </div>
         </div>
       </div>
@@ -536,7 +536,7 @@ const OnboardingPlatform = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Rechercher une tâche..."
+                  placeholder="Rechercher une tache..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
@@ -553,8 +553,8 @@ const OnboardingPlatform = () => {
               <option value="all">Tous les statuts</option>
               <option value="pending">En attente</option>
               <option value="inProgress">En cours</option>
-              <option value="completed">Complété</option>
-              <option value="blocked">Bloqué</option>
+              <option value="completed">Complete</option>
+              <option value="blocked">Bloque</option>
             </select>
 
             <select
@@ -562,7 +562,7 @@ const OnboardingPlatform = () => {
               onChange={(e) => setFilterPriority(e.target.value)}
               className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
             >
-              <option value="all">Toutes priorités</option>
+              <option value="all">Toutes priorites</option>
               <option value="high">Haute</option>
               <option value="medium">Moyenne</option>
               <option value="low">Basse</option>
@@ -627,18 +627,18 @@ const OnboardingPlatform = () => {
       {/* Footer */}
       <div className="bg-gray-900 text-white py-6 mt-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          {/* Avertissement de confidentialité */}
+          {/* Avertissement de confidentialite */}
           <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-4 max-w-3xl mx-auto">
             <p className="text-yellow-300 font-semibold flex items-center justify-center gap-2">
               <AlertCircle className="w-5 h-5" />
-              ⚠️ IMPORTANT : N'inscrivez aucune information confidentielle dans cette plateforme
+               IMPORTANT : N'inscrivez aucune information confidentielle dans cette plateforme
             </p>
           </div>
           <p className="text-gray-400">
-            Plateforme d'Intégration RH
+            Plateforme d'Integration RH
           </p>
           <p className="text-gray-500 text-sm mt-2">
-            Système de gestion complète pour l'intégration des nouveaux employés
+            Systeme de gestion complete pour l'integration des nouveaux employes
           </p>
         </div>
       </div>

@@ -11,7 +11,7 @@ interface Snapshot {
     notes: string;
     is_current: boolean;
     created_at: string;
-    sync_metadata?: any; // Métadonnées de synchronisation
+    sync_metadata?: any; // Metadonnees de synchronisation
 }
 
 interface VersionHistoryProps {
@@ -36,7 +36,7 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
         loadSnapshots();
     }, [ticker]);
 
-    // ✅ FIX: Nettoyer le timer d'erreur au démontage
+    //  FIX: Nettoyer le timer d'erreur au demontage
     useEffect(() => {
         return () => {
             if (errorTimerRef.current) {
@@ -65,7 +65,7 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
     const handleDelete = async (snapshotId: string, e: React.MouseEvent) => {
         e.stopPropagation();
 
-        if (!confirm('Supprimer cette version définitivement?')) {
+        if (!confirm('Supprimer cette version definitivement?')) {
             return;
         }
 
@@ -77,7 +77,7 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
         } else {
             setError(`Erreur: ${result.error}`);
             // Clear error after 5 seconds
-            // ✅ FIX: Nettoyer le timer précédent s'il existe
+            //  FIX: Nettoyer le timer precedent s'il existe
             if (errorTimerRef.current) {
                 clearTimeout(errorTimerRef.current);
             }
@@ -102,7 +102,7 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
     if (!ticker) {
         return (
             <div className="p-4 text-center text-gray-400 text-sm">
-                Sélectionnez un ticker
+                Selectionnez un ticker
             </div>
         );
     }
@@ -123,11 +123,11 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
                         aria-label="Recharger l'historique"
                         title="Recharger l'historique des versions"
                     >
-                        {loading ? '⟳' : '↻'}
+                        {loading ? '' : ''}
                     </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                    {ticker} • {snapshots.length} version{snapshots.length !== 1 ? 's' : ''}
+                    {ticker} - {snapshots.length} version{snapshots.length !== 1 ? 's' : ''}
                 </p>
             </div>
 
@@ -147,7 +147,7 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
 
                 {!loading && snapshots.length === 0 && (
                     <div className="p-4 text-center text-gray-400 text-sm">
-                        Aucune version sauvegardée
+                        Aucune version sauvegardee
                     </div>
                 )}
 
@@ -185,10 +185,10 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
                                                 setSelectedSyncDetails({ snapshot, details: snapshot.sync_metadata });
                                             }}
                                             className="mt-1 text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                                            title="Voir les détails de synchronisation"
+                                            title="Voir les details de synchronisation"
                                         >
                                             <InformationCircleIcon className="w-3 h-3" />
-                                            Détails sync
+                                            Details sync
                                         </button>
                                     )}
                                 </div>
@@ -214,12 +214,12 @@ export const VersionHistory: React.FC<VersionHistoryProps> = ({
             {snapshots.length > 0 && (
                 <div className="px-4 py-2 bg-gray-50 border-t border-gray-200">
                     <p className="text-xs text-gray-500">
-                        💡 Cliquez pour charger une version
+                         Cliquez pour charger une version
                     </p>
                 </div>
             )}
 
-            {/* Dialog des détails de synchronisation */}
+            {/* Dialog des details de synchronisation */}
             {selectedSyncDetails && (
                 <SyncDetailsDialog
                     isOpen={!!selectedSyncDetails}

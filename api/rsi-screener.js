@@ -5,11 +5,11 @@
  * Usage:
  * GET /api/rsi-screener?type=both&markets=US,CA&limit=20
  *
- * Paramètres:
- * - type: "oversold" | "overbought" | "both" (défaut: "both")
- * - markets: Liste de marchés séparés par virgules (défaut: "US")
- * - limit: Nombre max de résultats par catégorie (défaut: 20)
- * - market_cap: "large" | "mid" | "all" (défaut: "large")
+ * Parametres:
+ * - type: "oversold" | "overbought" | "both" (defaut: "both")
+ * - markets: Liste de marches separes par virgules (defaut: "US")
+ * - limit: Nombre max de resultats par categorie (defaut: 20)
+ * - market_cap: "large" | "mid" | "all" (defaut: "large")
  */
 
 import { screenByRSI } from './tools/rsi-screener.js';
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
 
     if (req.method !== 'GET') {
         return res.status(405).json({
-            error: 'Méthode non autorisée',
+            error: 'Methode non autorisee',
             allowed: ['GET']
         });
     }
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
 
         if (invalidMarkets.length > 0) {
             return res.status(400).json({
-                error: 'Marchés invalides',
+                error: 'Marches invalides',
                 valid_markets: validMarkets,
                 invalid_markets: invalidMarkets
             });
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
         const limitNum = parseInt(limit, 10);
         if (isNaN(limitNum) || limitNum < 1 || limitNum > 100) {
             return res.status(400).json({
-                error: 'Limite invalide (doit être entre 1 et 100)',
+                error: 'Limite invalide (doit etre entre 1 et 100)',
                 received: limit
             });
         }
@@ -84,7 +84,7 @@ export default async function handler(req, res) {
             });
         }
 
-        console.log(`🔍 [RSI Screener API] Type: ${type}, Markets: ${marketsList.join(',')}, Limit: ${limitNum}`);
+        console.log(` [RSI Screener API] Type: ${type}, Markets: ${marketsList.join(',')}, Limit: ${limitNum}`);
 
         // Execute screener
         const result = await screenByRSI({
@@ -108,12 +108,12 @@ export default async function handler(req, res) {
             api_info: {
                 endpoint: '/api/rsi-screener',
                 version: '1.0.0',
-                documentation: 'Screening RSI multi-marchés pour Emma IA'
+                documentation: 'Screening RSI multi-marches pour Emma IA'
             }
         });
 
     } catch (error) {
-        console.error('❌ [RSI Screener API] Error:', error);
+        console.error(' [RSI Screener API] Error:', error);
         return res.status(500).json({
             error: 'Erreur serveur',
             message: error.message,

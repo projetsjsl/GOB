@@ -23,7 +23,7 @@ interface HistoricalCurvePickerProps {
   maxCurves?: number
 }
 
-// Couleurs prédéfinies pour les courbes historiques
+// Couleurs predefinies pour les courbes historiques
 const CURVE_COLORS = [
   "#f59e0b", // amber
   "#10b981", // emerald  
@@ -33,13 +33,13 @@ const CURVE_COLORS = [
   "#f97316", // orange
 ]
 
-// Dates suggérées (événements économiques importants)
+// Dates suggerees (evenements economiques importants)
 const SUGGESTED_DATES = [
-  { date: "2024-01-02", label: "Début 2024" },
+  { date: "2024-01-02", label: "Debut 2024" },
   { date: "2023-10-19", label: "Pic des taux 2023" },
   { date: "2023-03-08", label: "Crise bancaire SVB" },
-  { date: "2022-12-14", label: "Dernière hausse FED 2022" },
-  { date: "2022-03-16", label: "1ère hausse FED 2022" },
+  { date: "2022-12-14", label: "Derniere hausse FED 2022" },
+  { date: "2022-03-16", label: "1ere hausse FED 2022" },
   { date: "2020-03-09", label: "COVID Crash" },
 ]
 
@@ -56,7 +56,7 @@ export function HistoricalCurvePicker({
 
   const handleAddCurve = async () => {
     if (!newDate) {
-      setError("Veuillez sélectionner une date")
+      setError("Veuillez selectionner une date")
       return
     }
 
@@ -65,10 +65,10 @@ export function HistoricalCurvePicker({
       return
     }
 
-    // Vérifier si cette courbe existe déjà
+    // Verifier si cette courbe existe deja
     const exists = selectedCurves.some(c => c.date === newDate && c.country === newCountry)
     if (exists) {
-      setError("Cette courbe est déjà sélectionnée")
+      setError("Cette courbe est deja selectionnee")
       return
     }
 
@@ -79,7 +79,7 @@ export function HistoricalCurvePicker({
       const data = await onLoadCurve(newDate, newCountry.toLowerCase())
       
       if (!data || !data.rates || data.rates.length === 0) {
-        setError("Aucune donnée disponible pour cette date")
+        setError("Aucune donnee disponible pour cette date")
         setLoading(false)
         return
       }
@@ -97,7 +97,7 @@ export function HistoricalCurvePicker({
       onCurvesChange([...selectedCurves, newCurve])
       setNewDate("")
     } catch (err) {
-      setError("Erreur lors du chargement des données")
+      setError("Erreur lors du chargement des donnees")
       console.error("Error loading historical curve:", err)
     } finally {
       setLoading(false)
@@ -124,7 +124,7 @@ export function HistoricalCurvePicker({
               Courbes Historiques
             </CardTitle>
             <CardDescription className="text-xs text-muted-foreground">
-              Comparez avec des données passées
+              Comparez avec des donnees passees
             </CardDescription>
           </div>
           <Badge variant="outline" className="text-[10px]">
@@ -137,7 +137,7 @@ export function HistoricalCurvePicker({
         {selectedCurves.length > 0 && (
           <div className="space-y-2">
             <Label className="text-[11px] text-muted-foreground uppercase tracking-wider">
-              Courbes sélectionnées
+              Courbes selectionnees
             </Label>
             <div className="flex flex-wrap gap-2">
               {selectedCurves.map(curve => (
@@ -156,14 +156,14 @@ export function HistoricalCurvePicker({
                     style={{ backgroundColor: curve.color }}
                   />
                   <span style={{ color: curve.color }}>
-                    {curve.country} • {curve.date}
+                    {curve.country} - {curve.date}
                   </span>
                   <button
                     onClick={() => handleRemoveCurve(curve.id)}
                     className="ml-1 text-zinc-500 hover:text-red-400 transition-colors"
                     title="Supprimer"
                   >
-                    ×
+                    x
                   </button>
                 </div>
               ))}
@@ -194,7 +194,7 @@ export function HistoricalCurvePicker({
                 className="h-9 px-3 text-xs"
                 onClick={() => setNewCountry("US")}
               >
-                🇺🇸 US
+                 US
               </Button>
               <Button
                 variant={newCountry === "CA" ? "default" : "outline"}
@@ -202,7 +202,7 @@ export function HistoricalCurvePicker({
                 className="h-9 px-3 text-xs"
                 onClick={() => setNewCountry("CA")}
               >
-                🇨🇦 CA
+                 CA
               </Button>
             </div>
           </div>
@@ -215,12 +215,12 @@ export function HistoricalCurvePicker({
           >
             {loading ? (
               <>
-                <span className="animate-spin mr-2">⏳</span>
+                <span className="animate-spin mr-2"></span>
                 Chargement...
               </>
             ) : (
               <>
-                <span className="mr-2">📈</span>
+                <span className="mr-2"></span>
                 Charger la Courbe Historique
               </>
             )}
@@ -234,7 +234,7 @@ export function HistoricalCurvePicker({
         {/* Suggested dates */}
         <div className="space-y-2 pt-3 border-t border-border">
           <Label className="text-[11px] text-muted-foreground uppercase tracking-wider">
-            Dates suggérées
+            Dates suggerees
           </Label>
           <div className="flex flex-wrap gap-1.5">
             {SUGGESTED_DATES.map(({ date, label }) => (

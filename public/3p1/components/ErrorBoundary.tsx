@@ -69,12 +69,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             onClick={this.handleRetry}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
           >
-            Réessayer
+            Reessayer
           </button>
           {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
             <details className="mt-4 text-xs text-gray-500 max-w-full overflow-auto">
               <summary className="cursor-pointer hover:text-gray-400">
-                Détails techniques
+                Details techniques
               </summary>
               <pre className="mt-2 p-2 bg-gray-900 rounded text-left whitespace-pre-wrap">
                 {this.state.errorInfo.componentStack}

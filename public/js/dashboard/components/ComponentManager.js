@@ -4,33 +4,33 @@
 const ComponentManager = (() => {
     const { useState, useEffect, useCallback, useMemo } = React;
 
-    // Métadonnées enrichies pour chaque composant
+    // Metadonnees enrichies pour chaque composant
     const KNOWN_COMPONENTS = [
         // --- EMMA ---
         { 
             id: 'AskEmmaTab', 
             name: 'Ask Emma (Chat)', 
             category: 'Emma',
-            description: "Interface de chat principale avec l'IA Emma. Gère les interactions utilisateur, les requêtes financières et le pilotage du dashboard par le langage naturel.",
-            implications: "Si désactivé : L'utilisateur ne pourra plus dialoguer avec Emma ni utiliser les commandes vocal/chat.",
+            description: "Interface de chat principale avec l'IA Emma. Gere les interactions utilisateur, les requetes financieres et le pilotage du dashboard par le langage naturel.",
+            implications: "Si desactive : L'utilisateur ne pourra plus dialoguer avec Emma ni utiliser les commandes vocal/chat.",
             riskLevel: 'medium',
-            techDetails: "React Functional Component. Dépend de: /api/emma-agent, supabase." 
+            techDetails: "React Functional Component. Depend de: /api/emma-agent, supabase." 
         },
         { 
             id: 'ChatGPTGroupTab', 
             name: 'ChatGPT Group', 
             category: 'Emma',
-            description: "Salon de discussion multi-utilisateurs (ou mode hybride) permettant de collaborer en temps réel avec une IA ou entre membres de l'équipe.",
-            implications: "Si désactivé : L'onglet 'Group Chat' sera inaccessible ou vide.",
+            description: "Salon de discussion multi-utilisateurs (ou mode hybride) permettant de collaborer en temps reel avec une IA ou entre membres de l'equipe.",
+            implications: "Si desactive : L'onglet 'Group Chat' sera inaccessible ou vide.",
             riskLevel: 'low',
-            techDetails: "Intégration WebSocket/Polling ou lien externe vers ChatGPT."
+            techDetails: "Integration WebSocket/Polling ou lien externe vers ChatGPT."
         },
         { 
             id: 'VoiceAssistantTab', 
             name: 'Assistant Vocal', 
             category: 'Emma',
-            description: "Module de reconnaissance et de synthèse vocale pour Emma (Web Speech API).",
-            implications: "Si désactivé : Les fonctions 'Emma Vocal' ne fonctionneront plus.",
+            description: "Module de reconnaissance et de synthese vocale pour Emma (Web Speech API).",
+            implications: "Si desactive : Les fonctions 'Emma Vocal' ne fonctionneront plus.",
             riskLevel: 'low',
             techDetails: "Utilise window.speechSynthesis et window.webkitSpeechRecognition."
         },
@@ -40,26 +40,26 @@ const ComponentManager = (() => {
             id: 'StocksNewsTab', 
             name: 'Stocks & News', 
             category: 'Market',
-            description: "Affiche le portfolio utilisateur et les nouvelles financières agrégées.",
-            implications: "Si désactivé : L'utilisateur ne verra plus ses titres ni les news associées.",
+            description: "Affiche le portfolio utilisateur et les nouvelles financieres agregees.",
+            implications: "Si desactive : L'utilisateur ne verra plus ses titres ni les news associees.",
             riskLevel: 'medium',
-            techDetails: "Dépend de l'API FMP et Supabase."
+            techDetails: "Depend de l'API FMP et Supabase."
         },
         { 
             id: 'MarketsEconomyTab', 
             name: 'Markets & Economy', 
             category: 'Market',
-            description: "Vue macro-économique globale (Indices, Forex, Commodities).",
-            implications: "Si désactivé : La vue 'Marchés > Vue Globale' sera vide.",
+            description: "Vue macro-economique globale (Indices, Forex, Commodities).",
+            implications: "Si desactive : La vue 'Marches > Vue Globale' sera vide.",
             riskLevel: 'medium',
-            techDetails: "Données temps réel via API tierces."
+            techDetails: "Donnees temps reel via API tierces."
         },
         { 
             id: 'YieldCurveTab', 
             name: 'Yield Curve', 
             category: 'Market',
-            description: "Visualisation de la courbe des taux (US, CA) et analyse des spreads (Récéssion).",
-            implications: "Si désactivé : L'analyse obligataire (Yield Curve) sera indisponible.",
+            description: "Visualisation de la courbe des taux (US, CA) et analyse des spreads (Recession).",
+            implications: "Si desactive : L'analyse obligataire (Yield Curve) sera indisponible.",
             riskLevel: 'low',
             techDetails: "Graphs Recharts complexes, calculs de spread en frontend."
         },
@@ -69,8 +69,8 @@ const ComponentManager = (() => {
             id: 'JLabTab', 
             name: 'JLab Analysis', 
             category: 'Analysis',
-            description: "Laboratoire d'analyse technique et fondamentale avancé (JLab).",
-            implications: "Si désactivé : Les outils d'analyse JLab seront inaccessibles.",
+            description: "Laboratoire d'analyse technique et fondamentale avance (JLab).",
+            implications: "Si desactive : Les outils d'analyse JLab seront inaccessibles.",
             riskLevel: 'medium',
             techDetails: "Composant lourd contenant plusieurs sous-modules."
         },
@@ -79,9 +79,9 @@ const ComponentManager = (() => {
             name: 'Advanced Analysis', 
             category: 'Analysis',
             description: "Module d'analyse approfondie (DCF, Ratios complexes).",
-            implications: "Si désactivé : L'onglet 'Analyse Pro' ne chargera pas.",
+            implications: "Si desactive : L'onglet 'Analyse Pro' ne chargera pas.",
             riskLevel: 'low',
-            techDetails: "Calculs financiers intensifs côté client."
+            techDetails: "Calculs financiers intensifs cote client."
         },
 
         // --- CALENDAR ---
@@ -89,17 +89,17 @@ const ComponentManager = (() => {
             id: 'EconomicCalendarTab', 
             name: 'Economic Calendar', 
             category: 'Calendar',
-            description: "Calendrier des événements économiques majeurs (Fed, BCE, PIB, CPI).",
-            implications: "Si désactivé : Pas d'agenda macro-économique visible.",
+            description: "Calendrier des evenements economiques majeurs (Fed, BCE, PIB, CPI).",
+            implications: "Si desactive : Pas d'agenda macro-economique visible.",
             riskLevel: 'low',
             techDetails: "Parsing de flux RSS ou API externe."
         },
         { 
             id: 'InvestingCalendarTab', 
-            name: 'Investing Calendar (→ MarketsEconomyTab)', 
+            name: 'Investing Calendar (-> MarketsEconomyTab)', 
             category: 'Calendar',
-            description: "FUSIONNÉ dans MarketsEconomyTab. Calendrier économique, Forex, TSX.",
-            implications: "Utiliser MarketsEconomyTab à la place.",
+            description: "FUSIONNE dans MarketsEconomyTab. Calendrier economique, Forex, TSX.",
+            implications: "Utiliser MarketsEconomyTab a la place.",
             riskLevel: 'low',
             techDetails: "Redirige vers MarketsEconomyTab."
         },
@@ -110,9 +110,9 @@ const ComponentManager = (() => {
             name: 'Seeking Alpha', 
             category: 'News',
             description: "Flux d'articles et analyses provenant de Seeking Alpha (via scraping/API).",
-            implications: "Si désactivé : L'onglet Seeking Alpha sera vide.",
+            implications: "Si desactive : L'onglet Seeking Alpha sera vide.",
             riskLevel: 'low',
-            techDetails: "Nécessite souvent un proxy ou un backend de scraping."
+            techDetails: "Necessite souvent un proxy ou un backend de scraping."
         },
 
         // --- ADMIN ---
@@ -120,8 +120,8 @@ const ComponentManager = (() => {
             id: 'ScrappingSATab', 
             name: 'SA Scraping', 
             category: 'Admin',
-            description: "Interface d'administration pour les tâches de scraping (logs, status).",
-            implications: "Si désactivé : Impossible de monitorer les scrapers depuis le front.",
+            description: "Interface d'administration pour les taches de scraping (logs, status).",
+            implications: "Si desactive : Impossible de monitorer les scrapers depuis le front.",
             riskLevel: 'low',
             techDetails: "Outil interne pour admin."
         },
@@ -129,10 +129,10 @@ const ComponentManager = (() => {
             id: 'AdminJSLaiTab', 
             name: 'Admin JSLAI', 
             category: 'Admin',
-            description: "Panneau de configuration général de l'IA (Prompts, Modèles, Clés API).",
-            implications: "Si désactivé : Impossible de configurer Emma ou les clés API depuis l'interface.",
+            description: "Panneau de configuration general de l'IA (Prompts, Modeles, Cles API).",
+            implications: "Si desactive : Impossible de configurer Emma ou les cles API depuis l'interface.",
             riskLevel: 'high',
-            techDetails: "Accès critique aux configurations système."
+            techDetails: "Acces critique aux configurations systeme."
         },
 
         // --- PORTFOLIO ---
@@ -140,8 +140,8 @@ const ComponentManager = (() => {
             id: 'DansWatchlistTab', 
             name: 'Watchlist', 
             category: 'Portfolio',
-            description: "Liste de surveillance personnalisée (Watchlist) de l'utilisateur.",
-            implications: "Si désactivé : La watchlist personnelle ne s'affichera pas.",
+            description: "Liste de surveillance personnalisee (Watchlist) de l'utilisateur.",
+            implications: "Si desactive : La watchlist personnelle ne s'affichera pas.",
             riskLevel: 'medium',
             techDetails: "CRUD sur Supabase/LocalStorage."
         },
@@ -150,8 +150,8 @@ const ComponentManager = (() => {
             id: 'DashboardGridWrapper', 
             name: 'Grid Wrapper', 
             category: 'Core',
-            description: "CRITIQUE. Ce composant enveloppe toute la grille du dashboard. Il gère l'espacement, le responsive et le conteneur principal.",
-            implications: "SI DÉSACTIVÉ : LE DASHBOARD NE S'AFFICHERA PAS. ÉCRAN BLANC POTENTIEL.",
+            description: "CRITIQUE. Ce composant enveloppe toute la grille du dashboard. Il gere l'espacement, le responsive et le conteneur principal.",
+            implications: "SI DESACTIVE : LE DASHBOARD NE S'AFFICHERA PAS. ECRAN BLANC POTENTIEL.",
             riskLevel: 'critical',
             techDetails: "Layout component structurel."
         },
@@ -159,17 +159,17 @@ const ComponentManager = (() => {
             id: 'RglDashboard', 
             name: 'RGL Dashboard', 
             category: 'Core',
-            description: "CRITIQUE. Le moteur de grille (React Grid Layout) qui permet de déplacer et redimensionner les widgets.",
-            implications: "SI DÉSACTIVÉ : La plupart des vues modulaires cesseront de fonctionner.",
+            description: "CRITIQUE. Le moteur de grille (React Grid Layout) qui permet de deplacer et redimensionner les widgets.",
+            implications: "SI DESACTIVE : La plupart des vues modulaires cesseront de fonctionner.",
             riskLevel: 'critical',
-            techDetails: "Dépendance lourde RGL."
+            techDetails: "Dependance lourde RGL."
         },
         { 
             id: 'ThemeSelector', 
             name: 'Theme Selector', 
             category: 'Core',
-            description: "Gère le basculement Dark Mode / Light Mode.",
-            implications: "Si désactivé : L'utilisateur sera bloqué sur le thème par défaut.",
+            description: "Gere le basculement Dark Mode / Light Mode.",
+            implications: "Si desactive : L'utilisateur sera bloque sur le theme par defaut.",
             riskLevel: 'medium',
             techDetails: "Context provider ou gestionnaire de state global."
         },
@@ -179,8 +179,8 @@ const ComponentManager = (() => {
             id: 'PlusTab', 
             name: 'Plus Tab', 
             category: 'Other',
-            description: "Onglet 'Plus' / Paramètres divers. Point d'entrée pour certaines configs.",
-            implications: "Si désactivé : Accès réduit aux réglages secondaires.",
+            description: "Onglet 'Plus' / Parametres divers. Point d'entree pour certaines configs.",
+            implications: "Si desactive : Acces reduit aux reglages secondaires.",
             riskLevel: 'low',
             techDetails: "Menu de navigation secondaire."
         },
@@ -191,7 +191,7 @@ const ComponentManager = (() => {
         const [layout, setLayout] = useState([]);
         const [activeTab, setActiveTab] = useState('components');
         const [searchTerm, setSearchTerm] = useState('');
-        const [selectedComp, setSelectedComp] = useState(null); // Pour la vue détaillée
+        const [selectedComp, setSelectedComp] = useState(null); // Pour la vue detaillee
         const [preferences, setPreferences] = useState({});
 
         // Chargement initial
@@ -231,7 +231,7 @@ const ComponentManager = (() => {
         }, [layout]);
 
         const handleResetLayout = useCallback(() => {
-            if(!confirm("Êtes-vous sûr de vouloir réinitialiser tout l'agencement du dashboard ?")) return;
+            if(!confirm("Etes-vous sur de vouloir reinitialiser tout l'agencement du dashboard ?")) return;
             localStorage.removeItem('dashboard-grid-layout');
             setLayout([]);
             window.location.reload();
@@ -273,12 +273,12 @@ const ComponentManager = (() => {
                     <div className={`flex items-center justify-between p-5 border-b ${border} bg-gradient-to-r from-transparent to-transparent`}>
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                                <span className="text-2xl">⚡</span>
+                                <span className="text-2xl"></span>
                             </div>
                             <div>
                                 <h2 className="text-2xl font-bold tracking-tight">System Component Manager</h2>
                                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    v2.0 • Gestion avancée & Diagnostic
+                                    v2.0 - Gestion avancee & Diagnostic
                                 </p>
                             </div>
                         </div>
@@ -287,7 +287,7 @@ const ComponentManager = (() => {
                                 {components.filter(c => c.isLoaded).length} actifs / {components.length} total
                             </span>
                             <button onClick={onClose} className={`p-2 rounded-xl ${isDarkMode ? 'hover:bg-neutral-800' : 'hover:bg-gray-100'} transition-colors`}>
-                                <span className="text-xl">✕</span>
+                                <span className="text-xl"></span>
                             </button>
                         </div>
                     </div>
@@ -295,9 +295,9 @@ const ComponentManager = (() => {
                     {/* Navigation */}
                     <div className={`flex border-b ${border} px-2`}>
                         {[
-                            { id: 'components', label: '📦 Registry', count: components.length },
-                            { id: 'layout', label: '📐 Layout Engine', count: layout.length },
-                            { id: 'diagnostics', label: '🏥 Diagnostics', count: null }
+                            { id: 'components', label: ' Registry', count: components.length },
+                            { id: 'layout', label: ' Layout Engine', count: layout.length },
+                            { id: 'diagnostics', label: ' Diagnostics', count: null }
                         ].map(tab => (
                             <button
                                 key={tab.id}
@@ -322,7 +322,7 @@ const ComponentManager = (() => {
                                 {/* Left List */}
                                 <div className={`w-1/3 border-r ${border} overflow-y-auto p-4 space-y-4`}>
                                     <div className="relative">
-                                        <span className="absolute left-3 top-2.5 text-gray-400">🔍</span>
+                                        <span className="absolute left-3 top-2.5 text-gray-400"></span>
                                         <input
                                             type="text"
                                             placeholder="Filtrer les composants..."
@@ -380,7 +380,7 @@ const ComponentManager = (() => {
                                                 </div>
                                                 <div className={`px-4 py-2 rounded-lg border ${border} ${selectedComp.isLoaded ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
                                                     <div className="flex items-center gap-2">
-                                                        <span className={`text-xl ${selectedComp.isLoaded ? 'animate-pulse' : ''}`}>{selectedComp.isLoaded ? '●' : '○'}</span>
+                                                        <span className={`text-xl ${selectedComp.isLoaded ? 'animate-pulse' : ''}`}>{selectedComp.isLoaded ? '' : ''}</span>
                                                         <span className={`font-bold ${selectedComp.isLoaded ? 'text-emerald-400' : 'text-red-400'}`}>
                                                             {selectedComp.isLoaded ? 'ONLINE' : 'OFFLINE'}
                                                         </span>
@@ -391,7 +391,7 @@ const ComponentManager = (() => {
                                             {/* Description Card */}
                                             <div className={`p-6 rounded-2xl border ${border} ${modalBg} shadow-sm`}>
                                                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                                    <span>📝</span> Description
+                                                    <span></span> Description
                                                 </h3>
                                                 <p className={`leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     {selectedComp.description}
@@ -402,7 +402,7 @@ const ComponentManager = (() => {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className={`p-6 rounded-2xl border ${border} ${modalBg}`}>
                                                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                                        <span>⚠️</span> Implications
+                                                        <span></span> Implications
                                                     </h3>
                                                     <p className={`text-sm leading-relaxed ${selectedComp.riskLevel === 'critical' ? 'text-red-400 font-bold' : isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                         {selectedComp.implications}
@@ -411,7 +411,7 @@ const ComponentManager = (() => {
 
                                                 <div className={`p-6 rounded-2xl border ${border} ${modalBg}`}>
                                                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                                        <span>⚙️</span> Technical
+                                                        <span></span> Technical
                                                     </h3>
                                                     <p className={`text-sm font-mono ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                         {selectedComp.techDetails}
@@ -421,12 +421,12 @@ const ComponentManager = (() => {
 
                                             {/* Parameterization / Danger Zone */}
                                             <div className={`mt-8 border-t ${border} pt-8`}>
-                                                <h3 className="text-lg font-semibold mb-6">Paramètres de chargement</h3>
+                                                <h3 className="text-lg font-semibold mb-6">Parametres de chargement</h3>
                                                 
                                                 <div className={`flex items-center justify-between p-4 rounded-xl border ${border} ${isDarkMode ? 'bg-neutral-900' : 'bg-white'}`}>
                                                     <div>
-                                                        <div className="font-medium">État du composant</div>
-                                                        <div className="text-sm text-gray-500">Contrôle si le composant est actif ou ignoré par le système.</div>
+                                                        <div className="font-medium">Etat du composant</div>
+                                                        <div className="text-sm text-gray-500">Controle si le composant est actif ou ignore par le systeme.</div>
                                                     </div>
                                                     <label className="relative inline-flex items-center cursor-pointer">
                                                         <input 
@@ -446,9 +446,9 @@ const ComponentManager = (() => {
                                                 
                                                 {selectedComp.riskLevel === 'critical' && (
                                                     <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start gap-2">
-                                                        <span className="text-red-400">⛔</span>
+                                                        <span className="text-red-400"></span>
                                                         <p className="text-xs text-red-400 mt-0.5">
-                                                            Ce composant est <strong>CRITIQUE</strong> pour le système. Il ne peut pas être désactivé sans causer un crash majeur de l'application.
+                                                            Ce composant est <strong>CRITIQUE</strong> pour le systeme. Il ne peut pas etre desactive sans causer un crash majeur de l'application.
                                                         </p>
                                                     </div>
                                                 )}
@@ -457,9 +457,9 @@ const ComponentManager = (() => {
                                         </div>
                                     ) : (
                                         <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
-                                            <div className="text-6xl mb-4">👈</div>
-                                            <h3 className="text-xl font-medium">Sélectionnez un composant</h3>
-                                            <p className="text-sm">Consultez les détails, les risques et les configurations.</p>
+                                            <div className="text-6xl mb-4"></div>
+                                            <h3 className="text-xl font-medium">Selectionnez un composant</h3>
+                                            <p className="text-sm">Consultez les details, les risques et les configurations.</p>
                                         </div>
                                     )}
                                 </div>
@@ -472,17 +472,17 @@ const ComponentManager = (() => {
                                 <div className="flex items-center justify-between mb-8">
                                     <div>
                                         <h3 className="text-xl font-bold">Grid Layout Engine</h3>
-                                        <p className="text-gray-500 text-sm">Gère la position et la persistance des widgets sur le dashboard.</p>
+                                        <p className="text-gray-500 text-sm">Gere la position et la persistance des widgets sur le dashboard.</p>
                                     </div>
                                     <button onClick={handleResetLayout} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold shadow-lg shadow-red-600/20 transition-all transform hover:scale-105">
-                                        🧨 FACTORY RESET LAYOUT
+                                         FACTORY RESET LAYOUT
                                     </button>
                                 </div>
 
                                 {layout.length === 0 ? (
                                     <div className="text-center py-20 border-2 border-dashed border-gray-700 rounded-3xl">
-                                        <div className="text-4xl mb-4 opacity-50">🕸️</div>
-                                        <p className="text-gray-400">Le layout est vide ou utilise la configuration par défaut.</p>
+                                        <div className="text-4xl mb-4 opacity-50"></div>
+                                        <p className="text-gray-400">Le layout est vide ou utilise la configuration par defaut.</p>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -491,12 +491,12 @@ const ComponentManager = (() => {
                                                 <div className="flex justify-between items-start mb-2">
                                                     <span className="font-mono text-xs px-2 py-1 bg-gray-800 rounded text-gray-300">{widget.i}</span>
                                                     <button onClick={() => handleDeleteWidget(widget.i)} className="text-gray-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100">
-                                                        <span className="text-lg">🗑️</span>
+                                                        <span className="text-lg"></span>
                                                     </button>
                                                 </div>
                                                 <div className="flex gap-4 text-xs text-gray-500 mt-auto">
-                                                    <span>📍 X:{widget.x} Y:{widget.y}</span>
-                                                    <span>📏 W:{widget.w} H:{widget.h}</span>
+                                                    <span> X:{widget.x} Y:{widget.y}</span>
+                                                    <span> W:{widget.w} H:{widget.h}</span>
                                                 </div>
                                             </div>
                                         ))}
@@ -510,7 +510,7 @@ const ComponentManager = (() => {
                             <div className="p-8 w-full max-w-4xl mx-auto space-y-8">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className={`p-6 rounded-2xl border ${border} ${modalBg} shadow-sm`}>
-                                        <h4 className="font-bold text-lg mb-4 flex items-center gap-2"><span>🌡️</span> Core Vital Signs</h4>
+                                        <h4 className="font-bold text-lg mb-4 flex items-center gap-2"><span></span> Core Vital Signs</h4>
                                         <div className="space-y-3">
                                             {[
                                                 { label: 'React Core', check: typeof React !== 'undefined', crit: true },
@@ -530,24 +530,24 @@ const ComponentManager = (() => {
                                     </div>
 
                                     <div className={`p-6 rounded-2xl border ${border} ${modalBg} shadow-sm`}>
-                                        <h4 className="font-bold text-lg mb-4 flex items-center gap-2"><span>🧹</span> System Maintenance</h4>
+                                        <h4 className="font-bold text-lg mb-4 flex items-center gap-2"><span></span> System Maintenance</h4>
                                         <div className="space-y-3">
-                                            <p className="text-sm text-gray-500 mb-4">Utilisez ces outils avec précaution pour résoudre des problèmes de cache ou d'état corrompu.</p>
+                                            <p className="text-sm text-gray-500 mb-4">Utilisez ces outils avec precaution pour resoudre des problemes de cache ou d'etat corrompu.</p>
                                             <button onClick={() => { if(confirm('Vider tout le LocalStorage ?')) { localStorage.clear(); window.location.reload(); } }} className="w-full py-2 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg border border-red-500/20 text-sm font-medium transition-colors text-left flex items-center gap-3">
-                                                <span>🗑️</span> Purge LocalStorage (Hard Reset)
+                                                <span></span> Purge LocalStorage (Hard Reset)
                                             </button>
                                             <button onClick={() => { sessionStorage.clear(); window.location.reload(); }} className="w-full py-2 px-4 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 rounded-lg border border-orange-500/20 text-sm font-medium transition-colors text-left flex items-center gap-3">
-                                                <span>🧹</span> Purge SessionStorage (Soft Reset)
+                                                <span></span> Purge SessionStorage (Soft Reset)
                                             </button>
                                             <button onClick={() => window.location.reload()} className="w-full py-2 px-4 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg border border-blue-500/20 text-sm font-medium transition-colors text-left flex items-center gap-3">
-                                                <span>🔄</span> Force Reload Application
+                                                <span></span> Force Reload Application
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div className={`p-6 rounded-2xl border ${border} ${modalBg} shadow-sm`}>
-                                    <h4 className="font-bold text-lg mb-4">📜 Environment Variables</h4>
+                                    <h4 className="font-bold text-lg mb-4"> Environment Variables</h4>
                                     <div className="font-mono text-xs space-y-1 text-gray-500">
                                         <div className="grid grid-cols-2 border-b border-gray-800 pb-1 mb-1">
                                             <span>Variable</span>
@@ -603,7 +603,7 @@ const ComponentManager = (() => {
     };
 
     // Log initialization
-    void('✅ ComponentManager 2.0 chargé avec succès. Documentation et gestion des risques actives.');
+    void(' ComponentManager 2.0 charge avec succes. Documentation et gestion des risques actives.');
 
     return { ComponentManagerPanel };
 })();

@@ -155,8 +155,8 @@ function calculateFairValue(financialData, assumptions = {}) {
     } = financialData;
 
     const {
-        discountRate = 0.10, // 10% WACC par défaut
-        terminalGrowthRate = 0.03, // 3% croissance perpétuelle
+        discountRate = 0.10, // 10% WACC par defaut
+        terminalGrowthRate = 0.03, // 3% croissance perpetuelle
         projectionYears = 5
     } = assumptions;
 
@@ -166,7 +166,7 @@ function calculateFairValue(financialData, assumptions = {}) {
     const cashFlowArray = Array.isArray(cashFlow) ? cashFlow : [];
     const keyMetricsArray = Array.isArray(keyMetrics) ? keyMetrics : [];
 
-    // Méthode 1: DCF (Discounted Cash Flow)
+    // Methode 1: DCF (Discounted Cash Flow)
     let dcfValue = dcfData?.dcf || dcfData?.dcfValue || dcfData?.value || null;
     if (!dcfValue && cashFlowArray.length > 0) {
         const latestFCF = cashFlowArray[0].freeCashFlow || 0;
@@ -194,12 +194,12 @@ function calculateFairValue(financialData, assumptions = {}) {
         dcfValue = equityValue / sharesOutstanding;
     }
 
-    // Méthode 2: P/E Multiple
+    // Methode 2: P/E Multiple
     let peValue = null;
     const peFromRatios = keyMetricsArray[0]?.peRatio || keyMetricsArray[0]?.pe || null;
     if (incomeStatementArray.length > 0 && keyMetricsArray.length > 0) {
         const eps = incomeStatementArray[0].eps || incomeStatementArray[0].epsdiluted || 0;
-        const industryPE = 20; // P/E moyen du secteur (à ajuster)
+        const industryPE = 20; // P/E moyen du secteur (a ajuster)
         peValue = eps * industryPE;
     } else if (peFromRatios && currentPrice) {
         const eps = peFromRatios > 0 ? currentPrice / peFromRatios : 0;
@@ -207,19 +207,19 @@ function calculateFairValue(financialData, assumptions = {}) {
         peValue = eps * industryPE;
     }
 
-    // Méthode 3: P/B Multiple
+    // Methode 3: P/B Multiple
     let pbValue = null;
     if (balanceSheetArray.length > 0 && keyMetricsArray.length > 0) {
         const bookValuePerShare = keyMetricsArray[0].bookValuePerShare || 0;
-        const industryPB = 3; // P/B moyen du secteur (à ajuster)
+        const industryPB = 3; // P/B moyen du secteur (a ajuster)
         pbValue = bookValuePerShare * industryPB;
     }
 
-    // Moyenne pondérée des méthodes
+    // Moyenne ponderee des methodes
     const values = [dcfValue, peValue, pbValue].filter(v => v !== null && v > 0);
     const fairValue = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : null;
 
-    // Calcul de la marge de sécurité
+    // Calcul de la marge de securite
     const marginOfSafety = fairValue && currentPrice ?
         ((fairValue - currentPrice) / fairValue) * 100 : null;
 
@@ -270,12 +270,12 @@ async function generateAIInsights(symbol, financialData) {
         const cashFlowArray = Array.isArray(cashFlow) ? cashFlow : [];
         const keyMetricsArray = Array.isArray(keyMetrics) ? keyMetrics : [];
 
-        // Préparer le contexte pour l'IA
+        // Preparer le contexte pour l'IA
         const context = `
-Analyse financière pour ${symbol}:
+Analyse financiere pour ${symbol}:
 
 Revenus (5 ans): ${incomeStatementArray.slice(0, 5).map(is => `${is.date}: $${(is.revenue / 1e9).toFixed(2)}B`).join(', ')}
-Bénéfice net (5 ans): ${incomeStatementArray.slice(0, 5).map(is => `${is.date}: $${(is.netIncome / 1e9).toFixed(2)}B`).join(', ')}
+Benefice net (5 ans): ${incomeStatementArray.slice(0, 5).map(is => `${is.date}: $${(is.netIncome / 1e9).toFixed(2)}B`).join(', ')}
 Marge nette: ${incomeStatementArray[0] ? ((incomeStatementArray[0].netIncome / incomeStatementArray[0].revenue) * 100).toFixed(1) : 'N/A'}%
 ROE: ${keyMetricsArray[0]?.roe ? (keyMetricsArray[0].roe * 100).toFixed(1) : 'N/A'}%
 Ratio D/E: ${keyMetricsArray[0]?.debtToEquity?.toFixed(2) || 'N/A'}
@@ -284,7 +284,7 @@ Free Cash Flow: $${cashFlowArray[0] ? (cashFlowArray[0].freeCashFlow / 1e9).toFi
 Fournis une analyse concise (max 150 mots) couvrant:
 1. Forces principales (2-3 points)
 2. Faiblesses/risques (2-3 points)
-3. Tendances clés observées
+3. Tendances cles observees
 4. Perspective d'investissement
 `;
 
@@ -322,10 +322,10 @@ Fournis une analyse concise (max 150 mots) couvrant:
             success: true,
             error: error.message,
             analysis: 'Analyse IA temporairement indisponible',
-            strengths: ['Forces à analyser'],
-            weaknesses: ['Faiblesses à analyser'],
-            trends: ['Tendances à analyser'],
-            outlook: ['Perspective à analyser']
+            strengths: ['Forces a analyser'],
+            weaknesses: ['Faiblesses a analyser'],
+            trends: ['Tendances a analyser'],
+            outlook: ['Perspective a analyser']
         };
     }
 }
@@ -346,8 +346,8 @@ function extractBulletPoints(text, section) {
 
         if (inSection) {
             const trimmed = line.trim();
-            if (trimmed.startsWith('-') || trimmed.startsWith('•') || trimmed.match(/^\d+\./)) {
-                points.push(trimmed.replace(/^[-•\d.]\s*/, ''));
+            if (trimmed.startsWith('-') || trimmed.startsWith('-') || trimmed.match(/^\d+\./)) {
+                points.push(trimmed.replace(/^[--\d.]\s*/, ''));
             } else if (trimmed === '' || trimmed.match(/^\d+\./)) {
                 inSection = false;
             }
@@ -356,7 +356,7 @@ function extractBulletPoints(text, section) {
         if (points.length >= 3) break;
     }
 
-    return points.length > 0 ? points : [`${section} à analyser`];
+    return points.length > 0 ? points : [`${section} a analyser`];
 }
 
 /**

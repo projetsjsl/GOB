@@ -1,4 +1,4 @@
-# Fichiers à ignorer lors du déploiement Vercel
+# Fichiers a ignorer lors du deploiement Vercel
 .DS_Store
 *.bak
 *.log

@@ -30,7 +30,7 @@ export function ChartControls({
 
   return (
     <div className="flex flex-wrap gap-3 items-center mb-4">
-      {/* Période */}
+      {/* Periode */}
       <div className="flex items-center gap-2">
         <div className="flex gap-1 flex-wrap">
           {periods.map((period) => (

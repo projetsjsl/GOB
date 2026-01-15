@@ -1,12 +1,12 @@
 /**
- * Ajoute des boutons "Calculer" et "Procéder" au calculateur de retraite
- * Ces boutons déclenchent les recalculs et les mises à jour
+ * Ajoute des boutons "Calculer" et "Proceder" au calculateur de retraite
+ * Ces boutons declenchent les recalculs et les mises a jour
  */
 
 (function() {
     'use strict';
     
-    console.log('🔘 Ajout des boutons Calculer et Procéder...');
+    console.log(' Ajout des boutons Calculer et Proceder...');
     
     // Styles pour les boutons
     const buttonStyles = `
@@ -113,11 +113,11 @@
     style.textContent = buttonStyles;
     document.head.appendChild(style);
     
-    // Fonction pour déclencher les calculs
+    // Fonction pour declencher les calculs
     function triggerCalculations() {
-        console.log('🔄 Déclenchement des calculs...');
+        console.log(' Declenchement des calculs...');
         
-        // 1. Déclencher tous les événements de changement
+        // 1. Declencher tous les evenements de changement
         document.querySelectorAll('input, select, textarea').forEach(el => {
             ['input', 'change', 'blur'].forEach(type => {
                 el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));
@@ -146,14 +146,14 @@
             if (typeof window[funcName] === 'function') {
                 try {
                     window[funcName]();
-                    console.log(`✅ ${funcName}() appelée`);
+                    console.log(` ${funcName}() appelee`);
                 } catch (e) {
-                    console.warn(`⚠️ ${funcName}() a échoué:`, e);
+                    console.warn(` ${funcName}() a echoue:`, e);
                 }
             }
         });
         
-        // 4. Mettre à jour toutes les sections
+        // 4. Mettre a jour toutes les sections
         document.querySelectorAll('.card, .recommendation-card, .chart-card, .result-card').forEach(el => {
             el.setAttribute('data-last-update', Date.now().toString());
             el.dispatchEvent(new CustomEvent('sectionUpdate', { bubbles: true }));
@@ -167,7 +167,7 @@
                 const text = el.textContent;
                 let replacement = 'Non calculable';
                 
-                if (text.includes('Âge') || text.includes('ans')) replacement = 'N/A';
+                if (text.includes('Age') || text.includes('ans')) replacement = 'N/A';
                 else if (text.includes('$') || text.includes('Montant')) replacement = '$0';
                 else if (text.includes('%')) replacement = '0%';
                 else if (text.includes('Score')) replacement = '0/10';
@@ -176,19 +176,19 @@
             }
         });
         
-        console.log('✅ Calculs déclenchés');
+        console.log(' Calculs declenches');
     }
     
-    // Fonction pour procéder (étape suivante ou validation)
+    // Fonction pour proceder (etape suivante ou validation)
     function proceed() {
-        console.log('➡️ Procéder...');
+        console.log(' Proceder...');
         
-        // 1. Vérifier que les calculs sont à jour
+        // 1. Verifier que les calculs sont a jour
         triggerCalculations();
         
         // 2. Attendre un peu pour que les calculs se terminent
         setTimeout(() => {
-            // 3. Déclencher l'événement de procédure
+            // 3. Declencher l'evenement de procedure
             document.body.dispatchEvent(new CustomEvent('proceed', { bubbles: true }));
             
             // 4. Si une fonction proceed existe, l'appeler
@@ -196,25 +196,25 @@
                 try {
                     window.proceed();
                 } catch (e) {
-                    console.warn('⚠️ proceed() a échoué:', e);
+                    console.warn(' proceed() a echoue:', e);
                 }
             }
             
-            // 5. Scroll vers les résultats
+            // 5. Scroll vers les resultats
             const results = document.querySelector('.recommendation-card, .result-card, [id*="result"]');
             if (results) {
                 results.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
             
-            console.log('✅ Procédure terminée');
+            console.log(' Procedure terminee');
         }, 500);
     }
     
-    // Créer les boutons
+    // Creer les boutons
     function createButtons() {
-        // Vérifier si les boutons existent déjà
+        // Verifier si les boutons existent deja
         if (document.getElementById('retirement-calc-buttons')) {
-            console.log('⚠️ Les boutons existent déjà');
+            console.log(' Les boutons existent deja');
             return;
         }
         
@@ -225,7 +225,7 @@
         // Bouton Calculer
         const calculateBtn = document.createElement('button');
         calculateBtn.className = 'calc-button calculate';
-        calculateBtn.innerHTML = '<span>🔄</span> <span>CALCULER</span>';
+        calculateBtn.innerHTML = '<span></span> <span>CALCULER</span>';
         calculateBtn.onclick = function() {
             this.disabled = true;
             this.innerHTML = '<span class="spinner"></span> <span>CALCUL EN COURS...</span>';
@@ -234,19 +234,19 @@
             
             setTimeout(() => {
                 this.disabled = false;
-                this.innerHTML = '<span>✅</span> <span>CALCULER</span>';
+                this.innerHTML = '<span></span> <span>CALCULER</span>';
                 
-                // Retour à l'état normal après 2 secondes
+                // Retour a l'etat normal apres 2 secondes
                 setTimeout(() => {
-                    this.innerHTML = '<span>🔄</span> <span>CALCULER</span>';
+                    this.innerHTML = '<span></span> <span>CALCULER</span>';
                 }, 2000);
             }, 1000);
         };
         
-        // Bouton Procéder
+        // Bouton Proceder
         const proceedBtn = document.createElement('button');
         proceedBtn.className = 'calc-button proceed';
-        proceedBtn.innerHTML = '<span>➡️</span> <span>PROCÉDER</span>';
+        proceedBtn.innerHTML = '<span></span> <span>PROCEDER</span>';
         proceedBtn.onclick = function() {
             this.disabled = true;
             this.innerHTML = '<span class="spinner"></span> <span>TRAITEMENT...</span>';
@@ -255,11 +255,11 @@
             
             setTimeout(() => {
                 this.disabled = false;
-                this.innerHTML = '<span>✅</span> <span>PROCÉDER</span>';
+                this.innerHTML = '<span></span> <span>PROCEDER</span>';
                 
-                // Retour à l'état normal après 2 secondes
+                // Retour a l'etat normal apres 2 secondes
                 setTimeout(() => {
-                    this.innerHTML = '<span>➡️</span> <span>PROCÉDER</span>';
+                    this.innerHTML = '<span></span> <span>PROCEDER</span>';
                 }, 2000);
             }, 1500);
         };
@@ -268,12 +268,12 @@
         container.appendChild(proceedBtn);
         document.body.appendChild(container);
         
-        console.log('✅ Boutons ajoutés');
+        console.log(' Boutons ajoutes');
     }
     
     // Initialiser
     function init() {
-        // Attendre que le DOM soit prêt
+        // Attendre que le DOM soit pret
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', createButtons);
         } else {
@@ -287,7 +287,7 @@
     
     init();
     
-    // Re-créer les boutons si le DOM change (pour les apps React)
+    // Re-creer les boutons si le DOM change (pour les apps React)
     const observer = new MutationObserver(function(mutations) {
         if (!document.getElementById('retirement-calc-buttons')) {
             createButtons();
@@ -299,8 +299,8 @@
         subtree: false
     });
     
-    console.log('✅ Script de boutons chargé');
-    console.log('💡 Utilisez window.triggerRetirementCalculations() ou window.proceedRetirement()');
+    console.log(' Script de boutons charge');
+    console.log(' Utilisez window.triggerRetirementCalculations() ou window.proceedRetirement()');
 })();
 
 

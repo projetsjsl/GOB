@@ -1,28 +1,28 @@
 // ============================================================================
-// 🛡️  GUARDRAIL CRITIQUE - SUPABASE WATCHLIST API 🛡️
+//   GUARDRAIL CRITIQUE - SUPABASE WATCHLIST API 
 // ============================================================================
-// ⚠️  ATTENTION : Ce fichier contient la configuration validée et fonctionnelle
-// ⚠️  Toute modification peut casser la connexion Supabase
-// ⚠️  Toujours tester en local avant de déployer
-// ⚠️  Date de validation : 15 octobre 2025
-// ⚠️  Statut : 100% opérationnel - source: "supabase"
+//   ATTENTION : Ce fichier contient la configuration validee et fonctionnelle
+//   Toute modification peut casser la connexion Supabase
+//   Toujours tester en local avant de deployer
+//   Date de validation : 15 octobre 2025
+//   Statut : 100% operationnel - source: "supabase"
 //
-// ✅ CONFIGURATION VALIDÉE :
-// - Supabase connecté et fonctionnel
-// - Variables d'environnement configurées dans Vercel
-// - Fallback opérationnel en cas de problème
+//  CONFIGURATION VALIDEE :
+// - Supabase connecte et fonctionnel
+// - Variables d'environnement configurees dans Vercel
+// - Fallback operationnel en cas de probleme
 // - Dashboard compatible
 //
-// ❌ INTERDICTIONS ABSOLUES :
+//  INTERDICTIONS ABSOLUES :
 // - Modifier les variables d'environnement sans test
 // - Changer la logique de connexion Supabase
 // - Supprimer le fallback
 // - Modifier les noms de tables Supabase
 //
-// 🔧 DÉPANNAGE RAPIDE :
+//  DEPANNAGE RAPIDE :
 // - source: "fallback" = variables d'environnement manquantes
-// - 500 error = problème de connexion Supabase
-// - 404 error = endpoint non trouvé
+// - 500 error = probleme de connexion Supabase
+// - 404 error = endpoint non trouve
 // ============================================================================
 
 import { createClient } from '@supabase/supabase-js';
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
   const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!SUPABASE_URL) {
-    console.error('❌ SUPABASE_URL manquante');
+    console.error(' SUPABASE_URL manquante');
     return res.status(503).json({
       error: 'Configuration Supabase manquante',
       message: 'Configurez SUPABASE_URL dans Vercel',
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
   const supabaseKey = SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY;
   
   if (!supabaseKey) {
-    console.error('❌ Aucune clé Supabase configurée');
+    console.error(' Aucune cle Supabase configuree');
     return res.status(503).json({
       error: 'Configuration Supabase manquante',
       message: 'Configurez SUPABASE_SERVICE_ROLE_KEY ou SUPABASE_ANON_KEY dans Vercel',
@@ -59,28 +59,28 @@ export default async function handler(req, res) {
     });
   }
 
-  console.log(`🔑 Utilisation de la clé: ${SUPABASE_SERVICE_ROLE_KEY ? 'SERVICE_ROLE' : 'ANON'}`);
-  console.log(`🔑 SUPABASE_URL: ${SUPABASE_URL ? 'Configurée' : 'Manquante'} (${SUPABASE_URL})`);
-  console.log(`🔑 SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY ? 'Configurée' : 'Manquante'}`);
-  console.log(`🔑 SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY ? 'Configurée' : 'Manquante'}`);
-  console.log(`🔑 Clé utilisée: ${supabaseKey ? 'Configurée' : 'Manquante'}`);
-  console.log(`🔑 FORCE REDEPLOY: ${new Date().toISOString()}`);
+  console.log(` Utilisation de la cle: ${SUPABASE_SERVICE_ROLE_KEY ? 'SERVICE_ROLE' : 'ANON'}`);
+  console.log(` SUPABASE_URL: ${SUPABASE_URL ? 'Configuree' : 'Manquante'} (${SUPABASE_URL})`);
+  console.log(` SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY ? 'Configuree' : 'Manquante'}`);
+  console.log(` SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY ? 'Configuree' : 'Manquante'}`);
+  console.log(` Cle utilisee: ${supabaseKey ? 'Configuree' : 'Manquante'}`);
+  console.log(` FORCE REDEPLOY: ${new Date().toISOString()}`);
 
   try {
     const { method } = req;
     const { action, tickers, userId = 'default' } = req.body || {};
 
-    console.log(`🔧 Supabase Watchlist - ${method} ${action || 'GET'}`);
+    console.log(` Supabase Watchlist - ${method} ${action || 'GET'}`);
 
-    // Créer le client Supabase avec la clé appropriée
+    // Creer le client Supabase avec la cle appropriee
     let supabase;
     try {
       supabase = createClient(SUPABASE_URL, supabaseKey);
-      console.log('✅ Client Supabase créé avec succès');
+      console.log(' Client Supabase cree avec succes');
     } catch (clientError) {
-      console.log('❌ Erreur création client Supabase:', clientError.message);
+      console.log(' Erreur creation client Supabase:', clientError.message);
       
-      // FALLBACK: Retourner des données de test si la création du client échoue
+      // FALLBACK: Retourner des donnees de test si la creation du client echoue
       if (method === 'GET') {
         const fallbackTickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN'];
         return res.status(200).json({
@@ -89,12 +89,12 @@ export default async function handler(req, res) {
           count: fallbackTickers.length,
           lastUpdated: new Date().toISOString(),
           source: 'fallback',
-          note: 'Données de test - Erreur création client Supabase'
+          note: 'Donnees de test - Erreur creation client Supabase'
         });
       } else {
         return res.status(200).json({
           success: true,
-          message: 'Opération simulée - Client Supabase indisponible',
+          message: 'Operation simulee - Client Supabase indisponible',
           source: 'fallback'
         });
       }
@@ -115,14 +115,14 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Action POST invalide' });
       
       default:
-        return res.status(405).json({ error: 'Méthode non autorisée' });
+        return res.status(405).json({ error: 'Methode non autorisee' });
     }
 
   } catch (error) {
-    console.error('❌ Erreur Supabase Watchlist:', error);
-    console.error('❌ Stack trace:', error.stack);
-    console.error('❌ Error type:', typeof error);
-    console.error('❌ Error constructor:', error.constructor.name);
+    console.error(' Erreur Supabase Watchlist:', error);
+    console.error(' Stack trace:', error.stack);
+    console.error(' Error type:', typeof error);
+    console.error(' Error constructor:', error.constructor.name);
     
     return res.status(500).json({
       error: 'Erreur serveur Supabase',
@@ -133,13 +133,13 @@ export default async function handler(req, res) {
   }
 }
 
-// Récupérer la watchlist
+// Recuperer la watchlist
 async function handleGet(supabase, userId, res) {
   try {
-    console.log(`🔍 handleGet - userId: ${userId}`);
-    console.log(`🔍 handleGet - supabase client:`, typeof supabase);
+    console.log(` handleGet - userId: ${userId}`);
+    console.log(` handleGet - supabase client:`, typeof supabase);
     
-    // FALLBACK: Si Supabase échoue, retourner des données de test
+    // FALLBACK: Si Supabase echoue, retourner des donnees de test
     try {
       const { data, error } = await supabase
         .from('watchlists')
@@ -147,16 +147,16 @@ async function handleGet(supabase, userId, res) {
         .eq('user_id', userId)
         .single();
 
-      console.log(`🔍 handleGet - data:`, data);
-      console.log(`🔍 handleGet - error:`, error);
+      console.log(` handleGet - data:`, data);
+      console.log(` handleGet - error:`, error);
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = pas de ligne trouvée
-        console.log(`🔍 handleGet - throwing error:`, error);
+      if (error && error.code !== 'PGRST116') { // PGRST116 = pas de ligne trouvee
+        console.log(` handleGet - throwing error:`, error);
         throw error;
       }
 
       const tickers = data?.tickers || [];
-      console.log(`🔍 handleGet - tickers:`, tickers);
+      console.log(` handleGet - tickers:`, tickers);
       
       return res.status(200).json({
         success: true,
@@ -167,9 +167,9 @@ async function handleGet(supabase, userId, res) {
       });
       
     } catch (supabaseError) {
-      console.log('⚠️ Supabase échoue, utilisation du fallback:', supabaseError.message);
+      console.log(' Supabase echoue, utilisation du fallback:', supabaseError.message);
       
-      // FALLBACK: Données de test
+      // FALLBACK: Donnees de test
       const fallbackTickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN'];
       
       return res.status(200).json({
@@ -178,13 +178,13 @@ async function handleGet(supabase, userId, res) {
         count: fallbackTickers.length,
         lastUpdated: new Date().toISOString(),
         source: 'fallback',
-        note: 'Données de test - Supabase temporairement indisponible'
+        note: 'Donnees de test - Supabase temporairement indisponible'
       });
     }
 
   } catch (error) {
-    console.error('❌ Erreur GET Supabase:', error);
-    console.error('❌ Error details:', {
+    console.error(' Erreur GET Supabase:', error);
+    console.error(' Error details:', {
       message: error.message,
       code: error.code,
       details: error.details,
@@ -200,15 +200,15 @@ async function handleGet(supabase, userId, res) {
       count: fallbackTickers.length,
       lastUpdated: new Date().toISOString(),
       source: 'fallback',
-      note: 'Données de test - Erreur Supabase'
+      note: 'Donnees de test - Erreur Supabase'
     });
   }
 }
 
-// Sauvegarder la watchlist complète
+// Sauvegarder la watchlist complete
 async function handleSave(supabase, userId, tickers, res) {
   if (!Array.isArray(tickers)) {
-    return res.status(400).json({ error: 'tickers doit être un array' });
+    return res.status(400).json({ error: 'tickers doit etre un array' });
   }
 
   try {
@@ -231,7 +231,7 @@ async function handleSave(supabase, userId, tickers, res) {
 
     return res.status(200).json({
       success: true,
-      message: `Watchlist sauvegardée (${tickers.length} tickers)`,
+      message: `Watchlist sauvegardee (${tickers.length} tickers)`,
       data: {
         tickers,
         count: tickers.length,
@@ -256,7 +256,7 @@ async function handleAdd(supabase, userId, ticker, res) {
   }
 
   try {
-    // Récupérer la watchlist actuelle
+    // Recuperer la watchlist actuelle
     const { data: current, error: getError } = await supabase
       .from('watchlists')
       .select('tickers')
@@ -269,11 +269,11 @@ async function handleAdd(supabase, userId, ticker, res) {
 
     const currentTickers = current?.tickers || [];
     
-    // Vérifier si le ticker existe déjà
+    // Verifier si le ticker existe deja
     if (currentTickers.includes(ticker)) {
       return res.status(200).json({
         success: true,
-        message: `${ticker} déjà dans la watchlist`,
+        message: `${ticker} deja dans la watchlist`,
         data: {
           tickers: currentTickers,
           count: currentTickers.length
@@ -301,7 +301,7 @@ async function handleAdd(supabase, userId, ticker, res) {
 
     return res.status(200).json({
       success: true,
-      message: `${ticker} ajouté à la watchlist`,
+      message: `${ticker} ajoute a la watchlist`,
       data: {
         tickers: updatedTickers,
         count: updatedTickers.length,
@@ -326,7 +326,7 @@ async function handleRemove(supabase, userId, ticker, res) {
   }
 
   try {
-    // Récupérer la watchlist actuelle
+    // Recuperer la watchlist actuelle
     const { data: current, error: getError } = await supabase
       .from('watchlists')
       .select('tickers')
@@ -339,11 +339,11 @@ async function handleRemove(supabase, userId, ticker, res) {
 
     const currentTickers = current?.tickers || [];
     
-    // Vérifier si le ticker existe
+    // Verifier si le ticker existe
     if (!currentTickers.includes(ticker)) {
       return res.status(200).json({
         success: true,
-        message: `${ticker} n'était pas dans la watchlist`,
+        message: `${ticker} n'etait pas dans la watchlist`,
         data: {
           tickers: currentTickers,
           count: currentTickers.length
@@ -371,7 +371,7 @@ async function handleRemove(supabase, userId, ticker, res) {
 
     return res.status(200).json({
       success: true,
-      message: `${ticker} supprimé de la watchlist`,
+      message: `${ticker} supprime de la watchlist`,
       data: {
         tickers: updatedTickers,
         count: updatedTickers.length,

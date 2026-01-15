@@ -15,14 +15,14 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABA
 
 // Tables related to 3P1 Finance Pro
 const P3P1_TABLES = [
-    { name: 'finance_pro_snapshots', label: 'Snapshots 3P1', icon: '📸', primaryKey: 'id' },
-    { name: 'tickers', label: 'Tickers Database', icon: '📊', primaryKey: 'ticker' },
-    { name: 'watchlist', label: 'Watchlist', icon: '⭐', primaryKey: 'ticker' },
-    { name: 'user_profiles', label: 'User Profiles', icon: '👤', primaryKey: 'id' },
-    { name: 'validation_settings', label: 'Validation Settings', icon: '⚙️', primaryKey: 'id' },
-    { name: 'emma_config', label: 'Emma Config', icon: '🤖', primaryKey: 'id' },
-    { name: 'news_cache', label: 'News Cache', icon: '📰', primaryKey: 'id' },
-    { name: 'llm_models', label: 'LLM Models', icon: '🧠', primaryKey: 'id' }
+    { name: 'finance_pro_snapshots', label: 'Snapshots 3P1', icon: '', primaryKey: 'id' },
+    { name: 'tickers', label: 'Tickers Database', icon: '', primaryKey: 'ticker' },
+    { name: 'watchlist', label: 'Watchlist', icon: '', primaryKey: 'ticker' },
+    { name: 'user_profiles', label: 'User Profiles', icon: '', primaryKey: 'id' },
+    { name: 'validation_settings', label: 'Validation Settings', icon: '', primaryKey: 'id' },
+    { name: 'emma_config', label: 'Emma Config', icon: '', primaryKey: 'id' },
+    { name: 'news_cache', label: 'News Cache', icon: '', primaryKey: 'id' },
+    { name: 'llm_models', label: 'LLM Models', icon: '', primaryKey: 'id' }
 ];
 
 export default async function handler(req, res) {
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
                 });
         }
     } catch (error) {
-        console.error('❌ Data Explorer API error:', error);
+        console.error(' Data Explorer API error:', error);
         return res.status(500).json({ error: error.message });
     }
 }

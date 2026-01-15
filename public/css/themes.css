@@ -1,9 +1,9 @@
 /**
- * Styles CSS pour les thèmes du Dashboard GOB
- * Les thèmes utilisent des variables CSS définies dynamiquement par theme-system.js
+ * Styles CSS pour les themes du Dashboard GOB
+ * Les themes utilisent des variables CSS definies dynamiquement par theme-system.js
  */
 
-/* Styles pour la modal de sélection de thème */
+/* Styles pour la modal de selection de theme */
 .theme-selector-modal {
     z-index: 10000 !important;
     position: fixed !important;
@@ -39,7 +39,7 @@
     }
 }
 
-/* Scrollbar personnalisée pour la modal */
+/* Scrollbar personnalisee pour la modal */
 .custom-scrollbar::-webkit-scrollbar {
     width: 10px;
 }
@@ -61,7 +61,7 @@
     background-clip: padding-box;
 }
 
-/* Animations pour les cartes de thème */
+/* Animations pour les cartes de theme */
 @keyframes pulse-ring {
     0% {
         transform: scale(0.95);
@@ -228,7 +228,7 @@ header h1::after {
     opacity: 1;
 }
 
-/* Effets de hover améliorés */
+/* Effets de hover ameliores */
 .theme-preview-card-hover {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -245,7 +245,7 @@ header h1::after {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Application des variables de thème aux éléments du dashboard */
+/* Application des variables de theme aux elements du dashboard */
 .theme-default,
 .theme-terminal,
 .theme-ia,
@@ -258,7 +258,7 @@ header h1::after {
 .theme-bloomberg-mobile,
 .theme-bloomberg-nostalgie,
 
-/* Header avec thème */
+/* Header avec theme */
 .theme-default header,
 .theme-terminal header,
 .theme-ia header,
@@ -275,7 +275,7 @@ header h1::after {
     border-color: var(--theme-border) !important;
 }
 
-/* Cards avec thème */
+/* Cards avec theme */
 .theme-default .bg-gray-900,
 .theme-terminal .bg-gray-900,
 .theme-ia .bg-gray-900,
@@ -294,7 +294,7 @@ header h1::after {
     box-shadow: var(--theme-shadow) !important;
 }
 
-/* Texte avec thème */
+/* Texte avec theme */
 .theme-default .text-white,
 .theme-terminal .text-white,
 .theme-ia .text-white,
@@ -344,10 +344,10 @@ header h1::after {
 .theme-bloomberg-nostalgie .bg-black,
 .theme-desjardins .bg-black,
 .theme-light .bg-black {
-    background-color: #ffffff !important; /* Blanc pour thèmes light */
+    background-color: #ffffff !important; /* Blanc pour themes light */
 }
 
-/* Boutons avec thème */
+/* Boutons avec theme */
 .theme-default button,
 .theme-terminal button,
 .theme-ia button,
@@ -363,7 +363,7 @@ header h1::after {
     font-family: var(--theme-font-primary) !important;
 }
 
-/* Thème spécifique: Bloomberg Terminal - Style terminal classique */
+/* Theme specifique: Bloomberg Terminal - Style terminal classique */
 .theme-bloomberg-terminal {
     font-family: var(--theme-font-mono) !important;
     background-color: #000000 !important;
@@ -427,7 +427,7 @@ header h1::after {
     background-color: #0a0a0a !important;
 }
 
-/* Thème spécifique: Seeking Alpha (mode clair avec sidebar sombre) */
+/* Theme specifique: Seeking Alpha (mode clair avec sidebar sombre) */
 .theme-seeking-alpha {
     background-color: var(--theme-bg) !important;
 }
@@ -458,7 +458,7 @@ header h1::after {
     background-color: var(--theme-primary) !important; /* Orange pour CTA */
 }
 
-/* Thème spécifique: MarketQ - Style data-focused avec cyan */
+/* Theme specifique: MarketQ - Style data-focused avec cyan */
 .theme-marketq {
     background-color: #0a0e27 !important;
     color: #e0e7ff !important;
@@ -507,7 +507,7 @@ header h1::after {
     box-shadow: 0 0 8px rgba(0, 212, 255, 0.4) !important;
 }
 
-/* Thème spécifique: Bloomberg Mobile - Optimisé mobile avec accents jaunes */
+/* Theme specifique: Bloomberg Mobile - Optimise mobile avec accents jaunes */
 .theme-bloomberg-mobile {
     background-color: #1a1a1a !important;
     color: #ffffff !important;
@@ -522,7 +522,7 @@ header h1::after {
 .theme-bloomberg-mobile .bg-gray-900,
 .theme-bloomberg-mobile .bg-gray-800 {
     background-color: #2a2a2a !important;
-    border-radius: 1rem !important; /* Arrondi généreux pour touch */
+    border-radius: 1rem !important; /* Arrondi genereux pour touch */
     border: 1px solid #444444 !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
 }
@@ -558,7 +558,7 @@ header h1::after {
     color: #000000 !important;
 }
 
-/* Navigation avec thème */
+/* Navigation avec theme */
 .theme-default nav,
 .theme-terminal nav,
 .theme-ia nav,
@@ -575,7 +575,7 @@ header h1::after {
     border-color: var(--theme-border) !important;
 }
 
-/* Thème spécifique: Terminal (identique à Bloomberg Terminal) */
+/* Theme specifique: Terminal (identique a Bloomberg Terminal) */
 .theme-terminal {
     font-family: 'Courier New', monospace !important;
     background-color: #000000 !important;
@@ -586,13 +586,13 @@ header h1::after {
     font-family: 'Courier New', monospace !important;
 }
 
-/* Thème spécifique: IA (identique à default) */
+/* Theme specifique: IA (identique a default) */
 .theme-ia {
     background-color: #000000 !important;
     color: #ffffff !important;
 }
 
-/* Thème spécifique: Light */
+/* Theme specifique: Light */
 .theme-light {
     background-color: #ffffff !important;
     color: #1a1a1a !important;
@@ -606,7 +606,7 @@ header h1::after {
     background-color: #ffffff !important;
 }
 
-/* Thème spécifique: Vert Professionnel - Vert et blanc professionnel */
+/* Theme specifique: Vert Professionnel - Vert et blanc professionnel */
 .theme-desjardins {
     background-color: #ffffff !important;
     color: #1a1a1a !important;
@@ -648,7 +648,7 @@ header h1::after {
 .theme-desjardins button.bg-blue-600,
 .theme-desjardins .bg-blue-600,
 .theme-desjardins .bg-green-500 {
-    background-color: #006747 !important; /* Vert foncé pour CTA */
+    background-color: #006747 !important; /* Vert fonce pour CTA */
     color: #ffffff !important;
     border: 1px solid #006747 !important;
 }
@@ -692,7 +692,7 @@ header h1::after {
 
 
 
-/* Thème spécifique: MarketQ Noir - Version ultra sombre */
+/* Theme specifique: MarketQ Noir - Version ultra sombre */
 .theme-marketq-dark {
     background-color: #000000 !important;
     color: #ffffff !important;
@@ -758,7 +758,7 @@ header h1::after {
     background-color: #0a0a0a !important;
 }
 
-/* Thème spécifique: Bloomberg Nostalgie - Style rétro années 1990 */
+/* Theme specifique: Bloomberg Nostalgie - Style retro annees 1990 */
 .theme-bloomberg-nostalgie {
     background-color: #ffffff !important;
     color: #4c1d95 !important;
@@ -834,7 +834,7 @@ header h1::after {
     background-color: #ffffff !important;
 }
 
-/* Transitions douces pour changement de thème */
+/* Transitions douces pour changement de theme */
 * {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }

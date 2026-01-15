@@ -1,6 +1,6 @@
 /**
  * EMMA MULTI-USER MODULE
- * Gère les conversations Emma avec permissions basées sur les rôles
+ * Gere les conversations Emma avec permissions basees sur les roles
  */
 
 class EmmaMultiUser {
@@ -11,7 +11,7 @@ class EmmaMultiUser {
     this.messages = [];
     this.isInitialized = false;
 
-    console.log('💬 Emma Multi-User: Initialisation...');
+    console.log(' Emma Multi-User: Initialisation...');
   }
 
   /**
@@ -19,37 +19,37 @@ class EmmaMultiUser {
    */
   async init() {
     if (this.isInitialized) {
-      console.log('⚠️ Emma déjà initialisée');
+      console.log(' Emma deja initialisee');
       return;
     }
 
     // Attendre que GOB_AUTH soit disponible (fourni par auth-guard.js)
     if (!window.GOB_AUTH) {
-      console.error('❌ GOB_AUTH non disponible - Impossible d\'initialiser Emma');
+      console.error(' GOB_AUTH non disponible - Impossible d\'initialiser Emma');
       return;
     }
 
     this.currentUser = window.GOB_AUTH.user;
     this.permissions = window.GOB_AUTH.permissions;
 
-    console.log('✅ Emma initialisée pour:', this.currentUser.display_name);
-    console.log('🔑 Permissions Emma:', this.permissions);
+    console.log(' Emma initialisee pour:', this.currentUser.display_name);
+    console.log(' Permissions Emma:', this.permissions);
 
-    // Générer un nouveau session ID
+    // Generer un nouveau session ID
     this.sessionId = this.generateSessionId();
 
     // Charger l'historique si permissions
     if (this.permissions.view_own_history) {
       await this.loadUserHistory();
     } else {
-      console.log('📝 Mode lecture seule - Pas d\'historique à charger');
+      console.log(' Mode lecture seule - Pas d\'historique a charger');
       this.showReadOnlyNotice();
     }
 
-    // Attacher les événements
+    // Attacher les evenements
     this.attachEventListeners();
 
-    // Si admin, ajouter les fonctionnalités admin
+    // Si admin, ajouter les fonctionnalites admin
     if (this.permissions.view_all_history) {
       this.initAdminFeatures();
     }
@@ -58,15 +58,15 @@ class EmmaMultiUser {
   }
 
   /**
-   * Génère un ID de session unique (UUID valide)
+   * Genere un ID de session unique (UUID valide)
    */
   generateSessionId() {
-    // Utiliser crypto.randomUUID() pour générer un UUID v4 valide
+    // Utiliser crypto.randomUUID() pour generer un UUID v4 valide
     // Compatible avec le type UUID de PostgreSQL/Supabase
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
       return crypto.randomUUID();
     }
-    // Fallback pour les anciens navigateurs (génère un UUID v4 manuellement)
+    // Fallback pour les anciens navigateurs (genere un UUID v4 manuellement)
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       const r = Math.random() * 16 | 0;
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -95,13 +95,13 @@ class EmmaMultiUser {
         this.messages = data.messages;
         this.sessionId = data.session_id || this.sessionId;
         this.renderMessages();
-        console.log(`✅ Historique chargé: ${this.messages.length} messages`);
+        console.log(` Historique charge: ${this.messages.length} messages`);
       } else {
-        console.log('📝 Aucun historique trouvé - Nouvelle conversation');
+        console.log(' Aucun historique trouve - Nouvelle conversation');
       }
 
     } catch (error) {
-      console.error('❌ Erreur chargement historique:', error);
+      console.error(' Erreur chargement historique:', error);
     }
   }
 
@@ -120,7 +120,7 @@ class EmmaMultiUser {
         <span class="font-semibold">Mode lecture seule</span>
       </div>
       <p class="text-sm mt-1">
-        Vos conversations ne sont pas sauvegardées. Pour sauvegarder vos historiques, contactez un administrateur.
+        Vos conversations ne sont pas sauvegardees. Pour sauvegarder vos historiques, contactez un administrateur.
       </p>
     `;
 
@@ -128,7 +128,7 @@ class EmmaMultiUser {
   }
 
   /**
-   * Attache les événements aux boutons Emma
+   * Attache les evenements aux boutons Emma
    */
   attachEventListeners() {
     // Bouton Envoyer
@@ -137,7 +137,7 @@ class EmmaMultiUser {
       sendBtn.addEventListener('click', () => this.sendMessage());
     }
 
-    // Input (touche Entrée)
+    // Input (touche Entree)
     const input = document.getElementById('emma-input');
     if (input) {
       input.addEventListener('keypress', (e) => {
@@ -162,11 +162,11 @@ class EmmaMultiUser {
       historyBtn.style.display = 'none'; // Cacher si pas de permission
     }
 
-    console.log('✅ Event listeners attachés');
+    console.log(' Event listeners attaches');
   }
 
   /**
-   * Envoie un message à Emma
+   * Envoie un message a Emma
    */
   async sendMessage() {
     const input = document.getElementById('emma-input');
@@ -178,11 +178,11 @@ class EmmaMultiUser {
     this.addMessage('user', userMessage);
     input.value = '';
 
-    // Désactiver l'input pendant le traitement
+    // Desactiver l'input pendant le traitement
     const sendBtn = document.getElementById('emma-send-btn');
     if (sendBtn) {
       sendBtn.disabled = true;
-      sendBtn.innerHTML = '<i class="iconoir-loading animate-spin"></i> Réflexion...';
+      sendBtn.innerHTML = '<i class="iconoir-loading animate-spin"></i> Reflexion...';
     }
 
     try {
@@ -203,10 +203,10 @@ class EmmaMultiUser {
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || 'Erreur lors de la réponse d\'Emma');
+        throw new Error(data.error || 'Erreur lors de la reponse d\'Emma');
       }
 
-      // Ajouter réponse Emma
+      // Ajouter reponse Emma
       this.addMessage('assistant', data.response, {
         tools_used: data.tools_used,
         confidence: data.confidence,
@@ -220,11 +220,11 @@ class EmmaMultiUser {
       }
 
     } catch (error) {
-      console.error('❌ Erreur Emma:', error);
+      console.error(' Erreur Emma:', error);
       this.addMessage('system', `Erreur: ${error.message}`, { error: true });
 
     } finally {
-      // Réactiver l'input
+      // Reactiver l'input
       if (sendBtn) {
         sendBtn.disabled = false;
         sendBtn.innerHTML = '<i class="iconoir-send"></i> Envoyer';
@@ -233,7 +233,7 @@ class EmmaMultiUser {
   }
 
   /**
-   * Ajoute un message à la conversation
+   * Ajoute un message a la conversation
    */
   addMessage(role, content, metadata = {}) {
     const message = {
@@ -253,7 +253,7 @@ class EmmaMultiUser {
   renderMessage(message) {
     const container = document.getElementById('emma-messages-container');
     if (!container) {
-      console.error('❌ Container de messages non trouvé');
+      console.error(' Container de messages non trouve');
       return;
     }
 
@@ -263,7 +263,7 @@ class EmmaMultiUser {
     const isUser = message.role === 'user';
     const isSystem = message.role === 'system';
 
-    // Style selon rôle
+    // Style selon role
     let bgClass = 'bg-blue-500 text-white';
     if (!isUser) {
       bgClass = isSystem ? 'bg-red-50 border border-red-200 text-red-800' : 'bg-white border border-gray-200';
@@ -274,15 +274,15 @@ class EmmaMultiUser {
         <div class="max-w-[80%] ${bgClass} rounded-lg p-4 shadow-sm">
           ${!isUser && !isSystem ? `
             <div class="flex items-center gap-2 mb-2">
-              <span class="text-xl">🤖</span>
-              <span class="font-bold text-sm">Emma IA™</span>
+              <span class="text-xl"></span>
+              <span class="font-bold text-sm">Emma IATM</span>
             </div>
           ` : ''}
           <div class="message-content text-sm whitespace-pre-wrap">${this.formatContent(message.content)}</div>
           <div class="text-xs opacity-70 mt-2 flex items-center gap-2">
             <span>${new Date(message.timestamp).toLocaleTimeString('fr-FR')}</span>
-            ${message.confidence ? `<span>• Confiance: ${Math.round(message.confidence * 100)}%</span>` : ''}
-            ${message.failed_tools && message.failed_tools.length > 0 ? `<span class="text-yellow-600">⚠️ ${message.failed_tools.length} sources indisponibles</span>` : ''}
+            ${message.confidence ? `<span>- Confiance: ${Math.round(message.confidence * 100)}%</span>` : ''}
+            ${message.failed_tools && message.failed_tools.length > 0 ? `<span class="text-yellow-600"> ${message.failed_tools.length} sources indisponibles</span>` : ''}
           </div>
           ${message.unavailable_sources && message.unavailable_sources.length > 0 ? `
             <details class="mt-2 text-xs">
@@ -317,15 +317,15 @@ class EmmaMultiUser {
   formatContent(content) {
     if (!content) return '';
 
-    // Échapper le HTML pour sécurité
+    // Echapper le HTML pour securite
     content = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    // Parser les tags spéciaux
+    // Parser les tags speciaux
     content = content.replace(/\[SOURCE:(.*?)\|(.*?)\]/g,
-      '<a href="$2" target="_blank" class="text-blue-600 underline hover:text-blue-800">📎 $1</a>');
+      '<a href="$2" target="_blank" class="text-blue-600 underline hover:text-blue-800"> $1</a>');
 
     content = content.replace(/\[CHART:(.*?)\]/g,
-      '<div class="chart-placeholder bg-gray-100 p-2 rounded mt-2">📊 Graphique: $1</div>');
+      '<div class="chart-placeholder bg-gray-100 p-2 rounded mt-2"> Graphique: $1</div>');
 
     // Markdown basique
     content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -343,7 +343,7 @@ class EmmaMultiUser {
    */
   async saveConversation() {
     if (!this.permissions.save_conversations) {
-      console.log('📝 Pas de permission pour sauvegarder');
+      console.log(' Pas de permission pour sauvegarder');
       return;
     }
 
@@ -363,21 +363,21 @@ class EmmaMultiUser {
       const data = await response.json();
 
       if (data.success) {
-        console.log('✅ Conversation sauvegardée');
+        console.log(' Conversation sauvegardee');
       } else {
-        console.warn('⚠️ Échec sauvegarde:', data.error);
+        console.warn(' Echec sauvegarde:', data.error);
       }
 
     } catch (error) {
-      console.error('❌ Erreur sauvegarde conversation:', error);
+      console.error(' Erreur sauvegarde conversation:', error);
     }
   }
 
   /**
-   * Démarre une nouvelle session
+   * Demarre une nouvelle session
    */
   startNewSession() {
-    if (confirm('Voulez-vous commencer une nouvelle conversation? L\'historique actuel sera conservé.')) {
+    if (confirm('Voulez-vous commencer une nouvelle conversation? L\'historique actuel sera conserve.')) {
       this.messages = [];
       this.sessionId = this.generateSessionId();
 
@@ -386,7 +386,7 @@ class EmmaMultiUser {
         container.innerHTML = '';
       }
 
-      console.log('✨ Nouvelle conversation démarrée');
+      console.log(' Nouvelle conversation demarree');
     }
   }
 
@@ -396,7 +396,7 @@ class EmmaMultiUser {
   async showHistoryModal() {
     const histories = await this.loadAllHistories();
 
-    // Créer modal HTML
+    // Creer modal HTML
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50';
     modal.innerHTML = `
@@ -404,11 +404,11 @@ class EmmaMultiUser {
         <div class="flex items-center justify-between p-6 border-b">
           <h2 class="text-2xl font-bold text-gray-900">Historique des Conversations</h2>
           <button class="close-modal w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
-            <span class="text-xl text-gray-600">×</span>
+            <span class="text-xl text-gray-600">x</span>
           </button>
         </div>
         <div class="overflow-y-auto p-6 flex-1">
-          ${histories.length === 0 ? '<p class="text-center text-gray-500 py-8">Aucune conversation enregistrée</p>' : ''}
+          ${histories.length === 0 ? '<p class="text-center text-gray-500 py-8">Aucune conversation enregistree</p>' : ''}
           <div class="space-y-3">
             ${histories.map(h => `
               <div class="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors" data-convo-id="${h.id}">
@@ -493,7 +493,7 @@ class EmmaMultiUser {
   }
 
   /**
-   * Charge une conversation spécifique
+   * Charge une conversation specifique
    */
   async loadConversation(convoId) {
     try {
@@ -503,7 +503,7 @@ class EmmaMultiUser {
         const conversation = JSON.parse(data);
         this.currentHistory = conversation.messages || [];
         this.renderConversationHistory();
-        console.log(`✅ Conversation ${convoId} chargée`);
+        console.log(` Conversation ${convoId} chargee`);
       }
     } catch (error) {
       console.error('Erreur lors du chargement de la conversation:', error);
@@ -517,7 +517,7 @@ class EmmaMultiUser {
     try {
       const key = `emma-history-${convoId}`;
       localStorage.removeItem(key);
-      console.log(`✅ Conversation ${convoId} supprimée`);
+      console.log(` Conversation ${convoId} supprimee`);
     } catch (error) {
       console.error('Erreur lors de la suppression:', error);
     }
@@ -531,12 +531,12 @@ class EmmaMultiUser {
   }
 
   /**
-   * Initialise les fonctionnalités admin
+   * Initialise les fonctionnalites admin
    */
   initAdminFeatures() {
-    console.log('🔓 Fonctionnalités admin activées');
+    console.log(' Fonctionnalites admin activees');
 
-    // Créer bouton "Voir tous les historiques"
+    // Creer bouton "Voir tous les historiques"
     const adminBtn = document.createElement('button');
     adminBtn.id = 'emma-admin-view-all';
     adminBtn.className = 'btn btn-sm bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700';
@@ -572,13 +572,13 @@ class EmmaMultiUser {
         return;
       }
 
-      // Créer modal
+      // Creer modal
       const modal = document.createElement('div');
       modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
       modal.innerHTML = `
         <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-y-auto p-6">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-bold">📊 Tous les Historiques (Admin)</h2>
+            <h2 class="text-2xl font-bold"> Tous les Historiques (Admin)</h2>
             <button id="close-admin-modal" class="text-gray-500 hover:text-gray-700">
               <i class="iconoir-cancel text-2xl"></i>
             </button>
@@ -591,8 +591,8 @@ class EmmaMultiUser {
                 <ul class="space-y-2">
                   ${conversations.slice(0, 5).map(conv => `
                     <li class="text-sm bg-gray-50 p-2 rounded">
-                      <span class="font-semibold">Session:</span> ${conv.session_id.substring(0, 8)}... •
-                      <span class="font-semibold">Date:</span> ${new Date(conv.updated_at).toLocaleString('fr-FR')} •
+                      <span class="font-semibold">Session:</span> ${conv.session_id.substring(0, 8)}... -
+                      <span class="font-semibold">Date:</span> ${new Date(conv.updated_at).toLocaleString('fr-FR')} -
                       <span class="font-semibold">Messages:</span> ${conv.messages.length}
                     </li>
                   `).join('')}
@@ -611,13 +611,13 @@ class EmmaMultiUser {
       });
 
     } catch (error) {
-      console.error('❌ Erreur affichage historiques admin:', error);
+      console.error(' Erreur affichage historiques admin:', error);
       alert('Erreur lors du chargement des historiques');
     }
   }
 }
 
-// Initialiser Emma Multi-User quand le DOM et GOB_AUTH sont prêts
+// Initialiser Emma Multi-User quand le DOM et GOB_AUTH sont prets
 window.addEventListener('load', () => {
   // Attendre que GOB_AUTH soit disponible
   const checkAuth = setInterval(() => {
@@ -628,11 +628,11 @@ window.addEventListener('load', () => {
     }
   }, 100);
 
-  // Timeout après 5 secondes
+  // Timeout apres 5 secondes
   setTimeout(() => {
     clearInterval(checkAuth);
     if (!window.emmaMultiUser) {
-      console.error('❌ Emma Multi-User: Timeout - GOB_AUTH non disponible');
+      console.error(' Emma Multi-User: Timeout - GOB_AUTH non disponible');
     }
   }, 5000);
 });

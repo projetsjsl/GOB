@@ -21,7 +21,7 @@ export function ChartControls({
 
   return (
     <div className="flex flex-wrap gap-2 items-center mb-4">
-      {/* Période */}
+      {/* Periode */}
       <div className="flex items-center gap-1">
         <Calendar className="w-4 h-4 text-muted-foreground" />
         <div className="flex gap-1 flex-wrap">

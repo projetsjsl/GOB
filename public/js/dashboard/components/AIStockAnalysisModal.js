@@ -218,7 +218,7 @@ Use the latest market data and news. Be objective and data-driven. Format with m
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-white">AI Stock Analysis</h2>
-                            <p className="text-gray-400 text-sm">{symbol} • Powered by Emma IA via {selectedModel === 'perplexity' ? 'Perplexity AI (Real-time)' : 'OpenAI GPT-4o'}</p>
+                            <p className="text-gray-400 text-sm">{symbol} - Powered by Emma IA via {selectedModel === 'perplexity' ? 'Perplexity AI (Real-time)' : 'OpenAI GPT-4o'}</p>
                         </div>
                     </div>
                     <button title="Action"

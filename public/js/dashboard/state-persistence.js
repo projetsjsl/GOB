@@ -1,7 +1,7 @@
 /**
- * PERF #16 FIX: State Persistence pour éviter rechargement complet au changement d'onglet
+ * PERF #16 FIX: State Persistence pour eviter rechargement complet au changement d'onglet
  * 
- * Sauvegarde l'état des onglets et des données pour éviter de tout recharger
+ * Sauvegarde l'etat des onglets et des donnees pour eviter de tout recharger
  * lors du changement d'onglet.
  */
 
@@ -27,11 +27,11 @@
         }
 
         /**
-         * Sauvegarder l'état d'un onglet
+         * Sauvegarder l'etat d'un onglet
          */
         saveTabState(tabId, state) {
             try {
-                // Limiter la taille des données sauvegardées
+                // Limiter la taille des donnees sauvegardees
                 const serialized = JSON.stringify(state);
                 if (serialized.length > MAX_STORAGE_SIZE) {
                     console.warn(`[StatePersistence] Tab ${tabId} state too large, skipping save`);
@@ -70,18 +70,18 @@
         }
 
         /**
-         * Récupérer l'état d'un onglet
+         * Recuperer l'etat d'un onglet
          */
         getTabState(tabId) {
-            // D'abord vérifier le cache mémoire
+            // D'abord verifier le cache memoire
             if (this.stateCache.has(tabId)) {
                 const cached = this.stateCache.get(tabId);
-                // Vérifier si le cache n'est pas trop vieux (1 heure max)
+                // Verifier si le cache n'est pas trop vieux (1 heure max)
                 const maxAge = 60 * 60 * 1000; // 1 heure
                 if (Date.now() - cached.timestamp < maxAge) {
                     return cached.state;
                 } else {
-                    // Cache expiré, le supprimer
+                    // Cache expire, le supprimer
                     this.stateCache.delete(tabId);
                 }
             }
@@ -93,10 +93,10 @@
                     const allStates = JSON.parse(saved);
                     if (allStates[tabId]) {
                         const cached = allStates[tabId];
-                        // Vérifier l'âge
+                        // Verifier l'age
                         const maxAge = 60 * 60 * 1000; // 1 heure
                         if (Date.now() - cached.timestamp < maxAge) {
-                            // Mettre en cache mémoire
+                            // Mettre en cache memoire
                             this.stateCache.set(tabId, cached);
                             return cached.state;
                         }
@@ -110,7 +110,7 @@
         }
 
         /**
-         * Supprimer l'état d'un onglet
+         * Supprimer l'etat d'un onglet
          */
         clearTabState(tabId) {
             this.stateCache.delete(tabId);
@@ -127,7 +127,7 @@
         }
 
         /**
-         * Nettoyer les états expirés
+         * Nettoyer les etats expires
          */
         cleanup() {
             const maxAge = 60 * 60 * 1000; // 1 heure
@@ -160,7 +160,7 @@
         }
 
         /**
-         * S'abonner aux changements d'état
+         * S'abonner aux changements d'etat
          */
         subscribe(listener) {
             this.listeners.add(listener);
@@ -173,7 +173,7 @@
     // Instance globale
     const stateManager = new StatePersistenceManager();
 
-    // Nettoyage périodique (toutes les 30 minutes)
+    // Nettoyage periodique (toutes les 30 minutes)
     setInterval(() => {
         stateManager.cleanup();
     }, 30 * 60 * 1000);
@@ -197,5 +197,5 @@
         stateManager.clearTabState(tabId);
     };
 
-    console.log('✅ State Persistence Manager initialized');
+    console.log(' State Persistence Manager initialized');
 })();

@@ -40,9 +40,9 @@ export function CountrySpreadHistory() {
   return (
     <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-foreground">Spread Historique US-Canada par Maturité</CardTitle>
+        <CardTitle className="text-foreground">Spread Historique US-Canada par Maturite</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Écart de rendement entre le Trésor américain et les obligations gouvernementales canadiennes (1 année)
+          Ecart de rendement entre le Tresor americain et les obligations gouvernementales canadiennes (1 annee)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -154,7 +154,7 @@ export function CountrySpreadHistory() {
 
         <div className="mt-4 pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground">
-            Sources: Réserve Fédérale des États-Unis (FRED) | Banque du Canada
+            Sources: Reserve Federale des Etats-Unis (FRED) | Banque du Canada
           </p>
         </div>
       </CardContent>

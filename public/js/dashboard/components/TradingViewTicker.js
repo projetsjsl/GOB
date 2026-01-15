@@ -10,18 +10,18 @@ const TradingViewTickerContent = React.memo(({
 }) => {
     const containerRef = React.useRef(null);
     
-    // PERF #17 FIX: Mémoriser les symboles finaux pour éviter recalculs
+    // PERF #17 FIX: Memoriser les symboles finaux pour eviter recalculs
     const finalSymbols = React.useMemo(() => {
         // Obtenir tous les indices disponibles
         const allIndices = window.getAllAvailableIndices ? window.getAllAvailableIndices() : {};
         const flatIndices = Object.values(allIndices).flat();
         
-        // Filtrer les indices sélectionnés
+        // Filtrer les indices selectionnes
         const symbolsToDisplay = flatIndices.filter(idx => 
             selectedIndices && selectedIndices.includes(idx.proName)
         );
 
-        // Si aucun indice sélectionné, utiliser les indices par défaut
+        // Si aucun indice selectionne, utiliser les indices par defaut
         return symbolsToDisplay.length > 0 
             ? symbolsToDisplay 
             : [
@@ -43,13 +43,13 @@ const TradingViewTickerContent = React.memo(({
         widgetContainer.className = 'tradingview-widget-container__widget';
         container.appendChild(widgetContainer);
 
-        // Créer le script
+        // Creer le script
         const script = document.createElement('script');
         script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
         script.type = 'text/javascript';
         script.async = true;
-        // BUG #4 FIX: Améliorer configuration pour E-Mini futures et autres symboles
-        // PERF #17 FIX: Utiliser finalSymbols mémorisé
+        // BUG #4 FIX: Ameliorer configuration pour E-Mini futures et autres symboles
+        // PERF #17 FIX: Utiliser finalSymbols memorise
         script.textContent = JSON.stringify({
             symbols: finalSymbols,
             colorTheme: isDarkMode ? 'dark' : 'light',
@@ -58,12 +58,12 @@ const TradingViewTickerContent = React.memo(({
             isTransparent: false,
             showSymbolLogo: true,
             displayMode: 'adaptive',
-            // Options supplémentaires pour meilleur affichage des futures
+            // Options supplementaires pour meilleur affichage des futures
             hideDateRanges: false,
             showVolume: false
         });
 
-        // Ajouter le script à son conteneur
+        // Ajouter le script a son conteneur
         container.appendChild(script);
 
         // Store cleanup references
@@ -75,7 +75,7 @@ const TradingViewTickerContent = React.memo(({
 
         // Intercepter les clics et navigations depuis le TickerBanner
         const setupTickerInterception = () => {
-            // Attendre que l'iframe soit créé
+            // Attendre que l'iframe soit cree
             checkForIframeInterval = setInterval(() => {
                 const iframe = container.querySelector('iframe');
                 
@@ -111,11 +111,11 @@ const TradingViewTickerContent = React.memo(({
                     
                     // Intercepter les clics sur le conteneur du widget
                     clickHandler = (e) => {
-                        // Vérifier si le clic est sur un élément cliquable du ticker
+                        // Verifier si le clic est sur un element cliquable du ticker
                         const clickableElement = e.target.closest('a, button, [role="button"], [onclick]');
                         
                         if (clickableElement || e.target.closest('.tradingview-widget-container__widget')) {
-                            // Empêcher la navigation par défaut
+                            // Empecher la navigation par defaut
                             e.preventDefault();
                             e.stopPropagation();
                             
@@ -157,7 +157,7 @@ const TradingViewTickerContent = React.memo(({
                     `;
                     overlay.addEventListener('click', clickHandler, true);
                     
-                    // Positionner le conteneur en relative si nécessaire
+                    // Positionner le conteneur en relative si necessaire
                     if (getComputedStyle(widgetContainer).position === 'static') {
                         widgetContainer.style.position = 'relative';
                     }
@@ -166,7 +166,7 @@ const TradingViewTickerContent = React.memo(({
                 }
             }, 100);
             
-            // Timeout de sécurité - clear interval after 10 seconds
+            // Timeout de securite - clear interval after 10 seconds
             iframeTimeoutId = setTimeout(() => {
                 if (checkForIframeInterval) {
                     clearInterval(checkForIframeInterval);
@@ -177,7 +177,7 @@ const TradingViewTickerContent = React.memo(({
         
         setupTickerInterception();
 
-        // ✅ CRITICAL: Proper cleanup function
+        //  CRITICAL: Proper cleanup function
         return () => {
             if (checkForIframeInterval) {
                 clearInterval(checkForIframeInterval);
@@ -200,7 +200,7 @@ const TradingViewTickerContent = React.memo(({
 
     }, [isDarkMode, finalSymbols, setTickerExpandableUrl, setTickerExpandableTitle, setTickerExpandableOpen]);
 
-    // BUG #4 FIX: Détecter les erreurs dans le widget TradingView et afficher des tooltips
+    // BUG #4 FIX: Detecter les erreurs dans le widget TradingView et afficher des tooltips
     React.useEffect(() => {
         if (!containerRef.current) return;
 
@@ -208,10 +208,10 @@ const TradingViewTickerContent = React.memo(({
             const iframe = containerRef.current?.querySelector('iframe');
             if (!iframe) return;
 
-            // Écouter les messages d'erreur de TradingView
+            // Ecouter les messages d'erreur de TradingView
             const messageHandler = (event) => {
                 if (event.data && typeof event.data === 'object') {
-                    // Détecter les erreurs de chargement de symboles
+                    // Detecter les erreurs de chargement de symboles
                     if (event.data.type === 'error' || event.data.error) {
                         console.warn('TradingView widget error detected:', event.data);
                         // Afficher un tooltip d'erreur si disponible
@@ -219,7 +219,7 @@ const TradingViewTickerContent = React.memo(({
                         errorSymbols.forEach(symbol => {
                             const element = containerRef.current?.querySelector(`[data-symbol="${symbol}"]`);
                             if (element) {
-                                element.setAttribute('title', `Erreur de chargement pour ${symbol}. Données temporairement indisponibles.`);
+                                element.setAttribute('title', `Erreur de chargement pour ${symbol}. Donnees temporairement indisponibles.`);
                                 element.style.opacity = '0.6';
                             }
                         });
@@ -231,7 +231,7 @@ const TradingViewTickerContent = React.memo(({
             return () => window.removeEventListener('message', messageHandler);
         };
 
-        // Vérifier périodiquement pour les erreurs (TradingView peut mettre du temps à charger)
+        // Verifier periodiquement pour les erreurs (TradingView peut mettre du temps a charger)
         const interval = setInterval(checkForErrors, 2000);
         const cleanup = checkForErrors();
 
@@ -252,14 +252,14 @@ const TradingViewTickerContent = React.memo(({
                     fontSize: '10px',
                     color: isDarkMode ? '#9ca3af' : '#6b7280'
                 }}
-                title="Les indicateurs avec ⚠️ peuvent avoir des données temporairement indisponibles. Survolez pour plus d'infos."
+                title="Les indicateurs avec  peuvent avoir des donnees temporairement indisponibles. Survolez pour plus d'infos."
             >
-                ℹ️
+                i
             </div>
         </div>
     );
 }, (prevProps, nextProps) => {
-    // PERF #17 FIX: Comparaison personnalisée pour éviter re-renders inutiles
+    // PERF #17 FIX: Comparaison personnalisee pour eviter re-renders inutiles
     return (
         prevProps.isDarkMode === nextProps.isDarkMode &&
         JSON.stringify(prevProps.selectedIndices) === JSON.stringify(nextProps.selectedIndices) &&

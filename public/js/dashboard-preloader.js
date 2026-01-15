@@ -1,6 +1,6 @@
 /**
- * Dashboard Preloader - Préchargement des données essentielles
- * S'exécute sur la page de login pour accélérer le chargement du dashboard
+ * Dashboard Preloader - Prechargement des donnees essentielles
+ * S'execute sur la page de login pour accelerer le chargement du dashboard
  */
 
 (function() {
@@ -15,7 +15,7 @@
     const PRELOAD_EXPIRY = 5 * 60 * 1000; // 5 minutes
 
     /**
-     * Vérifier si les données préchargées sont encore valides
+     * Verifier si les donnees prechargees sont encore valides
      */
     function isPreloadValid() {
         try {
@@ -25,7 +25,7 @@
             const data = JSON.parse(preloadData);
             const now = Date.now();
             
-            // Vérifier l'expiration
+            // Verifier l'expiration
             if (data.timestamp && (now - data.timestamp) > PRELOAD_EXPIRY) {
                 sessionStorage.removeItem(PRELOAD_STORAGE_KEY);
                 return false;
@@ -33,13 +33,13 @@
 
             return true;
         } catch (e) {
-            console.warn('[Preloader] Erreur vérification préchargement:', e);
+            console.warn('[Preloader] Erreur verification prechargement:', e);
             return false;
         }
     }
 
     /**
-     * Sauvegarder les données préchargées
+     * Sauvegarder les donnees prechargees
      */
     function savePreloadData(data) {
         try {
@@ -48,14 +48,14 @@
                 data: data
             };
             sessionStorage.setItem(PRELOAD_STORAGE_KEY, JSON.stringify(preloadData));
-            console.log('[Preloader] ✅ Données préchargées sauvegardées');
+            console.log('[Preloader]  Donnees prechargees sauvegardees');
         } catch (e) {
-            console.warn('[Preloader] ⚠️ Impossible de sauvegarder:', e);
+            console.warn('[Preloader]  Impossible de sauvegarder:', e);
         }
     }
 
     /**
-     * Précharger les permissions utilisateur
+     * Precharger les permissions utilisateur
      */
     async function preloadUserPermissions(username) {
         try {
@@ -75,13 +75,13 @@
                 }
             }
         } catch (e) {
-            console.warn('[Preloader] Erreur préchargement permissions:', e);
+            console.warn('[Preloader] Erreur prechargement permissions:', e);
         }
         return null;
     }
 
     /**
-     * Précharger les données de l'API status
+     * Precharger les donnees de l'API status
      */
     async function preloadApiStatus() {
         try {
@@ -91,17 +91,17 @@
                 return data;
             }
         } catch (e) {
-            console.warn('[Preloader] Erreur préchargement API status:', e);
+            console.warn('[Preloader] Erreur prechargement API status:', e);
         }
         return null;
     }
 
     /**
-     * Précharger les données de configuration des thèmes
+     * Precharger les donnees de configuration des themes
      */
     async function preloadThemeConfig() {
         try {
-            // Les thèmes sont déjà dans theme-system.js, mais on peut précharger la config
+            // Les themes sont deja dans theme-system.js, mais on peut precharger la config
             if (window.GOBThemes) {
                 return {
                     currentTheme: window.GOBThemes.getCurrentTheme(),
@@ -109,17 +109,17 @@
                 };
             }
         } catch (e) {
-            console.warn('[Preloader] Erreur préchargement thèmes:', e);
+            console.warn('[Preloader] Erreur prechargement themes:', e);
         }
         return null;
     }
 
     /**
-     * Précharger les données GitHub (si disponibles)
+     * Precharger les donnees GitHub (si disponibles)
      */
     async function preloadGitHubData() {
         try {
-            // Précharger les tickers depuis GitHub si possible
+            // Precharger les tickers depuis GitHub si possible
             const response = await fetch('/api/github-tickers');
             if (response.ok) {
                 const data = await response.json();
@@ -133,7 +133,7 @@
     }
 
     /**
-     * Précharger les nouvelles Finviz (limitées)
+     * Precharger les nouvelles Finviz (limitees)
      */
     async function preloadNews() {
         try {
@@ -143,13 +143,13 @@
                 return data;
             }
         } catch (e) {
-            console.warn('[Preloader] Erreur préchargement news:', e);
+            console.warn('[Preloader] Erreur prechargement news:', e);
         }
         return null;
     }
 
     /**
-     * Précharger les données de watchlist Supabase
+     * Precharger les donnees de watchlist Supabase
      */
     async function preloadWatchlist() {
         try {
@@ -159,27 +159,27 @@
                 return data;
             }
         } catch (e) {
-            console.warn('[Preloader] Erreur préchargement watchlist:', e);
+            console.warn('[Preloader] Erreur prechargement watchlist:', e);
         }
         return null;
     }
 
     /**
-     * Fonction principale de préchargement
+     * Fonction principale de prechargement
      */
     async function preloadDashboardData(username) {
-        console.log('[Preloader] 🚀 Démarrage du préchargement...');
+        console.log('[Preloader]  Demarrage du prechargement...');
 
-        // Vérifier si déjà préchargé et valide
+        // Verifier si deja precharge et valide
         if (isPreloadValid()) {
-            console.log('[Preloader] ✅ Données déjà préchargées et valides');
+            console.log('[Preloader]  Donnees deja prechargees et valides');
             return;
         }
 
         const startTime = Date.now();
         const preloadData = {};
 
-        // Précharger en parallèle toutes les données non-bloquantes
+        // Precharger en parallele toutes les donnees non-bloquantes
         const preloadPromises = [
             preloadApiStatus().then(data => { preloadData.apiStatus = data; }),
             preloadThemeConfig().then(data => { preloadData.themeConfig = data; }),
@@ -188,7 +188,7 @@
             preloadGitHubData().then(data => { preloadData.githubData = data; })
         ];
 
-        // Précharger les permissions si username disponible
+        // Precharger les permissions si username disponible
         if (username) {
             preloadPromises.push(
                 preloadUserPermissions(username).then(data => {
@@ -197,13 +197,13 @@
             );
         }
 
-        // Attendre que toutes les promesses se résolvent
+        // Attendre que toutes les promesses se resolvent
         await Promise.allSettled(preloadPromises);
 
         const duration = Date.now() - startTime;
-        console.log(`[Preloader] ✅ Préchargement terminé en ${duration}ms`);
+        console.log(`[Preloader]  Prechargement termine en ${duration}ms`);
 
-        // Sauvegarder les données
+        // Sauvegarder les donnees
         savePreloadData(preloadData);
 
         // Afficher un indicateur visuel (optionnel)
@@ -211,7 +211,7 @@
     }
 
     /**
-     * Mettre à jour l'indicateur visuel de préchargement
+     * Mettre a jour l'indicateur visuel de prechargement
      */
     function updatePreloadIndicator(completed) {
         try {
@@ -219,10 +219,10 @@
             if (indicator) {
                 if (completed) {
                     indicator.classList.add('completed');
-                    indicator.textContent = '✅ Prêt';
+                    indicator.textContent = ' Pret';
                 } else {
                     indicator.classList.remove('completed');
-                    indicator.textContent = '⏳ Préparation...';
+                    indicator.textContent = ' Preparation...';
                 }
             }
         } catch (e) {
@@ -231,7 +231,7 @@
     }
 
     /**
-     * Récupérer les données préchargées
+     * Recuperer les donnees prechargees
      */
     function getPreloadData() {
         try {
@@ -243,16 +243,16 @@
                 }
             }
         } catch (e) {
-            console.warn('[Preloader] Erreur récupération données:', e);
+            console.warn('[Preloader] Erreur recuperation donnees:', e);
         }
         return null;
     }
 
     /**
-     * Initialiser le préchargement
+     * Initialiser le prechargement
      */
     function initPreloader() {
-        // Attendre que le DOM soit prêt
+        // Attendre que le DOM soit pret
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 startPreload();
@@ -263,36 +263,36 @@
     }
 
     /**
-     * Démarrer le préchargement
+     * Demarrer le prechargement
      */
     function startPreload() {
-        // Récupérer le username depuis le formulaire de login (si disponible)
+        // Recuperer le username depuis le formulaire de login (si disponible)
         let username = null;
         try {
             const usernameInput = document.getElementById('username') || document.querySelector('input[name="username"]');
             if (usernameInput) {
-                // Écouter les changements pour précharger avec le bon username
+                // Ecouter les changements pour precharger avec le bon username
                 usernameInput.addEventListener('input', (e) => {
                     const value = e.target.value.trim().toLowerCase();
                     if (value && value.length >= 2) {
-                        // Précharger avec le username saisi
+                        // Precharger avec le username saisi
                         preloadDashboardData(value);
                     }
                 });
 
-                // Précharger immédiatement si username déjà saisi
+                // Precharger immediatement si username deja saisi
                 if (usernameInput.value) {
                     username = usernameInput.value.trim().toLowerCase();
                 }
             }
         } catch (e) {
-            console.warn('[Preloader] Impossible de récupérer username:', e);
+            console.warn('[Preloader] Impossible de recuperer username:', e);
         }
 
-        // Démarrer le préchargement (sans username d'abord, puis avec si disponible)
+        // Demarrer le prechargement (sans username d'abord, puis avec si disponible)
         preloadDashboardData(username);
 
-        // Précharger aussi après un délai pour récupérer le username si saisi
+        // Precharger aussi apres un delai pour recuperer le username si saisi
         setTimeout(() => {
             try {
                 const usernameInput = document.getElementById('username') || document.querySelector('input[name="username"]');
@@ -319,5 +319,5 @@
     // Initialiser automatiquement
     initPreloader();
 
-    console.log('[Preloader] 📦 Système de préchargement initialisé');
+    console.log('[Preloader]  Systeme de prechargement initialise');
 })();

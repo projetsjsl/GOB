@@ -2,7 +2,7 @@
  * Console Wrapper pour Production
  * 
  * Supprime automatiquement les console.log en production
- * et les remplace par logger.debug en développement
+ * et les remplace par logger.debug en developpement
  */
 
 (function() {
@@ -12,35 +12,35 @@
                        window.location.hostname !== '127.0.0.1' &&
                        !window.location.hostname.includes('localhost');
 
-  // Logger disponible (si chargé)
-  // Attendre que logger.js soit chargé - vérifier de manière asynchrone
+  // Logger disponible (si charge)
+  // Attendre que logger.js soit charge - verifier de maniere asynchrone
   const hasLogger = () => {
     if (typeof window === 'undefined') return false;
     
-    // Vérifier si logger est déjà chargé
+    // Verifier si logger est deja charge
     if (typeof window.logger !== 'undefined' && 
         window.logger && 
         typeof window.logger.debug === 'function') {
       return true;
     }
     
-    // Vérifier si le script logger.js est en cours de chargement
+    // Verifier si le script logger.js est en cours de chargement
     const loggerScript = document.querySelector('script[src*="logger.js"]');
     if (loggerScript && !loggerScript.hasAttribute('data-loaded')) {
-      // Script pas encore chargé, retourner false pour l'instant
+      // Script pas encore charge, retourner false pour l'instant
       return false;
     }
     
     return false;
   };
 
-  // Sauvegarder les méthodes originales
+  // Sauvegarder les methodes originales
   const originalLog = console.log;
   const originalWarn = console.warn;
   const originalError = console.error;
   const originalDebug = console.debug;
 
-  // Map des méthodes originales pour éviter la récursion infinie
+  // Map des methodes originales pour eviter la recursion infinie
   const originalMethods = {
     log: originalLog,
     warn: originalWarn,
@@ -56,14 +56,14 @@
         try {
           window.logger[level](...args);
         } catch (e) {
-          // Si logger échoue, ne rien faire en production
+          // Si logger echoue, ne rien faire en production
         }
       }
       // Sinon, ne rien logger en production
       return;
     }
 
-    // En développement, utiliser la méthode ORIGINALE (pas l'overridée)
+    // En developpement, utiliser la methode ORIGINALE (pas l'overridee)
     const method = originalMethods[level] || originalLog;
     method.apply(console, args);
   }
@@ -103,7 +103,7 @@
     }
   };
 
-  // Exposer une méthode pour restaurer (pour debugging)
+  // Exposer une methode pour restaurer (pour debugging)
   console._restore = function() {
     console.log = originalLog;
     console.warn = originalWarn;
@@ -111,26 +111,26 @@
     console.debug = originalDebug;
   };
 
-  // Exposer une méthode pour vérifier l'état
+  // Exposer une methode pour verifier l'etat
   console._isProduction = isProduction;
   console._hasLogger = hasLogger();
 
-  // Attendre que logger.js soit chargé si nécessaire
+  // Attendre que logger.js soit charge si necessaire
   if (typeof window !== 'undefined' && !hasLogger()) {
     const checkLogger = setInterval(() => {
       if (hasLogger()) {
         clearInterval(checkLogger);
         if (!isProduction) {
-          console.log('🔧 Console wrapper: Logger maintenant disponible');
+          console.log(' Console wrapper: Logger maintenant disponible');
         }
       }
     }, 100);
     
-    // Arrêter après 5 secondes
+    // Arreter apres 5 secondes
     setTimeout(() => clearInterval(checkLogger), 5000);
   }
 
   if (!isProduction) {
-    console.log('🔧 Console wrapper activé (mode développement)');
+    console.log(' Console wrapper active (mode developpement)');
   }
 })();

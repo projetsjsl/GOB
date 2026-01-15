@@ -1,6 +1,6 @@
 /**
- * Widget Loader Optimisé - Charge les widgets TradingView en lazy loading
- * Évite de charger tous les widgets en même temps au démarrage
+ * Widget Loader Optimise - Charge les widgets TradingView en lazy loading
+ * Evite de charger tous les widgets en meme temps au demarrage
  */
 
 class OptimizedWidgetLoader {
@@ -8,7 +8,7 @@ class OptimizedWidgetLoader {
         this.loadedWidgets = new Set();
         this.loadingQueue = [];
         this.isLoading = false;
-        this.maxConcurrentLoads = 2; // Maximum 2 widgets en parallèle
+        this.maxConcurrentLoads = 2; // Maximum 2 widgets en parallele
     }
 
     _ensureWidgetId(container, widgetType) {
@@ -27,21 +27,21 @@ class OptimizedWidgetLoader {
     }
 
     /**
-     * Charge un widget TradingView de manière optimisée
-     * @param {HTMLElement} container - Container où charger le widget
+     * Charge un widget TradingView de maniere optimisee
+     * @param {HTMLElement} container - Container ou charger le widget
      * @param {string} widgetType - Type de widget (market-overview, screener, etc.)
      * @param {Object} config - Configuration du widget
      * @param {boolean} lazy - Si true, charge seulement quand visible
      */
     async loadWidget(container, widgetType, config, lazy = true) {
         if (!container) {
-            console.warn(`⚠️ Container manquant pour widget ${widgetType}`);
+            console.warn(` Container manquant pour widget ${widgetType}`);
             return;
         }
 
         // S'assurer que le container est dans le DOM
         if (!container.parentNode && container !== document.body) {
-            console.warn(`⚠️ Container ${widgetType} pas dans le DOM, attente...`);
+            console.warn(` Container ${widgetType} pas dans le DOM, attente...`);
             await new Promise(resolve => {
                 const checkInterval = setInterval(() => {
                     if (container.parentNode || container === document.body) {
@@ -58,7 +58,7 @@ class OptimizedWidgetLoader {
 
         const widgetId = this._ensureWidgetId(container, widgetType);
         
-        // Éviter les chargements en double
+        // Eviter les chargements en double
         if (this.loadedWidgets.has(widgetId)) {
             return;
         }
@@ -73,14 +73,14 @@ class OptimizedWidgetLoader {
                     }
                 });
             }, {
-                rootMargin: '50px' // Commencer à charger 50px avant d'être visible
+                rootMargin: '50px' // Commencer a charger 50px avant d'etre visible
             });
             
             observer.observe(container);
         } else {
-            // Chargement immédiat - vérifier d'abord si le container est dans le DOM et visible
+            // Chargement immediat - verifier d'abord si le container est dans le DOM et visible
             if (!container.parentNode) {
-                console.warn(`⚠️ Container ${widgetType} pas dans le DOM, attente...`);
+                console.warn(` Container ${widgetType} pas dans le DOM, attente...`);
                 await new Promise(resolve => {
                     const checkInterval = setInterval(() => {
                         if (container.parentNode) {
@@ -94,7 +94,7 @@ class OptimizedWidgetLoader {
                     }, 2000);
                 });
             }
-            // Pas de délai pour les widgets critiques - charger immédiatement
+            // Pas de delai pour les widgets critiques - charger immediatement
             await this._loadWidgetNow(container, widgetType, config, widgetId);
         }
     }
@@ -103,7 +103,7 @@ class OptimizedWidgetLoader {
      * Charge effectivement le widget
      */
     async _loadWidgetNow(container, widgetType, config, widgetId) {
-        // Ajouter à la queue si trop de chargements en cours
+        // Ajouter a la queue si trop de chargements en cours
         if (this.loadingQueue.length >= this.maxConcurrentLoads) {
             return new Promise((resolve) => {
                 this.loadingQueue.push(() => {
@@ -116,11 +116,11 @@ class OptimizedWidgetLoader {
     }
 
     /**
-     * Exécute le chargement du widget
+     * Execute le chargement du widget
      */
     async _executeLoad(container, widgetType, config, widgetId) {
         try {
-            // S'assurer que le DOM est prêt
+            // S'assurer que le DOM est pret
             if (document.readyState === 'loading') {
                 await new Promise(resolve => {
                     if (document.readyState === 'loading') {
@@ -138,17 +138,17 @@ class OptimizedWidgetLoader {
             container.innerHTML = '';
             container.classList.add('tradingview-widget-container');
 
-            // Créer le div du widget avec attributs pour améliorer la compatibilité iframe
+            // Creer le div du widget avec attributs pour ameliorer la compatibilite iframe
             const widgetDiv = document.createElement('div');
             widgetDiv.className = 'tradingview-widget-container__widget';
             widgetDiv.setAttribute('data-widget-type', widgetType);
-            // Forcer la hauteur à 100% pour hériter de la hauteur du parent
+            // Forcer la hauteur a 100% pour heriter de la hauteur du parent
             widgetDiv.style.width = '100%';
             widgetDiv.style.height = '100%';
-            widgetDiv.style.minHeight = '400px'; // Hauteur minimale pour éviter les widgets trop petits
+            widgetDiv.style.minHeight = '400px'; // Hauteur minimale pour eviter les widgets trop petits
             container.appendChild(widgetDiv);
 
-            // Créer le script
+            // Creer le script
             const script = document.createElement('script');
             script.src = `https://s3.tradingview.com/external-embedding/embed-widget-${widgetType}.js`;
             script.type = 'text/javascript';
@@ -159,22 +159,22 @@ class OptimizedWidgetLoader {
             try {
                 script.innerHTML = JSON.stringify(config);
             } catch (e) {
-                console.error(`❌ Erreur sérialisation config pour ${widgetType}:`, e);
+                console.error(` Erreur serialisation config pour ${widgetType}:`, e);
                 this._processQueue();
                 return;
             }
 
-            // Attendre que le script soit chargé
+            // Attendre que le script soit charge
             await new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => {
-                    console.warn(`⚠️ Timeout chargement widget ${widgetType}`);
+                    console.warn(` Timeout chargement widget ${widgetType}`);
                     this._processQueue();
                     resolve(); // Resolve au lieu de reject pour ne pas bloquer
                 }, 10000); // 10 secondes timeout
 
                 script.onload = () => {
                     clearTimeout(timeout);
-                    // Attendre un peu pour que l'iframe soit créée
+                    // Attendre un peu pour que l'iframe soit creee
                     setTimeout(() => {
                         this.loadedWidgets.add(widgetId);
                         this._processQueue();
@@ -184,7 +184,7 @@ class OptimizedWidgetLoader {
                 
                 script.onerror = (error) => {
                     clearTimeout(timeout);
-                    console.warn(`⚠️ Échec chargement widget ${widgetType}:`, error);
+                    console.warn(` Echec chargement widget ${widgetType}:`, error);
                     this._processQueue();
                     resolve(); // Resolve pour ne pas bloquer les autres widgets
                 };
@@ -192,23 +192,23 @@ class OptimizedWidgetLoader {
                 container.appendChild(script);
             });
 
-            // Vérifier que l'iframe est créée et gérer les erreurs de communication
+            // Verifier que l'iframe est creee et gerer les erreurs de communication
             setTimeout(() => {
                 const iframe = container.querySelector('iframe');
                 if (iframe) {
                     // Les erreurs "contentWindow not available" sont normales pour TradingView
                     // car ils utilisent des iframes avec sandbox restrictions
-                    // On peut ignorer ces erreurs car les widgets fonctionnent quand même
+                    // On peut ignorer ces erreurs car les widgets fonctionnent quand meme
                     iframe.setAttribute('loading', 'lazy');
                     iframe.setAttribute('title', `TradingView ${widgetType} widget`);
                     
-                    // Forcer la hauteur de l'iframe à 100% pour qu'elle hérite du parent
+                    // Forcer la hauteur de l'iframe a 100% pour qu'elle herite du parent
                     iframe.style.height = '100%';
                     iframe.style.width = '100%';
                     iframe.style.minHeight = '400px';
                 }
                 
-                // Forcer aussi la hauteur du widgetDiv après création de l'iframe
+                // Forcer aussi la hauteur du widgetDiv apres creation de l'iframe
                 if (widgetDiv) {
                     const containerHeight = container.getBoundingClientRect().height;
                     if (containerHeight > 200) {
@@ -219,7 +219,7 @@ class OptimizedWidgetLoader {
             }, 500);
 
         } catch (error) {
-            console.error(`❌ Erreur chargement widget ${widgetType}:`, error);
+            console.error(` Erreur chargement widget ${widgetType}:`, error);
             this._processQueue();
         }
     }
@@ -235,7 +235,7 @@ class OptimizedWidgetLoader {
     }
 
     /**
-     * Désactive tous les widgets non visibles
+     * Desactive tous les widgets non visibles
      */
     disableHiddenWidgets() {
         document.querySelectorAll('.tradingview-widget-container').forEach(container => {
@@ -266,7 +266,7 @@ if (!window.__optimizedWidgetLoaderInitialized) {
     window.optimizedWidgetLoader = new OptimizedWidgetLoader();
     window.__optimizedWidgetLoaderInitialized = true;
 
-    // Désactiver les widgets cachés au scroll
+    // Desactiver les widgets caches au scroll
     let scrollTimeout;
     window.addEventListener('scroll', () => {
         clearTimeout(scrollTimeout);

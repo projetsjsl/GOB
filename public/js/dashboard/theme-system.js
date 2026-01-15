@@ -1,10 +1,10 @@
 /**
- * Système de thèmes pour le Dashboard GOB
- * Thèmes par défaut: Terminal, IA, DarkMode, Light
- * Thèmes personnalisés: MarketQ, Bloomberg Terminal, Seeking Alpha, etc.
+ * Systeme de themes pour le Dashboard GOB
+ * Themes par defaut: Terminal, IA, DarkMode, Light
+ * Themes personnalises: MarketQ, Bloomberg Terminal, Seeking Alpha, etc.
  */
 
-// Thèmes par défaut (Terminal, IA, DarkMode, Light) - DÉFINIS EN PREMIER
+// Themes par defaut (Terminal, IA, DarkMode, Light) - DEFINIS EN PREMIER
 const defaultThemes = {
     'terminal': {
         name: 'Terminal',
@@ -135,10 +135,10 @@ const defaultThemes = {
     }
 };
 
-// Thèmes personnalisés
+// Themes personnalises
 const customThemes = {
     default: {
-        name: 'Par défaut',
+        name: 'Par defaut',
         id: 'default',
         colors: {
             primary: '#10b981', // emerald-500
@@ -194,9 +194,9 @@ const customThemes = {
         styles: {
             headerBg: 'linear-gradient(135deg, #141b3d 0%, #1e2749 100%)',
             cardBg: '#141b3d',
-            cardBorder: '1px solid rgba(0, 212, 255, 0.25)', // cyan avec transparence légèrement plus visible
+            cardBorder: '1px solid rgba(0, 212, 255, 0.25)', // cyan avec transparence legerement plus visible
             borderRadius: '0.5rem',
-            shadow: '0 8px 32px rgba(0, 212, 255, 0.2)', // glow cyan plus prononcé
+            shadow: '0 8px 32px rgba(0, 212, 255, 0.2)', // glow cyan plus prononce
             backdropFilter: 'blur(16px) saturate(150%)' // Cyberpunk glass
         }
     },
@@ -205,7 +205,7 @@ const customThemes = {
         id: 'marketq-dark',
         colors: {
             primary: '#00d4ff', // cyan brillant (#00D4FF) - accents principaux
-            secondary: '#00a8cc', // cyan plus foncé (#00A8CC) - accents secondaires
+            secondary: '#00a8cc', // cyan plus fonce (#00A8CC) - accents secondaires
             background: '#000000', // noir pur (#000000) - fond principal
             surface: '#0a0a0a', // near black (#0A0A0A) - cards, panels
             surfaceLight: '#1a1a1a', // dark gray (#1A1A1A) - hover states, active
@@ -213,7 +213,7 @@ const customThemes = {
             textSecondary: '#888888', // medium gray (#888888) - texte secondaire
             textGreen: '#00ff88', // green-cyan brillant (#00FF88) - gains
             textRed: '#ff3366', // pink-red (#FF3366) - pertes
-            border: 'rgba(0, 212, 255, 0.15)', // cyan très subtil (bordures)
+            border: 'rgba(0, 212, 255, 0.15)', // cyan tres subtil (bordures)
             accent: '#00d4ff', // cyan (highlights, focus, CTA)
             success: '#00ff88', // green-cyan brillant (#00FF88) - gains
             danger: '#ff3366', // pink-red (#FF3366) - pertes
@@ -227,7 +227,7 @@ const customThemes = {
         styles: {
             headerBg: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
             cardBg: '#0a0a0a',
-            cardBorder: '1px solid rgba(0, 212, 255, 0.15)', // cyan très subtil
+            cardBorder: '1px solid rgba(0, 212, 255, 0.15)', // cyan tres subtil
             borderRadius: '0.5rem',
             shadow: '0 4px 20px rgba(0, 212, 255, 0.15)', // glow cyan subtil sur noir
         }
@@ -236,8 +236,8 @@ const customThemes = {
         name: 'Bloomberg Terminal',
         id: 'bloomberg-terminal',
         colors: {
-            primary: '#ffcc00', // Bloomberg yellow (#FFCC00 exact) - utilisé pour texte principal
-            secondary: '#00ff00', // green brillant (#00FF00) pour données positives/gains
+            primary: '#ffcc00', // Bloomberg yellow (#FFCC00 exact) - utilise pour texte principal
+            secondary: '#00ff00', // green brillant (#00FF00) pour donnees positives/gains
             background: '#000000', // black pur (#000000)
             surface: '#0a0a0a', // near black (panels, cards)
             surfaceLight: '#1a1a1a', // dark gray (hover states, active)
@@ -280,7 +280,7 @@ const customThemes = {
             textGreen: '#34a853', // Google green (gains)
             textRed: '#ea4335', // Google red (pertes)
             border: '#dadce0', // Google light gray (bordures)
-            accent: '#ff6b35', // orange (navigation sélectionnée, highlights)
+            accent: '#ff6b35', // orange (navigation selectionnee, highlights)
             success: '#34a853', // Google green
             danger: '#ea4335', // Google red
             warning: '#fbbc04', // Google yellow
@@ -326,17 +326,17 @@ const customThemes = {
             headerBg: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
             cardBg: '#2a2a2a',
             cardBorder: '1px solid #444444',
-            borderRadius: '1rem', // arrondi généreux pour mobile (touch-friendly)
-            shadow: '0 4px 12px rgba(0, 0, 0, 0.5)', // ombre plus prononcée pour profondeur
+            borderRadius: '1rem', // arrondi genereux pour mobile (touch-friendly)
+            shadow: '0 4px 12px rgba(0, 0, 0, 0.5)', // ombre plus prononcee pour profondeur
         }
     },
     'bloomberg-nostalgie': {
         name: 'Bloomberg Nostalgie',
         id: 'bloomberg-nostalgie',
         colors: {
-            primary: '#8b5cf6', // purple/violet (#8B5CF6) - accents principaux (style rétro)
+            primary: '#8b5cf6', // purple/violet (#8B5CF6) - accents principaux (style retro)
             secondary: '#a78bfa', // lighter purple (#A78BFA) - accents secondaires
-            background: '#ffffff', // white (#FFFFFF) - fond principal (style années 1990)
+            background: '#ffffff', // white (#FFFFFF) - fond principal (style annees 1990)
             surface: '#f8f9fa', // very light gray (#F8F9FA) - cards, panels
             surfaceLight: '#ffffff', // white (#FFFFFF) - hover states
             surfaceDark: '#e9ecef', // light gray (#E9ECEF) - borders, separators
@@ -351,15 +351,15 @@ const customThemes = {
             warning: '#f59e0b', // amber (#F59E0B)
         },
         fonts: {
-            primary: '"Georgia", "Times New Roman", "Palatino", "Times", serif', // Style rétro années 1990
-            secondary: '"Courier New", "Courier", "Consolas", "Monaco", monospace', // Style terminal rétro
+            primary: '"Georgia", "Times New Roman", "Palatino", "Times", serif', // Style retro annees 1990
+            secondary: '"Courier New", "Courier", "Consolas", "Monaco", monospace', // Style terminal retro
             mono: '"Courier New", "Courier", "Consolas", "Monaco", monospace'
         },
         styles: {
             headerBg: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
             cardBg: '#ffffff',
-            cardBorder: '2px solid #8b5cf6', // Bordure violette style rétro
-            borderRadius: '0.25rem', // Légèrement arrondi (style années 1990)
+            cardBorder: '2px solid #8b5cf6', // Bordure violette style retro
+            borderRadius: '0.25rem', // Legerement arrondi (style annees 1990)
             shadow: '0 2px 8px rgba(139, 92, 246, 0.15)', // Ombre violette subtile
         }
     },
@@ -367,18 +367,18 @@ const customThemes = {
         name: 'Vert Professionnel',
         id: 'desjardins',
         colors: {
-            primary: '#006747', // Vert foncé (#006747) - couleur principale
+            primary: '#006747', // Vert fonce (#006747) - couleur principale
             secondary: '#00a651', // Vert plus clair (#00A651) - accents
             background: '#ffffff', // Blanc (#FFFFFF) - fond principal
-            surface: '#f5f5f5', // Gris très clair (#F5F5F5) - cards, panels
+            surface: '#f5f5f5', // Gris tres clair (#F5F5F5) - cards, panels
             surfaceLight: '#ffffff', // Blanc (#FFFFFF) - hover states
             surfaceDark: '#e8e8e8', // Gris clair (#E8E8E8) - borders, separators
-            text: '#1a1a1a', // Noir/gris foncé (#1A1A1A) - texte principal
+            text: '#1a1a1a', // Noir/gris fonce (#1A1A1A) - texte principal
             textSecondary: '#666666', // Gris moyen (#666666) - texte secondaire
             textGreen: '#00a651', // Vert (#00A651) - gains
             textRed: '#d32f2f', // Rouge (#D32F2F) - pertes
             border: '#d0d0d0', // Gris clair (#D0D0D0) - bordures
-            accent: '#006747', // Vert foncé (highlights, CTA)
+            accent: '#006747', // Vert fonce (highlights, CTA)
             success: '#00a651', // Vert (#00A651) - success
             danger: '#d32f2f', // Rouge (#D32F2F) - danger
             warning: '#ff9800', // Orange (#FF9800) - alertes
@@ -389,10 +389,10 @@ const customThemes = {
             mono: '"SF Mono", "Consolas", "Monaco", "Menlo", "Courier New", monospace'
         },
         styles: {
-            headerBg: 'linear-gradient(135deg, #006747 0%, #00a651 100%)', // Dégradé vert
+            headerBg: 'linear-gradient(135deg, #006747 0%, #00a651 100%)', // Degrade vert
             cardBg: '#ffffff',
             cardBorder: '1px solid #d0d0d0',
-            borderRadius: '0.5rem', // Arrondi modéré
+            borderRadius: '0.5rem', // Arrondi modere
             shadow: '0 2px 8px rgba(0, 103, 71, 0.1)', // Ombre verte subtile
         }
     },
@@ -432,23 +432,23 @@ const customThemes = {
     }
 };
 
-// Fusionner tous les thèmes (défaut + personnalisés)
+// Fusionner tous les themes (defaut + personnalises)
 const allThemes = {
     ...defaultThemes,
     ...customThemes
 };
 
-// Fonction pour appliquer un thème
-// BUG #8 FIX: Optimiser avec debounce et CSS variables pour éviter timeout
+// Fonction pour appliquer un theme
+// BUG #8 FIX: Optimiser avec debounce et CSS variables pour eviter timeout
 let themeApplyTimeout = null;
 function applyTheme(themeId) {
-    // ✅ FIX: Empêcher l'application du thème 'lightglass' dès l'entrée
+    //  FIX: Empecher l'application du theme 'lightglass' des l'entree
     if (themeId === 'lightglass') {
-        console.warn('Le thème "lightglass" est désactivé. Utilisation de "darkmode" à la place.');
+        console.warn('Le theme "lightglass" est desactive. Utilisation de "darkmode" a la place.');
         themeId = 'darkmode';
     }
     
-    // BUG #8 FIX: Debounce pour éviter les changements trop rapides
+    // BUG #8 FIX: Debounce pour eviter les changements trop rapides
     if (themeApplyTimeout) {
         clearTimeout(themeApplyTimeout);
     }
@@ -461,15 +461,15 @@ function applyTheme(themeId) {
 function _applyThemeInternal(themeId) {
     // Validation du themeId
     if (!themeId || typeof themeId !== 'string') {
-        console.warn('Theme ID invalide, utilisation du thème par défaut');
+        console.warn('Theme ID invalide, utilisation du theme par defaut');
         themeId = 'darkmode';
     }
     
-    // ✅ FIX: Empêcher l'application du thème 'lightglass'
+    //  FIX: Empecher l'application du theme 'lightglass'
     if (themeId === 'lightglass') {
-        console.warn('Le thème "lightglass" est désactivé. Utilisation de "darkmode" à la place.');
+        console.warn('Le theme "lightglass" est desactive. Utilisation de "darkmode" a la place.');
         themeId = 'darkmode';
-        // Mettre à jour le localStorage pour éviter la récurrence
+        // Mettre a jour le localStorage pour eviter la recurrence
         try {
             localStorage.setItem('gob-dashboard-theme', 'darkmode');
         } catch (e) {
@@ -477,18 +477,18 @@ function _applyThemeInternal(themeId) {
         }
     }
     
-    // Utiliser allThemes pour inclure les thèmes par défaut
+    // Utiliser allThemes pour inclure les themes par defaut
     const theme = allThemes[themeId] || allThemes.darkmode || defaultThemes.darkmode;
     
-    // Validation du thème
+    // Validation du theme
     if (!theme || !theme.colors || !theme.styles || !theme.fonts) {
-        console.error('Thème invalide:', themeId, 'Utilisation du thème par défaut');
+        console.error('Theme invalide:', themeId, 'Utilisation du theme par defaut');
         return _applyThemeInternal('darkmode');
     }
     
     const root = document.documentElement;
     
-    // BUG #8 FIX: Utiliser requestAnimationFrame pour éviter les reflows massifs
+    // BUG #8 FIX: Utiliser requestAnimationFrame pour eviter les reflows massifs
     requestAnimationFrame(() => {
     
     // Fonction helper pour convertir hex en RGB
@@ -502,7 +502,7 @@ function _applyThemeInternal(themeId) {
         } : { r: 16, g: 185, b: 129 }; // Default emerald
     };
     
-    // Gestion du Background Spécial (Mesh Gradient pour effet verre)
+    // Gestion du Background Special (Mesh Gradient pour effet verre)
     if (theme.colors.background === 'fixed' || theme.id === 'lightglass') {
         let bgGradient = '';
         let bgColor = '';
@@ -623,7 +623,7 @@ function _applyThemeInternal(themeId) {
     root.style.setProperty('--theme-danger-rgb', `${dangerRgb.r}, ${dangerRgb.g}, ${dangerRgb.b}`);
     root.style.setProperty('--theme-accent-rgb', `${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}`);
     
-    // Variables spécifiques pour certains thèmes
+    // Variables specifiques pour certains themes
     if (theme.colors.textGreen) {
         root.style.setProperty('--theme-text-green', theme.colors.textGreen);
     }
@@ -649,7 +649,7 @@ function _applyThemeInternal(themeId) {
     root.style.setProperty('--theme-font-secondary', theme.fonts.secondary);
     root.style.setProperty('--theme-font-mono', theme.fonts.mono);
     
-        // Ajouter une classe au body pour le thème
+        // Ajouter une classe au body pour le theme
         document.body.className = document.body.className.replace(/theme-\w+/g, '');
         document.body.classList.add(`theme-${themeId}`);
         
@@ -657,10 +657,10 @@ function _applyThemeInternal(themeId) {
         try {
         localStorage.setItem('gob-dashboard-theme', themeId);
     } catch (error) {
-        console.warn('Impossible de sauvegarder le thème dans localStorage:', error);
+        console.warn('Impossible de sauvegarder le theme dans localStorage:', error);
     }
     
-        // Déclencher un événement personnalisé
+        // Declencher un evenement personnalise
         window.dispatchEvent(new CustomEvent('themeChanged', { detail: { themeId } }));
 
         // PROPAGATION AUX IFRAMES (pour Emma IA et autres sous-apps)
@@ -699,7 +699,7 @@ function _applyThemeInternal(themeId) {
                     }
                 }, '*');
             } catch (e) {
-                console.warn('Impossible de propager le thème à l\'iframe', e);
+                console.warn('Impossible de propager le theme a l\'iframe', e);
             }
         });
         } catch (e) {
@@ -710,32 +710,32 @@ function _applyThemeInternal(themeId) {
     return theme;
 }
 
-// Fonction pour obtenir le thème actuel
+// Fonction pour obtenir le theme actuel
 function getCurrentTheme() {
     try {
         const saved = localStorage.getItem('gob-dashboard-theme');
-        // ✅ FIX: Ignorer 'lightglass' et le remplacer par 'darkmode'
+        //  FIX: Ignorer 'lightglass' et le remplacer par 'darkmode'
         if (saved === 'lightglass') {
             // Supprimer 'lightglass' du localStorage et utiliser 'darkmode'
             try {
                 localStorage.setItem('gob-dashboard-theme', 'darkmode');
             } catch (e) {
-                console.warn('Impossible de mettre à jour le thème:', e);
+                console.warn('Impossible de mettre a jour le theme:', e);
             }
             return 'darkmode';
         }
-        // Vérifier dans tous les thèmes (par défaut + personnalisés)
+        // Verifier dans tous les themes (par defaut + personnalises)
         if (saved && typeof saved === 'string' && allThemes[saved]) {
             return saved;
         }
     } catch (error) {
         console.warn('Erreur lors de la lecture du localStorage:', error);
     }
-    // Par défaut: darkmode
+    // Par defaut: darkmode
     return 'darkmode';
 }
 
-// Fonction pour initialiser le thème au chargement
+// Fonction pour initialiser le theme au chargement
 function initTheme() {
     const themeId = getCurrentTheme();
     return applyTheme(themeId);
@@ -761,13 +761,13 @@ function getTheme(themeId = null) {
     return allThemes[id] || allThemes.darkmode;
 }
 
-// Fonction pour réinitialiser le thème (supprimer du localStorage et appliquer le défaut)
+// Fonction pour reinitialiser le theme (supprimer du localStorage et appliquer le defaut)
 function resetTheme() {
     try {
         localStorage.removeItem('gob-dashboard-theme');
         return applyTheme('darkmode');
     } catch (error) {
-        console.warn('Erreur lors de la réinitialisation du thème:', error);
+        console.warn('Erreur lors de la reinitialisation du theme:', error);
         return applyTheme('darkmode');
     }
 }
@@ -781,14 +781,14 @@ window.GOBThemes = {
     getCurrentTheme,
     getTheme,
     initTheme,
-    resetTheme, // ✅ Nouvelle fonction pour réinitialiser le thème
+    resetTheme, //  Nouvelle fonction pour reinitialiser le theme
     // New helpers to replace isDarkMode
     isLightTheme,
     getTradingViewTheme,
     LIGHT_THEMES
 };
 
-// Initialiser le thème au chargement
+// Initialiser le theme au chargement
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initTheme);
 } else {

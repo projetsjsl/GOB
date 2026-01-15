@@ -366,7 +366,7 @@
             .sidebar { width: 80px; padding: 20px 10px; }
             .sidebar h2 span, .menu-item span, .menu-item:after { display: none; } /* Hide text, keep icons if added later */
             .sidebar h2 { font-size: 0; justify-content: center; } 
-            .sidebar h2::before { content: '⚙️'; font-size: 1.5rem; }
+            .sidebar h2::before { content: ''; font-size: 1.5rem; }
             .menu-item { justify-content: center; padding: 15px; }
             .main-content { margin-left: 80px; padding: 20px; }
             .sidebar-footer { left: 10px; right: 10px; }
@@ -394,16 +394,16 @@
     <div class="admin-container">
         <!-- Sidebar -->
         <nav class="sidebar">
-            <h2 title="Admin Panel">⚙️ Admin</h2>
-            <div class="menu-item active" onclick="switchSection('dashboard')">📊 Dashboard</div>
-            <div class="menu-item" onclick="switchSection('users')">👥 Utilisateurs</div>
-            <div class="menu-item" onclick="switchSection('fields')">📝 Champs</div>
-            <div class="menu-item" onclick="switchSection('templates')">📋 Templates</div>
-            <div class="menu-item" onclick="switchSection('clients')">📁 Dossiers</div>
-            <div class="menu-item" onclick="switchSection('import-export')">📤 Import/Export</div>
+            <h2 title="Admin Panel"> Admin</h2>
+            <div class="menu-item active" onclick="switchSection('dashboard')"> Dashboard</div>
+            <div class="menu-item" onclick="switchSection('users')"> Utilisateurs</div>
+            <div class="menu-item" onclick="switchSection('fields')"> Champs</div>
+            <div class="menu-item" onclick="switchSection('templates')"> Templates</div>
+            <div class="menu-item" onclick="switchSection('clients')"> Dossiers</div>
+            <div class="menu-item" onclick="switchSection('import-export')"> Import/Export</div>
             
             <div class="sidebar-footer">
-                <button class="btn-logout-admin" onclick="logoutAdmin()">Déconnexion</button>
+                <button class="btn-logout-admin" onclick="logoutAdmin()">Deconnexion</button>
             </div>
         </nav>
 
@@ -413,7 +413,7 @@
             <section id="dashboard" class="content-section active">
                 <div class="section-header">
                     <h1>Dashboard</h1>
-                    <p>Vue d'ensemble et état du système</p>
+                    <p>Vue d'ensemble et etat du systeme</p>
                 </div>
 
                 <div class="cards-grid">
@@ -432,7 +432,7 @@
                 </div>
 
                 <div class="form-container">
-                    <h3>Informations Système</h3>
+                    <h3>Informations Systeme</h3>
                     <table>
                         <tr>
                             <td style="width: 200px; color: var(--text-muted);">Version App</td>
@@ -443,7 +443,7 @@
                             <td id="storageInfo">Calcul...</td>
                         </tr>
                         <tr>
-                            <td style="color: var(--text-muted);">Dernière MAJ</td>
+                            <td style="color: var(--text-muted);">Derniere MAJ</td>
                             <td id="lastUpdate">-</td>
                         </tr>
                         <tr>
@@ -458,7 +458,7 @@
             <section id="users" class="content-section">
                 <div class="section-header">
                     <h1>Utilisateurs</h1>
-                    <p>Gérer les accès et les rôles</p>
+                    <p>Gerer les acces et les roles</p>
                 </div>
 
                 <div id="alertUsers" class="alert"></div>
@@ -477,10 +477,10 @@
                             </div>
                             <div class="form-group">
                                 <label>Mot de Passe</label>
-                                <input type="password" id="newPassword" required placeholder="••••••">
+                                <input type="password" id="newPassword" required placeholder="------">
                             </div>
                             <div class="form-group">
-                                <label>Rôle</label>
+                                <label>Role</label>
                                 <select id="newRole">
                                     <option value="user">Adjointe</option>
                                     <option value="admin">Admin</option>
@@ -488,7 +488,7 @@
                             </div>
                         </div>
                         <div style="text-align: right;">
-                            <button type="submit" class="btn btn-primary">Créer le Compte</button>
+                            <button type="submit" class="btn btn-primary">Creer le Compte</button>
                         </div>
                     </form>
                 </div>
@@ -499,8 +499,8 @@
                             <tr>
                                 <th>Nom</th>
                                 <th>Utilisateur</th>
-                                <th>Rôle</th>
-                                <th>Créé le</th>
+                                <th>Role</th>
+                                <th>Cree le</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -509,7 +509,7 @@
                 </div>
             </section>
 
-            <!-- Paramétrer Champs -->
+            <!-- Parametrer Champs -->
             <section id="fields" class="content-section">
                 <div class="section-header">
                     <h1>Configuration Champs</h1>
@@ -534,7 +534,7 @@
                     <h3>Excel Configuration</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Préfixe Fichier</label>
+                            <label>Prefixe Fichier</label>
                             <input type="text" id="excelTemplate" value="client_" placeholder="client_">
                         </div>
                         <div class="form-group">
@@ -559,10 +559,10 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Sections à inclure</label>
-                            <textarea id="pdfSections">Identité
+                            <label>Sections a inclure</label>
+                            <textarea id="pdfSections">Identite
 Situation Personnelle
-Situation Financière</textarea>
+Situation Financiere</textarea>
                         </div>
                     </div>
                     <div style="text-align: right; margin-top: 20px;">
@@ -575,7 +575,7 @@ Situation Financière</textarea>
             <section id="clients" class="content-section">
                 <div class="section-header">
                     <h1>Dossiers Clients</h1>
-                    <p>Base de données locale</p>
+                    <p>Base de donnees locale</p>
                 </div>
 
                 <div class="table-container">
@@ -603,13 +603,13 @@ Situation Financière</textarea>
 
                 <div class="form-container">
                     <h3>Export Global</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 20px;">Téléchargez une archive complète de la base de données locale.</p>
-                    <button class="btn btn-primary" onclick="exportAll()">📥 Télécharger ZIP</button>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">Telechargez une archive complete de la base de donnees locale.</p>
+                    <button class="btn btn-primary" onclick="exportAll()"> Telecharger ZIP</button>
                     
                     <h3 style="margin-top: 40px;">Import Global</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 20px;">Restaurer une sauvegarde (Attention: écrase les données actuelles).</p>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">Restaurer une sauvegarde (Attention: ecrase les donnees actuelles).</p>
                     <input type="file" id="importFile" accept=".json" style="margin-bottom: 20px;">
-                    <button class="btn btn-edit" onclick="importConfig()">📤 Restaurer</button>
+                    <button class="btn btn-edit" onclick="importConfig()"> Restaurer</button>
                 </div>
             </section>
         </main>
@@ -620,16 +620,16 @@ Situation Financière</textarea>
 
     <!-- Emma IA -->
     <div class="emma-container">
-        <button class="emma-toggle" id="emmaToggle">💬</button>
+        <button class="emma-toggle" id="emmaToggle"></button>
         <div class="emma-window" id="emmaWindow">
             <div class="emma-header" style="justify-content: space-between; display: flex;">
                 <span>Emma IA Admin</span>
-                <button class="emma-close" id="emmaClose">✕</button>
+                <button class="emma-close" id="emmaClose"></button>
             </div>
             <div class="emma-messages" id="emmaMessages"></div>
             <div class="emma-input-area">
                 <input type="text" id="emmaInput" placeholder="Aide Admin...">
-                <button class="emma-send" id="emmaSend">➤</button>
+                <button class="emma-send" id="emmaSend"></button>
             </div>
         </div>
     </div>

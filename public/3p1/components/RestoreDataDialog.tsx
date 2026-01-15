@@ -34,10 +34,10 @@ export const RestoreDataDialog: React.FC<RestoreDataDialogProps> = ({
 
         {/* Header */}
         <h2 className="text-xl font-bold text-gray-900 mb-2">
-          Restaurer les données
+          Restaurer les donnees
         </h2>
         <p className="text-sm text-gray-600 mb-6">
-          Choisissez comment restaurer les données de ce ticker :
+          Choisissez comment restaurer les donnees de ce ticker :
         </p>
 
         {/* Options */}
@@ -57,14 +57,14 @@ export const RestoreDataDialog: React.FC<RestoreDataDialogProps> = ({
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 mb-1">
-                  Depuis la dernière sauvegarde
+                  Depuis la derniere sauvegarde
                 </h3>
                 <p className="text-sm text-gray-600 mb-2">
-                  Restaure les données et métriques de la dernière version sauvegardée (snapshot).
+                  Restaure les donnees et metriques de la derniere version sauvegardee (snapshot).
                 </p>
                 {latestSnapshotDate && (
                   <p className="text-xs text-gray-500">
-                    Dernière sauvegarde : {new Date(latestSnapshotDate).toLocaleString('fr-CA')}
+                    Derniere sauvegarde : {new Date(latestSnapshotDate).toLocaleString('fr-CA')}
                   </p>
                 )}
               </div>
@@ -89,10 +89,10 @@ export const RestoreDataDialog: React.FC<RestoreDataDialogProps> = ({
                   Recalculer depuis FMP
                 </h3>
                 <p className="text-sm text-gray-600 mb-2">
-                  Récupère les données FMP et recalcule automatiquement toutes les métriques (comme lors d'un nouvel ajout de ticker).
+                  Recupere les donnees FMP et recalcule automatiquement toutes les metriques (comme lors d'un nouvel ajout de ticker).
                 </p>
                 <p className="text-xs text-gray-500">
-                  Les métriques seront recalculées selon les bonnes pratiques (CAGR, ratios moyens, etc.)
+                  Les metriques seront recalculees selon les bonnes pratiques (CAGR, ratios moyens, etc.)
                 </p>
               </div>
             </div>

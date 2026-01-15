@@ -1,5 +1,5 @@
 /**
- * API endpoint pour créer un nouveau salon de chat intégré
+ * API endpoint pour creer un nouveau salon de chat integre
  * POST /api/groupchat/integrated/create-room
  */
 
@@ -43,9 +43,9 @@ export default async function handler(req, res) {
             process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
-        // Générer un code de salon unique
-        // Note: La fonction RPC generate_room_code() doit être créée dans Supabase
-        // Fallback: génération côté serveur si la fonction n'existe pas
+        // Generer un code de salon unique
+        // Note: La fonction RPC generate_room_code() doit etre creee dans Supabase
+        // Fallback: generation cote serveur si la fonction n'existe pas
         let roomCode;
         try {
             const { data: codeData, error: codeError } = await supabase.rpc('generate_room_code');
@@ -55,12 +55,12 @@ export default async function handler(req, res) {
                 throw new Error('RPC function not available');
             }
         } catch (error) {
-            // Fallback: génération côté serveur
+            // Fallback: generation cote serveur
             const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
             const timePart = Date.now().toString().slice(-4);
             roomCode = `GOB-${randomPart}-${timePart}`;
             
-            // Vérifier que le code n'existe pas déjà (peu probable mais sécurité)
+            // Verifier que le code n'existe pas deja (peu probable mais securite)
             const { data: existing } = await supabase
                 .from('group_chat_rooms')
                 .select('id')
@@ -68,12 +68,12 @@ export default async function handler(req, res) {
                 .single();
             
             if (existing) {
-                // Si le code existe, en générer un nouveau
+                // Si le code existe, en generer un nouveau
                 roomCode = `GOB-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
             }
         }
 
-        // Créer le salon
+        // Creer le salon
         const { data: room, error: createError } = await supabase
             .from('group_chat_rooms')
             .insert([{
@@ -92,10 +92,10 @@ export default async function handler(req, res) {
             .single();
 
         if (createError) {
-            console.error('Erreur création salon:', createError);
+            console.error('Erreur creation salon:', createError);
             return res.status(500).json({
                 success: false,
-                error: 'Erreur création salon',
+                error: 'Erreur creation salon',
                 details: createError.message
             });
         }
@@ -119,7 +119,7 @@ export default async function handler(req, res) {
                 .insert([{
                     room_id: room.id,
                     user_id: 'system',
-                    user_display_name: 'Système',
+                    user_display_name: 'Systeme',
                     role: 'system',
                     content: welcomeMessage
                 }]);

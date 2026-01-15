@@ -1,5 +1,5 @@
 /**
- * API pour gérer les configurations de l'application
+ * API pour gerer les configurations de l'application
  * Remplace le hardcoding par des valeurs dynamiques depuis Supabase
  */
 
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: 'Method not allowed' });
     }
   } catch (error) {
-    console.error('❌ App config API error:', error);
+    console.error(' App config API error:', error);
     console.error('[app-config] Error stack:', error.stack);
     return res.status(500).json({
       success: false,
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
 }
 
 /**
- * GET - Récupérer les configurations
+ * GET - Recuperer les configurations
  */
 async function getConfig(req, res, supabase) {
   const { key, category, all } = req.query;
@@ -88,7 +88,7 @@ async function getConfig(req, res, supabase) {
   }
 
   if (all === 'true') {
-    // Récupérer toutes les configurations actives
+    // Recuperer toutes les configurations actives
     const { data, error } = await query.order('config_category', { ascending: true });
 
     if (error) {
@@ -108,7 +108,7 @@ async function getConfig(req, res, supabase) {
       data: data
     });
   } else {
-    // Récupérer une configuration spécifique
+    // Recuperer une configuration specifique
     const { data, error } = await query.maybeSingle();
 
     if (error) {
@@ -133,7 +133,7 @@ async function getConfig(req, res, supabase) {
 }
 
 /**
- * POST/PUT - Créer ou mettre à jour une configuration
+ * POST/PUT - Creer ou mettre a jour une configuration
  */
 async function setConfig(req, res, supabase) {
   const { config_key, config_category, config_value, description, is_active } = req.body;
@@ -193,7 +193,7 @@ async function setConfig(req, res, supabase) {
 }
 
 /**
- * DELETE - Supprimer une configuration (désactiver)
+ * DELETE - Supprimer une configuration (desactiver)
  */
 async function deleteConfig(req, res, supabase) {
   const { key } = req.query;
@@ -205,7 +205,7 @@ async function deleteConfig(req, res, supabase) {
     });
   }
 
-  // Désactiver au lieu de supprimer
+  // Desactiver au lieu de supprimer
   const { data, error } = await supabase
     .from('app_config')
     .update({ is_active: false, updated_at: new Date().toISOString() })

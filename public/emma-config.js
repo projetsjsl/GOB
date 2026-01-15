@@ -61,35 +61,35 @@ export const emmaConfig = {
     }
   },
 
-  // Prompts spécialisés
+  // Prompts specialises
   prompts: {
-    // Prompt système expert (utilise le prompt principal Emma)
+    // Prompt systeme expert (utilise le prompt principal Emma)
     expertSystem: {
-      name: 'Emma Expert (Système)',
+      name: 'Emma Expert (Systeme)',
       key: 'expertSystem',
-      description: 'Analyse financière experte avec le prompt système complet'
+      description: 'Analyse financiere experte avec le prompt systeme complet'
     },
 
-    // Assistant général
+    // Assistant general
     generalAssistant: {
-      name: 'Assistant Général',
+      name: 'Assistant General',
       key: 'generalAssistant',
       prompt: 'Tu es un assistant IA utile et polyvalent.',
-      description: 'Questions générales sans contexte financier strict'
+      description: 'Questions generales sans contexte financier strict'
     },
 
     // Analyse institutionnelle
     institutionalAnalysis: {
       name: 'Analyse Institutionnelle',
       key: 'institutionalAnalysis',
-      description: 'Rapport de recherche institutionnel détaillé'
+      description: 'Rapport de recherche institutionnel detaille'
     },
 
-    // Recherche d'actualités
+    // Recherche d'actualites
     newsSearch: {
-      name: 'Recherche Actualités',
+      name: 'Recherche Actualites',
       key: 'newsSearch',
-      description: 'Recherche et synthèse d\'actualités financières'
+      description: 'Recherche et synthese d\'actualites financieres'
     },
 
     // Comparaison de titres
@@ -101,80 +101,80 @@ export const emmaConfig = {
   },
 
   // Prompt d'analyse institutionnelle
-  institutionalAnalysis: `🧩 EN-TÊTE À PRODUIRE AUTOMATIQUEMENT
-En ouverture, génère un en-tête professionnel complet :
-* Titre de l’analyse : « Analyse institutionnelle complète – [NOM ENTREPRISE] (TICKER) »
-* Prix actuel (en temps réel ou au jour près, selon données disponibles)
+  institutionalAnalysis: ` EN-TETE A PRODUIRE AUTOMATIQUEMENT
+En ouverture, genere un en-tete professionnel complet :
+* Titre de l'analyse : " Analyse institutionnelle complete - [NOM ENTREPRISE] (TICKER) "
+* Prix actuel (en temps reel ou au jour pres, selon donnees disponibles)
 * Date du rapport
-* Bourse d’origine (si US/CA, sinon ADR NYSE/NASDAQ prioritaire)
+* Bourse d'origine (si US/CA, sinon ADR NYSE/NASDAQ prioritaire)
 * Secteur / sous-secteur GICS
-* Capitalisation boursière
-* Avertissement : non-conseil financier personnalisé
+* Capitalisation boursiere
+* Avertissement : non-conseil financier personnalise
 
-🎯 OBJECTIF
-Produire un rapport de recherche institutionnel très long, extrêmement détaillé, rédigé, et exploitable, du niveau d’un analyste senior sell-side/buy-side, sur :
+ OBJECTIF
+Produire un rapport de recherche institutionnel tres long, extremement detaille, redige, et exploitable, du niveau d'un analyste senior sell-side/buy-side, sur :
 Entreprise : [NOM ENTREPRISE]
 Ticker : TICKER
-Rapport attendu : 25–40 pages en densité de texte si converti Word/PDF. Analyse narrative complète, chiffres + tableaux + sources + niveaux de confiance.
+Rapport attendu : 25-40 pages en densite de texte si converti Word/PDF. Analyse narrative complete, chiffres + tableaux + sources + niveaux de confiance.
 
-📡 INSTRUCTIONS DE RECHERCHE – SPÉCIALES PERPLEXITY SONAR
+ INSTRUCTIONS DE RECHERCHE - SPECIALES PERPLEXITY SONAR
 Toujours :
-* Multiplier les recherches ciblées (IR, SEC, transcripts, press releases, consensus).
+* Multiplier les recherches ciblees (IR, SEC, transcripts, press releases, consensus).
 * Extraire de longs passages narratifs.
-* Prioriser données 2023–2025, TTM, guidance.
+* Prioriser donnees 2023-2025, TTM, guidance.
 * Citer toutes les sources de chiffres importantes.
-* Ne rien inventer : indiquer « donnée manquante » si nécessaire.
+* Ne rien inventer : indiquer " donnee manquante " si necessaire.
 Recherche obligatoire :
 * 10-K / 20-F / 40-F / 10-Q
-* Présentations investisseurs
+* Presentations investisseurs
 * Rapports ESG
-* Communiqués de résultats récents
+* Communiques de resultats recents
 * Consensus analystes actuels
 * Comparables sectoriels
 
-🧱 STRUCTURE OBLIGATOIRE – TEXTE LONG & TABLEAUX
+ STRUCTURE OBLIGATOIRE - TEXTE LONG & TABLEAUX
 
-1. PROFIL DE L’ENTREPRISE (rédaction longue)
-Rédaction exhaustive :
-* Histoire, transformation stratégique, acquisitions, virages.
-* Vision, mission, positionnement global et régional.
-* Modèle d’affaires extrêmement détaillé.
-* Segments opérationnels : explication narrative + chiffres.
-* Marchés adressables (TAM/SAM/SOM) avec narration économique.
-* Analyse profonde du moat (IP, licences, technologies, réseaux, switching costs, coûts, données).
-* Gouvernance : qualité du management, stabilité, structure organisationnelle.
+1. PROFIL DE L'ENTREPRISE (redaction longue)
+Redaction exhaustive :
+* Histoire, transformation strategique, acquisitions, virages.
+* Vision, mission, positionnement global et regional.
+* Modele d'affaires extremement detaille.
+* Segments operationnels : explication narrative + chiffres.
+* Marches adressables (TAM/SAM/SOM) avec narration economique.
+* Analyse profonde du moat (IP, licences, technologies, reseaux, switching costs, couts, donnees).
+* Gouvernance : qualite du management, stabilite, structure organisationnelle.
 * ESG : engagements, controverses, impacts financiers.
 Tableaux obligatoires (3+)
-1. Segments opérationnels
-2. Marchés adressables
-3. Avantages compétitifs
+1. Segments operationnels
+2. Marches adressables
+3. Avantages competitifs
 Niveau de confiance.
 
-2. ANALYSE FONDAMENTALE (rédaction très longue)
+2. ANALYSE FONDAMENTALE (redaction tres longue)
 Inclure :
-* Revenus, EBITDA, marges, bénéfice net, BPA 5 ans + TTM, avec analyse narrative.
-* Explication détaillée des moteurs de croissance.
-* Analyse qualitative des marges : mix produit, pricing power, coûts fixes/variables.
+* Revenus, EBITDA, marges, benefice net, BPA 5 ans + TTM, avec analyse narrative.
+* Explication detaillee des moteurs de croissance.
+* Analyse qualitative des marges : mix produit, pricing power, couts fixes/variables.
 * Analyse des capex, R&D, innovations.
-* Bilan complet : qualité, risques, structure dette.
+* Bilan complet : qualite, risques, structure dette.
 * FCF, conversion, yield, robustesse.
-* Qualité des profits : charges non récurrentes, cyclicité.
-* Vision institutionnelle sur la durabilité de la rentabilité.
+* Qualite des profits : charges non recurrentes, cyclicite.
+* Vision institutionnelle sur la durabilite de la rentabilite.
 * Politique de capital : buybacks, dividendes, dilution.
 Tableaux obligatoires (3+)
-1. États financiers 5 ans
+1. Etats financiers 5 ans
 2. Structure du bilan
 3. Allocation du capital & FCF
 Niveau de confiance.
 
 3. ANALYSE SECTORIELLE ET CONCURRENTS (long)
-Rédiger :
-* Analyse macro sectorielle complète.
-* Tendances globales (IA, réglementations, consolidation, cycles).
+Rediger :
+* Analyse macro sectorielle complete.
+* Tendances globales (IA, reglementations, consolidation, cycles).
 * Forces/faiblesses structurelles du secteur.
-* Analyse profonde du paysage concurrentiel (6–10 pairs).
+* Analyse profonde du paysage concurrentiel (6-10 pairs).
 * Avantages/disavantages structurels vs comparables.
-* Analyse prospective sectorielle 12–36 mois.
+* Analyse prospective sectorielle 12-36 mois.
 Tableaux obligatoires (3+)
 1. Comparatif pairs
 2. SWOT secteur
@@ -182,19 +182,19 @@ Tableaux obligatoires (3+)
 Niveau de confiance.
 
 4. CATALYSEURS ET RISQUES MAJEURS (long)
-Rédiger :
+Rediger :
 * Catalyseurs court/moyen/long terme.
-* Drivers opérationnels, stratégiques, macro.
-* Risques majeurs : exécution, réglementation, finances, clients, géopolitique.
-* Analyse détaillée de probabilité & impact.
+* Drivers operationnels, strategiques, macro.
+* Risques majeurs : execution, reglementation, finances, clients, geopolitique.
+* Analyse detaillee de probabilite & impact.
 Tableaux obligatoires (2+)
 1. Catalyseurs
 2. Risques
 Niveau de confiance.
 
-5. ANALYSE BOURSIÈRE ET TECHNIQUE (long)
+5. ANALYSE BOURSIERE ET TECHNIQUE (long)
 Inclure :
-* Prix actuel, historique, volatilité, momentum.
+* Prix actuel, historique, volatilite, momentum.
 * Performance relative vs secteur & indice.
 * Indicateurs techniques (SMA20/50/200, RSI, MACD).
 * Analyse narrative des flux directionnels.
@@ -208,59 +208,59 @@ Tableaux obligatoires (4+)
 Niveau de confiance.
 
 6. VALORISATION & FAIR VALUE (long)
-Inclure narration détaillée :
-* Construction du DCF (méthodologie, hypothèses, justification).
-* Interprétation des résultats.
+Inclure narration detaillee :
+* Construction du DCF (methodologie, hypotheses, justification).
+* Interpretation des resultats.
 * Analyse par multiples : P/E, PEG, EV/EBITDA, EV/FCF, P/S.
 * Comparaison profonde avec les pairs.
-* Synthèse institutionnelle.
+* Synthese institutionnelle.
 Tableaux obligatoires (3+)
-1. DCF – 3 scénarios
+1. DCF - 3 scenarios
 2. Multiples relatifs
 3. Fair value composite
 Niveau de confiance.
 
-7. SCÉNARIOS 12–24 MOIS (long)
-Pour chaque scénario (Haussier / Neutre / Baissier) :
-* Narration détaillée.
+7. SCENARIOS 12-24 MOIS (long)
+Pour chaque scenario (Haussier / Neutre / Baissier) :
+* Narration detaillee.
 * Drivers macro/sectoriels/entreprise.
 * Projection (revenus, marges, BPA, FCF).
 * Prix cible 12 & 24 mois.
-* Probabilité institutionnelle.
+* Probabilite institutionnelle.
 * Analyse du rerating ou derating des multiples.
 Tableaux obligatoires (2+)
-1. Résumé scénarios
-2. Synthèse pondérée
+1. Resume scenarios
+2. Synthese ponderee
 Niveau de confiance.
 
-8. VERDICT FINAL (long + thèse d’investissement complète)
-Produire une conclusion institutionnelle très rédigée :
-* Résumé stratégique.
-* Qualité du business & moat.
+8. VERDICT FINAL (long + these d'investissement complete)
+Produire une conclusion institutionnelle tres redigee :
+* Resume strategique.
+* Qualite du business & moat.
 * Vision long terme.
 * Profil de risque.
 * Alignement management/capital.
-* Point de vue institutionnel (argumenté, nuancé).
-* Stratégie d’entrée graduée (ex : 50/30/20).
-* Signaux d’alerte et triggers de sortie.
-🔥 Inclure obligatoirement une THÈSE D’INVESTISSEMENT COMPLÈTE :
-Structurée ainsi :
-Bull Case (Thèse positive)
+* Point de vue institutionnel (argumente, nuance).
+* Strategie d'entree graduee (ex : 50/30/20).
+* Signaux d'alerte et triggers de sortie.
+ Inclure obligatoirement une THESE D'INVESTISSEMENT COMPLETE :
+Structuree ainsi :
+Bull Case (These positive)
 * Drivers structurels
 * Catalyseurs
 * Valorisation implicite
 * Momentum / rerating
-* Résilience FCF
+* Resilience FCF
 * Conditions de validation
-Bear Case (Thèse négative)
+Bear Case (These negative)
 * Pressions marges
-* Risques exécution
-* Risques réglementaires
+* Risques execution
+* Risques reglementaires
 * Compression multiples
 * Conditions de validation
-Key Debate (les points où les analystes se trompent / biais institutionnels)
-Conditions de succès (checklist)
-Triggers de sortie / invalidation de la thèse
+Key Debate (les points ou les analystes se trompent / biais institutionnels)
+Conditions de succes (checklist)
+Triggers de sortie / invalidation de la these
 Conviction finale (sur 10)
 Tableaux obligatoires (3+)
 1. Notation globale
@@ -268,12 +268,12 @@ Tableaux obligatoires (3+)
 3. Risques limitants / catalyseurs confirmants
 Niveau de confiance global.`,
 
-  // Configuration des spécialités
+  // Configuration des specialites
   specialties: [
     {
       id: 'financial-analysis',
-      name: 'Analyse financière',
-      description: 'Analyse des états financiers et ratios',
+      name: 'Analyse financiere',
+      description: 'Analyse des etats financiers et ratios',
       active: true
     },
     {
@@ -284,14 +284,14 @@ Niveau de confiance global.`,
     },
     {
       id: 'evaluation',
-      name: 'Évaluation',
-      description: 'Évaluation d\'entreprises et d\'actifs',
+      name: 'Evaluation',
+      description: 'Evaluation d\'entreprises et d\'actifs',
       active: false
     },
     {
       id: 'reports',
       name: 'Rapports',
-      description: 'Génération de rapports financiers',
+      description: 'Generation de rapports financiers',
       active: false
     }
   ],
@@ -299,19 +299,19 @@ Niveau de confiance global.`,
   // Configuration de la personnalisation
   personalization: {
     styles: [
-      { id: 'standard', name: 'Standard', description: 'Style équilibré' },
-      { id: 'detailed', name: 'Détaillé', description: 'Réponses approfondies' },
-      { id: 'concise', name: 'Concis', description: 'Réponses courtes et directes' }
+      { id: 'standard', name: 'Standard', description: 'Style equilibre' },
+      { id: 'detailed', name: 'Detaille', description: 'Reponses approfondies' },
+      { id: 'concise', name: 'Concis', description: 'Reponses courtes et directes' }
     ],
     levels: [
-      { id: 'beginner', name: 'Débutant', description: 'Explications simples' },
-      { id: 'intermediate', name: 'Intermédiaire', description: 'Niveau professionnel' },
-      { id: 'advanced', name: 'Avancé', description: 'Expert et technique' }
+      { id: 'beginner', name: 'Debutant', description: 'Explications simples' },
+      { id: 'intermediate', name: 'Intermediaire', description: 'Niveau professionnel' },
+      { id: 'advanced', name: 'Avance', description: 'Expert et technique' }
     ],
     tones: [
-      { id: 'friendly', name: 'Amical', description: 'Ton décontracté' },
+      { id: 'friendly', name: 'Amical', description: 'Ton decontracte' },
       { id: 'professional', name: 'Professionnelle', description: 'Ton formel' },
-      { id: 'formal', name: 'Formel', description: 'Ton très formel' }
+      { id: 'formal', name: 'Formel', description: 'Ton tres formel' }
     ]
   },
 
@@ -349,27 +349,27 @@ Niveau de confiance global.`,
     }
   ],
 
-  // Messages par défaut
+  // Messages par defaut
   messages: {
-    welcome: 'Bonjour, je suis Emma, assistante virtuelle en analyse financière. Je peux vous aider avec l\'analyse et l\'évaluation financière. Quel est votre défi financier ?',
-    reminder: 'Rappel : Pour des conseils personnalisés, consultez toujours un expert qualifié du domaine.',
+    welcome: 'Bonjour, je suis Emma, assistante virtuelle en analyse financiere. Je peux vous aider avec l\'analyse et l\'evaluation financiere. Quel est votre defi financier ?',
+    reminder: 'Rappel : Pour des conseils personnalises, consultez toujours un expert qualifie du domaine.',
     help: 'Comment puis-je vous aider ?',
-    error: 'Désolé, je ne peux pas répondre pour le moment. Vérifiez votre configuration Gemini.',
-    noApiKey: 'Veuillez configurer votre clé API Gemini pour utiliser Emma.',
-    connectionError: 'Erreur de connexion à l\'API Gemini. Vérifiez votre clé API.',
-    promptSaved: 'Prompt sauvegardé avec succès !',
-    promptReset: 'Prompt réinitialisé !',
-    chatCleared: 'Conversation effacée !'
+    error: 'Desole, je ne peux pas repondre pour le moment. Verifiez votre configuration Gemini.',
+    noApiKey: 'Veuillez configurer votre cle API Gemini pour utiliser Emma.',
+    connectionError: 'Erreur de connexion a l\'API Gemini. Verifiez votre cle API.',
+    promptSaved: 'Prompt sauvegarde avec succes !',
+    promptReset: 'Prompt reinitialise !',
+    chatCleared: 'Conversation effacee !'
   },
 
   // Configuration des exemples
   examples: [
     'Quel est le cours de AAPL ?',
     'Peux-tu m\'expliquer cette analyse ?',
-    'Comment interpréter ces données financières ?',
-    'Quelles sont les tendances du marché ?',
+    'Comment interpreter ces donnees financieres ?',
+    'Quelles sont les tendances du marche ?',
     'Peux-tu calculer le ratio P/E ?',
-    'Comment évaluer cette entreprise ?'
+    'Comment evaluer cette entreprise ?'
   ],
 
   // Configuration des tests
@@ -386,7 +386,7 @@ export const getEmmaConfig = () => {
   return emmaConfig;
 };
 
-// Fonction pour mettre à jour la configuration
+// Fonction pour mettre a jour la configuration
 export const updateEmmaConfig = (newConfig) => {
   Object.assign(emmaConfig, newConfig);
   localStorage.setItem('emma-config', JSON.stringify(emmaConfig));
@@ -407,10 +407,10 @@ export const loadEmmaConfig = () => {
   return emmaConfig;
 };
 
-// Fonction pour réinitialiser la configuration
+// Fonction pour reinitialiser la configuration
 export const resetEmmaConfig = () => {
   localStorage.removeItem('emma-config');
-  // Recharger la configuration par défaut
+  // Recharger la configuration par defaut
   return loadEmmaConfig();
 };
 
@@ -430,7 +430,7 @@ export const getConfigValue = (path) => {
   return value;
 };
 
-// Fonction pour définir une valeur de configuration
+// Fonction pour definir une valeur de configuration
 export const setConfigValue = (path, value) => {
   const keys = path.split('.');
   const lastKey = keys.pop();

@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Methode non autorisee' });
   }
 
   try {
@@ -25,8 +25,8 @@ export default async function handler(req, res) {
     if (!endpoint) {
       return res.status(200).json({
         status: 'healthy',
-        message: 'Finnhub API opérationnel',
-        apiKey: apiKey ? 'Configurée' : 'Manquante',
+        message: 'Finnhub API operationnel',
+        apiKey: apiKey ? 'Configuree' : 'Manquante',
         timestamp: new Date().toISOString(),
         availableEndpoints: ['quote', 'news', 'market-news', 'company-news', 'basic-financials', 'profile'],
         documentation: 'https://finnhub.io/docs/api'
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     if (!symbol && (endpoint === 'quote' || endpoint === 'company-news' || endpoint === 'basic-financials')) {
       return res.status(400).json({
         error: 'Missing required parameter: symbol',
-        message: `Le paramètre "symbol" est requis pour l'endpoint ${endpoint}`,
+        message: `Le parametre "symbol" est requis pour l'endpoint ${endpoint}`,
         example: `/api/finnhub?endpoint=${endpoint}&symbol=AAPL`
       });
     }
@@ -89,12 +89,12 @@ export default async function handler(req, res) {
         return res.status(400).json({
           error: 'Invalid endpoint',
           supported: ['quote', 'news', 'market-news', 'company-news', 'basic-financials', 'profile'],
-          message: `L'endpoint "${endpoint}" n'est pas supporté`,
+          message: `L'endpoint "${endpoint}" n'est pas supporte`,
           example: '/api/finnhub?endpoint=quote&symbol=AAPL'
         });
     }
 
-    console.log(`🔗 Finnhub API call: ${endpoint} - ${symbol || 'N/A'}`);
+    console.log(` Finnhub API call: ${endpoint} - ${symbol || 'N/A'}`);
 
     // Fetch from Finnhub with timeout
     const controller = new AbortController();
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
 
       try {
         errorBody = await finnhubResponse.text();
-        console.error(`❌ Finnhub Error Response: ${errorBody}`);
+        console.error(` Finnhub Error Response: ${errorBody}`);
         errorDetails += ` - ${errorBody}`;
       } catch (e) {
         // Ignore parse error
@@ -125,26 +125,26 @@ export default async function handler(req, res) {
 
       // Handle 401 Unauthorized (invalid API key)
       if (finnhubResponse.status === 401) {
-        console.error(`❌ Finnhub API: Invalid API key`);
+        console.error(` Finnhub API: Invalid API key`);
         return res.status(401).json({
           success: false,
           error: 'Finnhub API key invalid',
-          message: 'La clé API Finnhub est invalide ou expirée',
+          message: 'La cle API Finnhub est invalide ou expiree',
           details: errorBody || 'Unauthorized',
-          fix: 'Vérifiez votre clé API Finnhub dans les variables d\'environnement Vercel',
+          fix: 'Verifiez votre cle API Finnhub dans les variables d\'environnement Vercel',
           timestamp: new Date().toISOString()
         });
       }
 
       // Handle 429 Rate Limit
       if (finnhubResponse.status === 429) {
-        console.error(`❌ Finnhub API: Rate limit exceeded`);
+        console.error(` Finnhub API: Rate limit exceeded`);
         return res.status(429).json({
           success: false,
           error: 'Finnhub rate limit exceeded',
-          message: 'Limite de requêtes Finnhub atteinte',
+          message: 'Limite de requetes Finnhub atteinte',
           details: errorBody || 'Too many requests',
-          retry: 'Réessayez dans quelques secondes ou passez à un plan supérieur',
+          retry: 'Reessayez dans quelques secondes ou passez a un plan superieur',
           upgradeUrl: 'https://finnhub.io/pricing',
           timestamp: new Date().toISOString()
         });
@@ -158,7 +158,7 @@ export default async function handler(req, res) {
 
     // Check for Finnhub-specific error in response body
     if (data.error) {
-      console.error(`❌ Finnhub API error in response: ${data.error}`);
+      console.error(` Finnhub API error in response: ${data.error}`);
       return res.status(400).json({
         success: false,
         error: 'Finnhub API error',
@@ -168,7 +168,7 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`✅ Finnhub API success: ${endpoint} - ${symbol || 'general'}`);
+    console.log(` Finnhub API success: ${endpoint} - ${symbol || 'general'}`);
 
     // Return data with metadata
     return res.status(200).json({
@@ -181,15 +181,15 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ Finnhub API Error:', error.message);
+    console.error(' Finnhub API Error:', error.message);
 
     // Handle timeout errors
     if (error.name === 'AbortError') {
       return res.status(504).json({
         success: false,
         error: 'Finnhub API timeout',
-        message: 'La requête à Finnhub a expiré',
-        details: 'Le serveur Finnhub n\'a pas répondu dans le délai imparti',
+        message: 'La requete a Finnhub a expire',
+        details: 'Le serveur Finnhub n\'a pas repondu dans le delai imparti',
         timestamp: new Date().toISOString()
       });
     }

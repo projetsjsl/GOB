@@ -12,9 +12,9 @@
  *   await credentialsManager.set('FMP_API_KEY', 'abc123', 'supabase');
  */
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // CREDENTIAL SOURCES
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 const SOURCES = {
     VERCEL: 'vercel',       // Environment variables on Vercel
@@ -23,16 +23,16 @@ const SOURCES = {
     MANUAL: 'manual'        // Manually entered (session only)
 };
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // API REGISTRY - All supported APIs and their metadata
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 const API_REGISTRY = {
     // LLM Providers
     PERPLEXITY_API_KEY: {
         name: 'Perplexity AI',
         category: 'llm',
-        icon: '🔮',
+        icon: '',
         description: 'Web-search augmented AI (Sonar, Pro models)',
         required: true,
         testEndpoint: 'https://api.perplexity.ai/chat/completions',
@@ -41,7 +41,7 @@ const API_REGISTRY = {
     OPENAI_API_KEY: {
         name: 'OpenAI',
         category: 'llm',
-        icon: '🤖',
+        icon: '',
         description: 'GPT-4, GPT-4o, o1 models',
         required: false,
         testEndpoint: 'https://api.openai.com/v1/models',
@@ -50,7 +50,7 @@ const API_REGISTRY = {
     ANTHROPIC_API_KEY: {
         name: 'Anthropic Claude',
         category: 'llm',
-        icon: '🧠',
+        icon: '',
         description: 'Claude 3.5 Sonnet, Haiku, Opus',
         required: false,
         testEndpoint: 'https://api.anthropic.com/v1/messages',
@@ -59,7 +59,7 @@ const API_REGISTRY = {
     GOOGLE_API_KEY: {
         name: 'Google Gemini',
         category: 'llm',
-        icon: '💎',
+        icon: '',
         description: 'Gemini Flash, Pro models with grounding',
         required: false,
         docUrl: 'https://ai.google.dev/docs'
@@ -69,7 +69,7 @@ const API_REGISTRY = {
     FMP_API_KEY: {
         name: 'Financial Modeling Prep',
         category: 'finance',
-        icon: '📊',
+        icon: '',
         description: 'Stock quotes, financials, earnings',
         required: true,
         testEndpoint: 'https://financialmodelingprep.com/api/v3/stock/list',
@@ -78,7 +78,7 @@ const API_REGISTRY = {
     FINNHUB_API_KEY: {
         name: 'Finnhub',
         category: 'finance',
-        icon: '📈',
+        icon: '',
         description: 'Real-time quotes, company news',
         required: false,
         testEndpoint: 'https://finnhub.io/api/v1/stock/symbol',
@@ -89,7 +89,7 @@ const API_REGISTRY = {
     RESEND_API_KEY: {
         name: 'Resend',
         category: 'communication',
-        icon: '📧',
+        icon: '',
         description: 'Email sending for briefings',
         required: false,
         testEndpoint: 'https://api.resend.com/emails',
@@ -98,7 +98,7 @@ const API_REGISTRY = {
     TWILIO_ACCOUNT_SID: {
         name: 'Twilio Account SID',
         category: 'communication',
-        icon: '📱',
+        icon: '',
         description: 'SMS sending',
         required: false,
         docUrl: 'https://www.twilio.com/docs'
@@ -106,7 +106,7 @@ const API_REGISTRY = {
     TWILIO_AUTH_TOKEN: {
         name: 'Twilio Auth Token',
         category: 'communication',
-        icon: '📱',
+        icon: '',
         description: 'SMS authentication',
         required: false,
         isSensitive: true
@@ -116,7 +116,7 @@ const API_REGISTRY = {
     SUPABASE_URL: {
         name: 'Supabase URL',
         category: 'database',
-        icon: '🗄️',
+        icon: '',
         description: 'Supabase project URL',
         required: true,
         docUrl: 'https://supabase.com/docs'
@@ -124,14 +124,14 @@ const API_REGISTRY = {
     SUPABASE_ANON_KEY: {
         name: 'Supabase Anon Key',
         category: 'database',
-        icon: '🔑',
+        icon: '',
         description: 'Public anonymous key',
         required: true
     },
     SUPABASE_SERVICE_ROLE_KEY: {
         name: 'Supabase Service Role',
         category: 'database',
-        icon: '🔐',
+        icon: '',
         description: 'Admin access key (server-side only)',
         required: false,
         isSensitive: true
@@ -141,7 +141,7 @@ const API_REGISTRY = {
     TAVUS_API_KEY: {
         name: 'Tavus',
         category: 'video',
-        icon: '🎬',
+        icon: '',
         description: 'AI video avatars',
         required: false,
         docUrl: 'https://docs.tavus.io/'
@@ -149,51 +149,51 @@ const API_REGISTRY = {
     HEYGEN_API_KEY: {
         name: 'HeyGen',
         category: 'video',
-        icon: '🎭',
+        icon: '',
         description: 'AI video generation',
         required: false,
         docUrl: 'https://docs.heygen.com/'
     }
 };
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // MCP CONNECTIONS REGISTRY
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 const MCP_REGISTRY = {
     'perplexity-ask': {
         name: 'Perplexity Ask',
         description: 'Web search with AI analysis',
-        icon: '🔮',
+        icon: '',
         requiredKeys: ['PERPLEXITY_API_KEY'],
         status: 'connected'
     },
     'supabase-mcp-server': {
         name: 'Supabase MCP',
         description: 'Database operations, migrations',
-        icon: '🗄️',
+        icon: '',
         requiredKeys: ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'],
         status: 'connected'
     },
     'financial-data': {
         name: 'Financial Data',
         description: 'Stock quotes, company data, earnings',
-        icon: '📊',
+        icon: '',
         requiredKeys: ['FMP_API_KEY'],
         status: 'available'
     },
     'email-sender': {
         name: 'Email Sender',
         description: 'Send emails via Resend',
-        icon: '📧',
+        icon: '',
         requiredKeys: ['RESEND_API_KEY'],
         status: 'available'
     }
 };
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // CREDENTIALS MANAGER CLASS
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 class CredentialsManager {
     constructor() {
@@ -214,7 +214,7 @@ class CredentialsManager {
         } catch { }
         
         this.initialized = true;
-        console.log('✅ [CredentialsManager] Initialized');
+        console.log(' [CredentialsManager] Initialized');
     }
 
     /**
@@ -273,7 +273,7 @@ class CredentialsManager {
                 this._setInSession(key, value);
                 break;
             case SOURCES.VERCEL:
-                console.warn('⚠️ Cannot set Vercel env vars from client. Use Vercel dashboard.');
+                console.warn(' Cannot set Vercel env vars from client. Use Vercel dashboard.');
                 return false;
         }
         
@@ -368,9 +368,9 @@ class CredentialsManager {
         return mcpStatus;
     }
 
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // PRIVATE: Source-specific getters/setters
-    // ═══════════════════════════════════════════════════════════════
+    // 
 
     async _getFromVercel(key) {
         try {
@@ -471,9 +471,9 @@ class CredentialsManager {
     }
 }
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // SINGLETON INSTANCE
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 const credentialsManager = new CredentialsManager();
 

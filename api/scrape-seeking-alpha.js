@@ -18,18 +18,18 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // GET: Retourne le script de scraping à injecter
+  // GET: Retourne le script de scraping a injecter
   if (req.method === 'GET') {
     const { ticker } = req.query;
 
-    // Script qui sera injecté dans la page Seeking Alpha
+    // Script qui sera injecte dans la page Seeking Alpha
     const scrapingScript = `
 (function() {
   try {
     // Extraire tout le texte de la page
     const fullText = document.body.innerText;
 
-    // Chercher des sections spécifiques
+    // Chercher des sections specifiques
     const sections = {};
     const sectionHeaders = [
       'Investment Thesis',
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
       }
     });
 
-    // Retourner les données
+    // Retourner les donnees
     return {
       success: true,
       fullText: fullText,
@@ -74,14 +74,14 @@ export default async function handler(req, res) {
       instructions: {
         step1: 'Ouvrir la page Seeking Alpha',
         step2: 'Injecter ce script via console ou bookmarklet',
-        step3: 'Le script retourne les données automatiquement',
-        step4: 'POST les données à cette API pour sauvegarde'
+        step3: 'Le script retourne les donnees automatiquement',
+        step4: 'POST les donnees a cette API pour sauvegarde'
       },
       timestamp: new Date().toISOString()
     });
   }
 
-  // POST: Sauvegarder les données scrapées
+  // POST: Sauvegarder les donnees scrapees
   if (req.method === 'POST') {
     try {
       const { ticker, fullText, sections, url } = req.body;
@@ -93,7 +93,7 @@ export default async function handler(req, res) {
         });
       }
 
-      console.log(`📥 Réception données scrapées pour ${ticker} - ${fullText.length} caractères`);
+      console.log(` Reception donnees scrapees pour ${ticker} - ${fullText.length} caracteres`);
 
       // Ici, on pourrait sauvegarder dans Supabase
       // Pour l'instant, on retourne simplement success
@@ -106,12 +106,12 @@ export default async function handler(req, res) {
           sectionsCount: Object.keys(sections || {}).length,
           url: url
         },
-        message: `Données reçues pour ${ticker}`,
+        message: `Donnees recues pour ${ticker}`,
         timestamp: new Date().toISOString()
       });
 
     } catch (error) {
-      console.error('❌ Erreur sauvegarde:', error.message);
+      console.error(' Erreur sauvegarde:', error.message);
       return res.status(500).json({
         success: false,
         error: error.message

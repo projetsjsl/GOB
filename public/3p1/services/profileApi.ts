@@ -1,6 +1,6 @@
 /**
  * Service pour sauvegarder et charger les profils depuis Supabase
- * Remplace progressivement localStorage/IndexedDB par Supabase comme source de vérité
+ * Remplace progressivement localStorage/IndexedDB par Supabase comme source de verite
  */
 
 import { AnalysisProfile } from '../types';
@@ -27,7 +27,7 @@ export async function saveProfileToSupabase(
       profile.data,
       profile.assumptions,
       profile.info,
-      notes || `Profil sauvegardé automatiquement`,
+      notes || `Profil sauvegarde automatiquement`,
       true, // is_current
       false, // auto_fetched
       0, // retryCount
@@ -40,14 +40,14 @@ export async function saveProfileToSupabase(
 
     return result;
   } catch (error: any) {
-    console.error(`❌ Erreur sauvegarde profil ${profile.id} dans Supabase:`, error);
+    console.error(` Erreur sauvegarde profil ${profile.id} dans Supabase:`, error);
     return { success: false, error: error.message || 'Erreur inconnue' };
   }
 }
 
 /**
  * Sauvegarde plusieurs profils en batch dans Supabase
- * Optimisé pour sauvegarder tous les profils d'un coup
+ * Optimise pour sauvegarder tous les profils d'un coup
  */
 export async function saveProfilesBatchToSupabase(
   profiles: Record<string, AnalysisProfile>
@@ -57,9 +57,9 @@ export async function saveProfilesBatchToSupabase(
   let failedCount = 0;
   const errors: string[] = [];
 
-  console.log(`💾 Sauvegarde batch de ${tickers.length} profils dans Supabase...`);
+  console.log(` Sauvegarde batch de ${tickers.length} profils dans Supabase...`);
 
-  // ✅ Charger la taille du batch depuis Supabase (pas de hardcoding)
+  //  Charger la taille du batch depuis Supabase (pas de hardcoding)
   const { getConfigValue } = await import('./appConfigApi');
   const configuredBatchSize = Number(await getConfigValue('profile_batch_size'));
   const configuredDelayMs = Number(await getConfigValue('delay_between_batches_ms'));
@@ -89,13 +89,13 @@ export async function saveProfilesBatchToSupabase(
       })
     );
 
-    // Petit délai entre batches pour éviter rate limiting
+    // Petit delai entre batches pour eviter rate limiting
     if (i + batchSize < tickers.length && batchDelayMs > 0) {
       await new Promise(resolve => setTimeout(resolve, batchDelayMs));
     }
   }
 
-  console.log(`✅ Sauvegarde batch terminée: ${successCount} succès, ${failedCount} échecs`);
+  console.log(` Sauvegarde batch terminee: ${successCount} succes, ${failedCount} echecs`);
 
   return {
     success: successCount,
@@ -114,7 +114,7 @@ export async function loadAllProfilesFromSupabase(): Promise<{
   error?: string;
 }> {
   try {
-    // ✅ Limite depuis Supabase (pas de hardcoding)
+    //  Limite depuis Supabase (pas de hardcoding)
     const { getConfigValue } = await import('./appConfigApi');
     const limit = await getConfigValue('snapshots_limit');
     const response = await fetch(`${API_BASE}/api/finance-snapshots?all=true&current=true&limit=${limit}`);
@@ -126,7 +126,7 @@ export async function loadAllProfilesFromSupabase(): Promise<{
     const result = await response.json();
 
     if (!result.success || !result.data) {
-      return { success: false, profiles: {}, error: 'Format de réponse invalide' };
+      return { success: false, profiles: {}, error: 'Format de reponse invalide' };
     }
 
     const profiles: Record<string, AnalysisProfile> = {};
@@ -141,19 +141,19 @@ export async function loadAllProfilesFromSupabase(): Promise<{
           assumptions: snapshot.assumptions || {},
           info: snapshot.company_info || {},
           notes: snapshot.notes || '',
-          isWatchlist: null // Sera déterminé depuis tickers table
+          isWatchlist: null // Sera determine depuis tickers table
         };
       }
     });
 
-    console.log(`✅ ${Object.keys(profiles).length} profils chargés depuis Supabase`);
+    console.log(` ${Object.keys(profiles).length} profils charges depuis Supabase`);
 
     return {
       success: true,
       profiles
     };
   } catch (error: any) {
-    console.error('❌ Erreur chargement profils depuis Supabase:', error);
+    console.error(' Erreur chargement profils depuis Supabase:', error);
     return {
       success: false,
       profiles: {},

@@ -1,6 +1,6 @@
 /**
  * Unified News API
- * Agrège les actualités depuis multiples sources avec déduplication et scoring
+ * Agrege les actualites depuis multiples sources avec deduplication et scoring
  * Sources: FMP, Finnhub, Finviz, RSS feeds
  */
 
@@ -15,7 +15,7 @@ try {
   const configPath = join(process.cwd(), 'config', 'news-sources-scoring.json');
   scoringConfig = JSON.parse(readFileSync(configPath, 'utf8'));
 } catch (error) {
-  console.error('⚠️ Could not load scoring config, using defaults');
+  console.error(' Could not load scoring config, using defaults');
   scoringConfig = {
     criteria_weights: {
       reliability: 0.30,
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   if (handled) return;
 
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Methode non autorisee' });
   }
 
   try {
@@ -47,14 +47,14 @@ export default async function handler(req, res) {
 
     if (!searchQuery && strict) {
       return res.status(400).json({
-        error: 'Paramètre q, ticker ou symbol requis',
+        error: 'Parametre q, ticker ou symbol requis',
         success: false
       });
     }
 
-    console.log(`📰 Fetching unified news: query="${searchQuery}", limit=${maxLimit}, context=${context}`);
+    console.log(` Fetching unified news: query="${searchQuery}", limit=${maxLimit}, context=${context}`);
 
-    // Collecter news depuis toutes les sources en parallèle
+    // Collecter news depuis toutes les sources en parallele
     const newsPromises = [];
 
     // Source 1: FMP News
@@ -83,16 +83,16 @@ export default async function handler(req, res) {
       }
     }
 
-    // Attendre toutes les réponses
+    // Attendre toutes les reponses
     const results = await Promise.allSettled(newsPromises);
     const allNews = [];
 
-    // Traiter les résultats
+    // Traiter les resultats
     for (const result of results) {
       if (result.status === 'fulfilled' && result.value) {
         allNews.push(...result.value);
       } else if (result.status === 'rejected') {
-        console.error('❌ News source error:', result.reason?.message || result.reason);
+        console.error(' News source error:', result.reason?.message || result.reason);
       }
     }
 
@@ -102,12 +102,12 @@ export default async function handler(req, res) {
         articles: [],
         count: 0,
         sources: [],
-        message: 'Aucune actualité trouvée',
+        message: 'Aucune actualite trouvee',
         timestamp: new Date().toISOString()
       });
     }
 
-    // Déduplication par URL et titre similaire
+    // Deduplication par URL et titre similaire
     const deduplicatedNews = deduplicateNews(allNews);
 
     // Appliquer scoring de pertinence
@@ -121,13 +121,13 @@ export default async function handler(req, res) {
       return new Date(b.published_at || b.datetime || b.date) - new Date(a.published_at || a.datetime || a.date);
     });
 
-    // Limiter les résultats
+    // Limiter les resultats
     const limitedNews = scoredNews.slice(0, maxLimit);
 
-    // Extraire les sources utilisées
+    // Extraire les sources utilisees
     const sourcesUsed = [...new Set(limitedNews.map(n => n.source_provider).filter(Boolean))];
 
-    console.log(`✅ Unified news: ${limitedNews.length} articles from ${sourcesUsed.length} sources`);
+    console.log(` Unified news: ${limitedNews.length} articles from ${sourcesUsed.length} sources`);
 
     return res.status(200).json({
       success: true,
@@ -135,15 +135,15 @@ export default async function handler(req, res) {
       count: limitedNews.length,
       sources: sourcesUsed,
       source: sourcesUsed.join(', '),
-      message: `Actualités récupérées depuis ${sourcesUsed.join(', ')}`,
+      message: `Actualites recuperees depuis ${sourcesUsed.join(', ')}`,
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
-    console.error('❌ Unified news API error:', error);
+    console.error(' Unified news API error:', error);
     return res.status(500).json({
       success: false,
-      error: 'Erreur lors de la récupération des actualités',
+      error: 'Erreur lors de la recuperation des actualites',
       message: process.env.NODE_ENV === 'development' ? error.message : 'Internal error',
       endpoint: '/api/news',
       query: (req.query.q || req.query.ticker || req.query.symbol || 'general').substring(0, 20),
@@ -153,7 +153,7 @@ export default async function handler(req, res) {
 }
 
 /**
- * Récupère news depuis FMP
+ * Recupere news depuis FMP
  */
 async function fetchFMPNews(query, limit) {
   try {
@@ -164,7 +164,7 @@ async function fetchFMPNews(query, limit) {
       // News par ticker
       url = `https://financialmodelingprep.com/stable/news/stock?symbols=${query.toUpperCase()}&apikey=${apiKey}`;
     } else {
-      // News générales
+      // News generales
       url = `https://financialmodelingprep.com/stable/news/general-latest?page=0&limit=${limit}&apikey=${apiKey}`;
     }
 
@@ -197,13 +197,13 @@ async function fetchFMPNews(query, limit) {
     }));
 
   } catch (error) {
-    console.error('❌ FMP news fetch error:', error.message);
+    console.error(' FMP news fetch error:', error.message);
     return [];
   }
 }
 
 /**
- * Récupère news depuis Finnhub avec gestion du rate limiting
+ * Recupere news depuis Finnhub avec gestion du rate limiting
  */
 async function fetchFinnhubNews(query, limit, retryCount = 0) {
   const MAX_RETRIES = 2;
@@ -219,7 +219,7 @@ async function fetchFinnhubNews(query, limit, retryCount = 0) {
       const toDate = new Date().toISOString().split('T')[0];
       url = `https://finnhub.io/api/v1/company-news?symbol=${query.toUpperCase()}&from=${fromDate}&to=${toDate}&token=${apiKey}`;
     } else {
-      // News générales
+      // News generales
       url = `https://finnhub.io/api/v1/news?category=general&token=${apiKey}`;
     }
 
@@ -229,11 +229,11 @@ async function fetchFinnhubNews(query, limit, retryCount = 0) {
     if (response.status === 429) {
       if (retryCount < MAX_RETRIES) {
         const delay = RETRY_DELAY_MS * Math.pow(2, retryCount); // Exponential backoff
-        console.warn(`⚠️ Finnhub rate limited (429), retrying in ${delay}ms... (attempt ${retryCount + 1}/${MAX_RETRIES})`);
+        console.warn(` Finnhub rate limited (429), retrying in ${delay}ms... (attempt ${retryCount + 1}/${MAX_RETRIES})`);
         await new Promise(resolve => setTimeout(resolve, delay));
         return fetchFinnhubNews(query, limit, retryCount + 1);
       }
-      console.warn('⚠️ Finnhub rate limit exceeded, skipping source');
+      console.warn(' Finnhub rate limit exceeded, skipping source');
       return [];
     }
 
@@ -272,13 +272,13 @@ async function fetchFinnhubNews(query, limit, retryCount = 0) {
     });
 
   } catch (error) {
-    console.error('❌ Finnhub news fetch error:', error.message);
+    console.error(' Finnhub news fetch error:', error.message);
     return [];
   }
 }
 
 /**
- * Récupère news depuis Finviz
+ * Recupere news depuis Finviz
  */
 async function fetchFinvizNews(ticker, limit) {
   try {
@@ -310,13 +310,13 @@ async function fetchFinvizNews(ticker, limit) {
     }));
 
   } catch (error) {
-    console.error('❌ Finviz news fetch error:', error.message);
+    console.error(' Finviz news fetch error:', error.message);
     return [];
   }
 }
 
 /**
- * Déduplique les news par URL et titre similaire
+ * Deduplique les news par URL et titre similaire
  */
 function deduplicateNews(news) {
   const seen = new Set();
@@ -326,13 +326,13 @@ function deduplicateNews(news) {
     const url = article.url;
     const title = (article.title || article.headline || '').toLowerCase().trim();
 
-    // Créer une clé unique basée sur URL ou titre
+    // Creer une cle unique basee sur URL ou titre
     let key = url;
     if (!key || key === 'null' || key === 'undefined') {
-      key = title.substring(0, 100); // Utiliser les 100 premiers caractères du titre
+      key = title.substring(0, 100); // Utiliser les 100 premiers caracteres du titre
     }
 
-    // Normaliser l'URL (enlever paramètres de tracking, etc.)
+    // Normaliser l'URL (enlever parametres de tracking, etc.)
     if (key && key.startsWith('http')) {
       try {
         const urlObj = new URL(key);
@@ -367,10 +367,10 @@ function applyScoring(news, context = 'general') {
     const sourceConfig = sourceKey ? scoringConfig.sources[sourceKey] : null;
 
     // Score de base depuis config
-    let relevanceScore = 5.0; // Score par défaut
+    let relevanceScore = 5.0; // Score par defaut
 
     if (sourceConfig) {
-      // Calculer score pondéré
+      // Calculer score pondere
       const scores = sourceConfig.scores;
       relevanceScore = (
         scores.reliability * weights.reliability +
@@ -382,12 +382,12 @@ function applyScoring(news, context = 'general') {
       );
     }
 
-    // Bonus si source préférée pour le contexte
+    // Bonus si source preferee pour le contexte
     if (contextConfig.preferred_sources.includes(sourceKey)) {
       relevanceScore += 0.5;
     }
 
-    // Bonus pour récence (plus récent = score plus élevé)
+    // Bonus pour recence (plus recent = score plus eleve)
     const publishedDate = new Date(article.published_at || article.datetime || article.date);
     const hoursAgo = (Date.now() - publishedDate.getTime()) / (1000 * 60 * 60);
     if (hoursAgo < 24) {
@@ -405,7 +405,7 @@ function applyScoring(news, context = 'general') {
 }
 
 /**
- * Trouve la clé de source dans la config depuis le nom
+ * Trouve la cle de source dans la config depuis le nom
  */
 function findSourceKey(sourceName) {
   if (!sourceName) return null;
@@ -459,7 +459,7 @@ function findSourceKey(sourceName) {
 }
 
 /**
- * Sélectionne les flux RSS selon le contexte
+ * Selectionne les flux RSS selon le contexte
  */
 function selectRSSFeedsForContext(context) {
   const contextFeeds = {
@@ -475,7 +475,7 @@ function selectRSSFeedsForContext(context) {
 }
 
 /**
- * Récupère news depuis flux RSS
+ * Recupere news depuis flux RSS
  */
 async function fetchRSSNews(feedKeys, limit, query) {
   try {
@@ -502,7 +502,7 @@ async function fetchRSSNews(feedKeys, limit, query) {
 
     return articles;
   } catch (error) {
-    console.error('❌ RSS news fetch error:', error.message);
+    console.error(' RSS news fetch error:', error.message);
     return [];
   }
 }

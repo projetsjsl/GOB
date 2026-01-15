@@ -30,9 +30,9 @@ export function CountrySpreadChart({ usData, caData }: CountrySpreadChartProps) 
   return (
     <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-foreground">Écart de Rendement États-Unis-Canada</CardTitle>
+        <CardTitle className="text-foreground">Ecart de Rendement Etats-Unis-Canada</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Différence entre les rendements des obligations du Trésor américain et des obligations d'État canadiennes
+          Difference entre les rendements des obligations du Tresor americain et des obligations d'Etat canadiennes
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -45,7 +45,7 @@ export function CountrySpreadChart({ usData, caData }: CountrySpreadChartProps) 
             <YAxis
               stroke="#9ca3af"
               tick={{ fill: "#9ca3af", fontSize: 12 }}
-              label={{ value: "Écart (pb)", angle: -90, position: "insideLeft", fill: "#d1d5db" }}
+              label={{ value: "Ecart (pb)", angle: -90, position: "insideLeft", fill: "#d1d5db" }}
               tickFormatter={(value) => `${(value * 100).toFixed(0)}`}
             />
             <Tooltip
@@ -57,7 +57,7 @@ export function CountrySpreadChart({ usData, caData }: CountrySpreadChartProps) 
               }}
               formatter={(value: number, name: string) => {
                 if (name === "spread") {
-                  return [`${(value * 100).toFixed(1)} pb`, "Écart US-CA"]
+                  return [`${(value * 100).toFixed(1)} pb`, "Ecart US-CA"]
                 }
                 return [`${value.toFixed(2)}%`, name === "usYield" ? "Rendement US" : "Rendement CA"]
               }}
@@ -73,26 +73,26 @@ export function CountrySpreadChart({ usData, caData }: CountrySpreadChartProps) 
 
         <div className="mt-4 grid grid-cols-3 gap-2">
           <div className="p-2 rounded bg-muted/30 text-center">
-            <p className="text-xs text-muted-foreground">Écart Moyen</p>
+            <p className="text-xs text-muted-foreground">Ecart Moyen</p>
             <p className="text-sm font-semibold text-foreground">
               {((spreadData.reduce((sum, d) => sum + d.spread, 0) / spreadData.length) * 100).toFixed(1)} pb
             </p>
           </div>
           <div className="p-2 rounded bg-muted/30 text-center">
-            <p className="text-xs text-muted-foreground">Écart 10Y</p>
+            <p className="text-xs text-muted-foreground">Ecart 10Y</p>
             <p className="text-sm font-semibold text-foreground">
               {((spreadData.find((d) => d.maturity === "10Y")?.spread || 0) * 100).toFixed(1)} pb
             </p>
           </div>
           <div className="p-2 rounded bg-muted/30 text-center">
-            <p className="text-xs text-muted-foreground">Écart 30Y</p>
+            <p className="text-xs text-muted-foreground">Ecart 30Y</p>
             <p className="text-sm font-semibold text-foreground">
               {((spreadData.find((d) => d.maturity === "30Y")?.spread || 0) * 100).toFixed(1)} pb
             </p>
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground">Source: Réserve Fédérale des États-Unis et Banque du Canada</p>
+          <p className="text-xs text-muted-foreground">Source: Reserve Federale des Etats-Unis et Banque du Canada</p>
         </div>
       </CardContent>
     </Card>

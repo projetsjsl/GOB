@@ -1,46 +1,46 @@
 ![Image](IMG_9800.jpeg)
 
-# 📊 Collecteur Financier - Application Web Complète
+#  Collecteur Financier - Application Web Complete
 
-## 🎯 Vue d'Ensemble
+##  Vue d'Ensemble
 
-Application Web ultra-complète pour la **collecte de données d'onboarding client en finance** avec :
+Application Web ultra-complete pour la **collecte de donnees d'onboarding client en finance** avec :
 
-✅ **Page de Login** sécurisée avec 2 rôles (Admin/User)
-✅ **Formulaire d'Onboarding** en 3 étapes avec sauvegarde automatique
-✅ **Dashboard Admin** complet pour paramétrer tout
-✅ **Export Excel et PDF** automatiques et paramétrables
-✅ **Gestion des Utilisateurs** - créer/modifier/supprimer comptes
-✅ **Gestion des Champs** - ajouter/modifier les champs du formulaire
-✅ **Import/Export** de configurations et données
-✅ **Palette de Couleurs Créative** (Teal, Orange, Crème)
-✅ **100% Local** - Fonctionne en mode standalone sans build
+ **Page de Login** securisee avec 2 roles (Admin/User)
+ **Formulaire d'Onboarding** en 3 etapes avec sauvegarde automatique
+ **Dashboard Admin** complet pour parametrer tout
+ **Export Excel et PDF** automatiques et parametrables
+ **Gestion des Utilisateurs** - creer/modifier/supprimer comptes
+ **Gestion des Champs** - ajouter/modifier les champs du formulaire
+ **Import/Export** de configurations et donnees
+ **Palette de Couleurs Creative** (Teal, Orange, Creme)
+ **100% Local** - Fonctionne en mode standalone sans build
 
 ---
 
-## 🚀 Démarrage Ultra-Rapide
+##  Demarrage Ultra-Rapide
 
-### Étape 1 : Créer la Structure
+### Etape 1 : Creer la Structure
 
-Créez un dossier `collecteur` et dedans :
+Creez un dossier `collecteur` et dedans :
 
 ```
 collecteur/
-├── public/
-│   ├── index.html          (Page login)
-│   ├── app.html            (Formulaire)
-│   ├── admin.html          (Admin panel)
-│   ├── app-logic.js        (Logique app)
-│   ├── admin-logic.js      (Logique admin)
-│   └── data/
-│       ├── users.json      (Utilisateurs)
-│       ├── clients.json    (Données collectées)
-│       └── config.json     (Configuration)
+ public/
+    index.html          (Page login)
+    app.html            (Formulaire)
+    admin.html          (Admin panel)
+    app-logic.js        (Logique app)
+    admin-logic.js      (Logique admin)
+    data/
+        users.json      (Utilisateurs)
+        clients.json    (Donnees collectees)
+        config.json     (Configuration)
 ```
 
-### Étape 2 : Lancer le Serveur Local
+### Etape 2 : Lancer le Serveur Local
 
-**Option A - Python 3 (recommandé):**
+**Option A - Python 3 (recommande):**
 ```bash
 cd collecteur
 python -m http.server 8000
@@ -57,55 +57,55 @@ npx http-server
 - Clic droit sur `index.html`
 - "Open with Live Server"
 
-### Étape 3 : Accéder à l'Application
+### Etape 3 : Acceder a l'Application
 
-Ouvrez votre navigateur et allez à :
+Ouvrez votre navigateur et allez a :
 ```
 http://localhost:8000/public/index.html
 ```
 
 ---
 
-## 🔐 Identifiants de Test
+##  Identifiants de Test
 
 ### Administrateur
 ```
-👤 Utilisateur: admin
-🔑 Mot de passe: admin123
+ Utilisateur: admin
+ Mot de passe: admin123
 ```
 
-### Adjointe (Collectrice de Données)
+### Adjointe (Collectrice de Donnees)
 ```
-👤 Utilisateur: user
-🔑 Mot de passe: user123
+ Utilisateur: user
+ Mot de passe: user123
 ```
 
 ---
 
-## 📱 Workflow Utilisateur
+##  Workflow Utilisateur
 
-### 👤 Mode Adjointe (Collectrice)
+###  Mode Adjointe (Collectrice)
 
 1. **Connexion**
    - Entrez `user` / `user123`
-   - Accès direct au formulaire
+   - Acces direct au formulaire
 
-2. **Remplir les 3 Étapes**
-   - **Étape 1: Identité** - Nom, email, adresse
-   - **Étape 2: Situation** - État civil, emploi, famille
-   - **Étape 3: Finances** - Revenu, actifs, placements
+2. **Remplir les 3 Etapes**
+   - **Etape 1: Identite** - Nom, email, adresse
+   - **Etape 2: Situation** - Etat civil, emploi, famille
+   - **Etape 3: Finances** - Revenu, actifs, placements
 
 3. **Sauvegarde Automatique**
-   - Chaque modification est sauvegardée (💾 indicateur visible)
-   - Données stockées localement (localStorage)
+   - Chaque modification est sauvegardee ( indicateur visible)
+   - Donnees stockees localement (localStorage)
 
-4. **Récapitulatif & Export**
-   - Voir tous les champs collectés
-   - Exporter en **Excel** (téléchargement CSV)
+4. **Recapitulatif & Export**
+   - Voir tous les champs collectes
+   - Exporter en **Excel** (telechargement CSV)
    - Exporter en **PDF** (format texte signable)
-   - Créer un nouveau dossier client
+   - Creer un nouveau dossier client
 
-### 🔧 Mode Admin (Paramétrage)
+###  Mode Admin (Parametrage)
 
 1. **Connexion**
    - Entrez `admin` / `admin123`
@@ -113,34 +113,34 @@ http://localhost:8000/public/index.html
 
 2. **Sections Admin Disponibles:**
 
-   **📊 Dashboard**
+   ** Dashboard**
    - Vue d'ensemble : nombre users, clients, champs
-   - Info système, stockage utilisé, navigateur
+   - Info systeme, stockage utilise, navigateur
 
-   **👥 Gestion Utilisateurs**
-   - Créer de nouveaux utilisateurs
-   - Attribuer rôles (Admin/Adjointe)
+   ** Gestion Utilisateurs**
+   - Creer de nouveaux utilisateurs
+   - Attribuer roles (Admin/Adjointe)
    - Supprimer utilisateurs
-   - Table complète avec dates de création
+   - Table complete avec dates de creation
 
-   **📝 Paramétrer Champs**
+   ** Parametrer Champs**
    - Modifier les 3 sections du formulaire
    - Ajouter/supprimer/modifier champs
-   - Configurer: libellé, type (text/number/date/select/textarea), requis/optionnel
+   - Configurer: libelle, type (text/number/date/select/textarea), requis/optionnel
    - Changer l'ordre des champs
 
-   **📋 Configuration Templates**
+   ** Configuration Templates**
    - **Excel**: nom fichier, colonnes incluses
    - **PDF**: titre formulaire, inclure signature, sections
    - Sauvegarder configurations
 
-   **📁 Dossiers Clients**
-   - Liste tous les clients collectés
+   ** Dossiers Clients**
+   - Liste tous les clients collectes
    - Voir/supprimer dossiers
-   - Informations financières
-   - Dates de création
+   - Informations financieres
+   - Dates de creation
 
-   **📤 Import/Export Global**
+   ** Import/Export Global**
    - Exporter tout en ZIP (users, config, clients)
    - Importer configurations JSON
    - Tester sauvegarde auto Excel
@@ -148,122 +148,122 @@ http://localhost:8000/public/index.html
 
 ---
 
-## 🎨 Palette de Couleurs
+##  Palette de Couleurs
 
 | Couleur | Hexadecimal | Usage |
 |---------|------------|-------|
 | Teal (Primaire) | #208C8E | Headers, boutons, accents |
 | Teal Clair | #32B8C6 | Hover, highlights |
 | Orange (Accent) | #E67F61 | Boutons secondaires, alerte |
-| Vert (Succès) | #15804D | Validation, confirmation |
-| Crème (Fond) | #FFFBF5 | Background principal |
+| Vert (Succes) | #15804D | Validation, confirmation |
+| Creme (Fond) | #FFFBF5 | Background principal |
 | Charcoal (Texte) | #1F2121 | Texte principal |
 
 ---
 
-## 📋 Champs Collectés par Défaut
+##  Champs Collectes par Defaut
 
-### Section 1 : Identité
-- Prénom (requis)
+### Section 1 : Identite
+- Prenom (requis)
 - Nom (requis)
 - Email (requis)
-- Téléphone (requis)
+- Telephone (requis)
 - Adresse (requis)
 - Ville
 - Province
 - Code Postal
 
 ### Section 2 : Situation Personnelle
-- État Civil (requis) - Sélect
+- Etat Civil (requis) - Select
 - Date de Naissance (requis)
-- NAS (Numéro Assurance Sociale)
-- Nombre d'Enfants à Charge
+- NAS (Numero Assurance Sociale)
+- Nombre d'Enfants a Charge
 - Employeur (requis)
 - Titre de Poste (requis)
 - Nom du Conjoint
 - Employeur du Conjoint
 
-### Section 3 : Situation Financière
+### Section 3 : Situation Financiere
 - Revenu Annuel (requis)
 - Revenu Conjoint
-- Valeur Immobilière
+- Valeur Immobiliere
 - Actifs Liquides
-- Horizon de Placement (requis) - Sélect
-- Tolérance au Risque (requis) - Sélect
-- Numéro REER
+- Horizon de Placement (requis) - Select
+- Tolerance au Risque (requis) - Select
+- Numero REER
 - Comptable (Nom)
-- Comptable (Téléphone)
+- Comptable (Telephone)
 - Notes Additionnelles
 
 ---
 
-## 💾 Données et Stockage
+##  Donnees et Stockage
 
 ### LocalStorage (Navigateur)
 - **users.json** : Comptes utilisateurs + mots de passe
 - **config.json** : Configuration champs, templates
-- **clients.json** : Données collectées
+- **clients.json** : Donnees collectees
 - **currentUser** : Session active
 - **currentFormData** : Formulaire en cours
 
 ### Limitations Actuelles
-⚠️ Les données restent LOCAL au navigateur
-⚠️ Pas de synchronisation multi-appareil
-⚠️ Mots de passe en CLAIR (à crypter en prod)
+ Les donnees restent LOCAL au navigateur
+ Pas de synchronisation multi-appareil
+ Mots de passe en CLAIR (a crypter en prod)
 
 ### Pour Production
-- Intégrer une vraie BDD (PostgreSQL, MongoDB, etc.)
+- Integrer une vraie BDD (PostgreSQL, MongoDB, etc.)
 - Chiffrer les mots de passe (bcrypt)
 - Ajouter authentification JWT
 - HTTPS obligatoire
-- Backup réguliers
+- Backup reguliers
 
 ---
 
-## 📊 Exports
+##  Exports
 
 ### Format Excel (CSV)
-Télécharge un fichier `.csv` avec :
-- En-têtes des colonnes
-- Données du client
+Telecharge un fichier `.csv` avec :
+- En-tetes des colonnes
+- Donnees du client
 - Format compatible Excel
 
 **Nom fichier:** `client_[NOM]_[DATE].csv`
 
 ### Format PDF (Texte)
-Génère un fichier texte formaté prêt à imprimer/signer :
+Genere un fichier texte formate pret a imprimer/signer :
 - Titre du formulaire
 - Toutes les sections
 - Espace signature
-- Date de génération
+- Date de generation
 
 **Nom fichier:** `formulaire_[NOM]_[DATE].txt`
 
 ### Sauvegarde Auto Excel
-À chaque création de nouveau client, un Excel est généré automatiquement depuis l'admin.
+A chaque creation de nouveau client, un Excel est genere automatiquement depuis l'admin.
 
 ---
 
-## 🔄 Import/Export Configuration
+##  Import/Export Configuration
 
 ### Exporter Configuration (Admin)
-1. Allez à "📤 Import/Export"
-2. Cliquez "📥 Exporter ZIP"
-3. Télécharge JSON avec tous les settings
+1. Allez a " Import/Export"
+2. Cliquez " Exporter ZIP"
+3. Telecharge JSON avec tous les settings
 
 ### Importer Configuration
-1. Depuis admin, "📤 Import/Export"
-2. Sélectionnez fichier JSON
-3. Cliquez "📤 Importer"
-4. Configuration remplacée
+1. Depuis admin, " Import/Export"
+2. Selectionnez fichier JSON
+3. Cliquez " Importer"
+4. Configuration remplacee
 
 ---
 
-## 🔧 Customisation
+##  Customisation
 
 ### Modifier la Palette de Couleurs
 
-Éditez le bloc CSS `:root` dans `index.html`, `app.html`, `admin.html` :
+Editez le bloc CSS `:root` dans `index.html`, `app.html`, `admin.html` :
 
 ```css
 :root {
@@ -279,16 +279,16 @@ Génère un fichier texte formaté prêt à imprimer/signer :
 ### Ajouter un Nouveau Champ
 
 **Via Admin:**
-1. Allez à "📝 Paramétrer Champs"
-2. Sélectionnez une section
+1. Allez a " Parametrer Champs"
+2. Selectionnez une section
 3. Cliquez "+ Ajouter Champ"
-4. Configurez libellé, type, requis
+4. Configurez libelle, type, requis
 
 **Manuellement (config.json):**
 ```json
 {
   "id": "nouveauChamp",
-  "label": "Libellé Affichage",
+  "label": "Libelle Affichage",
   "type": "text|number|email|date|select|textarea",
   "required": true|false,
   "visible": true|false
@@ -297,38 +297,38 @@ Génère un fichier texte formaté prêt à imprimer/signer :
 
 ### Renommer l'Application
 
-Éditez dans `index.html` :
+Editez dans `index.html` :
 ```html
-<h1>💼 Collecteur Financier</h1>
+<h1> Collecteur Financier</h1>
 ```
 
 Et dans `app.html` header :
 ```html
-<h1>📊 Collecteur Financier</h1>
+<h1> Collecteur Financier</h1>
 ```
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
-### Problème: "Impossible de se connecter"
-- Vérifiez localStorage n'est pas désactivé
+### Probleme: "Impossible de se connecter"
+- Verifiez localStorage n'est pas desactive
 - Ouvrez Console (F12) pour voir les erreurs
-- Réinitialisez : Supprimer localStorage + rafraîchir
+- Reinitialisez : Supprimer localStorage + rafraichir
 
-### Problème: Les données ne se sauvegardent pas
-- Vérifiez que localStorage est activé
-- Vérifiez permissions navigateur
-- Essayez une fenêtre privée/incognito
+### Probleme: Les donnees ne se sauvegardent pas
+- Verifiez que localStorage est active
+- Verifiez permissions navigateur
+- Essayez une fenetre privee/incognito
 
-### Problème: Export Excel ne fonctionne pas
-- Vérifiez permissions téléchargement
+### Probleme: Export Excel ne fonctionne pas
+- Verifiez permissions telechargement
 - Essayez un autre navigateur
-- Vérifiez la console pour erreurs
+- Verifiez la console pour erreurs
 
-### Problème: Oubli de mot de passe
+### Probleme: Oubli de mot de passe
 - Admin: Modifier directement dans localStorage
-- Ouvrir Console (F12), exécuter:
+- Ouvrir Console (F12), executer:
 ```javascript
 let users = JSON.parse(localStorage.getItem('users'));
 users[0].password = 'newpassword';
@@ -337,24 +337,24 @@ localStorage.setItem('users', JSON.stringify(users));
 
 ---
 
-## 🌐 Déploiement Production
+##  Deploiement Production
 
-### Sur Vercel (Gratuit, Recommandé)
+### Sur Vercel (Gratuit, Recommande)
 
 1. Poussez code sur GitHub
 2. Allez sur vercel.com
 3. Connectez repo
-4. Déploiement automatique
+4. Deploiement automatique
 5. URL publique disponible
 
-⚠️ **Important**: Ne pas expose localStorage en prod, utilisez API backend!
+ **Important**: Ne pas expose localStorage en prod, utilisez API backend!
 
 ### Sur Netlify
 
-1. Créez un compte netlify.com
+1. Creez un compte netlify.com
 2. Connectez repo GitHub
-3. Paramètres build: Command = `echo`, Directory = `public`
-4. Déploiement automatique
+3. Parametres build: Command = `echo`, Directory = `public`
+4. Deploiement automatique
 
 ### Sur votre serveur (Node.js)
 
@@ -363,22 +363,22 @@ npm install -g serve
 serve -s public -l 3000
 ```
 
-Accédez à `http://votreserveur.com:3000`
+Accedez a `http://votreserveur.com:3000`
 
 ---
 
-## 📞 Support et Maintenance
+##  Support et Maintenance
 
 ### Logs de Debug
 Ouvrez la Console du navigateur (F12) :
 ```javascript
-// Voir toutes les données
+// Voir toutes les donnees
 console.log(JSON.parse(localStorage.getItem('users')));
 console.log(JSON.parse(localStorage.getItem('clients')));
 console.log(JSON.parse(localStorage.getItem('config')));
 ```
 
-### Réinitialiser Complètement
+### Reinitialiser Completement
 ```javascript
 localStorage.clear();
 location.reload();
@@ -392,29 +392,29 @@ console.table(clients);
 
 ---
 
-## ✨ Fonctionnalités Futures
+##  Fonctionnalites Futures
 
-- [ ] Intégration BDD (Firebase, Supabase)
+- [ ] Integration BDD (Firebase, Supabase)
 - [ ] Authentification multi-factor
-- [ ] Chiffrement des données
-- [ ] Synchronisation temps réel
+- [ ] Chiffrement des donnees
+- [ ] Synchronisation temps reel
 - [ ] Mobile app native
 - [ ] Rapports automatiques
 - [ ] Webhooks/API
-- [ ] Intégration CRM
+- [ ] Integration CRM
 - [ ] Notifications par email
 - [ ] Audit trail complet
 
 ---
 
-## 📄 Licence
+##  Licence
 
-Utilisation interne - Tous droits réservés
+Utilisation interne - Tous droits reserves
 
 ---
 
-## 🎉 Vous êtes Prêt!
+##  Vous etes Pret!
 
-Lancez votre serveur et commencez à collecter des données. Bonne chance! 🚀
+Lancez votre serveur et commencez a collecter des donnees. Bonne chance! 
 
-**Pour toute question ou amélioration, consultez l'admin panel.**
+**Pour toute question ou amelioration, consultez l'admin panel.**

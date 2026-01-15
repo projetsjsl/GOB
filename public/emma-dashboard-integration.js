@@ -1,5 +1,5 @@
 // ========================================
-// INTÉGRATION EMMA DANS LE DASHBOARD
+// INTEGRATION EMMA DANS LE DASHBOARD
 // ========================================
 
 import { EmmaChatInterface, EmmaPromptEditor, EmmaGeminiConfig } from './emma-ui-components.js';
@@ -20,26 +20,26 @@ class EmmaDashboardIntegration {
     if (this.isInitialized) return;
 
     try {
-      // Charger le prompt personnalisé
+      // Charger le prompt personnalise
       loadFinancialPrompt();
       
-      // Créer l'interface Emma
+      // Creer l'interface Emma
       this.createEmmaInterface();
       
-      // Attacher les événements
+      // Attacher les evenements
       this.attachEventListeners();
       
-      // Vérifier la connexion Gemini
+      // Verifier la connexion Gemini
       await this.checkGeminiConnection();
       
       this.isInitialized = true;
-      console.log('✅ Emma intégrée avec succès dans le dashboard');
+      console.log(' Emma integree avec succes dans le dashboard');
     } catch (error) {
-      console.error('❌ Erreur lors de l\'initialisation d\'Emma:', error);
+      console.error(' Erreur lors de l\'initialisation d\'Emma:', error);
     }
   }
 
-  // Créer l'interface Emma
+  // Creer l'interface Emma
   createEmmaInterface() {
     const askEmmaTab = document.querySelector('#ask-emma-tab');
     if (!askEmmaTab) {
@@ -55,33 +55,33 @@ class EmmaDashboardIntegration {
           ${EmmaChatInterface()}
         </div>
         
-        <!-- Éditeur de prompt (masqué par défaut) -->
+        <!-- Editeur de prompt (masque par defaut) -->
         <div class="emma-prompt-editor-container" id="emma-prompt-editor-container" style="display: none;">
           ${EmmaPromptEditor()}
         </div>
         
-        <!-- Configuration Gemini (masquée par défaut) -->
+        <!-- Configuration Gemini (masquee par defaut) -->
         <div class="emma-gemini-config-container" id="emma-gemini-config-container" style="display: none;">
           ${EmmaGeminiConfig()}
         </div>
         
-        <!-- Boutons de contrôle -->
+        <!-- Boutons de controle -->
         <div class="emma-control-buttons">
           <button class="emma-btn emma-btn-secondary" id="emma-toggle-prompt-editor">
-            📝 Éditer le prompt
+             Editer le prompt
           </button>
           <button class="emma-btn emma-btn-secondary" id="emma-toggle-gemini-config">
-            ⚙️ Configuration Gemini
+             Configuration Gemini
           </button>
           <button class="emma-btn emma-btn-primary" id="emma-clear-chat">
-            🗑️ Effacer la conversation
+             Effacer la conversation
           </button>
         </div>
       </div>
     `;
   }
 
-  // Attacher les événements
+  // Attacher les evenements
   attachEventListeners() {
     // Envoi de message
     const sendButton = document.getElementById('emma-send-input');
@@ -96,7 +96,7 @@ class EmmaDashboardIntegration {
       });
     }
 
-    // Boutons de contrôle
+    // Boutons de controle
     document.getElementById('emma-toggle-prompt-editor')?.addEventListener('click', () => {
       this.togglePromptEditor();
     });
@@ -155,22 +155,22 @@ class EmmaDashboardIntegration {
     this.showTypingIndicator();
 
     try {
-      // Obtenir le prompt personnalisé
+      // Obtenir le prompt personnalise
       const profile = getFinancialProfile();
       
-      // Générer la réponse avec Gemini
+      // Generer la reponse avec Gemini
       const response = await emmaGeminiService.generateResponse(message, profile.prompt);
       
       // Masquer l'indicateur de frappe
       this.hideTypingIndicator();
       
-      // Ajouter la réponse d'Emma
+      // Ajouter la reponse d'Emma
       this.addMessage('emma', response);
       
     } catch (error) {
-      console.error('Erreur lors de la génération de la réponse:', error);
+      console.error('Erreur lors de la generation de la reponse:', error);
       this.hideTypingIndicator();
-      this.addMessage('error', 'Désolé, je ne peux pas répondre pour le moment. Vérifiez votre configuration Gemini.');
+      this.addMessage('error', 'Desole, je ne peux pas repondre pour le moment. Verifiez votre configuration Gemini.');
     }
   }
 
@@ -189,17 +189,17 @@ class EmmaDashboardIntegration {
 
     this.currentMessages.push(message);
 
-    // Créer l'élément HTML du message
+    // Creer l'element HTML du message
     const messageElement = this.createMessageElement(message);
     
     // Ajouter le message au conteneur
     messagesContainer.appendChild(messageElement);
     
-    // Faire défiler vers le bas
+    // Faire defiler vers le bas
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
   }
 
-  // Créer l'élément HTML d'un message
+  // Creer l'element HTML d'un message
   createMessageElement(message) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `emma-message ${message.type}`;
@@ -225,7 +225,7 @@ class EmmaDashboardIntegration {
     return messageDiv;
   }
 
-  // Formater le contenu du message (rendu enrichi, fond inchangé)
+  // Formater le contenu du message (rendu enrichi, fond inchange)
   formatMessageContent(content) {
     const escapeHtml = (s) => {
       const div = document.createElement('div');
@@ -233,7 +233,7 @@ class EmmaDashboardIntegration {
       return div.innerHTML;
     };
 
-    // Protéger les blocs de code ``` ```
+    // Proteger les blocs de code ``` ```
     const codeBlocks = [];
     let t = escapeHtml(content || '');
     t = t.replace(/```([\w-]*)\n([\s\S]*?)\n```/g, (_m, lang, code) => {
@@ -250,7 +250,7 @@ class EmmaDashboardIntegration {
     t = t.replace(/`([^`]+)`/g, '<code class="px-1 py-0.5 rounded bg-gray-800/10 text-[0.95em]">$1</code>');
 
     // Titres de section avec emoji
-    t = t.replace(/^(🔍|📌|💡|⚠️|✅|🔑|📊|💬|📈|📉|✉️|🔗)\s*(?:\*\*(.+?)\*\*|([^\n]+))$/gm, (_m, emj, boldTitle, plainTitle) => {
+    t = t.replace(/^(|||||||||||)\s*(?:\*\*(.+?)\*\*|([^\n]+))$/gm, (_m, emj, boldTitle, plainTitle) => {
       const title = boldTitle || plainTitle || '';
       return `<div class="mt-2 mb-1 font-semibold flex items-center gap-2">${emj} <span>${title}</span></div>`;
     });
@@ -260,17 +260,17 @@ class EmmaDashboardIntegration {
     t = t.replace(/^##\s+(.+)$/gm, '<div class="mt-2 mb-1 font-semibold text-base">$1</div>');
     t = t.replace(/^#\s+(.+)$/gm, '<div class="mt-3 mb-1 font-bold text-lg">$1</div>');
 
-    // Listes à puces groupées
-    t = t.replace(/(?:^|\n)((?:[-•*]\s+.+(?:\n|$))+)/gm, (block) => {
+    // Listes a puces groupees
+    t = t.replace(/(?:^|\n)((?:[--*]\s+.+(?:\n|$))+)/gm, (block) => {
       const items = block.trim().split(/\n/)
-        .filter(l => /^[-•*]\s+/.test(l))
-        .map(l => l.replace(/^[-•*]\s+/, ''))
+        .filter(l => /^[--*]\s+/.test(l))
+        .map(l => l.replace(/^[--*]\s+/, ''))
         .map(x => `<li>${x}</li>`)
         .join('');
       return `\n<ul class="list-disc pl-5 space-y-1">${items}</ul>\n`;
     });
 
-    // Listes numérotées groupées
+    // Listes numerotees groupees
     t = t.replace(/(?:^|\n)((?:\d+\.\s+.+(?:\n|$))+)/gm, (block) => {
       const items = block.trim().split(/\n/)
         .filter(l => /^\d+\.\s+/.test(l))
@@ -280,12 +280,12 @@ class EmmaDashboardIntegration {
       return `\n<ol class="list-decimal pl-5 space-y-1">${items}</ol>\n`;
     });
 
-    // Citations et séparateurs
+    // Citations et separateurs
     t = t.replace(/^(>+)\s*(.+)$/gm, (_m, _arrows, quote) => `<blockquote class="border-l-4 pl-3 italic opacity-90">${quote}</blockquote>`);
     t = t.replace(/^\s*(?:---|___)\s*$/gm, '<hr class="my-3 opacity-50">');
 
     // Section Sources
-    t = t.replace(/^\s*(?:🔗\s*)?Sources?\s*:\s*$/gim, '<div class="mt-2 mb-1 font-semibold">🔗 Sources</div>');
+    t = t.replace(/^\s*(?:\s*)?Sources?\s*:\s*$/gim, '<div class="mt-2 mb-1 font-semibold"> Sources</div>');
 
     // Paragraphes et sauts de ligne
     t = t.replace(/\n\n/g, '</p><p class="mb-2">');
@@ -297,7 +297,7 @@ class EmmaDashboardIntegration {
       return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline">${url}</a>`;
     });
 
-    // Réinsertion blocs de code
+    // Reinsertion blocs de code
     t = t.replace(/@@CODE_BLOCK_(\d+)@@/g, (_m, idxStr) => {
       const idx = parseInt(idxStr, 10);
       const block = codeBlocks[idx];
@@ -310,7 +310,7 @@ class EmmaDashboardIntegration {
     return `<div class="leading-relaxed text-sm">${t}</div>`;
   }
 
-  // Échapper le HTML
+  // Echapper le HTML
   escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
@@ -350,7 +350,7 @@ class EmmaDashboardIntegration {
     this.isTyping = false;
   }
 
-  // Basculer l'éditeur de prompt
+  // Basculer l'editeur de prompt
   togglePromptEditor() {
     const mainInterface = document.getElementById('emma-main-interface');
     const promptEditor = document.getElementById('emma-prompt-editor-container');
@@ -384,7 +384,7 @@ class EmmaDashboardIntegration {
     }
   }
 
-  // Charger le prompt dans l'éditeur
+  // Charger le prompt dans l'editeur
   loadPromptIntoEditor() {
     const textarea = document.getElementById('emma-prompt-textarea');
     if (textarea) {
@@ -398,12 +398,12 @@ class EmmaDashboardIntegration {
     const apiKeyInput = document.getElementById('emma-api-key');
     if (apiKeyInput) {
       const status = emmaGeminiService.getConnectionStatus();
-      apiKeyInput.value = status.hasApiKey ? '••••••••••••••••' : '';
+      apiKeyInput.value = status.hasApiKey ? '----------------' : '';
       this.updateConnectionStatus(status.isConnected);
     }
   }
 
-  // Mettre à jour le statut de connexion
+  // Mettre a jour le statut de connexion
   updateConnectionStatus(isConnected) {
     const statusElement = document.getElementById('emma-connection-status');
     const statusText = statusElement?.querySelector('.emma-status-text');
@@ -411,10 +411,10 @@ class EmmaDashboardIntegration {
     if (statusElement && statusText) {
       if (isConnected) {
         statusElement.classList.add('connected');
-        statusText.textContent = 'Connecté';
+        statusText.textContent = 'Connecte';
       } else {
         statusElement.classList.remove('connected');
-        statusText.textContent = 'Non connecté';
+        statusText.textContent = 'Non connecte';
       }
     }
   }
@@ -426,7 +426,7 @@ class EmmaDashboardIntegration {
 
     const apiKey = apiKeyInput.value.trim();
     if (!apiKey) {
-      alert('Veuillez saisir une clé API Gemini');
+      alert('Veuillez saisir une cle API Gemini');
       return;
     }
 
@@ -434,10 +434,10 @@ class EmmaDashboardIntegration {
       emmaGeminiService.saveApiKey(apiKey);
       await emmaGeminiService.testConnection();
       this.updateConnectionStatus(true);
-      alert('✅ Connexion Gemini réussie !');
+      alert(' Connexion Gemini reussie !');
     } catch (error) {
       this.updateConnectionStatus(false);
-      alert(`❌ Erreur de connexion: ${error.message}`);
+      alert(` Erreur de connexion: ${error.message}`);
     }
   }
 
@@ -448,26 +448,26 @@ class EmmaDashboardIntegration {
 
     const newPrompt = textarea.value.trim();
     if (!newPrompt) {
-      alert('Le prompt ne peut pas être vide');
+      alert('Le prompt ne peut pas etre vide');
       return;
     }
 
     updateFinancialPrompt(newPrompt);
-    alert('✅ Prompt sauvegardé avec succès !');
+    alert(' Prompt sauvegarde avec succes !');
   }
 
-  // Réinitialiser le prompt
+  // Reinitialiser le prompt
   resetPrompt() {
-    if (confirm('Êtes-vous sûr de vouloir réinitialiser le prompt à sa valeur par défaut ?')) {
+    if (confirm('Etes-vous sur de vouloir reinitialiser le prompt a sa valeur par defaut ?')) {
       resetFinancialPrompt();
       this.loadPromptIntoEditor();
-      alert('✅ Prompt réinitialisé !');
+      alert(' Prompt reinitialise !');
     }
   }
 
   // Sauvegarde automatique du prompt
   autoSavePrompt() {
-    // Sauvegarder automatiquement après 2 secondes d'inactivité
+    // Sauvegarder automatiquement apres 2 secondes d'inactivite
     clearTimeout(this.autoSaveTimeout);
     this.autoSaveTimeout = setTimeout(() => {
       const textarea = document.getElementById('emma-prompt-textarea');
@@ -477,20 +477,20 @@ class EmmaDashboardIntegration {
     }, 2000);
   }
 
-  // Effacer la clé API
+  // Effacer la cle API
   clearApiKey() {
-    if (confirm('Êtes-vous sûr de vouloir effacer la clé API ?')) {
+    if (confirm('Etes-vous sur de vouloir effacer la cle API ?')) {
       emmaGeminiService.clearApiKey();
       const apiKeyInput = document.getElementById('emma-api-key');
       if (apiKeyInput) {
         apiKeyInput.value = '';
       }
       this.updateConnectionStatus(false);
-      alert('✅ Clé API effacée !');
+      alert(' Cle API effacee !');
     }
   }
 
-  // Basculer la visibilité de la clé API
+  // Basculer la visibilite de la cle API
   toggleApiKeyVisibility() {
     const apiKeyInput = document.getElementById('emma-api-key');
     const toggleButton = document.getElementById('emma-toggle-api-key');
@@ -516,7 +516,7 @@ class EmmaDashboardIntegration {
 
   // Effacer le chat
   clearChat() {
-    if (confirm('Êtes-vous sûr de vouloir effacer toute la conversation ?')) {
+    if (confirm('Etes-vous sur de vouloir effacer toute la conversation ?')) {
       this.currentMessages = [];
       const messagesContainer = document.querySelector('.emma-messages-container');
       if (messagesContainer) {
@@ -530,7 +530,7 @@ class EmmaDashboardIntegration {
     }
   }
 
-  // Vérifier la connexion Gemini
+  // Verifier la connexion Gemini
   async checkGeminiConnection() {
     try {
       const status = emmaGeminiService.getConnectionStatus();
@@ -549,7 +549,7 @@ class EmmaDashboardIntegration {
 // Instance globale
 export const emmaDashboard = new EmmaDashboardIntegration();
 
-// Auto-initialisation quand le DOM est prêt
+// Auto-initialisation quand le DOM est pret
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     emmaDashboard.initialize();

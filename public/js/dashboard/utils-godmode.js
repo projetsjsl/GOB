@@ -4,10 +4,10 @@
  */
 
 window.showCommandsHelp = function() {
-    alert("ℹ️ Aide Commandes :\n\n- /reset : Réinitialiser le chat\n- /clear : Effacer l'historique\n- /help : Afficher ce message");
+    alert("i Aide Commandes :\n\n- /reset : Reinitialiser le chat\n- /clear : Effacer l'historique\n- /help : Afficher ce message");
 };
 
-// Patch pour 'exports' si jamais un module mal transpilé l'utilise
+// Patch pour 'exports' si jamais un module mal transpile l'utilise
 if (typeof exports === 'undefined') {
     window.exports = {};
 }

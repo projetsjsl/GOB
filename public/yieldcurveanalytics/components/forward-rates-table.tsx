@@ -29,7 +29,7 @@ export function ForwardRatesTable({ forwards, compact = false }: ForwardRatesTab
       <CardHeader>
         <CardTitle className="text-foreground">Taux Forwards Detailles</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Rendements forwards implicites entre les maturites (formule officielle: f = (r2·t2 - r1·t1) / (t2 - t1))
+          Rendements forwards implicites entre les maturites (formule officielle: f = (r2t2 - r1t1) / (t2 - t1))
         </CardDescription>
       </CardHeader>
       <CardContent>

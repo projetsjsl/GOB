@@ -86,7 +86,7 @@ const RGLExports = {
 };
 
 // Log successful initialization
-console.log('✅ React Grid Layout v2.1.1 loaded with custom WidthProvider');
+console.log(' React Grid Layout v2.1.1 loaded with custom WidthProvider');
 
 // Export the module object
 export default RGLExports;

@@ -41,7 +41,7 @@ const MarketsEconomyTab = ({
 
     const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
     const markets = ['US', 'Canada', 'Europe', 'Asie'];
-    const themes = ['Tech', 'Finance', 'Énergie', 'Santé', 'Crypto', 'IA'];
+    const themes = ['Tech', 'Finance', 'Energie', 'Sante', 'Crypto', 'IA'];
 
     // Get shared TradingView widgets
     const TVWidgets = window.TradingViewWidgets || {};
@@ -142,8 +142,8 @@ const MarketsEconomyTab = ({
             const themeKeywords = {
                 'Tech': ['tech', 'technology', 'software', 'apple', 'google', 'microsoft', 'nvidia'],
                 'Finance': ['bank', 'finance', 'financial', 'trading', 'investment'],
-                'Énergie': ['energy', 'oil', 'gas', 'renewable', 'solar'],
-                'Santé': ['health', 'healthcare', 'pharma', 'medical'],
+                'Energie': ['energy', 'oil', 'gas', 'renewable', 'solar'],
+                'Sante': ['health', 'healthcare', 'pharma', 'medical'],
                 'Crypto': ['crypto', 'bitcoin', 'ethereum', 'blockchain'],
                 'IA': ['ai', 'artificial intelligence', 'machine learning', 'chatgpt']
             };
@@ -172,22 +172,22 @@ const MarketsEconomyTab = ({
             }`}>
                 <h2 className={`text-2xl md:text-3xl font-bold mb-2 transition-colors duration-300 ${
                     isLightTheme() ? 'text-gray-900' : 'text-white'
-                }`}>📊 Marchés & Économie</h2>
+                }`}> Marches & Economie</h2>
                 <p className={`text-sm transition-colors duration-300 ${
                     isLightTheme() ? 'text-blue-800' : 'text-blue-200'
                 }`}>
-                    Vue complète des marchés, devises, calendriers économiques et actualités
+                    Vue complete des marches, devises, calendriers economiques et actualites
                 </p>
             </div>
 
             {/* Navigation Sections */}
             <div className="flex flex-wrap gap-2">
                 {[
-                    { id: 'overview', label: '📊 Vue Globale', icon: 'BarChart3' },
-                    { id: 'forex', label: '💱 Forex', icon: 'DollarSign' },
-                    { id: 'calendar', label: '📅 Calendrier', icon: 'Calendar' },
-                    { id: 'canada', label: '🇨🇦 Canada', icon: 'Flag' },
-                    { id: 'news', label: '📰 Actualités', icon: 'Newspaper' }
+                    { id: 'overview', label: ' Vue Globale', icon: 'BarChart3' },
+                    { id: 'forex', label: ' Forex', icon: 'DollarSign' },
+                    { id: 'calendar', label: ' Calendrier', icon: 'Calendar' },
+                    { id: 'canada', label: ' Canada', icon: 'Flag' },
+                    { id: 'news', label: ' Actualites', icon: 'Newspaper' }
                 ].map(section => (
                     <button
                         key={section.id}
@@ -212,10 +212,10 @@ const MarketsEconomyTab = ({
                     }`}>
                         <div className={`p-4 border-b ${isLightTheme() ? 'border-gray-200' : 'border-gray-700'}`}>
                             <h3 className={`text-lg font-bold ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>
-                                📊 Vue d'ensemble des Marchés
+                                 Vue d'ensemble des Marches
                             </h3>
                             <p className={`text-sm ${isLightTheme() ? 'text-gray-600' : 'text-gray-400'}`}>
-                                Indices majeurs, Forex, Crypto - Données en direct
+                                Indices majeurs, Forex, Crypto - Donnees en direct
                             </p>
                         </div>
                         <div style={{height: '450px'}}>
@@ -233,7 +233,7 @@ const MarketsEconomyTab = ({
                         }`}>
                             <div className={`p-4 border-b ${isLightTheme() ? 'border-gray-200' : 'border-gray-700'}`}>
                                 <h3 className={`text-lg font-bold ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>
-                                    🇺🇸 Heatmap S&P 500
+                                     Heatmap S&P 500
                                 </h3>
                             </div>
                             <div style={{height: '500px'}}>
@@ -249,7 +249,7 @@ const MarketsEconomyTab = ({
                         }`}>
                             <div className={`p-4 border-b ${isLightTheme() ? 'border-gray-200' : 'border-gray-700'}`}>
                                 <h3 className={`text-lg font-bold ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>
-                                    🇨🇦 Heatmap TSX
+                                     Heatmap TSX
                                 </h3>
                             </div>
                             <div style={{height: '500px'}}>
@@ -266,7 +266,7 @@ const MarketsEconomyTab = ({
                     }`}>
                         <div className={`p-4 border-b ${isLightTheme() ? 'border-gray-200' : 'border-gray-700'}`}>
                             <h3 className={`text-lg font-bold ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>
-                                📊 Cotations - Indices, Bonds, Forex
+                                 Cotations - Indices, Bonds, Forex
                             </h3>
                             <p className={`text-sm ${isLightTheme() ? 'text-gray-600' : 'text-gray-400'}`}>
                                 Rendements obligataires US/CAN et taux de change
@@ -290,7 +290,7 @@ const MarketsEconomyTab = ({
                     }`}>
                         <div className={`p-4 border-b ${isLightTheme() ? 'border-gray-200' : 'border-gray-700'}`}>
                             <h3 className={`text-lg font-bold ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>
-                                💱 Forex Heat Map
+                                 Forex Heat Map
                             </h3>
                             <p className={`text-sm ${isLightTheme() ? 'text-gray-600' : 'text-gray-400'}`}>
                                 Carte de chaleur des devises (EUR, USD, JPY, GBP, CHF, AUD, CAD, CNY)
@@ -309,7 +309,7 @@ const MarketsEconomyTab = ({
                     }`}>
                         <div className={`p-4 border-b ${isLightTheme() ? 'border-gray-200' : 'border-gray-700'}`}>
                             <h3 className={`text-lg font-bold ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>
-                                💱 Taux de Change Croisés
+                                 Taux de Change Croises
                             </h3>
                             <p className={`text-sm ${isLightTheme() ? 'text-gray-600' : 'text-gray-400'}`}>
                                 9 devises majeures (EUR, USD, JPY, GBP, CHF, AUD, CAD, NZD, CNY)
@@ -333,10 +333,10 @@ const MarketsEconomyTab = ({
                     }`}>
                         <div className={`p-4 border-b ${isLightTheme() ? 'border-gray-200' : 'border-gray-700'}`}>
                             <h3 className={`text-lg font-bold ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>
-                                📅 Calendrier Économique
+                                 Calendrier Economique
                             </h3>
                             <p className={`text-sm ${isLightTheme() ? 'text-gray-600' : 'text-gray-400'}`}>
-                                Événements majeurs et données en temps réel
+                                Evenements majeurs et donnees en temps reel
                             </p>
                         </div>
                         <div className="relative" style={{height: '500px'}}>
@@ -363,7 +363,7 @@ const MarketsEconomyTab = ({
                     }`}>
                         <div className={`p-4 border-b ${isLightTheme() ? 'border-gray-200' : 'border-gray-700'}`}>
                             <h3 className={`text-lg font-bold ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>
-                                📅 Événements Économiques TradingView
+                                 Evenements Economiques TradingView
                             </h3>
                         </div>
                         <div style={{height: '550px'}}>
@@ -384,7 +384,7 @@ const MarketsEconomyTab = ({
                     }`}>
                         <div className={`p-4 border-b ${isLightTheme() ? 'border-gray-200' : 'border-gray-700'}`}>
                             <h3 className={`text-lg font-bold ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>
-                                🇨🇦 Heatmap TSX
+                                 Heatmap TSX
                             </h3>
                             <p className={`text-sm ${isLightTheme() ? 'text-gray-600' : 'text-gray-400'}`}>
                                 Toronto Stock Exchange - Performance par secteur
@@ -399,7 +399,7 @@ const MarketsEconomyTab = ({
                 </div>
             )}
 
-            {/* ===== SECTION: ACTUALITÉS ===== */}
+            {/* ===== SECTION: ACTUALITES ===== */}
             {activeSection === 'news' && (
                 <div className="space-y-6">
                     {/* Header Actions */}
@@ -413,7 +413,7 @@ const MarketsEconomyTab = ({
                                         : (isLightTheme() ? 'bg-gray-200 hover:bg-gray-300 text-gray-900' : 'bg-gray-800 hover:bg-gray-700 text-white')
                                 }`}
                             >
-                                🇫🇷 Français {localFrenchOnly && '✓'}
+                                 Francais {localFrenchOnly && ''}
                             </button>
                             <button
                                 onClick={fetchNews}
@@ -422,14 +422,14 @@ const MarketsEconomyTab = ({
                                     isLightTheme() ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-800 hover:bg-gray-700 text-white'
                                 }`}
                             >
-                                {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
+                                {loading ? ' Actualisation...' : ' Actualiser'}
                             </button>
                         </div>
                     </div>
 
                     {lastUpdate && (
                         <p className="text-gray-400 text-sm">
-                            Dernière mise à jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
+                            Derniere mise a jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
                         </p>
                     )}
 
@@ -443,7 +443,7 @@ const MarketsEconomyTab = ({
                                     {localFilteredNews.length}
                                 </div>
                                 <div className={`text-sm ${isLightTheme() ? 'text-gray-600' : 'text-gray-400'}`}>
-                                    Articles filtrés
+                                    Articles filtres
                                 </div>
                             </div>
                             <LucideIcon name="Newspaper" className={`w-12 h-12 ${isLightTheme() ? 'text-gray-300' : 'text-gray-600'}`} />
@@ -454,11 +454,11 @@ const MarketsEconomyTab = ({
                     <div className={`p-6 rounded-xl transition-colors duration-300 ${
                         isLightTheme() ? 'bg-gradient-to-br from-white to-gray-50 border border-gray-200' : 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700'
                     }`}>
-                        <h3 className={`text-lg font-bold mb-4 ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}>🔍 Filtres</h3>
+                        <h3 className={`text-lg font-bold mb-4 ${isLightTheme() ? 'text-gray-900' : 'text-white'}`}> Filtres</h3>
 
                         {/* Source Filter */}
                         <div className="mb-4">
-                            <label className={`text-sm font-semibold mb-2 block ${isLightTheme() ? 'text-gray-700' : 'text-gray-300'}`}>📰 Source</label>
+                            <label className={`text-sm font-semibold mb-2 block ${isLightTheme() ? 'text-gray-700' : 'text-gray-300'}`}> Source</label>
                             <div className="flex flex-wrap gap-2">
                                 <button onClick={() => setSelectedSource('all')} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedSource === 'all' ? 'bg-blue-600 text-white' : (isLightTheme() ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')}`}>Toutes</button>
                                 {sources.map(source => (
@@ -469,7 +469,7 @@ const MarketsEconomyTab = ({
 
                         {/* Market Filter */}
                         <div className="mb-4">
-                            <label className={`text-sm font-semibold mb-2 block ${isLightTheme() ? 'text-gray-700' : 'text-gray-300'}`}>🌍 Marché</label>
+                            <label className={`text-sm font-semibold mb-2 block ${isLightTheme() ? 'text-gray-700' : 'text-gray-300'}`}> Marche</label>
                             <div className="flex flex-wrap gap-2">
                                 <button onClick={() => setSelectedMarket('all')} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedMarket === 'all' ? 'bg-green-600 text-white' : (isLightTheme() ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')}`}>Tous</button>
                                 {markets.map(market => (
@@ -480,7 +480,7 @@ const MarketsEconomyTab = ({
 
                         {/* Theme Filter */}
                         <div>
-                            <label className={`text-sm font-semibold mb-2 block ${isLightTheme() ? 'text-gray-700' : 'text-gray-300'}`}>🏷️ Thématique</label>
+                            <label className={`text-sm font-semibold mb-2 block ${isLightTheme() ? 'text-gray-700' : 'text-gray-300'}`}> Thematique</label>
                             <div className="flex flex-wrap gap-2">
                                 <button onClick={() => setSelectedTheme('all')} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${selectedTheme === 'all' ? 'bg-purple-600 text-white' : (isLightTheme() ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-gray-700 text-gray-300 hover:bg-gray-600')}`}>Toutes</button>
                                 {themes.map(theme => (
@@ -496,7 +496,7 @@ const MarketsEconomyTab = ({
                             <div className={`text-center py-12 ${isLightTheme() ? 'text-gray-600' : 'text-gray-400'}`}>
                                 <LucideIcon name="AlertCircle" className="w-16 h-16 mx-auto mb-4 opacity-50" />
                                 <p className="text-lg font-semibold mb-2">Aucune nouvelle disponible</p>
-                                <p className="text-sm">Cliquez sur Actualiser pour charger les dernières nouvelles</p>
+                                <p className="text-sm">Cliquez sur Actualiser pour charger les dernieres nouvelles</p>
                             </div>
                         ) : (
                             localFilteredNews.slice(0, 20).map((article, index) => {
@@ -532,7 +532,7 @@ const MarketsEconomyTab = ({
                                                         {new Date(article.publishedAt || article.publishedDate).toLocaleString('fr-FR')}
                                                     </span>
                                                     {isFrenchArticle(article) && (
-                                                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30">🇫🇷 FR</span>
+                                                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30"> FR</span>
                                                     )}
                                                 </div>
                                             </div>

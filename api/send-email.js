@@ -5,27 +5,27 @@
  *
  * @route POST /api/send-email
  * 
- * ════════════════════════════════════════════════════════════════════════════
- * BONNES PRATIQUES HTML EMAIL (compatibilité Outlook, Gmail, Apple Mail)
- * ════════════════════════════════════════════════════════════════════════════
  * 
- * Le paramètre `html` envoyé à ce endpoint DOIT respecter les règles suivantes
+ * BONNES PRATIQUES HTML EMAIL (compatibilite Outlook, Gmail, Apple Mail)
+ * 
+ * 
+ * Le parametre `html` envoye a ce endpoint DOIT respecter les regles suivantes
  * pour garantir un affichage correct dans TOUS les clients email:
  * 
- * ✅ STRUCTURE OBLIGATOIRE:
+ *  STRUCTURE OBLIGATOIRE:
  * - Utiliser <table role="presentation"> pour le layout
  * - Attributs sur chaque table: cellpadding="0" cellspacing="0" border="0"
  * - Largeur conteneur principal: width="600" style="max-width: 600px;"
- * - Wrapper externe centré avec <td align="center">
+ * - Wrapper externe centre avec <td align="center">
  * 
- * ✅ STYLES:
- * - 100% inline (style="...") sur chaque élément
+ *  STYLES:
+ * - 100% inline (style="...") sur chaque element
  * - Font stack: font-family: Arial, Helvetica, sans-serif;
- * - Couleurs hexadécimales complètes (#FFFFFF, pas #FFF)
+ * - Couleurs hexadecimales completes (#FFFFFF, pas #FFF)
  * - Utiliser padding au lieu de margin
  * - vertical-align: middle pour aligner images/texte
  * 
- * ❌ NE JAMAIS UTILISER:
+ *  NE JAMAIS UTILISER:
  * - <div> pour structure principale
  * - <style> block dans <head> (Outlook ignore)
  * - Classes CSS
@@ -36,42 +36,42 @@
  * - margin (utiliser padding)
  * - onerror JavaScript
  * 
- * 📧 TEMPLATE DE RÉFÉRENCE:
+ *  TEMPLATE DE REFERENCE:
  * Voir /GOB/.agent/workflows/email-best-practices.md pour un template complet
- * ════════════════════════════════════════════════════════════════════════════
+ * 
  */
 
 /**
- * Valide le HTML email pour compatibilité Outlook
- * @param {string} html - HTML à valider
+ * Valide le HTML email pour compatibilite Outlook
+ * @param {string} html - HTML a valider
  * @returns {Object} { valid: boolean, warnings: string[] }
  */
 function validateEmailHtml(html) {
     const warnings = [];
     
-    // Patterns problématiques pour Outlook
+    // Patterns problematiques pour Outlook
     if (html.includes('display: flex') || html.includes('display:flex')) {
-        warnings.push('Utilise display:flex (non supporté Outlook)');
+        warnings.push('Utilise display:flex (non supporte Outlook)');
     }
     if (html.includes('inline-flex')) {
-        warnings.push('Utilise inline-flex (non supporté Outlook)');
+        warnings.push('Utilise inline-flex (non supporte Outlook)');
     }
     if (html.includes('linear-gradient')) {
-        warnings.push('Utilise linear-gradient (non supporté Outlook)');
+        warnings.push('Utilise linear-gradient (non supporte Outlook)');
     }
     if (html.includes('box-shadow')) {
-        warnings.push('Utilise box-shadow (non supporté Outlook)');
+        warnings.push('Utilise box-shadow (non supporte Outlook)');
     }
     if (/<style[^>]*>/.test(html)) {
-        warnings.push('Contient bloc <style> (partiellement ignoré Outlook)');
+        warnings.push('Contient bloc <style> (partiellement ignore Outlook)');
     }
     
-    // Vérifications positives
+    // Verifications positives
     const hasTable = html.includes('<table');
     const hasRolePresentation = html.includes('role="presentation"');
     
     if (!hasTable) {
-        warnings.push('Pas de structure table (recommandé pour Outlook)');
+        warnings.push('Pas de structure table (recommande pour Outlook)');
     }
     if (hasTable && !hasRolePresentation) {
         warnings.push('Tables sans role="presentation"');
@@ -87,14 +87,14 @@ import { logEmail, updateEmailLog } from '../lib/email-logger.js';
 import { checkRateLimit } from '../lib/rate-limiter.js';
 
 export default async function handler(req, res) {
-    // Méthode POST uniquement
+    // Methode POST uniquement
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // RATE LIMITING
-    // ═══════════════════════════════════════════════════════════════
+    // 
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const rateLimitKey = `email:${clientIp}`;
     const rateLimit = checkRateLimit(rateLimitKey, 'email');
@@ -112,16 +112,16 @@ export default async function handler(req, res) {
     let logId = null;
 
     try {
-        // Validation des paramètres
+        // Validation des parametres
         if (!subject || !html) {
             return res.status(400).json({
                 error: 'Missing required fields: subject and html are required'
             });
         }
 
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // LOGGING (Start)
-        // ═══════════════════════════════════════════════════════════════
+        // 
         logId = logEmail({
             type: briefingType || 'manual',
             channel: 'email',
@@ -131,18 +131,18 @@ export default async function handler(req, res) {
             status: 'pending'
         });
 
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // VALIDATION HTML EMAIL
-        // ═══════════════════════════════════════════════════════════════
+        // 
         const htmlValidation = validateEmailHtml(html);
         if (htmlValidation.warnings.length > 0) {
-            console.warn('[Send Email] ⚠️ HTML Warnings:', htmlValidation.warnings.join(', '));
+            console.warn('[Send Email]  HTML Warnings:', htmlValidation.warnings.join(', '));
         }
 
-        // Vérifier taille du HTML
+        // Verifier taille du HTML
         const htmlSizeKB = Buffer.byteLength(html, 'utf8') / 1024;
         if (htmlSizeKB > 100) {
-            console.warn(`[Send Email] ⚠️ Large email: ${htmlSizeKB.toFixed(1)}KB`);
+            console.warn(`[Send Email]  Large email: ${htmlSizeKB.toFixed(1)}KB`);
         }
 
         // Configuration Resend
@@ -184,26 +184,26 @@ export default async function handler(req, res) {
         const data = await response.json();
 
         if (!response.ok) {
-            // Gérer les erreurs spécifiques Resend
+            // Gerer les erreurs specifiques Resend
             const errorMessage = data.message || 'Failed to send via Resend';
             const errorCode = data.error?.code || response.status;
             
-            // Gérer les limitations Resend gracieusement
+            // Gerer les limitations Resend gracieusement
             if (errorCode === 429 || errorMessage.includes('rate limit') || errorMessage.includes('quota')) {
                 return res.status(429).json({
                     error: 'Rate limit exceeded',
-                    message: 'Limite d\'envoi Resend atteinte. Réessayez plus tard.',
+                    message: 'Limite d\'envoi Resend atteinte. Reessayez plus tard.',
                     retryAfter: 3600, // 1 heure
-                    suggestion: 'Vérifiez votre quota Resend ou attendez avant de réessayer'
+                    suggestion: 'Verifiez votre quota Resend ou attendez avant de reessayer'
                 });
             }
             
             throw new Error(errorMessage);
         }
 
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // LOGGING (Success)
-        // ═══════════════════════════════════════════════════════════════
+        // 
         updateEmailLog(logId, {
             status: 'sent',
             durationMs: Date.now() - startTime,
@@ -218,9 +218,9 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // LOGGING (Error)
-        // ═══════════════════════════════════════════════════════════════
+        // 
         if (logId) {
             updateEmailLog(logId, {
                 status: 'failed',

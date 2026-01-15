@@ -1,6 +1,6 @@
 /**
- * API pour récupérer les données sectorielles depuis FMP
- * Calcule les moyennes/min/max des ratios pour un secteur donné
+ * API pour recuperer les donnees sectorielles depuis FMP
+ * Calcule les moyennes/min/max des ratios pour un secteur donne
  */
 
 export default async function handler(req, res) {
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     const cleanSector = sector.trim();
 
     try {
-        // 1. Récupérer la liste des entreprises du secteur
+        // 1. Recuperer la liste des entreprises du secteur
         // FMP n'a pas d'endpoint direct par secteur, on utilise le stock screener
         // Alternative: utiliser l'endpoint /stock-screener avec filtre sector
         const screenerUrl = `${FMP_BASE}/stock-screener?marketCapMoreThan=100000000&sector=${encodeURIComponent(cleanSector)}&limit=50&apikey=${FMP_KEY}`;
@@ -48,17 +48,17 @@ export default async function handler(req, res) {
         
         if (!companies || companies.length === 0) {
             // Fallback: essayer avec une recherche plus large
-            console.warn(`⚠️ Aucune entreprise trouvée pour le secteur "${cleanSector}", utilisation de valeurs par défaut`);
+            console.warn(` Aucune entreprise trouvee pour le secteur "${cleanSector}", utilisation de valeurs par defaut`);
             return res.status(200).json({
                 success: false,
                 sector: cleanSector,
-                message: 'Secteur non trouvé, utilisation de valeurs par défaut',
+                message: 'Secteur non trouve, utilisation de valeurs par defaut',
                 data: null
             });
         }
 
-        // 2. Récupérer les ratios TTM pour toutes les entreprises (batch)
-        const symbols = companies.slice(0, 30).map(c => c.symbol).join(','); // Limiter à 30 pour éviter les timeouts
+        // 2. Recuperer les ratios TTM pour toutes les entreprises (batch)
+        const symbols = companies.slice(0, 30).map(c => c.symbol).join(','); // Limiter a 30 pour eviter les timeouts
         
         const ratiosRes = await fetch(`${FMP_BASE}/ratios-ttm/${symbols}?apikey=${FMP_KEY}`);
         if (!ratiosRes.ok) {
@@ -69,11 +69,11 @@ export default async function handler(req, res) {
         const validRatios = Array.isArray(ratiosData) ? ratiosData.filter(r => r && r.peRatioTTM) : [];
 
         if (validRatios.length === 0) {
-            console.warn(`⚠️ Aucun ratio valide trouvé pour le secteur "${cleanSector}"`);
+            console.warn(` Aucun ratio valide trouve pour le secteur "${cleanSector}"`);
             return res.status(200).json({
                 success: false,
                 sector: cleanSector,
-                message: 'Aucun ratio valide trouvé',
+                message: 'Aucun ratio valide trouve',
                 data: null
             });
         }
@@ -84,19 +84,19 @@ export default async function handler(req, res) {
         const psRatios = validRatios.map(r => r.priceToSalesRatioTTM).filter(v => v && v > 0 && v < 100);
         const dividendYields = validRatios.map(r => r.dividendYieldTTM).filter(v => v && v >= 0 && v < 20);
 
-        // 4. Récupérer les key-metrics pour calculer les croissances
-        // On prend un échantillon de 10 entreprises pour les métriques annuelles (plus lourd)
+        // 4. Recuperer les key-metrics pour calculer les croissances
+        // On prend un echantillon de 10 entreprises pour les metriques annuelles (plus lourd)
         const sampleSymbols = companies.slice(0, 10).map(c => c.symbol);
         const growthData = [];
 
-        // Récupérer les key-metrics pour chaque entreprise (en série pour éviter les timeouts)
+        // Recuperer les key-metrics pour chaque entreprise (en serie pour eviter les timeouts)
         for (const symbol of sampleSymbols) {
             try {
                 const metricsRes = await fetch(`${FMP_BASE}/key-metrics/${symbol}?period=annual&limit=5&apikey=${FMP_KEY}`);
                 if (metricsRes.ok) {
                     const metrics = await metricsRes.json();
                     if (Array.isArray(metrics) && metrics.length >= 2) {
-                        // Calculer le CAGR sur les 5 dernières années
+                        // Calculer le CAGR sur les 5 dernieres annees
                         const sorted = metrics.sort((a, b) => new Date(b.date) - new Date(a.date));
                         const latest = sorted[0];
                         const oldest = sorted[sorted.length - 1];
@@ -115,10 +115,10 @@ export default async function handler(req, res) {
                         }
                     }
                 }
-                // Petit délai pour éviter les rate limits
+                // Petit delai pour eviter les rate limits
                 await new Promise(resolve => setTimeout(resolve, 100));
             } catch (err) {
-                console.warn(`⚠️ Erreur métriques pour ${symbol}:`, err.message);
+                console.warn(` Erreur metriques pour ${symbol}:`, err.message);
             }
         }
 

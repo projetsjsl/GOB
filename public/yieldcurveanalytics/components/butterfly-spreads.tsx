@@ -14,17 +14,17 @@ const BUTTERFLY_COLORS = ["#8b5cf6", "#ec4899", "#06b6d4"]
 const BUTTERFLY_EXPLANATIONS: Record<string, { description: string; formula: string; interpretation: string }> = {
   "2-5-10": {
     description:
-      "Mesure la courbure entre les obligations à court et moyen terme. Cet écart examine la forme du segment court de la courbe.",
-    formula: "(Taux 2Y + Taux 10Y) - 2 × (Taux 5Y)",
+      "Mesure la courbure entre les obligations a court et moyen terme. Cet ecart examine la forme du segment court de la courbe.",
+    formula: "(Taux 2Y + Taux 10Y) - 2 x (Taux 5Y)",
     interpretation:
-      "Positif = La maturité 5Y est bon marché (pente forte) | Négatif = La maturité 5Y est chère (pente faible)",
+      "Positif = La maturite 5Y est bon marche (pente forte) | Negatif = La maturite 5Y est chere (pente faible)",
   },
   "5-10-30": {
     description:
-      "Mesure la courbure entre les obligations à moyen et long terme. Cet écart examine la forme du segment long de la courbe.",
-    formula: "(Taux 5Y + Taux 30Y) - 2 × (Taux 10Y)",
+      "Mesure la courbure entre les obligations a moyen et long terme. Cet ecart examine la forme du segment long de la courbe.",
+    formula: "(Taux 5Y + Taux 30Y) - 2 x (Taux 10Y)",
     interpretation:
-      "Positif = La maturité 10Y est bon marché (pente forte) | Négatif = La maturité 10Y est chère (pente faible)",
+      "Positif = La maturite 10Y est bon marche (pente forte) | Negatif = La maturite 10Y est chere (pente faible)",
   },
 }
 
@@ -39,12 +39,12 @@ export function ButterflySpreadsCard({ spreads }: ButterflySpreadsProps) {
         <CardHeader>
           <CardTitle className="text-foreground">Spreads Papillon</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Analyse de la courbure et opportunités de trading structurées
+            Analyse de la courbure et opportunites de trading structurees
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="p-4 rounded-lg bg-muted/30 text-center text-muted-foreground text-sm">
-            Données de spreads papillon indisponibles
+            Donnees de spreads papillon indisponibles
           </div>
         </CardContent>
       </Card>
@@ -56,7 +56,7 @@ export function ButterflySpreadsCard({ spreads }: ButterflySpreadsProps) {
       <CardHeader>
         <CardTitle className="text-foreground">Spreads Papillon</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Analyse de la courbure et opportunités de trading structurées
+          Analyse de la courbure et opportunites de trading structurees
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -106,22 +106,22 @@ export function ButterflySpreadsCard({ spreads }: ButterflySpreadsProps) {
                   </div>
 
                   <div>
-                    <p className="text-xs font-semibold text-foreground mb-2">Interprétation:</p>
+                    <p className="text-xs font-semibold text-foreground mb-2">Interpretation:</p>
                     <p className="text-xs text-muted-foreground">{explanation.interpretation}</p>
                   </div>
 
                   <div className="bg-muted/20 p-3 rounded border-l-2 border-l-blue-500">
                     <p className="text-xs text-muted-foreground">
-                      <span className="font-semibold">Stratégie:</span> Un papillon positif suggère que la maturité
-                      intermédiaire est attrayante pour les investisseurs cherchant du rendement relatif.
+                      <span className="font-semibold">Strategie:</span> Un papillon positif suggere que la maturite
+                      intermediaire est attrayante pour les investisseurs cherchant du rendement relatif.
                     </p>
                   </div>
 
                   <div className="text-xs text-muted-foreground bg-amber-950/20 p-3 rounded border-l-2 border-l-amber-600">
                     <p>
-                      <span className="font-semibold">Note:</span> Les spreads papillon sont utilisés par les traders
-                      pour les stratégies de spread trading, qui capturent les opportunités de mispricing entre
-                      différentes maturités.
+                      <span className="font-semibold">Note:</span> Les spreads papillon sont utilises par les traders
+                      pour les strategies de spread trading, qui capturent les opportunites de mispricing entre
+                      differentes maturites.
                     </p>
                   </div>
                 </div>
@@ -136,18 +136,18 @@ export function ButterflySpreadsCard({ spreads }: ButterflySpreadsProps) {
             Comprendre les Spreads Papillon
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Un spread papillon mesure la courbure d'une section spécifique de la courbe. La position s'appelle
-            "papillon" car elle implique être court sur deux maturités (les "ailes") et long sur une maturité
-            intermédiaire (le "corps"). Ces stratégies capturent les changements de convexité et la forme de la courbe.
+            Un spread papillon mesure la courbure d'une section specifique de la courbe. La position s'appelle
+            "papillon" car elle implique etre court sur deux maturites (les "ailes") et long sur une maturite
+            intermediaire (le "corps"). Ces strategies capturent les changements de convexite et la forme de la courbe.
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-            <span className="font-semibold">Cas d'usage:</span> Détection de courbure, arbitrage de spread,
-            positionnement tactique basé sur les changements de forme de courbe anticipés.
+            <span className="font-semibold">Cas d'usage:</span> Detection de courbure, arbitrage de spread,
+            positionnement tactique base sur les changements de forme de courbe anticipes.
           </p>
         </div>
 
         <div className="mt-4 pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground">Source: Réserve Fédérale des États-Unis | FRED API</p>
+          <p className="text-xs text-muted-foreground">Source: Reserve Federale des Etats-Unis | FRED API</p>
         </div>
       </CardContent>
     </Card>

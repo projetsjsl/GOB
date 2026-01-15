@@ -1,12 +1,12 @@
 /**
- * API Briefing - Génération de briefings automatisés
+ * API Briefing - Generation de briefings automatises
  * 
- * Pattern: Suit le même pattern que /api/chat.js
+ * Pattern: Suit le meme pattern que /api/chat.js
  * - Lit les prompts depuis config/briefing-prompts.json
- * - Récupère les tickers depuis Supabase (comme /api/chat)
+ * - Recupere les tickers depuis Supabase (comme /api/chat)
  * - Appelle /api/emma-agent avec output_mode: 'briefing'
  * - Applique le template HTML selon le type
- * - Retourne contenu formaté (texte + HTML)
+ * - Retourne contenu formate (texte + HTML)
  * 
  * Usage:
  * GET /api/briefing?type=morning|midday|evening
@@ -33,20 +33,20 @@ function loadBriefingConfig() {
     const configContent = readFileSync(configPath, 'utf-8');
     return JSON.parse(configContent);
   } catch (error) {
-    console.error('❌ Erreur chargement config briefings:', error);
+    console.error(' Erreur chargement config briefings:', error);
     throw new Error('Failed to load briefing configuration');
   }
 }
 
 /**
- * Récupère les tickers depuis Supabase (comme /api/chat)
+ * Recupere les tickers depuis Supabase (comme /api/chat)
  */
 async function getTickersFromSupabase() {
   try {
     const { createClient } = await import('@supabase/supabase-js');
     
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.warn('⚠️ Supabase non configuré, utilisation tickers par défaut');
+      console.warn(' Supabase non configure, utilisation tickers par defaut');
       return {
         teamTickers: [
           'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
@@ -89,7 +89,7 @@ async function getTickersFromSupabase() {
 
     return { teamTickers, watchlist };
   } catch (error) {
-    console.error('❌ Erreur récupération tickers:', error);
+    console.error(' Erreur recuperation tickers:', error);
     // Fallback
     return {
       teamTickers: [
@@ -103,7 +103,7 @@ async function getTickersFromSupabase() {
 }
 
 /**
- * Appelle Emma Agent pour générer le briefing
+ * Appelle Emma Agent pour generer le briefing
  */
 async function callEmmaAgent(prompt, tickers, briefingType, toolsPriority) {
   try {
@@ -139,7 +139,7 @@ async function callEmmaAgent(prompt, tickers, briefingType, toolsPriority) {
 
     return data;
   } catch (error) {
-    console.error('❌ Erreur appel Emma Agent:', error);
+    console.error(' Erreur appel Emma Agent:', error);
     throw error;
   }
 }
@@ -152,7 +152,7 @@ export default async function handler(req, res) {
   if (handled) return;
 
   try {
-        // 1. DÉTERMINER LE TYPE DE BRIEFING
+        // 1. DETERMINER LE TYPE DE BRIEFING
         let briefingType = req.query.type || req.body?.type;
         const customPrompt = req.body?.custom_prompt;
 
@@ -168,23 +168,23 @@ export default async function handler(req, res) {
           briefingType = 'custom';
         }
 
-        // ═══════════════════════════════════════════════════════════
-        // CONVERSION FRANÇAIS → ANGLAIS (pour compatibilité)
-        // ═══════════════════════════════════════════════════════════
+        // 
+        // CONVERSION FRANCAIS -> ANGLAIS (pour compatibilite)
+        // 
         const typeMapping = {
-          // Français → Anglais
+          // Francais -> Anglais
           'matin': 'morning',
           'midi': 'midday',
           'soir': 'evening',
-          // Anglais (compatibilité)
+          // Anglais (compatibilite)
           'morning': 'morning',
           'midday': 'midday',
           'evening': 'evening',
           'noon': 'midday', // Ancien format
-          'custom': 'custom' // Prompt personnalisé
+          'custom': 'custom' // Prompt personnalise
         };
         
-        // Normaliser le type (français ou anglais → anglais)
+        // Normaliser le type (francais ou anglais -> anglais)
         const normalizedType = typeMapping[briefingType?.toLowerCase()];
         
         if (!normalizedType) {
@@ -204,7 +204,7 @@ export default async function handler(req, res) {
           });
         }
 
-    console.log(`📧 Génération briefing ${briefingType}...`);
+    console.log(` Generation briefing ${briefingType}...`);
 
     // 2. CHARGER LA CONFIGURATION
     const config = loadBriefingConfig();
@@ -217,16 +217,16 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. RÉCUPÉRER LES TICKERS (comme /api/chat)
+    // 3. RECUPERER LES TICKERS (comme /api/chat)
     const { teamTickers, watchlist } = await getTickersFromSupabase();
     const allTickers = [...new Set([...teamTickers, ...(req.body?.tickers || [])])];
 
-    console.log(`📊 Tickers: ${allTickers.length} (team: ${teamTickers.length}, watchlist: ${watchlist.length})`);
+    console.log(` Tickers: ${allTickers.length} (team: ${teamTickers.length}, watchlist: ${watchlist.length})`);
 
-        // 4. PRÉPARER LE PROMPT
+        // 4. PREPARER LE PROMPT
         let prompt;
         if (briefingType === 'custom' && customPrompt) {
-          // Utiliser le prompt personnalisé
+          // Utiliser le prompt personnalise
           prompt = customPrompt;
         } else {
           prompt = promptConfig.prompt;
@@ -250,18 +250,18 @@ export default async function handler(req, res) {
 
     const content = emmaResponse.response || emmaResponse.analysis || '';
 
-    // 6. GÉNÉRER LE HTML AVEC LE TEMPLATE APPROPRIÉ (chargé depuis Supabase)
+    // 6. GENERER LE HTML AVEC LE TEMPLATE APPROPRIE (charge depuis Supabase)
     const htmlContent = await generateBriefingTemplate(briefingType, content, {
       tickers: allTickers,
       tools_used: emmaResponse.tools_used,
       execution_time_ms: emmaResponse.execution_time_ms
     });
 
-    // 7. PRÉPARER LE SUJET
+    // 7. PREPARER LE SUJET
     const date = new Date().toLocaleDateString('fr-FR');
     const subject = promptConfig.email_config.subject_template.replace('{date}', date);
 
-    // 8. RETOURNER LA RÉPONSE
+    // 8. RETOURNER LA REPONSE
     return res.status(200).json({
       success: true,
       type: briefingType,
@@ -282,7 +282,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur génération briefing:', error);
+    console.error(' Erreur generation briefing:', error);
     return res.status(500).json({
       success: false,
       error: error.message,

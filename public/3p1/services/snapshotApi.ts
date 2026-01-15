@@ -5,7 +5,7 @@ const API_BASE = typeof window !== 'undefined' ? window.location.origin : '';
 
 /**
  * Save current analysis as a snapshot
- * IMPORTANT: Les assumptions sont sanitisées avant sauvegarde pour éviter les valeurs aberrantes
+ * IMPORTANT: Les assumptions sont sanitisees avant sauvegarde pour eviter les valeurs aberrantes
  */
 export async function saveSnapshot(
     ticker: string,
@@ -17,10 +17,10 @@ export async function saveSnapshot(
     autoFetched = false,
     retryCount = 0,
     maxRetries = 2,
-    syncMetadata?: any // Métadonnées de synchronisation (détails de la sync)
+    syncMetadata?: any // Metadonnees de synchronisation (details de la sync)
 ): Promise<{ success: boolean; snapshot?: any; error?: string }> {
     try {
-        // ✅ VALIDATION: Vérifier que les données requises sont présentes
+        //  VALIDATION: Verifier que les donnees requises sont presentes
         if (!ticker || !ticker.trim()) {
             return { success: false, error: 'Ticker is required' };
         }
@@ -37,7 +37,7 @@ export async function saveSnapshot(
             return { success: false, error: 'Company info must be an object' };
         }
         
-        // ✅ SANITIZE: Corriger les valeurs aberrantes AVANT sauvegarde
+        //  SANITIZE: Corriger les valeurs aberrantes AVANT sauvegarde
         const sanitizedAssumptions = sanitizeAssumptionsSync(assumptions);
         
         const response = await fetch(`${API_BASE}/api/finance-snapshots`, {
@@ -52,7 +52,7 @@ export async function saveSnapshot(
                 notes,
                 is_current: isCurrent,
                 auto_fetched: autoFetched,
-                sync_metadata: syncMetadata || null // Ajouter les métadonnées de synchronisation
+                sync_metadata: syncMetadata || null // Ajouter les metadonnees de synchronisation
             })
         });
 
@@ -65,40 +65,40 @@ export async function saveSnapshot(
                 const baseDelay = 1000 * Math.pow(2, retryCount);
                 const jitter = Math.floor(Math.random() * 200);
                 const delay = baseDelay + jitter;
-                console.warn(`⚠️ Snapshot error ${response.status} for ${ticker}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+                console.warn(` Snapshot error ${response.status} for ${ticker}, retry ${retryCount + 1}/${maxRetries} apres ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 return saveSnapshot(ticker, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
             }
             
             // Ne pas logger comme erreur critique si c'est une erreur 400 (validation)
             if (response.status === 400) {
-                console.warn(`⚠️ Snapshot validation failed for ${ticker}: ${errorMessage}`);
+                console.warn(` Snapshot validation failed for ${ticker}: ${errorMessage}`);
             } else {
-                console.error(`❌ Failed to save snapshot for ${ticker}: ${errorMessage}`);
+                console.error(` Failed to save snapshot for ${ticker}: ${errorMessage}`);
             }
             return { success: false, error: errorMessage };
         }
 
         const snapshot = await response.json();
         if (retryCount > 0) {
-            console.log(`✅ Snapshot saved: ${ticker} v${snapshot.version} (après ${retryCount} retry)`);
+            console.log(` Snapshot saved: ${ticker} v${snapshot.version} (apres ${retryCount} retry)`);
         } else {
-            console.log(`✅ Snapshot saved: ${ticker} v${snapshot.version}`);
+            console.log(` Snapshot saved: ${ticker} v${snapshot.version}`);
         }
 
         return { success: true, snapshot };
     } catch (error: any) {
-        // ✅ RETRY: Pour erreurs réseau/timeout, réessayer automatiquement
+        //  RETRY: Pour erreurs reseau/timeout, reessayer automatiquement
         if (retryCount < maxRetries && (error.message?.includes('fetch') || error.message?.includes('timeout'))) {
             const baseDelay = 1000 * Math.pow(2, retryCount);
             const jitter = Math.floor(Math.random() * 200);
             const delay = baseDelay + jitter;
-            console.warn(`⚠️ Snapshot network error for ${ticker}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+            console.warn(` Snapshot network error for ${ticker}, retry ${retryCount + 1}/${maxRetries} apres ${delay}ms...`);
             await new Promise(resolve => setTimeout(resolve, delay));
             return saveSnapshot(ticker, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
         }
         
-        console.error(`❌ Failed to save snapshot for ${ticker}:`, error);
+        console.error(` Failed to save snapshot for ${ticker}:`, error);
         return { success: false, error: error.message || 'Unknown error' };
     }
 }
@@ -131,7 +131,7 @@ export async function listSnapshots(
  */
 export async function getAllApprovedTickers(): Promise<{ success: boolean; approvedTickers?: string[]; error?: string }> {
     try {
-        console.log('📊 KPI: Fetching all approved tickers (bulk query)...');
+        console.log(' KPI: Fetching all approved tickers (bulk query)...');
         const startTime = Date.now();
 
         const response = await fetch(`${API_BASE}/api/finance-snapshots?approved_only=true&distinct_tickers=true`);
@@ -143,10 +143,10 @@ export async function getAllApprovedTickers(): Promise<{ success: boolean; appro
         const data = await response.json();
         const approvedTickers = data.tickers || [];
 
-        console.log(`✅ KPI: ${approvedTickers.length} approved tickers loaded in ${Date.now() - startTime}ms`);
+        console.log(` KPI: ${approvedTickers.length} approved tickers loaded in ${Date.now() - startTime}ms`);
         return { success: true, approvedTickers };
     } catch (error: any) {
-        console.error('❌ KPI: Failed to get approved tickers:', error);
+        console.error(' KPI: Failed to get approved tickers:', error);
         return { success: false, error: error.message, approvedTickers: [] };
     }
 }
@@ -187,7 +187,7 @@ export async function deleteSnapshot(
             throw new Error(`HTTP ${response.status}`);
         }
 
-        console.log(`✅ Snapshot deleted: ${snapshotId}`);
+        console.log(` Snapshot deleted: ${snapshotId}`);
         return { success: true };
     } catch (error: any) {
         console.error('Failed to delete snapshot:', error);

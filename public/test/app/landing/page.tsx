@@ -208,7 +208,7 @@ export default function LandingPage() {
               CurveWatch
             </div>
             <p className="text-slate-500 text-sm mt-4 md:mt-0">
-              © 2026 CurveWatch. Professional yield curve analysis platform.
+               2026 CurveWatch. Professional yield curve analysis platform.
             </p>
           </div>
         </div>

@@ -158,7 +158,7 @@ async function saveSettings(req, res, supabase) {
         return res.status(500).json({ error: 'Failed to save settings' });
     }
 
-    console.log(`✅ Validation settings saved: ${settings_key}`);
+    console.log(` Validation settings saved: ${settings_key}`);
     return res.status(200).json(data);
 }
 
@@ -193,7 +193,7 @@ function getDefaultSettings() {
         validate_price_range: true,
         price_min_threshold: 0.01,
         price_max_threshold: 100000.00,
-        description: 'Paramètres par défaut',
+        description: 'Parametres par defaut',
         is_active: true
     };
 }

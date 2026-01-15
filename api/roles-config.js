@@ -1,6 +1,6 @@
 /**
- * API pour la configuration des rôles et permissions
- * Gestion complète des rôles utilisateur et permissions des composants
+ * API pour la configuration des roles et permissions
+ * Gestion complete des roles utilisateur et permissions des composants
  */
 
 import { createSupabaseClient } from '../lib/supabase-config.js';
@@ -21,7 +21,7 @@ function getSupabase() {
 }
 
 
-// Hash du mot de passe admin (par défaut: "admin")
+// Hash du mot de passe admin (par defaut: "admin")
 // En production, utiliser bcrypt ou argon2
 function hashPassword(password) {
     return crypto.createHash('sha256').update(password).digest('hex');
@@ -36,20 +36,20 @@ const AVAILABLE_COMPONENTS = [
     { id: 'stocks-news', label: 'Stocks & News', category: 'Principal' },
     { id: 'ask-emma', label: 'Ask Emma', category: 'Principal' },
     { id: 'intellistocks', label: 'JLab', category: 'Principal' },
-    { id: 'economic-calendar', label: 'Calendrier Économique', category: 'Calendriers' },
+    { id: 'economic-calendar', label: 'Calendrier Economique', category: 'Calendriers' },
     { id: 'investing-calendar', label: 'Calendrier Investissement', category: 'Calendriers' },
     { id: 'yield-curve', label: 'Courbe des Rendements', category: 'Analyse' },
-    { id: 'markets-economy', label: 'Marchés & Économie', category: 'Analyse' },
-    { id: 'dans-watchlist', label: 'Watchlist', category: 'Données' },
-    { id: 'scrapping-sa', label: 'Scrapping SA', category: 'Données' },
-    { id: 'seeking-alpha', label: 'Seeking Alpha', category: 'Données' },
+    { id: 'markets-economy', label: 'Marches & Economie', category: 'Analyse' },
+    { id: 'dans-watchlist', label: 'Watchlist', category: 'Donnees' },
+    { id: 'scrapping-sa', label: 'Scrapping SA', category: 'Donnees' },
+    { id: 'seeking-alpha', label: 'Seeking Alpha', category: 'Donnees' },
     { id: 'email-briefings', label: 'Briefings Email', category: 'Communication' },
     { id: 'admin-jslai', label: 'Admin JSL AI', category: 'Admin' },
     { id: 'emma-sms', label: 'Emma SMS', category: 'Communication' },
     { id: 'fastgraphs', label: 'FastGraphs', category: 'Outils' },
     { id: 'plus', label: 'Plus', category: 'Autres' },
-    { id: 'news-ticker', label: 'Bandeau Actualités', category: 'Principal' },
-    { id: 'theme-selector', label: 'Sélecteur de Thème', category: 'Interface' }
+    { id: 'news-ticker', label: 'Bandeau Actualites', category: 'Principal' },
+    { id: 'theme-selector', label: 'Selecteur de Theme', category: 'Interface' }
 ];
 
 export default async function handler(req, res) {
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
         }
 
         // ============================================================
-        // ACTION: VERIFY_ADMIN - Vérifier le mot de passe admin
+        // ACTION: VERIFY_ADMIN - Verifier le mot de passe admin
         // ============================================================
         if (action === 'verify_admin') {
             if (!adminPassword) {
@@ -100,8 +100,8 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Vérifier le mot de passe admin (par défaut: "admin")
-            // En production, récupérer depuis une variable d'environnement ou Supabase
+            // Verifier le mot de passe admin (par defaut: "admin")
+            // En production, recuperer depuis une variable d'environnement ou Supabase
             const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
             const passwordHash = hashPassword(ADMIN_PASSWORD);
 
@@ -114,13 +114,13 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                message: 'Authentification admin réussie',
+                message: 'Authentification admin reussie',
                 components: AVAILABLE_COMPONENTS
             });
         }
 
         // ============================================================
-        // ACTION: GET_ROLES - Récupérer tous les rôles
+        // ACTION: GET_ROLES - Recuperer tous les roles
         // ============================================================
         if (action === 'get_roles') {
             const { data: roles, error } = await db
@@ -140,7 +140,7 @@ export default async function handler(req, res) {
         }
 
         // ============================================================
-        // ACTION: GET_ROLE - Récupérer un rôle spécifique
+        // ACTION: GET_ROLE - Recuperer un role specifique
         // ============================================================
         if (action === 'get_role') {
             if (!roleId && !roleName) {
@@ -171,7 +171,7 @@ export default async function handler(req, res) {
         }
 
         // ============================================================
-        // ACTION: CREATE_ROLE - Créer un nouveau rôle
+        // ACTION: CREATE_ROLE - Creer un nouveau role
         // ============================================================
         if (action === 'create_role') {
             if (!adminPassword) {
@@ -181,7 +181,7 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Vérifier le mot de passe admin
+            // Verifier le mot de passe admin
             const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
             if (adminPassword !== ADMIN_PASSWORD) {
                 return res.status(401).json({
@@ -217,13 +217,13 @@ export default async function handler(req, res) {
 
             return res.status(201).json({
                 success: true,
-                message: 'Rôle créé avec succès',
+                message: 'Role cree avec succes',
                 role: role
             });
         }
 
         // ============================================================
-        // ACTION: UPDATE_ROLE - Mettre à jour un rôle
+        // ACTION: UPDATE_ROLE - Mettre a jour un role
         // ============================================================
         if (action === 'update_role') {
             if (!adminPassword) {
@@ -233,7 +233,7 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Vérifier le mot de passe admin
+            // Verifier le mot de passe admin
             const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
             if (adminPassword !== ADMIN_PASSWORD) {
                 return res.status(401).json({
@@ -268,13 +268,13 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                message: 'Rôle mis à jour avec succès',
+                message: 'Role mis a jour avec succes',
                 role: role
             });
         }
 
         // ============================================================
-        // ACTION: DELETE_ROLE - Supprimer un rôle
+        // ACTION: DELETE_ROLE - Supprimer un role
         // ============================================================
         if (action === 'delete_role') {
             if (!adminPassword) {
@@ -284,7 +284,7 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Vérifier le mot de passe admin
+            // Verifier le mot de passe admin
             const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
             if (adminPassword !== ADMIN_PASSWORD) {
                 return res.status(401).json({
@@ -311,12 +311,12 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                message: 'Rôle supprimé avec succès'
+                message: 'Role supprime avec succes'
             });
         }
 
         // ============================================================
-        // ACTION: ASSIGN_ROLE - Assigner un rôle à un utilisateur
+        // ACTION: ASSIGN_ROLE - Assigner un role a un utilisateur
         // ============================================================
         if (action === 'assign_role') {
             if (!adminPassword) {
@@ -326,7 +326,7 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Vérifier le mot de passe admin
+            // Verifier le mot de passe admin
             const ADMIN_PASSWORD = process.env.ROLES_ADMIN_PASSWORD || 'admin';
             if (adminPassword !== ADMIN_PASSWORD) {
                 return res.status(401).json({
@@ -359,13 +359,13 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                message: 'Rôle assigné avec succès',
+                message: 'Role assigne avec succes',
                 mapping: mapping
             });
         }
 
         // ============================================================
-        // ACTION: GET_USER_PERMISSIONS - Récupérer les permissions d'un utilisateur
+        // ACTION: GET_USER_PERMISSIONS - Recuperer les permissions d'un utilisateur
         // ============================================================
         if (action === 'get_user_permissions') {
             if (!username) {
@@ -412,7 +412,7 @@ export default async function handler(req, res) {
 
 
         // ============================================================
-        // ACTION: POPULATE_DEFAULTS - Peupler les rôles par défaut
+        // ACTION: POPULATE_DEFAULTS - Peupler les roles par defaut
         // ============================================================
         if (action === 'populate_defaults') {
             if (!adminPassword) {
@@ -433,8 +433,8 @@ export default async function handler(req, res) {
             const DEFAULT_ROLES = [
                 {
                     role_name: 'invite',
-                    display_name: 'Invité',
-                    description: 'Accès limité en lecture seule',
+                    display_name: 'Invite',
+                    description: 'Acces limite en lecture seule',
                     is_admin: false,
                     component_permissions: { 
                         'stocks-news': true, 'ask-emma': true, 'intellistocks': false, 
@@ -447,7 +447,7 @@ export default async function handler(req, res) {
                 {
                     role_name: 'client',
                     display_name: 'Client',
-                    description: 'Accès standard au tableau de bord',
+                    description: 'Acces standard au tableau de bord',
                     is_admin: false,
                     component_permissions: { 
                         'stocks-news': true, 'ask-emma': true, 'intellistocks': true, 
@@ -460,7 +460,7 @@ export default async function handler(req, res) {
                 {
                     role_name: 'daniel',
                     display_name: 'Daniel',
-                    description: 'Accès avancé et outils de gestion',
+                    description: 'Acces avance et outils de gestion',
                     is_admin: false,
                     component_permissions: { 
                         'stocks-news': true, 'ask-emma': true, 'intellistocks': true, 
@@ -473,7 +473,7 @@ export default async function handler(req, res) {
                 {
                     role_name: 'gob',
                     display_name: 'GOB',
-                    description: 'Accès super-utilisateur système',
+                    description: 'Acces super-utilisateur systeme',
                     is_admin: true,
                     component_permissions: { 
                         'stocks-news': true, 'ask-emma': true, 'intellistocks': true, 
@@ -520,7 +520,7 @@ export default async function handler(req, res) {
 
             return res.status(200).json({
                 success: true,
-                message: `Opération terminée: ${results.created} créés, ${results.skipped} existants.`,
+                message: `Operation terminee: ${results.created} crees, ${results.skipped} existants.`,
                 details: results
             });
         }
@@ -535,7 +535,7 @@ export default async function handler(req, res) {
         console.error('Erreur Roles Config API:', error);
         return res.status(500).json({
             success: false,
-            error: error.message || 'Erreur serveur lors de la gestion des rôles'
+            error: error.message || 'Erreur serveur lors de la gestion des roles'
         });
     }
 }

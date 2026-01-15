@@ -84,13 +84,13 @@
     // Widget definitions with metadata
     const WIDGET_DEFINITIONS = {
         'portfolio-value': { title: 'Valeur du Portfolio', icon: 'Wallet', type: 'kpi', color: 'emerald' },
-        'daily-change': { title: 'Variation Journalière', icon: 'TrendingUp', type: 'kpi', color: 'blue' },
-        'market-status': { title: 'État du Marché', icon: 'Activity', type: 'kpi', color: 'amber' },
+        'daily-change': { title: 'Variation Journaliere', icon: 'TrendingUp', type: 'kpi', color: 'blue' },
+        'market-status': { title: 'Etat du Marche', icon: 'Activity', type: 'kpi', color: 'amber' },
         'top-performer': { title: 'Meilleure Performance', icon: 'Star', type: 'kpi', color: 'purple' },
-        'portfolio-chart': { title: 'Évolution du Portfolio', icon: 'LineChart', type: 'chart-line' },
+        'portfolio-chart': { title: 'Evolution du Portfolio', icon: 'LineChart', type: 'chart-line' },
         'allocation-donut': { title: 'Allocation', icon: 'PieChart', type: 'chart-donut' },
         'holdings-table': { title: 'Positions', icon: 'Table', type: 'table' },
-        'news-feed': { title: 'Actualités', icon: 'Newspaper', type: 'news' },
+        'news-feed': { title: 'Actualites', icon: 'Newspaper', type: 'news' },
         'market-heatmap': { title: 'Heatmap Secteurs', icon: 'Grid3X3', type: 'heatmap' }
     };
 
@@ -110,8 +110,8 @@
         allocation: [
             { sector: 'Tech', value: 45, color: '#3B82F6' },
             { sector: 'Finance', value: 20, color: '#10B981' },
-            { sector: 'Santé', value: 15, color: '#8B5CF6' },
-            { sector: 'Énergie', value: 12, color: '#F59E0B' },
+            { sector: 'Sante', value: 15, color: '#8B5CF6' },
+            { sector: 'Energie', value: 12, color: '#F59E0B' },
             { sector: 'Autre', value: 8, color: '#6B7280' }
         ],
         chartData: Array.from({ length: 30 }, (_, i) => ({
@@ -157,7 +157,7 @@
                 subtitle = `+${MOCK_DATA.topPerformer.change}%`;
                 break;
             default:
-                value = '—';
+                value = '-';
                 subtitle = '';
         }
 
@@ -182,7 +182,7 @@
 
         return (
             <div className={`h-full rounded-xl p-4 ${isDarkMode ? 'bg-neutral-800' : 'bg-white'} shadow-lg flex flex-col`}>
-                <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Évolution Portfolio</h3>
+                <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Evolution Portfolio</h3>
                 <div className="flex-1 relative min-h-0">
                     <svg className="w-full h-full" viewBox="0 0 300 100" preserveAspectRatio="none">
                         <defs>
@@ -220,7 +220,7 @@
                     </svg>
                 </div>
                 <div className="flex flex-wrap gap-1 text-xs justify-center">
-                    {data.map(s => <span key={s.sector} style={{color:s.color}}>● {s.sector}</span>)}
+                    {data.map(s => <span key={s.sector} style={{color:s.color}}> {s.sector}</span>)}
                 </div>
             </div>
         );
@@ -246,12 +246,12 @@
 
     const NewsFeedWidget = ({ isDarkMode }) => (
         <div className={`h-full rounded-xl p-4 ${isDarkMode ? 'bg-neutral-800' : 'bg-white'} shadow-lg flex flex-col`}>
-            <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Actualités</h3>
+            <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Actualites</h3>
             <div className="flex-1 overflow-auto space-y-2">
                 {MOCK_DATA.news.map(n => (
                     <div key={n.id} className={`p-2 rounded-lg ${isDarkMode ? 'bg-neutral-700/50' : 'bg-gray-50'}`}>
                         <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{n.title}</p>
-                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{n.source} • {n.time}</p>
+                        <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{n.source} - {n.time}</p>
                     </div>
                 ))}
             </div>
@@ -261,7 +261,7 @@
     const HeatmapWidget = ({ isDarkMode }) => {
         const sectors = [
             { name: 'Tech', change: 2.3 }, { name: 'Finance', change: 0.8 },
-            { name: 'Santé', change: -0.5 }, { name: 'Énergie', change: 1.2 },
+            { name: 'Sante', change: -0.5 }, { name: 'Energie', change: 1.2 },
             { name: 'Conso', change: -1.1 }, { name: 'Industrie', change: 0.4 }
         ];
         const getColor = c => c >= 1 ? 'bg-emerald-500' : c >= 0 ? 'bg-emerald-300' : c >= -1 ? 'bg-red-300' : 'bg-red-500';
@@ -322,7 +322,7 @@
             return (
                 <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
                     <div className={`p-4 rounded-lg mb-4 ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
-                        <p className="font-medium">⚠️ React-Grid-Layout loading...</p>
+                        <p className="font-medium"> React-Grid-Layout loading...</p>
                         <p className="text-sm mt-1">Make sure the CDN script is loaded.</p>
                     </div>
                     <div className="grid grid-cols-4 gap-4">
@@ -342,9 +342,9 @@
                         </div>
                         <div className="flex items-center gap-2">
                             <button title="Action" onClick={() => setIsEditing(!isEditing)} className={`px-4 py-2 rounded-lg font-medium text-sm ${isEditing ? 'bg-emerald-500 text-white' : isDarkMode ? 'bg-neutral-700 text-gray-300' : 'bg-gray-200 text-gray-700'}`}>
-                                {isEditing ? '✓ Terminer' : '✎ Modifier'}
+                                {isEditing ? ' Terminer' : ' Modifier'}
                             </button>
-                            {isEditing && <button onClick={resetLayout} className={`px-4 py-2 rounded-lg font-medium text-sm ${isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600'}`}>↺ Reset</button>}
+                            {isEditing && <button onClick={resetLayout} className={`px-4 py-2 rounded-lg font-medium text-sm ${isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600'}`}> Reset</button>}
                         </div>
                     </div>
                 )}
@@ -361,7 +361,7 @@
                         ))}
                     </ResponsiveGridLayout>
                 </div>
-                {isEditing && <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full shadow-lg bg-emerald-500 text-white`}><span className="text-sm font-medium">🔧 Mode édition - Glissez et redimensionnez</span></div>}
+                {isEditing && <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full shadow-lg bg-emerald-500 text-white`}><span className="text-sm font-medium"> Mode edition - Glissez et redimensionnez</span></div>}
             </div>
         );
     };
@@ -371,5 +371,5 @@
     window.RGL_DEFAULT_LAYOUTS = DEFAULT_LAYOUTS;
     window.RGL_WIDGET_DEFINITIONS = WIDGET_DEFINITIONS;
 
-    console.log('✅ RglDashboard loaded');
+    console.log(' RglDashboard loaded');
 })();

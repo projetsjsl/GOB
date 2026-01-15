@@ -134,7 +134,7 @@ const clearAllDashboardCaches = () => {
         if (clearCachedData(key, 'local')) cleared++;
     });
 
-    console.log(`✅ Cleared ${cleared} cache entries`);
+    console.log(` Cleared ${cleared} cache entries`);
     return cleared;
 };
 
@@ -223,7 +223,7 @@ const formatCacheSize = (bytes) => {
  */
 const preloadDashboardData = async (API_BASE_URL) => {
     try {
-        console.log('🔄 Preloading dashboard data...');
+        console.log(' Preloading dashboard data...');
 
         // Fetch ticker data
         const tickerResponse = await fetch(`${API_BASE_URL}/api/marketdata-batch?type=indices`);
@@ -247,10 +247,10 @@ const preloadDashboardData = async (API_BASE_URL) => {
         // Save to sessionStorage
         sessionStorage.setItem('preloaded-dashboard-data', JSON.stringify(preloadPackage));
 
-        console.log('✅ Dashboard data preloaded successfully');
+        console.log(' Dashboard data preloaded successfully');
         return true;
     } catch (error) {
-        console.error('❌ Error preloading dashboard data:', error);
+        console.error(' Error preloading dashboard data:', error);
         return false;
     }
 };

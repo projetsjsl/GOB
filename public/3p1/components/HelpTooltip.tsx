@@ -62,12 +62,12 @@ interface CalculationExplanationProps {
 export const CalculationExplanation: React.FC<CalculationExplanationProps> = ({ metric, values }) => {
     const explanations = {
         CAGR: {
-            title: 'Taux de Croissance Annuel Composé (CAGR)',
+            title: 'Taux de Croissance Annuel Compose (CAGR)',
             content: (
                 <>
-                    <p className="mb-2">Le CAGR représente le taux de croissance annuel moyen sur une période donnée.</p>
+                    <p className="mb-2">Le CAGR represente le taux de croissance annuel moyen sur une periode donnee.</p>
                     <div className="bg-gray-100 p-3 rounded mb-2 font-mono text-xs">
-                        CAGR = ((Valeur Finale / Valeur Initiale)^(1/Années)) - 1
+                        CAGR = ((Valeur Finale / Valeur Initiale)^(1/Annees)) - 1
                     </div>
                     {values && (
                         <div className="bg-blue-50 p-3 rounded text-xs">
@@ -77,7 +77,7 @@ export const CalculationExplanation: React.FC<CalculationExplanationProps> = ({ 
                         </div>
                     )}
                     <p className="mt-2 text-xs text-gray-600">
-                        <strong>Note :</strong> Le CAGR est plafonné entre 0% et 20% pour éviter les projections irréalistes.
+                        <strong>Note :</strong> Le CAGR est plafonne entre 0% et 20% pour eviter les projections irrealistes.
                     </p>
                 </>
             )
@@ -88,11 +88,11 @@ export const CalculationExplanation: React.FC<CalculationExplanationProps> = ({ 
                 <>
                     <p className="mb-2">Le ratio P/E (Price-to-Earnings) cible est la moyenne historique des ratios P/E.</p>
                     <div className="bg-gray-100 p-3 rounded mb-2 font-mono text-xs">
-                        P/E = Prix / Bénéfice par Action (BPA)
+                        P/E = Prix / Benefice par Action (BPA)
                     </div>
-                    <p className="mb-2">Le P/E cible est calculé en faisant la moyenne des ratios P/E historiques (haut et bas) de toutes les années disponibles.</p>
+                    <p className="mb-2">Le P/E cible est calcule en faisant la moyenne des ratios P/E historiques (haut et bas) de toutes les annees disponibles.</p>
                     <p className="text-xs text-gray-600">
-                        <strong>Filtrage :</strong> Les valeurs infinies ou négatives sont exclues du calcul.
+                        <strong>Filtrage :</strong> Les valeurs infinies ou negatives sont exclues du calcul.
                     </p>
                 </>
             )
@@ -105,9 +105,9 @@ export const CalculationExplanation: React.FC<CalculationExplanationProps> = ({ 
                     <div className="bg-gray-100 p-3 rounded mb-2 font-mono text-xs">
                         P/CF = Prix / Cash Flow par Action
                     </div>
-                    <p className="mb-2">Le P/CF cible est calculé en faisant la moyenne des ratios P/CF historiques de toutes les années disponibles.</p>
+                    <p className="mb-2">Le P/CF cible est calcule en faisant la moyenne des ratios P/CF historiques de toutes les annees disponibles.</p>
                     <p className="text-xs text-gray-600">
-                        <strong>Avantage :</strong> Le cash flow est plus difficile à manipuler que le bénéfice net.
+                        <strong>Avantage :</strong> Le cash flow est plus difficile a manipuler que le benefice net.
                     </p>
                 </>
             )
@@ -118,52 +118,52 @@ export const CalculationExplanation: React.FC<CalculationExplanationProps> = ({ 
                 <>
                     <p className="mb-2">Le rendement cible est la moyenne historique du rendement en dividendes.</p>
                     <div className="bg-gray-100 p-3 rounded mb-2 font-mono text-xs">
-                        Rendement = (Dividende / Prix) × 100
+                        Rendement = (Dividende / Prix) x 100
                     </div>
-                    <p className="mb-2">Utilisé pour calculer le prix cible basé sur les dividendes projetés.</p>
+                    <p className="mb-2">Utilise pour calculer le prix cible base sur les dividendes projetes.</p>
                     <div className="bg-blue-50 p-3 rounded text-xs">
                         <p><strong>Prix Cible (DIV) :</strong></p>
-                        <p>= Dividende Projeté / (Rendement Cible / 100)</p>
+                        <p>= Dividende Projete / (Rendement Cible / 100)</p>
                     </div>
                 </>
             )
         },
         TARGET_PRICE: {
-            title: 'Prix Cible - Méthodologie',
+            title: 'Prix Cible - Methodologie',
             content: (
                 <>
-                    <p className="mb-2">Le prix cible est calculé selon 3 méthodes différentes :</p>
+                    <p className="mb-2">Le prix cible est calcule selon 3 methodes differentes :</p>
 
                     <div className="space-y-3">
                         <div className="bg-green-50 p-3 rounded">
-                            <p className="font-semibold text-green-800 mb-1">1. Méthode P/E</p>
+                            <p className="font-semibold text-green-800 mb-1">1. Methode P/E</p>
                             <div className="font-mono text-xs">
-                                Prix = BPA Projeté (An 5) × P/E Cible
+                                Prix = BPA Projete (An 5) x P/E Cible
                             </div>
                             {values && (
                                 <p className="text-xs mt-1">
-                                    = {values.projected?.toFixed(2)} × {values.ratio?.toFixed(1)} = ${((values.projected || 0) * (values.ratio || 0)).toFixed(2)}
+                                    = {values.projected?.toFixed(2)} x {values.ratio?.toFixed(1)} = ${((values.projected || 0) * (values.ratio || 0)).toFixed(2)}
                                 </p>
                             )}
                         </div>
 
                         <div className="bg-blue-50 p-3 rounded">
-                            <p className="font-semibold text-blue-800 mb-1">2. Méthode P/CF</p>
+                            <p className="font-semibold text-blue-800 mb-1">2. Methode P/CF</p>
                             <div className="font-mono text-xs">
-                                Prix = CF Projeté (An 5) × P/CF Cible
+                                Prix = CF Projete (An 5) x P/CF Cible
                             </div>
                         </div>
 
                         <div className="bg-purple-50 p-3 rounded">
-                            <p className="font-semibold text-purple-800 mb-1">3. Méthode Dividende</p>
+                            <p className="font-semibold text-purple-800 mb-1">3. Methode Dividende</p>
                             <div className="font-mono text-xs">
-                                Prix = DIV Projeté (An 5) / (Rendement % / 100)
+                                Prix = DIV Projete (An 5) / (Rendement % / 100)
                             </div>
                         </div>
                     </div>
 
                     <p className="mt-3 text-xs text-gray-600">
-                        <strong>Prix Cible Final :</strong> Moyenne des 3 méthodes (ou médiane pour plus de robustesse).
+                        <strong>Prix Cible Final :</strong> Moyenne des 3 methodes (ou mediane pour plus de robustesse).
                     </p>
                 </>
             )

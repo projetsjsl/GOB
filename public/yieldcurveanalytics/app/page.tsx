@@ -94,7 +94,7 @@ export default function Page() {
   const caPolicyRate = data?.["CA"]?.policyRate
   const lastUpdated = new Date().toLocaleString("fr-FR")
 
-  // Filtrer les données par maturités sélectionnées
+  // Filtrer les donnees par maturites selectionnees
   const filteredUsData = usData.filter((p: any) => selectedMaturities.includes(p.maturity))
   const filteredCaData = caData.filter((p: any) => selectedMaturities.includes(p.maturity))
 
@@ -121,7 +121,7 @@ export default function Page() {
 
   const butterflySpreads = calculateButterflySpreads(usData)
 
-  // Calculer métriques pour UnifiedMetrics
+  // Calculer metriques pour UnifiedMetrics
   const usMetrics = {
     slope2Y10Y:
       (usData.find((p: any) => p.maturity === "10Y")?.yield || 0) -
@@ -153,7 +153,7 @@ export default function Page() {
   }
 
   const handleExport = () => {
-    const csvRows = ["Maturité,US (%),Canada (%),Spread (bp)"]
+    const csvRows = ["Maturite,US (%),Canada (%),Spread (bp)"]
     const maturities = ["1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "20Y", "30Y"]
     maturities.forEach((mat) => {
       const usPoint = usData.find((p: any) => p.maturity === mat)
@@ -184,7 +184,7 @@ export default function Page() {
     return (
       <div className="flex items-center justify-center h-screen flex-col gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        <p className="text-muted-foreground">Chargement des données...</p>
+        <p className="text-muted-foreground">Chargement des donnees...</p>
       </div>
     )
   }
@@ -194,7 +194,7 @@ export default function Page() {
       <div className="flex items-center justify-center h-screen flex-col gap-4">
         <p className="text-red-500">{error}</p>
         <Button variant="default" size="sm" onClick={() => setLoading(true)}>
-          Réessayer
+          Reessayer
         </Button>
       </div>
     )
@@ -226,9 +226,9 @@ export default function Page() {
                         ? "ring-2 ring-primary ring-offset-1 bg-primary/10"
                         : "opacity-50 hover:opacity-75"
                     }`}
-                    title={country === "US" ? "États-Unis" : "Canada"}
+                    title={country === "US" ? "Etats-Unis" : "Canada"}
                   >
-                    {country === "US" ? "🇺🇸" : "🇨🇦"}
+                    {country === "US" ? "" : ""}
                   </button>
                 ))}
               </div>
@@ -245,7 +245,7 @@ export default function Page() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="linear">Linéaire</SelectItem>
+                  <SelectItem value="linear">Lineaire</SelectItem>
                   <SelectItem value="cubic-spline">Spline Cubique</SelectItem>
                   <SelectItem value="nelson-siegel">Nelson-Siegel</SelectItem>
                   <SelectItem value="monotone-cubic">Cubique Monotone</SelectItem>
@@ -283,7 +283,7 @@ export default function Page() {
                   variant={graphFilters.showObserved ? "default" : "outline"}
                   onClick={() => setGraphFilters({ ...graphFilters, showObserved: !graphFilters.showObserved })}
                   className="h-8 text-xs px-2"
-                  title="Points observés"
+                  title="Points observes"
                 >
                   {graphFilters.showObserved ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                 </Button>
@@ -326,7 +326,7 @@ export default function Page() {
             <div className="flex-1">
               <h1 className="text-3xl sm:text-4xl font-bold">JLab CurveWatch</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Propulsé par JSLAI • Métriques clés pour décisions rapides
+                Propulse par JSLAI - Metriques cles pour decisions rapides
               </p>
             </div>
             <div className="flex gap-2">
@@ -341,7 +341,7 @@ export default function Page() {
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          {/* Panneau de contrôle latéral */}
+          {/* Panneau de controle lateral */}
           <aside className="lg:col-span-1 space-y-4">
             <EnhancedControlsPanel
               method={interpolationMethod}
@@ -360,7 +360,7 @@ export default function Page() {
                 <Calendar className="h-4 w-4" />
                 Dates de Comparaison
               </h3>
-              <p className="text-xs text-muted-foreground">Ajoutez jusqu'à 5 dates pour comparer les courbes</p>
+              <p className="text-xs text-muted-foreground">Ajoutez jusqu'a 5 dates pour comparer les courbes</p>
               <div className="flex gap-2">
                 <Input
                   type="date"
@@ -394,7 +394,7 @@ export default function Page() {
 
           {/* Contenu principal */}
           <div className="lg:col-span-3 space-y-6">
-            {/* SECTION 2: COURBES DE TAUX OBLIGATAIRES - PRIORITÉ HAUTE */}
+            {/* SECTION 2: COURBES DE TAUX OBLIGATAIRES - PRIORITE HAUTE */}
             <section className="space-y-3 scroll-mt-20">
               <div className="flex items-center gap-2 mb-3">
                 <span className="inline-flex items-center justify-center h-6 w-6 bg-indigo-500/20 border border-indigo-500/50 rounded-full text-xs font-semibold text-indigo-400">
@@ -407,7 +407,7 @@ export default function Page() {
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold">Courbe des Taux Obligataires</h2>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Comparaison 2 courbes - courbes historiques en pointillés
+                    Comparaison 2 courbes - courbes historiques en pointilles
                   </p>
                 </div>
               </div>
@@ -449,7 +449,7 @@ export default function Page() {
                   3
                 </span>
                 <span className="text-xs text-muted-foreground uppercase tracking-wide">
-                  Grille Comparaison Maturités
+                  Grille Comparaison Maturites
                 </span>
               </div>
               <CurveComparisonGrid
@@ -466,21 +466,21 @@ export default function Page() {
                 <span className="inline-flex items-center justify-center h-6 w-6 bg-green-500/20 border border-green-500/50 rounded-full text-xs font-semibold text-green-400">
                   4
                 </span>
-                <span className="text-xs text-muted-foreground uppercase tracking-wide">État Marché & Spreads</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">Etat Marche & Spreads</span>
               </div>
               <div className="section-header">
                 <div className="h-8 w-1.5 bg-gradient-to-b from-green-500 to-emerald-500 rounded-full"></div>
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
                     <Activity className="h-6 w-6 text-green-400" />
-                    État du Marché & Risques
+                    Etat du Marche & Risques
                   </h2>
-                  <p className="text-xs text-muted-foreground mt-1">Spreads US/CA et comparaisons détaillées</p>
+                  <p className="text-xs text-muted-foreground mt-1">Spreads US/CA et comparaisons detaillees</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <ExpandableCard title="Écarts US-CA par Maturité" expandedSize="large">
+                <ExpandableCard title="Ecarts US-CA par Maturite" expandedSize="large">
                   <CountrySpreadChart usData={filteredUsData} caData={filteredCaData} />
                 </ExpandableCard>
 
@@ -534,7 +534,7 @@ export default function Page() {
                     <TrendingUp className="h-6 w-6 text-purple-400" />
                     Courbes de Taux
                   </h2>
-                  <p className="text-xs text-muted-foreground mt-1">Analyse interactive avec contrôles avancés</p>
+                  <p className="text-xs text-muted-foreground mt-1">Analyse interactive avec controles avances</p>
                 </div>
               </div>
 
@@ -553,22 +553,22 @@ export default function Page() {
               </div>
             </section>
 
-            {/* SECTION 6: ANALYTIQUE AVANCÉE */}
+            {/* SECTION 6: ANALYTIQUE AVANCEE */}
             <section id="section-analytical" className="space-y-3 border-t border-indigo-500/10 pt-6 scroll-mt-20">
               <div className="flex items-center gap-2 mb-3">
                 <span className="inline-flex items-center justify-center h-6 w-6 bg-amber-500/20 border border-amber-500/50 rounded-full text-xs font-semibold text-amber-400">
                   6
                 </span>
-                <span className="text-xs text-muted-foreground uppercase tracking-wide">Analytique Avancée</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">Analytique Avancee</span>
               </div>
               <div className="section-header">
                 <div className="h-8 w-1.5 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></div>
                 <div>
                   <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
                     <Zap className="h-6 w-6 text-amber-400" />
-                    Analytique Avancée
+                    Analytique Avancee
                   </h2>
-                  <p className="text-xs text-muted-foreground mt-1">Métriques détaillées, PCA et butterfly spreads</p>
+                  <p className="text-xs text-muted-foreground mt-1">Metriques detaillees, PCA et butterfly spreads</p>
                 </div>
               </div>
 
@@ -587,7 +587,7 @@ export default function Page() {
                 {selectedCountries.includes("US") && data?.["US"] && (
                   <ExpandableCard title="Forwards - US" expandedSize="large">
                     <div className="fed-card-bg rounded-lg p-4">
-                      <h4 className="text-xs font-semibold text-blue-300 mb-3 uppercase">Métriques Courbe US</h4>
+                      <h4 className="text-xs font-semibold text-blue-300 mb-3 uppercase">Metriques Courbe US</h4>
                       <CurveMetricsCard metrics={calculateEnhancedCurveMetrics(usData, [])} />
                     </div>
                   </ExpandableCard>
@@ -596,29 +596,29 @@ export default function Page() {
                 {selectedCountries.includes("CA") && data?.["CA"] && (
                   <ExpandableCard title="Forwards - CA" expandedSize="large">
                     <div className="canada-card-bg rounded-lg p-4">
-                      <h4 className="text-xs font-semibold text-red-300 mb-3 uppercase">Métriques Courbe CA</h4>
+                      <h4 className="text-xs font-semibold text-red-300 mb-3 uppercase">Metriques Courbe CA</h4>
                       <CurveMetricsCard metrics={calculateEnhancedCurveMetrics(caData, [])} />
                     </div>
                   </ExpandableCard>
                 )}
 
-                <ExpandableCard title="Butterfly Spreads Détaillés" expandedSize="large">
+                <ExpandableCard title="Butterfly Spreads Detailles" expandedSize="large">
                   <ButterflySpreadsCard spreads={butterflySpreads} />
                 </ExpandableCard>
 
                 {selectedCountries.includes("US") && (
-                  <ExpandableCard title="Métriques Courbe - US" expandedSize="large">
+                  <ExpandableCard title="Metriques Courbe - US" expandedSize="large">
                     <div className="fed-card-bg rounded-lg p-4">
-                      <h4 className="text-xs font-semibold text-blue-300 mb-3 uppercase">Métriques Courbe US</h4>
+                      <h4 className="text-xs font-semibold text-blue-300 mb-3 uppercase">Metriques Courbe US</h4>
                       <CurveMetricsCard metrics={calculateEnhancedCurveMetrics(usData, [])} />
                     </div>
                   </ExpandableCard>
                 )}
 
                 {selectedCountries.includes("CA") && (
-                  <ExpandableCard title="Métriques Courbe - CA" expandedSize="large">
+                  <ExpandableCard title="Metriques Courbe - CA" expandedSize="large">
                     <div className="canada-card-bg rounded-lg p-4">
-                      <h4 className="text-xs font-semibold text-red-300 mb-3 uppercase">Métriques Courbe CA</h4>
+                      <h4 className="text-xs font-semibold text-red-300 mb-3 uppercase">Metriques Courbe CA</h4>
                       <CurveMetricsCard metrics={calculateEnhancedCurveMetrics(caData, [])} />
                     </div>
                   </ExpandableCard>
@@ -667,9 +667,9 @@ export default function Page() {
                 <span className="inline-flex items-center justify-center h-6 w-6 bg-rose-500/20 border border-rose-500/50 rounded-full text-xs font-semibold text-rose-400">
                   7
                 </span>
-                <span className="text-xs text-muted-foreground uppercase tracking-wide">Historique Décisions</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">Historique Decisions</span>
               </div>
-              <ExpandableCard title="Historique des Décisions de Taux - FED & BOC" expandedSize="xlarge">
+              <ExpandableCard title="Historique des Decisions de Taux - FED & BOC" expandedSize="xlarge">
                 <RateDecisionsHistory />
               </ExpandableCard>
 

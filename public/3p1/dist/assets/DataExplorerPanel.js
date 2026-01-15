@@ -126,7 +126,7 @@ class Logger {
   success(message, ...args) {
     if (!this.config.enabled) return;
     console.log(
-      `%c[${this.config.prefix}] ✅ %c${message}`,
+      `%c[${this.config.prefix}]  %c${message}`,
       "color: #22c55e; font-weight: bold",
       "color: inherit",
       ...args
@@ -325,7 +325,7 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
       });
       const result = await res.json();
       if (result.success) {
-        addNotification("success", isNew ? "Enregistrement créé avec succès" : "Modification enregistrée");
+        addNotification("success", isNew ? "Enregistrement cree avec succes" : "Modification enregistree");
         setIsEditModalOpen(false);
         setEditingRow(null);
         loadTableData();
@@ -348,10 +348,10 @@ const DataExplorerPanel = ({ isOpen, onClose, onSyncSelected }) => {
     const id = row[pk] || row.id || row.ticker;
     logger.debug(`Deleting from ${selectedTable}, PK=${pk}, ID=${id}`, row);
     if (!id) {
-      addNotification("error", `Impossible de trouver l'ID (clé primaire: ${pk}) pour cet enregistrement`);
+      addNotification("error", `Impossible de trouver l'ID (cle primaire: ${pk}) pour cet enregistrement`);
       return;
     }
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer cet enregistrement ?
+    if (!confirm(`Etes-vous sur de vouloir supprimer cet enregistrement ?
 Table: ${selectedTable}
 ID: ${id}`)) return;
     setLoading(true);
@@ -366,7 +366,7 @@ ID: ${id}`)) return;
       });
       const result = await res.json();
       if (result.success) {
-        addNotification("success", "Enregistrement supprimé");
+        addNotification("success", "Enregistrement supprime");
         setTableData((prev) => prev.filter((r) => (r[pk] || r.id || r.ticker) !== id));
         loadTables();
       } else {
@@ -385,7 +385,7 @@ ID: ${id}`)) return;
   const handleSyncFMP = async (ticker) => {
     if (!ticker) return;
     setLoading(true);
-    addNotification("success", `Synchro FMP démarrée pour ${ticker}...`);
+    addNotification("success", `Synchro FMP demarree pour ${ticker}...`);
     try {
       const res = await fetch("/api/fmp-sync", {
         method: "POST",
@@ -394,7 +394,7 @@ ID: ${id}`)) return;
       });
       const data = await res.json();
       if (data.success) {
-        addNotification("success", `Synchro terminée pour ${ticker}`);
+        addNotification("success", `Synchro terminee pour ${ticker}`);
         loadTableData();
       } else {
         addNotification("error", data.error || "Erreur inconnue");
@@ -577,7 +577,7 @@ ID: ${id}`)) return;
             {
               onClick: () => setShowFilterBar(!showFilterBar),
               className: `p-2 rounded-lg border transition-all ${showFilterBar || Object.keys(activeFilters).length > 0 ? "bg-blue-600/20 border-blue-500 text-blue-400" : "bg-slate-900 border-slate-600 text-slate-400 hover:text-white"}`,
-              title: "Filtres avancés",
+              title: "Filtres avances",
               children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-5 h-5" })
             }
           ),
@@ -641,8 +641,8 @@ ID: ${id}`)) return;
                 checked: selectedRows.size === tableData.length && tableData.length > 0,
                 onChange: selectAllRows,
                 className: "rounded bg-slate-700 border-slate-600",
-                "aria-label": "Sélectionner toutes les lignes",
-                title: "Sélectionner toutes les lignes"
+                "aria-label": "Selectionner toutes les lignes",
+                title: "Selectionner toutes les lignes"
               }
             ) }),
             columns.slice(0, 8).map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -671,8 +671,8 @@ ID: ${id}`)) return;
                     checked: selectedRows.has(row.id || row.ticker),
                     onChange: () => toggleRowSelection(row.id || row.ticker),
                     className: "rounded bg-slate-700 border-slate-600",
-                    "aria-label": `Sélectionner ${row.ticker || row.id}`,
-                    title: `Sélectionner ${row.ticker || row.id}`
+                    "aria-label": `Selectionner ${row.ticker || row.id}`,
+                    title: `Selectionner ${row.ticker || row.id}`
                   }
                 ) }),
                 columns.slice(0, 8).map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-3 text-slate-300", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "truncate max-w-[200px]", title: formatValue(row[col.name], col.name), children: formatValue(row[col.name], col.name) }) }, col.name)),
@@ -730,7 +730,7 @@ ID: ${id}`)) return;
                 onClick: () => setPage(Math.max(1, page - 1)),
                 disabled: page === 1,
                 className: "px-3 py-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm",
-                children: "Précédent"
+                children: "Precedent"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -745,8 +745,8 @@ ID: ${id}`)) return;
           ] })
         ] })
       ] }) : showSummary ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-auto p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-4xl mx-auto", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold text-white mb-2", children: "Rapport de Données 3P1" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-slate-400 mb-8", children: "Vue d'ensemble de la santé des tables Supabase et colonnes visibles." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold text-white mb-2", children: "Rapport de Donnees 3P1" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-slate-400 mb-8", children: "Vue d'ensemble de la sante des tables Supabase et colonnes visibles." }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: tables.map((t) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `p-6 rounded-2xl border ${t.error ? "bg-red-900/10 border-red-800" : "bg-slate-800/50 border-slate-700"}`, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
@@ -761,7 +761,7 @@ ID: ${id}`)) return;
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white font-mono", children: t.count.toLocaleString() })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-400", children: "Dernière Sync:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-400", children: "Derniere Sync:" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white", children: formatLastUpdate(t.lastUpdate) })
             ] }),
             t.error && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 p-3 bg-red-950/50 border border-red-900 rounded-lg text-red-300 text-xs font-mono", children: t.error })
@@ -780,15 +780,15 @@ ID: ${id}`)) return;
         ] }, t.name)) })
       ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 flex items-center justify-center text-slate-500", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-16 h-16 mx-auto mb-4 opacity-50" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg", children: "Sélectionnez une table" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm mt-2", children: "pour visualiser les données" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg", children: "Selectionnez une table" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm mt-2", children: "pour visualiser les donnees" })
       ] }) }) })
     ] }),
     showSyncPanel && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-black/50 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800 border border-slate-600 rounded-xl p-6 max-w-md w-full mx-4", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-white mb-4", children: "Synchroniser les sélections" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-white mb-4", children: "Synchroniser les selections" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-slate-300 mb-4", children: [
         selectedRows.size,
-        " élément(s) sélectionné(s) pour synchronisation."
+        " element(s) selectionne(s) pour synchronisation."
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -921,11 +921,11 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
       if (value !== void 0 && value !== null) {
         setFmpValues((prev) => ({ ...prev, [fieldName]: value }));
       } else {
-        alert("Donnée non trouvée chez FMP pour ce champ.");
+        alert("Donnee non trouvee chez FMP pour ce champ.");
       }
     } catch (e) {
       logger.error("Error:", e);
-      alert("Erreur lors de la récupération FMP");
+      alert("Erreur lors de la recuperation FMP");
     } finally {
       setLoadingField(null);
     }
@@ -942,7 +942,7 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 z-[60] bg-black/60 flex items-center justify-center p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[80vh]", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 border-b border-slate-700 flex justify-between items-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-white", children: title }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onClose, className: "p-2 hover:bg-slate-700 rounded-lg", "aria-label": "Fermer le modal d'édition", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onClose, className: "p-2 hover:bg-slate-700 rounded-lg", "aria-label": "Fermer le modal d'edition", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-5 h-5" }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6 overflow-y-auto space-y-4", children: columns.map((col) => {
       if (["id", "created_at", "updated_at"].includes(col.name)) return null;
@@ -960,8 +960,8 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
                 onClick: () => handleFetchField(col.name),
                 disabled: !!loadingField,
                 className: `flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded transition-colors disabled:opacity-50 ${hasFmpValue ? "bg-green-600/20 text-green-400" : "bg-blue-600/20 text-blue-400 hover:bg-blue-600/30"}`,
-                title: "Récupérer depuis FMP",
-                "aria-label": `Récupérer ${col.name} depuis FMP`,
+                title: "Recuperer depuis FMP",
+                "aria-label": `Recuperer ${col.name} depuis FMP`,
                 children: [
                   loadingField === col.name ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-3 h-3 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "FMP" })
@@ -1026,7 +1026,7 @@ const EditModal = ({ title, initialData, columns, onClose, onSave }) => {
             },
             className: "w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32 focus:border-blue-500 outline-none",
             "aria-label": col.name.replace(/_/g, " "),
-            title: `Éditer ${col.name.replace(/_/g, " ")} (format JSON)`
+            title: `Editer ${col.name.replace(/_/g, " ")} (format JSON)`
           }
         ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(

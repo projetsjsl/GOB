@@ -124,7 +124,7 @@ export default async function handler(req, res) {
           const { data, error } = await query;
 
           if (error) {
-            console.warn('⚠️ latest_seeking_alpha_analysis indisponible, fallback table:', error.message);
+            console.warn(' latest_seeking_alpha_analysis indisponible, fallback table:', error.message);
             let fallbackQuery = supabase
               .from('seeking_alpha_analysis')
               .select('*')
@@ -311,7 +311,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ Seeking Alpha Scraping API Error:', error.message);
+    console.error(' Seeking Alpha Scraping API Error:', error.message);
     return res.status(500).json({
       success: false,
       error: 'Internal server error',

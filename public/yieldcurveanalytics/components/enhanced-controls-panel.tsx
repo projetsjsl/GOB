@@ -45,19 +45,19 @@ export function EnhancedControlsPanel({
   return (
     <Card className="bg-card border-border sticky top-4">
       <CardHeader>
-        <CardTitle className="text-foreground">Contrôles</CardTitle>
-        <CardDescription className="text-muted-foreground">Ajustez les paramètres d'affichage</CardDescription>
+        <CardTitle className="text-foreground">Controles</CardTitle>
+        <CardDescription className="text-muted-foreground">Ajustez les parametres d'affichage</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {onCountriesChange && (
           <div className="space-y-3 pb-4 border-b border-border">
             <Label className="text-foreground font-medium flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full" />
-              Pays & Régions
+              Pays & Regions
             </Label>
             <div className="space-y-2">
               {["US", "CA"].map((country) => {
-                const countryLabel = country === "US" ? "Trésor des États-Unis" : "Gouvernement Canadien"
+                const countryLabel = country === "US" ? "Tresor des Etats-Unis" : "Gouvernement Canadien"
                 const countryColor = country === "US" ? "#3b82f6" : "#ef4444"
                 return (
                   <div
@@ -90,17 +90,17 @@ export function EnhancedControlsPanel({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="linear">Linéaire</SelectItem>
+              <SelectItem value="linear">Lineaire</SelectItem>
               <SelectItem value="cubic-spline">Spline Cubique</SelectItem>
               <SelectItem value="nelson-siegel">Nelson-Siegel</SelectItem>
               <SelectItem value="monotone-cubic">Cubique Monotone</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {method === "linear" && "Interpolation linéaire simple entre les points"}
+            {method === "linear" && "Interpolation lineaire simple entre les points"}
             {method === "cubic-spline" && "Interpolation par spline cubique lisse et naturelle"}
-            {method === "nelson-siegel" && "Modèle paramétrique Nelson-Siegel pour courbes réalistes"}
-            {method === "monotone-cubic" && "Interpolation cubique monotone préservant la monotonie"}
+            {method === "nelson-siegel" && "Modele parametrique Nelson-Siegel pour courbes realistes"}
+            {method === "monotone-cubic" && "Interpolation cubique monotone preservant la monotonie"}
           </p>
         </div>
 
@@ -108,7 +108,7 @@ export function EnhancedControlsPanel({
           <div className="space-y-3 pb-4 border-b border-border">
             <Label htmlFor="date" className="text-foreground font-medium flex items-center gap-2">
               <span className="w-2 h-2 bg-primary rounded-full" />
-              Date des Données
+              Date des Donnees
             </Label>
             <div className="flex gap-2">
               <Input
@@ -133,13 +133,13 @@ export function EnhancedControlsPanel({
         <div className="space-y-2">
           <Button onClick={onRefresh} className="w-full" variant="secondary">
             <RefreshCw className="h-4 w-4 mr-2" />
-            Actualiser les Données
+            Actualiser les Donnees
           </Button>
         </div>
 
         <div className="pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Données provenant de {selectedCountries.includes("US") ? "FRED (Federal Reserve Economic Data)" : ""}
+            Donnees provenant de {selectedCountries.includes("US") ? "FRED (Federal Reserve Economic Data)" : ""}
             {selectedCountries.includes("CA") && selectedCountries.includes("US") ? " et " : ""}
             {selectedCountries.includes("CA") ? "Banque du Canada" : ""}
           </p>

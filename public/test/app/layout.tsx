@@ -10,7 +10,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "CurveWatch | Plateforme Analyse Courbes Taux | US & Canada",
   description:
-    "CurveWatch - Plateforme professionnelle d'analyse des courbes de rendement obligataires avec données en temps réel du Trésor américain et Banque du Canada. Visualisation interactive, métriques avancées, spreads et PCA.",
+    "CurveWatch - Plateforme professionnelle d'analyse des courbes de rendement obligataires avec donnees en temps reel du Tresor americain et Banque du Canada. Visualisation interactive, metriques avancees, spreads et PCA.",
   keywords: [
     "yield curve",
     "courbe de taux",
@@ -18,10 +18,10 @@ export const metadata: Metadata = {
     "treasury",
     "fixed income",
     "obligations",
-    "trésor américain",
+    "tresor americain",
     "banque du canada",
     "financial analysis",
-    "analysis financière",
+    "analysis financiere",
   ],
   generator: "v0.app",
   creator: "JSLAI",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     locale: "fr_CA",
     alternateLocale: ["en_US"],
     title: "CurveWatch - Analyse Courbes Taux Obligataires",
-    description: "Plateforme d'analyse des courbes de rendement avec données temps réel",
+    description: "Plateforme d'analyse des courbes de rendement avec donnees temps reel",
     siteName: "CurveWatch",
   },
   robots: {

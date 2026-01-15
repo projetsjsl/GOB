@@ -1,8 +1,8 @@
 /**
  * Component: ChatGPTGroupTab
- * Intégration complète du chat de groupe ChatGPT avec configuration avancée
+ * Integration complete du chat de groupe ChatGPT avec configuration avancee
  * 
- * Converti depuis TypeScript pour intégration dans app-inline.js
+ * Converti depuis TypeScript pour integration dans app-inline.js
  * Source: codex/add-group-chat-tab-to-dashboard-s7z4sd
  */
 
@@ -12,7 +12,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     // ============================================
     // CONFIGURATION INITIALE
     // ============================================
-    // Récupérer VITE_GROUP_CHAT_URL depuis l'environnement
+    // Recuperer VITE_GROUP_CHAT_URL depuis l'environnement
     // Note: En Babel inline, on utilise une variable globale ou window
     const [envChatUrl, setEnvChatUrl] = useState('');
     const [envLoaded, setEnvLoaded] = useState(false);
@@ -21,7 +21,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     useEffect(() => {
         const loadEnvUrl = async () => {
             try {
-                // Essayer d'abord window.importMetaEnv (si défini par script)
+                // Essayer d'abord window.importMetaEnv (si defini par script)
                 if (typeof window !== 'undefined' && window.importMetaEnv && window.importMetaEnv.VITE_GROUP_CHAT_URL) {
                     const url = window.importMetaEnv.VITE_GROUP_CHAT_URL.trim();
                     setEnvChatUrl(url);
@@ -38,7 +38,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                     return;
                 }
 
-                // Fallback: récupérer depuis l'API
+                // Fallback: recuperer depuis l'API
                 const response = await fetch('/api/groupchat-env');
                 if (response.ok) {
                     const data = await response.json();
@@ -52,7 +52,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                     setEnvLoaded(true);
                 }
             } catch (error) {
-                console.warn('⚠️ ChatGPTGroupTab: Impossible de charger VITE_GROUP_CHAT_URL', error);
+                console.warn(' ChatGPTGroupTab: Impossible de charger VITE_GROUP_CHAT_URL', error);
                 setEnvLoaded(true);
             }
         };
@@ -64,15 +64,15 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     const LOCAL_STORAGE_KEY = 'gob-group-chat-settings-v1';
 
     // ============================================
-    // VALEURS PAR DÉFAUT
+    // VALEURS PAR DEFAUT
     // ============================================
-    // Utiliser envChatUrl une fois chargé, sinon chaîne vide
+    // Utiliser envChatUrl une fois charge, sinon chaine vide
     const getDefaultSettings = () => ({
         sessionUrl: envChatUrl || '',
-        roomName: 'GOB x ChatGPT — Salon équipe',
+        roomName: 'GOB x ChatGPT - Salon equipe',
         adminDisplayName: 'Admin GOB',
-        welcomeMessage: "Bienvenue dans le salon d'équipe ! On synchronise ici toutes les décisions.",
-        systemPrompt: "Tu agis comme facilitateur de chat de groupe : résume, attribue des tâches et garde le contexte clair.",
+        welcomeMessage: "Bienvenue dans le salon d'equipe ! On synchronise ici toutes les decisions.",
+        systemPrompt: "Tu agis comme facilitateur de chat de groupe : resume, attribue des taches et garde le contexte clair.",
         defaultTone: 'Professionnel & bienveillant',
         temperature: 0.35,
         maxMessages: 500,
@@ -80,22 +80,22 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
         autoJoin: true,
         pinnedResource: 'https://chat.openai.com',
         userAlias: 'Analyste GOB',
-        userIcon: '🧠',
+        userIcon: '',
     });
 
     const defaultSettings = getDefaultSettings();
 
     const formatTemperature = (value) => Math.max(0, Math.min(1, Number(value) || 0));
-    const iconChoices = ['🧠', '🦉', '💹', '📊', '🚀', '🛡️', '🎯', '🗝️'];
+    const iconChoices = ['', '', '', '', '', '', '', ''];
 
     // ============================================
-    // ÉTATS REACT
+    // ETATS REACT
     // ============================================
-    // Mode de chat: 'shared' (partagé ChatGPT) ou 'integrated' (intégré avec API)
+    // Mode de chat: 'shared' (partage ChatGPT) ou 'integrated' (integre avec API)
     const [chatMode, setChatMode] = useState(() => {
         try {
             const saved = localStorage.getItem('gob-chat-mode');
-            return saved || 'shared'; // Par défaut: mode partagé
+            return saved || 'shared'; // Par defaut: mode partage
         } catch {
             return 'shared';
         }
@@ -106,9 +106,9 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     const [iframeError, setIframeError] = useState(null);
     const [cspBlocked, setCspBlocked] = useState(false);
     const [accessSafety, setAccessSafety] = useState('needs-token');
-    const [sessionOrigin, setSessionOrigin] = useState('non configuré');
+    const [sessionOrigin, setSessionOrigin] = useState('non configure');
     
-    // États pour le chat intégré
+    // Etats pour le chat integre
     const [integratedRoom, setIntegratedRoom] = useState(null);
     const [integratedMessages, setIntegratedMessages] = useState([]);
     const [integratedParticipants, setIntegratedParticipants] = useState([]);
@@ -117,28 +117,28 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     const [newMessage, setNewMessage] = useState('');
     const [pollingInterval, setPollingInterval] = useState(null);
     
-    // Contrôle des interventions LLM
+    // Controle des interventions LLM
     const [llmAutoReply, setLlmAutoReply] = useState(() => {
         try {
             const saved = localStorage.getItem('gob-llm-auto-reply');
             return saved === 'true';
         } catch {
-            return false; // Par défaut: désactivé pour éviter de "pourrir" la conversation
+            return false; // Par defaut: desactive pour eviter de "pourrir" la conversation
         }
     });
-    const [llmReplyOnMention, setLlmReplyOnMention] = useState(true); // Répondre si @chatgpt ou @assistant
-    const [llmReplyOnQuestion, setLlmReplyOnQuestion] = useState(false); // Répondre automatiquement aux questions
+    const [llmReplyOnMention, setLlmReplyOnMention] = useState(true); // Repondre si @chatgpt ou @assistant
+    const [llmReplyOnQuestion, setLlmReplyOnQuestion] = useState(false); // Repondre automatiquement aux questions
     const [isCallingLlm, setIsCallingLlm] = useState(false);
-    const [showPersonalityModal, setShowPersonalityModal] = useState(false); // Modal Personnalité et fonctionnement
+    const [showPersonalityModal, setShowPersonalityModal] = useState(false); // Modal Personnalite et fonctionnement
     
     const hasEnvChatUrl = Boolean(envChatUrl);
     const isUsingEnvDefault = Boolean(envChatUrl) && settings.sessionUrl === envChatUrl;
 
     // ============================================
-    // CHARGEMENT DES PARAMÈTRES SAUVEGARDÉS
+    // CHARGEMENT DES PARAMETRES SAUVEGARDES
     // ============================================
     useEffect(() => {
-        if (!envLoaded) return; // Attendre que l'URL d'environnement soit chargée
+        if (!envLoaded) return; // Attendre que l'URL d'environnement soit chargee
         
         try {
             const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -146,11 +146,11 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
             
             if (saved) {
                 const parsed = JSON.parse(saved);
-                // Si l'URL d'environnement est disponible et qu'aucune URL n'est sauvegardée, l'utiliser
+                // Si l'URL d'environnement est disponible et qu'aucune URL n'est sauvegardee, l'utiliser
                 const mergedSettings = {
                     ...currentDefaultSettings,
                     ...parsed,
-                    // Si aucune URL sauvegardée et qu'on a une URL d'environnement, l'utiliser
+                    // Si aucune URL sauvegardee et qu'on a une URL d'environnement, l'utiliser
                     sessionUrl: parsed.sessionUrl || envChatUrl || ''
                 };
                 setSettings(mergedSettings);
@@ -161,40 +161,40 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 setSettings(currentDefaultSettings);
             }
         } catch (error) {
-            console.warn('⚠️ ChatGPTGroupTab: Impossible de charger les paramètres du clavardage', error);
+            console.warn(' ChatGPTGroupTab: Impossible de charger les parametres du clavardage', error);
             setSettings(getDefaultSettings());
         }
     }, [envLoaded, envChatUrl]);
 
     // ============================================
-    // SAUVEGARDE AUTOMATIQUE DES PARAMÈTRES
+    // SAUVEGARDE AUTOMATIQUE DES PARAMETRES
     // ============================================
     useEffect(() => {
         try {
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(settings));
         } catch (error) {
-            console.warn('⚠️ ChatGPTGroupTab: Impossible de sauvegarder les paramètres du clavardage', error);
+            console.warn(' ChatGPTGroupTab: Impossible de sauvegarder les parametres du clavardage', error);
         }
     }, [settings]);
 
     // ============================================
-    // VALIDATION DE L'URL ET SÉCURITÉ
+    // VALIDATION DE L'URL ET SECURITE
     // ============================================
     useEffect(() => {
         if (!settings.sessionUrl) {
             setAccessSafety('needs-token');
-            setSessionOrigin('non configuré');
+            setSessionOrigin('non configure');
             return;
         }
 
-        // Vérifier si l'URL contient un token pour l'accès automatique
+        // Verifier si l'URL contient un token pour l'acces automatique
         setAccessSafety(settings.sessionUrl.includes('token=') ? 'token' : 'needs-token');
 
         try {
             const url = new URL(settings.sessionUrl);
             setSessionOrigin(url.hostname);
         } catch (error) {
-            console.warn('⚠️ ChatGPTGroupTab: URL de session invalide', error);
+            console.warn(' ChatGPTGroupTab: URL de session invalide', error);
             setSessionOrigin('inconnue');
         }
     }, [settings.sessionUrl]);
@@ -214,7 +214,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (error) {
-            console.error('❌ ChatGPTGroupTab: Impossible de copier le lien', error);
+            console.error(' ChatGPTGroupTab: Impossible de copier le lien', error);
         }
     };
 
@@ -236,14 +236,14 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
             console.warn('Impossible de sauvegarder le mode:', e);
         }
         
-        // Si on passe en mode intégré et qu'on n'a pas de salon, en créer un
+        // Si on passe en mode integre et qu'on n'a pas de salon, en creer un
         if (mode === 'integrated' && !integratedRoom) {
             handleCreateIntegratedRoom();
         }
     };
 
     // ============================================
-    // GESTION DU CHAT INTÉGRÉ
+    // GESTION DU CHAT INTEGRE
     // ============================================
     const handleCreateIntegratedRoom = async () => {
         try {
@@ -268,17 +268,17 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 setIntegratedRoom(data.room);
                 // Charger les messages initiaux
                 await loadIntegratedMessages(data.room.id);
-                // Démarrer la synchronisation
+                // Demarrer la synchronisation
                 startPolling(data.room.id);
-                // Mettre à jour la présence
+                // Mettre a jour la presence
                 updatePresence(data.room.id);
             } else {
-                console.error('Erreur création salon:', data.error);
-                console.log('Alert suppressed:', 'Erreur création salon: ' + (data.error || 'Erreur inconnue'));
+                console.error('Erreur creation salon:', data.error);
+                console.log('Alert suppressed:', 'Erreur creation salon: ' + (data.error || 'Erreur inconnue'));
             }
         } catch (error) {
-            console.error('Erreur création salon intégré:', error);
-            console.log('Alert suppressed:', 'Erreur création salon: ' + error.message);
+            console.error('Erreur creation salon integre:', error);
+            console.log('Alert suppressed:', 'Erreur creation salon: ' + error.message);
         } finally {
             setIsLoadingMessages(false);
         }
@@ -322,12 +322,12 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 })
             });
         } catch (error) {
-            console.error('Erreur mise à jour présence:', error);
+            console.error('Erreur mise a jour presence:', error);
         }
     };
 
     const startPolling = (roomId) => {
-        // Arrêter le polling existant
+        // Arreter le polling existant
         if (pollingInterval) {
             clearInterval(pollingInterval);
         }
@@ -342,7 +342,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
         setPollingInterval(interval);
     };
 
-    // Détecter si le message contient une mention ou une question
+    // Detecter si le message contient une mention ou une question
     const shouldCallLlm = (message) => {
         const msg = message.toLowerCase().trim();
         
@@ -356,7 +356,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
             return true;
         }
         
-        // Auto-reply activé
+        // Auto-reply active
         if (llmAutoReply) {
             return true;
         }
@@ -388,7 +388,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
             const data = await response.json();
             if (data.success) {
                 setNewMessage('');
-                // Recharger les messages pour avoir la réponse de l'assistant (si appelé)
+                // Recharger les messages pour avoir la reponse de l'assistant (si appele)
                 await loadIntegratedMessages(integratedRoom.id);
             } else {
                 console.log('Alert suppressed:', 'Erreur envoi message: ' + (data.error || 'Erreur inconnue'));
@@ -408,17 +408,17 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
         try {
             setIsCallingLlm(true);
             
-            // Récupérer le dernier message utilisateur
+            // Recuperer le dernier message utilisateur
             const lastUserMessage = [...integratedMessages]
                 .reverse()
                 .find(msg => msg.role === 'user');
             
             if (!lastUserMessage) {
-                console.log('Alert suppressed:', 'Aucun message utilisateur récent pour appeler le LLM');
+                console.log('Alert suppressed:', 'Aucun message utilisateur recent pour appeler le LLM');
                 return;
             }
 
-            // Appeler l'API pour générer une réponse
+            // Appeler l'API pour generer une reponse
             const response = await fetch('/api/groupchat/integrated/send-message', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -426,15 +426,15 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                     roomId: integratedRoom.id,
                     userId: 'assistant',
                     userDisplayName: 'ChatGPT',
-                    userIcon: '🤖',
+                    userIcon: '',
                     message: lastUserMessage.content,
-                    forceAssistant: true // Forcer la génération d'une réponse
+                    forceAssistant: true // Forcer la generation d'une reponse
                 })
             });
 
             const data = await response.json();
             if (data.success) {
-                // Recharger les messages pour voir la réponse
+                // Recharger les messages pour voir la reponse
                 await loadIntegratedMessages(integratedRoom.id);
             } else {
                 console.log('Alert suppressed:', 'Erreur appel LLM: ' + (data.error || 'Erreur inconnue'));
@@ -447,7 +447,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
         }
     };
 
-    // Nettoyer le polling à la fermeture
+    // Nettoyer le polling a la fermeture
     useEffect(() => {
         return () => {
             if (pollingInterval) {
@@ -457,13 +457,13 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     }, [pollingInterval]);
 
     // ============================================
-    // RÈGLES D'OR DU SALON (MÉMOISÉ)
+    // REGLES D'OR DU SALON (MEMOISE)
     // ============================================
     const chatGuardrails = useMemo(() => [
-        'Confirmer l\'objectif de la réunion en une phrase.',
-        'Lister les décisions prises et les propriétaires.',
-        'Vérifier que tout le monde dispose du lien ChatGPT et peut rejoindre.',
-        'Garder un ton respectueux, synthétique, orienté action.',
+        'Confirmer l\'objectif de la reunion en une phrase.',
+        'Lister les decisions prises et les proprietaires.',
+        'Verifier que tout le monde dispose du lien ChatGPT et peut rejoindre.',
+        'Garder un ton respectueux, synthetique, oriente action.',
     ], []);
 
     // ============================================
@@ -487,7 +487,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
     return React.createElement('div', { className: 'space-y-6 p-6' },
 
 
-        // Sélecteur de mode (Partagé vs Intégré)
+        // Selecteur de mode (Partage vs Integre)
         React.createElement('div', { 
             className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow` 
         },
@@ -495,12 +495,12 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 React.createElement('div', {},
                     React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text} mb-1` }, 'Mode de Chat'),
                     React.createElement('p', { className: `text-sm ${themeStyles.textSecondary}` }, 
-                        'Choisissez entre le chat de groupe partagé ChatGPT ou un chat intégré avec historique'
+                        'Choisissez entre le chat de groupe partage ChatGPT ou un chat integre avec historique'
                     )
                 )
             ),
             React.createElement('div', { className: 'grid grid-cols-2 gap-4' },
-                // Mode Partagé
+                // Mode Partage
                 React.createElement('button', {
                     onClick: () => handleModeChange('shared'),
                     className: `p-4 rounded-lg border-2 transition-all ${
@@ -510,17 +510,17 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                     }` 
                 },
                     React.createElement('div', { className: 'text-center space-y-2' },
-                        React.createElement('div', { className: 'text-3xl mb-2' }, '🔗'),
-                        React.createElement('h4', { className: `font-semibold ${themeStyles.text}` }, 'Chat Partagé'),
+                        React.createElement('div', { className: 'text-3xl mb-2' }, ''),
+                        React.createElement('h4', { className: `font-semibold ${themeStyles.text}` }, 'Chat Partage'),
                         React.createElement('p', { className: `text-xs ${themeStyles.textSecondary}` }, 
-                            'Lien ChatGPT partagé (ouvre dans nouvel onglet)'
+                            'Lien ChatGPT partage (ouvre dans nouvel onglet)'
                         ),
                         chatMode === 'shared' && (
-                            React.createElement('span', { className: 'text-xs text-blue-400 mt-2 block' }, '✓ Actif')
+                            React.createElement('span', { className: 'text-xs text-blue-400 mt-2 block' }, ' Actif')
                         )
                     )
                 ),
-                // Mode Intégré
+                // Mode Integre
                 React.createElement('button', {
                     onClick: () => handleModeChange('integrated'),
                     className: `p-4 rounded-lg border-2 transition-all ${
@@ -530,13 +530,13 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                     }` 
                 },
                     React.createElement('div', { className: 'text-center space-y-2' },
-                        React.createElement('div', { className: 'text-3xl mb-2' }, '💬'),
-                        React.createElement('h4', { className: `font-semibold ${themeStyles.text}` }, 'Chat Intégré'),
+                        React.createElement('div', { className: 'text-3xl mb-2' }, ''),
+                        React.createElement('h4', { className: `font-semibold ${themeStyles.text}` }, 'Chat Integre'),
                         React.createElement('p', { className: `text-xs ${themeStyles.textSecondary}` }, 
-                            'Chat avec historique, contexte et visibilité live'
+                            'Chat avec historique, contexte et visibilite live'
                         ),
                         chatMode === 'integrated' && (
-                            React.createElement('span', { className: 'text-xs text-green-400 mt-2 block' }, '✓ Actif')
+                            React.createElement('span', { className: 'text-xs text-green-400 mt-2 block' }, ' Actif')
                         )
                     )
                 )
@@ -546,7 +546,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
         // Contenu selon le mode choisi
         chatMode === 'shared' ? (
             // ============================================
-            // MODE PARTAGÉ (ChatGPT Group Chat Partagé)
+            // MODE PARTAGE (ChatGPT Group Chat Partage)
             // ============================================
             React.createElement('div', { key: 'shared-mode' },
                 // Header avec titre et actions
@@ -556,18 +556,18 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
             React.createElement('div', { className: 'space-y-1' },
                 React.createElement('p', { 
                     className: 'text-xs text-blue-200 uppercase tracking-[0.2em]' 
-                }, 'Chat d\'investissement sécurisé'),
+                }, 'Chat d\'investissement securise'),
                 React.createElement('h2', { 
                     className: 'text-3xl font-bold flex items-center gap-2' 
                 },
-                    'Salon partagé — Comité de placement',
+                    'Salon partage - Comite de placement',
                     React.createElement('span', { 
                         className: 'inline-flex items-center gap-1 text-sm px-3 py-1 rounded-full bg-blue-900 text-blue-100 border border-blue-500/50' 
                     }, 'Live')
                 ),
                 React.createElement('p', { 
                     className: `${themeStyles.textSecondary} mt-1 max-w-3xl` 
-                }, 'Pilotez le salon ChatGPT du comité : alias, icônes, prompts, accès sans login et prévisualisation intégrée. Tout est optimisé pour des décisions en temps réel.')
+                }, 'Pilotez le salon ChatGPT du comite : alias, icones, prompts, acces sans login et previsualisation integree. Tout est optimise pour des decisions en temps reel.')
             ),
             React.createElement('div', { className: 'flex items-center justify-between flex-wrap gap-3' },
                 React.createElement('div', { className: 'flex gap-3' },
@@ -579,7 +579,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 ? `${themeStyles.buttonSecondary} text-white`
                                 : `${themeStyles.surface} ${themeStyles.border} ${themeStyles.textMuted} cursor-not-allowed`
                         }`
-                    }, copied ? 'Lien copié ✅' : 'Copier le lien'),
+                    }, copied ? 'Lien copie ' : 'Copier le lien'),
                     React.createElement('button', {
                         onClick: handleOpenChat,
                         disabled: !settings.sessionUrl,
@@ -593,11 +593,11 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
             )
         ),
 
-        // Grille principale: Prévisualisation + Configuration
+        // Grille principale: Previsualisation + Configuration
         React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-3 gap-6' },
-            // Colonne gauche: Prévisualisation et Configuration (2/3)
+            // Colonne gauche: Previsualisation et Configuration (2/3)
             React.createElement('div', { className: 'lg:col-span-2 space-y-4' },
-                // Section Prévisualisation iframe
+                // Section Previsualisation iframe
                 React.createElement('div', { 
                     className: `p-4 rounded-xl bg-gradient-to-br from-gray-900 via-gray-850 to-black border ${themeStyles.border} shadow relative overflow-hidden`
                 },
@@ -609,7 +609,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             React.createElement('div', { className: 'flex items-center gap-2' },
                                 React.createElement('span', { 
                                     className: 'px-2 py-1 rounded-md bg-blue-900/50 text-blue-100 text-xs border border-blue-700/50' 
-                                }, 'Prévisualisation'),
+                                }, 'Previsualisation'),
                                 React.createElement('span', { 
                                     className: `px-2 py-1 rounded-md ${themeStyles.surface} ${themeStyles.textSecondary} text-xs border ${themeStyles.border}` 
                                 }, sessionOrigin),
@@ -617,16 +617,16 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                     accessSafety === 'token' ? (
                                         React.createElement('span', { 
                                             className: 'px-2 py-1 rounded-md bg-emerald-900/60 text-emerald-100 text-xs border border-emerald-600/60' 
-                                        }, 'Lien partagé (auto-access)')
+                                        }, 'Lien partage (auto-access)')
                                     ) : (
                                         React.createElement('span', { 
                                             className: 'px-2 py-1 rounded-md bg-amber-900/70 text-amber-100 text-xs border border-amber-700' 
-                                        }, 'Ajoutez un token pour éviter toute demande de login')
+                                        }, 'Ajoutez un token pour eviter toute demande de login')
                                     )
                                 ) : (
                                     React.createElement('span', { 
                                         className: `px-2 py-1 rounded-md ${themeStyles.surface} ${themeStyles.textSecondary} text-xs border ${themeStyles.border}` 
-                                    }, 'Lien à renseigner')
+                                    }, 'Lien a renseigner')
                                 )
                             ),
                             React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, settings.roomName),
@@ -635,7 +635,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                         React.createElement('div', { className: `flex items-center gap-3 text-sm ${themeStyles.textSecondary}` },
                             React.createElement('span', { 
                                 className: `px-3 py-1 rounded-full ${themeStyles.surface} ${themeStyles.text} border ${themeStyles.border}` 
-                            }, `Source : ${sessionOrigin === 'chatgpt.com' ? 'chatgpt.com (temps réel)' : sessionOrigin}`),
+                            }, `Source : ${sessionOrigin === 'chatgpt.com' ? 'chatgpt.com (temps reel)' : sessionOrigin}`),
                             React.createElement('span', {
                                 className: `px-3 py-1 rounded-full border ${
                                     hasEnvChatUrl
@@ -643,15 +643,15 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                         : 'bg-amber-900/60 text-amber-100 border-amber-700'
                                 }`
                             }, hasEnvChatUrl
-                                ? 'URL par défaut chargée depuis .env/Vercel'
+                                ? 'URL par defaut chargee depuis .env/Vercel'
                                 : 'Ajoutez VITE_GROUP_CHAT_URL dans .env ou Vercel'),
                             React.createElement('span', { 
                                 className: 'px-3 py-1 rounded-full bg-blue-900/60 text-blue-100 text-xs border border-blue-700/50' 
-                            }, '💡 Ouvrir dans un nouvel onglet (CSP bloque iframe)')
+                            }, ' Ouvrir dans un nouvel onglet (CSP bloque iframe)')
                         )
                     ),
-                    // Zone de prévisualisation (iframe remplacé par bouton d'ouverture)
-                    // ⚠️ NOTE: ChatGPT bloque les iframes via CSP (Content Security Policy)
+                    // Zone de previsualisation (iframe remplace par bouton d'ouverture)
+                    //  NOTE: ChatGPT bloque les iframes via CSP (Content Security Policy)
                     // Solution: Afficher un bouton d'ouverture au lieu d'un iframe
                     React.createElement('div', { 
                         className: 'aspect-video rounded-lg overflow-hidden border bg-gradient-to-br from-gray-900 via-gray-800 to-black relative z-10 flex items-center justify-center',
@@ -663,11 +663,11 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 className: 'absolute inset-0 flex flex-col items-center justify-center text-center p-8 space-y-6' 
                             },
                                 React.createElement('div', { className: 'space-y-4' },
-                                    // Icône ou illustration
-                                    React.createElement('div', { className: 'text-6xl mb-4' }, '💬'),
+                                    // Icone ou illustration
+                                    React.createElement('div', { className: 'text-6xl mb-4' }, ''),
                                     React.createElement('h3', { className: `text-2xl font-bold ${themeStyles.text} mb-2` }, settings.roomName),
                                     React.createElement('p', { className: `${themeStyles.textSecondary} text-sm mb-6` }, 
-                                        'ChatGPT bloque l\'intégration en iframe pour des raisons de sécurité.'
+                                        'ChatGPT bloque l\'integration en iframe pour des raisons de securite.'
                                     ),
                                     React.createElement('p', { className: `${themeStyles.textMuted} text-xs mb-8` },
                                         'Utilisez le bouton ci-dessous pour ouvrir le salon dans un nouvel onglet.'
@@ -681,7 +681,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                 : `${themeStyles.surface} ${themeStyles.textMuted} cursor-not-allowed`
                                         }`
                                     }, 
-                                        React.createElement('span', { className: 'mr-2' }, '🚀'),
+                                        React.createElement('span', { className: 'mr-2' }, ''),
                                         'Ouvrir le salon ChatGPT'
                                     ),
                                     // Bouton secondaire pour copier le lien
@@ -692,16 +692,16 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                 ? `${themeStyles.buttonSecondary} text-white`
                                                 : `${themeStyles.surface} ${themeStyles.border} ${themeStyles.textMuted} cursor-not-allowed`
                                         }`
-                                    }, copied ? '✅ Lien copié' : '📋 Copier le lien')
+                                    }, copied ? ' Lien copie' : ' Copier le lien')
                                 ),
                                 // Badge d'information CSP
                                 React.createElement('div', { 
                                     className: `mt-6 px-4 py-2 rounded-lg ${themeStyles.surface} border ${themeStyles.border} text-xs ${themeStyles.textMuted}` 
                                 },
-                                    React.createElement('p', { className: 'mb-2' }, 'ℹ️ Information'),
+                                    React.createElement('p', { className: 'mb-2' }, 'i Information'),
                                     React.createElement('p', { className: 'mb-1' }, 'ChatGPT bloque les iframes via CSP (Content Security Policy).'),
-                                    React.createElement('p', { className: 'mb-2' }, 'Les chats de groupe partagés n\'ont pas d\'API officielle.'),
-                                    React.createElement('p', {}, '💡 Alternative: Utiliser l\'API OpenAI pour créer un chat intégré (voir documentation).')
+                                    React.createElement('p', { className: 'mb-2' }, 'Les chats de groupe partages n\'ont pas d\'API officielle.'),
+                                    React.createElement('p', {}, ' Alternative: Utiliser l\'API OpenAI pour creer un chat integre (voir documentation).')
                                 )
                             )
                         ) : (
@@ -711,11 +711,11 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 React.createElement('div', { className: 'space-y-2 max-w-xl' },
                                     React.createElement('p', { className: `font-semibold ${themeStyles.text}` }, 'Configurez le lien du salon'),
                                     React.createElement('p', { className: `${themeStyles.textSecondary} text-sm` },
-                                        'Ajoutez l\'URL de clavardage partagée dans le formulaire ou via la variable d\'environnement ',
+                                        'Ajoutez l\'URL de clavardage partagee dans le formulaire ou via la variable d\'environnement ',
                                         React.createElement('code', { 
                                             className: `px-1 py-0.5 rounded ${themeStyles.surface} border ${themeStyles.border}` 
                                         }, 'VITE_GROUP_CHAT_URL'),
-                                        ' pour activer la prévisualisation.'
+                                        ' pour activer la previsualisation.'
                                     )
                                 )
                             )
@@ -729,14 +729,14 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                 },
                     React.createElement('div', { className: 'flex items-center justify-between' },
                         React.createElement('div', {},
-                            React.createElement('p', { className: 'text-xs uppercase text-blue-200 tracking-wide' }, 'Contrôles admin'),
-                            React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Paramétrage de la session'),
-                            React.createElement('p', { className: `${themeStyles.textSecondary} text-sm` }, 'Tout est sauvegardé localement (dashboard only) pour ne jamais perdre la configuration.')
+                            React.createElement('p', { className: 'text-xs uppercase text-blue-200 tracking-wide' }, 'Controles admin'),
+                            React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Parametrage de la session'),
+                            React.createElement('p', { className: `${themeStyles.textSecondary} text-sm` }, 'Tout est sauvegarde localement (dashboard only) pour ne jamais perdre la configuration.')
                         ),
                         React.createElement('button', {
                             onClick: handleReset,
                             className: `px-3 py-2 rounded-lg border ${themeStyles.border} text-sm hover:border-blue-400 ${themeStyles.textSecondary}`
-                        }, 'Réinitialiser')
+                        }, 'Reinitialiser')
                     ),
 
                     // Formulaire de configuration
@@ -752,10 +752,10 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 placeholder: PLACEHOLDER_CHAT_URL
                             }),
                             React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` },
-                                'Le lien partagé par ChatGPT pour rejoindre la session. Utilisez un lien avec un « token » pour que les invités accèdent sans aucune connexion manuelle.'
+                                'Le lien partage par ChatGPT pour rejoindre la session. Utilisez un lien avec un " token " pour que les invites accedent sans aucune connexion manuelle.'
                             ),
                             React.createElement('p', { className: 'text-xs text-blue-200' },
-                                'Source par défaut : variable d\'environnement ',
+                                'Source par defaut : variable d\'environnement ',
                                 React.createElement('code', { 
                                     className: `px-1 py-0.5 rounded ${themeStyles.surface} border ${themeStyles.border}` 
                                 }, 'VITE_GROUP_CHAT_URL'),
@@ -766,12 +766,12 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 ' ou Vercel). ',
                                 hasEnvChatUrl
                                     ? (isUsingEnvDefault
-                                        ? 'Valeur chargée automatiquement.'
-                                        : 'Valeur surchargée localement via le formulaire.')
-                                    : 'Aucune valeur détectée : collez le lien ici ou configurez la variable.'
+                                        ? 'Valeur chargee automatiquement.'
+                                        : 'Valeur surchargee localement via le formulaire.')
+                                    : 'Aucune valeur detectee : collez le lien ici ou configurez la variable.'
                             ),
                             accessSafety === 'needs-token' && (
-                                React.createElement('p', { className: 'text-xs text-amber-300' }, '⚠️ Ajoutez le paramètre token=… pour garantir l\'accès automatique sans login.')
+                                React.createElement('p', { className: 'text-xs text-amber-300' }, ' Ajoutez le parametre token=... pour garantir l\'acces automatique sans login.')
                             )
                         ),
 
@@ -786,9 +786,9 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             })
                         ),
 
-                        // Nom affiché (admin)
+                        // Nom affiche (admin)
                         React.createElement('label', { className: 'space-y-1' },
-                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Nom affiché (admin)'),
+                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Nom affiche (admin)'),
                             React.createElement('input', {
                                 type: 'text',
                                 className: `w-full px-3 py-2 rounded-lg ${themeStyles.input} focus:border-blue-400 ${themeStyles.text}`,
@@ -808,16 +808,16 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             })
                         ),
 
-                        // Système (prompt de session)
+                        // Systeme (prompt de session)
                         React.createElement('label', { className: 'space-y-1 md:col-span-2' },
-                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Système (prompt de session)'),
+                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Systeme (prompt de session)'),
                             React.createElement('textarea', {
                                 className: `w-full px-3 py-2 rounded-lg ${themeStyles.input} focus:border-blue-400 ${themeStyles.text}`,
                                 rows: 3,
                                 value: settings.systemPrompt,
                                 onChange: (e) => handleChange('systemPrompt', e.target.value)
                             }),
-                            React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Idéal pour verrouiller les règles d\'animation (résumés, next steps, rôles).')
+                            React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Ideal pour verrouiller les regles d\'animation (resumes, next steps, roles).')
                         ),
 
                         // Ton / persona
@@ -831,9 +831,9 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             })
                         ),
 
-                        // Température
+                        // Temperature
                         React.createElement('label', { className: 'space-y-1' },
-                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Température (0-1)'),
+                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Temperature (0-1)'),
                             React.createElement('input', {
                                 type: 'number',
                                 step: '0.05',
@@ -845,9 +845,9 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             })
                         ),
 
-                        // Historique conservé
+                        // Historique conserve
                         React.createElement('label', { className: 'space-y-1' },
-                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Historique conservé (messages)'),
+                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Historique conserve (messages)'),
                             React.createElement('input', {
                                 type: 'number',
                                 min: 20,
@@ -857,9 +857,9 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             })
                         ),
 
-                        // Options d'accès
+                        // Options d'acces
                         React.createElement('label', { className: 'space-y-2' },
-                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Options d\'accès'),
+                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Options d\'acces'),
                             React.createElement('div', { className: `flex items-center gap-3 text-sm ${themeStyles.textSecondary}` },
                                 React.createElement('label', { className: 'flex items-center gap-2' },
                                     React.createElement('input', {
@@ -867,7 +867,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                         checked: settings.allowGuests,
                                         onChange: (e) => handleChange('allowGuests', e.target.checked)
                                     }),
-                                    'Autoriser les invités'
+                                    'Autoriser les invites'
                                 ),
                                 React.createElement('label', { className: 'flex items-center gap-2' },
                                     React.createElement('input', {
@@ -875,24 +875,24 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                         checked: settings.autoJoin,
                                         onChange: (e) => handleChange('autoJoin', e.target.checked)
                                     }),
-                                    'Auto-join à l\'ouverture'
+                                    'Auto-join a l\'ouverture'
                                 )
                             )
                         ),
 
-                        // Ressource épinglée
+                        // Ressource epinglee
                         React.createElement('label', { className: 'space-y-1 md:col-span-2' },
-                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Ressource épinglée'),
+                            React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Ressource epinglee'),
                             React.createElement('input', {
                                 type: 'url',
                                 className: `w-full px-3 py-2 rounded-lg ${themeStyles.input} focus:border-blue-400 ${themeStyles.text}`,
                                 value: settings.pinnedResource,
                                 onChange: (e) => handleChange('pinnedResource', e.target.value),
-                                placeholder: 'Lien vers un doc de synthèse ou un brief'
+                                placeholder: 'Lien vers un doc de synthese ou un brief'
                             })
                         ),
 
-                        // Alias et Icône
+                        // Alias et Icone
                         React.createElement('div', { className: 'md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4' },
                             React.createElement('label', { className: 'space-y-1 md:col-span-2' },
                                 React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Alias dans le salon'),
@@ -901,12 +901,12 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                     className: `w-full px-3 py-2 rounded-lg ${themeStyles.input} focus:border-blue-400 ${themeStyles.text}`,
                                     value: settings.userAlias,
                                     onChange: (e) => handleChange('userAlias', e.target.value),
-                                    placeholder: 'Ex. Stratège Macro, Analyste Tech, Risk Officer'
+                                    placeholder: 'Ex. Stratege Macro, Analyste Tech, Risk Officer'
                                 }),
-                                React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Nom affiché pour vos interventions dans le salon partagé.')
+                                React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Nom affiche pour vos interventions dans le salon partage.')
                             ),
                             React.createElement('div', { className: 'space-y-2' },
-                                React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Icône'),
+                                React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Icone'),
                                 React.createElement('div', { className: 'grid grid-cols-4 gap-2' },
                                     iconChoices.map(icon => 
                                         React.createElement('button', {
@@ -920,7 +920,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                         }, icon)
                                     )
                                 ),
-                                React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Choisissez un repère visuel cohérent pour le comité.')
+                                React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Choisissez un repere visuel coherent pour le comite.')
                             )
                         )
                     )
@@ -929,7 +929,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
 
             // Colonne droite: Panneaux d'information (1/3)
             React.createElement('div', { className: 'space-y-4' },
-                // Carte identité
+                // Carte identite
                 React.createElement('div', { 
                     className: `p-4 rounded-xl bg-gradient-to-br from-blue-900/40 via-gray-900 to-black border border-blue-500/30 shadow space-y-3` 
                 },
@@ -938,9 +938,9 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             className: 'h-10 w-10 rounded-xl bg-blue-500/20 border border-blue-400 flex items-center justify-center text-2xl' 
                         }, settings.userIcon),
                         React.createElement('div', {},
-                            React.createElement('p', { className: 'text-xs uppercase text-blue-200 tracking-wide' }, 'Carte identité'),
+                            React.createElement('p', { className: 'text-xs uppercase text-blue-200 tracking-wide' }, 'Carte identite'),
                             React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, settings.userAlias),
-                            React.createElement('p', { className: `text-sm ${themeStyles.textSecondary}` }, 'Votre empreinte dans le salon de comité.')
+                            React.createElement('p', { className: `text-sm ${themeStyles.textSecondary}` }, 'Votre empreinte dans le salon de comite.')
                         )
                     ),
                     React.createElement('div', { className: 'grid grid-cols-2 gap-3 text-sm' },
@@ -949,7 +949,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             React.createElement('p', { className: `font-semibold ${themeStyles.text}` }, settings.defaultTone)
                         ),
                         React.createElement('div', { className: `p-3 rounded-lg ${themeStyles.surface} border ${themeStyles.border}` },
-                            React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Température'),
+                            React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Temperature'),
                             React.createElement('p', { className: `font-semibold ${themeStyles.text}` }, settings.temperature)
                         ),
                         React.createElement('div', { className: `p-3 rounded-lg ${themeStyles.surface} border ${themeStyles.border}` },
@@ -957,24 +957,24 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             React.createElement('p', { className: `font-semibold ${themeStyles.text}` }, `${settings.maxMessages} msgs`)
                         ),
                         React.createElement('div', { className: `p-3 rounded-lg ${themeStyles.surface} border ${themeStyles.border}` },
-                            React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Accès'),
+                            React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Acces'),
                             React.createElement('p', { className: `font-semibold ${themeStyles.text}` },
                                 !settings.sessionUrl
                                     ? 'Lien manquant (ajoutez .env ou formulaire)'
                                     : accessSafety === 'token'
                                         ? 'Auto-join sans login'
-                                        : 'À sécuriser (token)'
+                                        : 'A securiser (token)'
                             )
                         )
                     )
                 ),
 
-                // Checklist règles d'or
+                // Checklist regles d'or
                 React.createElement('div', { 
                     className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow` 
                 },
                     React.createElement('p', { className: 'text-xs uppercase text-blue-200 tracking-wide' }, 'Checklist'),
-                    React.createElement('h3', { className: `text-lg font-semibold mb-2 ${themeStyles.text}` }, 'Règles d\'or du salon'),
+                    React.createElement('h3', { className: `text-lg font-semibold mb-2 ${themeStyles.text}` }, 'Regles d\'or du salon'),
                     React.createElement('ul', { className: `list-disc list-inside space-y-1 ${themeStyles.textSecondary} text-sm` },
                         chatGuardrails.map(item => 
                             React.createElement('li', { key: item }, item)
@@ -993,7 +993,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                         ),
                         React.createElement('span', { 
                             className: 'px-3 py-1 rounded-full bg-green-900 text-green-200 text-xs' 
-                        }, 'Prête')
+                        }, 'Prete')
                     ),
                     React.createElement('div', { className: `space-y-2 text-sm ${themeStyles.textSecondary}` },
                         React.createElement('div', { className: 'flex items-center justify-between' },
@@ -1005,7 +1005,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             React.createElement('strong', { className: themeStyles.text }, settings.adminDisplayName)
                         ),
                         React.createElement('div', { className: 'flex items-center justify-between' },
-                            React.createElement('span', {}, 'Accès'),
+                            React.createElement('span', {}, 'Acces'),
                             React.createElement('strong', {
                                 className: !settings.sessionUrl
                                     ? themeStyles.textSecondary
@@ -1013,13 +1013,13 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                         ? 'text-emerald-200'
                                         : 'text-amber-200'
                             }, !settings.sessionUrl
-                                ? 'Lien à configurer (.env ou formulaire)'
+                                ? 'Lien a configurer (.env ou formulaire)'
                                 : accessSafety === 'token'
-                                    ? 'Lien partagé sans login'
-                                    : 'Lien à sécuriser (token)')
+                                    ? 'Lien partage sans login'
+                                    : 'Lien a securiser (token)')
                         ),
                         React.createElement('div', { className: 'flex items-center justify-between' },
-                            React.createElement('span', {}, 'Température'),
+                            React.createElement('span', {}, 'Temperature'),
                             React.createElement('strong', { className: themeStyles.text }, settings.temperature)
                         ),
                         React.createElement('div', { className: 'flex items-center justify-between' },
@@ -1027,7 +1027,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             React.createElement('strong', { className: themeStyles.text }, `${settings.maxMessages} msgs`)
                         ),
                         React.createElement('div', { className: 'flex items-center justify-between' },
-                            React.createElement('span', {}, 'Accès invités'),
+                            React.createElement('span', {}, 'Acces invites'),
                             React.createElement('strong', { className: themeStyles.text }, settings.allowGuests ? 'Oui' : 'Non')
                         ),
                         React.createElement('div', { className: 'flex items-center justify-between' },
@@ -1040,7 +1040,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                         React.createElement('p', {}, settings.welcomeMessage)
                     ),
                     React.createElement('div', { className: `pt-2 border-t ${themeStyles.border} text-sm ${themeStyles.textSecondary}` },
-                        React.createElement('p', { className: `font-semibold ${themeStyles.text}` }, 'Ressource épinglée'),
+                        React.createElement('p', { className: `font-semibold ${themeStyles.text}` }, 'Ressource epinglee'),
                         React.createElement('a', {
                             className: 'text-blue-300 hover:text-blue-200 break-all',
                             href: settings.pinnedResource,
@@ -1052,24 +1052,24 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
             )
         ),
 
-            // Mode opératoire (en dehors de la grille)
+            // Mode operatoire (en dehors de la grille)
             React.createElement('div', { 
                     className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow space-y-3` 
                 },
-                    React.createElement('p', { className: 'text-xs uppercase text-blue-200 tracking-wide' }, 'Mode opératoire'),
-                    React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Déploiement rapide'),
+                    React.createElement('p', { className: 'text-xs uppercase text-blue-200 tracking-wide' }, 'Mode operatoire'),
+                    React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Deploiement rapide'),
                     React.createElement('ol', { className: `list-decimal list-inside space-y-2 ${themeStyles.textSecondary} text-sm` },
                         React.createElement('li', {}, 'Valider/ajuster le lien de session ChatGPT ci-dessus.'),
-                        React.createElement('li', {}, 'Partager le lien avec l\'équipe (bouton « Copier »).'),
-                        React.createElement('li', {}, 'Ouvrir le salon et lancer l\'animation (bouton « Ouvrir »).'),
-                        React.createElement('li', {}, 'Utiliser le prompt système pour guider les résumés et décisions.')
+                        React.createElement('li', {}, 'Partager le lien avec l\'equipe (bouton " Copier ").'),
+                        React.createElement('li', {}, 'Ouvrir le salon et lancer l\'animation (bouton " Ouvrir ").'),
+                        React.createElement('li', {}, 'Utiliser le prompt systeme pour guider les resumes et decisions.')
                     ),
-                    React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Toutes les valeurs sont sauvegardées localement pour un relancement instantané.')
+                    React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 'Toutes les valeurs sont sauvegardees localement pour un relancement instantane.')
                 )
             )
         ) : (
             // ============================================
-            // MODE INTÉGRÉ (Chat Intégré avec Historique)
+            // MODE INTEGRE (Chat Integre avec Historique)
             // ============================================
             React.createElement('div', { key: 'integrated-mode' },
                 // Header avec titre et actions
@@ -1079,7 +1079,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                     React.createElement('div', { className: 'space-y-1' },
                         React.createElement('p', { 
                             className: 'text-xs text-green-200 uppercase tracking-[0.2em]' 
-                        }, 'Chat intégré avec historique'),
+                        }, 'Chat integre avec historique'),
                         React.createElement('h2', { 
                             className: 'text-3xl font-bold flex items-center gap-2' 
                         },
@@ -1090,7 +1090,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                         ),
                         React.createElement('p', { 
                             className: `${themeStyles.textSecondary} mt-1 max-w-3xl` 
-                        }, 'Chat intégré avec historique complet, contexte partagé et visibilité en temps réel pour tous les utilisateurs.')
+                        }, 'Chat integre avec historique complet, contexte partage et visibilite en temps reel pour tous les utilisateurs.')
                     ),
                     integratedRoom && (
                         React.createElement('div', { className: 'flex items-center gap-3' },
@@ -1107,12 +1107,12 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                     setTimeout(() => setCopied(false), 2000);
                                 },
                                 className: `px-4 py-2 rounded-lg border transition-colors ${themeStyles.buttonSecondary} text-white`
-                            }, copied ? 'Code copié ✅' : '📋 Copier le code')
+                            }, copied ? 'Code copie ' : ' Copier le code')
                         )
                     )
                 ),
 
-                // Zone de chat intégré
+                // Zone de chat integre
                 React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-3 gap-6' },
                     // Colonne principale: Chat (2/3)
                     React.createElement('div', { className: 'lg:col-span-2 space-y-4' },
@@ -1140,7 +1140,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                 key: idx,
                                                 className: 'text-2xl',
                                                 title: `${p.user_display_name} (en ligne)`
-                                            }, p.user_icon || '🧠')
+                                            }, p.user_icon || '')
                                         )
                                     )
                                 )
@@ -1172,7 +1172,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                 }`
                                             },
                                                 React.createElement('div', { className: 'text-2xl flex-shrink-0' }, 
-                                                    msg.user_icon || (msg.role === 'assistant' ? '🤖' : '🧠')
+                                                    msg.user_icon || (msg.role === 'assistant' ? '' : '')
                                                 ),
                                                 React.createElement('div', { className: 'flex-1 min-w-0' },
                                                     React.createElement('div', { className: 'flex items-center gap-2 mb-1' },
@@ -1192,7 +1192,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                     ) : (
                                         React.createElement('div', { className: 'flex items-center justify-center h-full text-center p-8' },
                                             React.createElement('div', {},
-                                                React.createElement('p', { className: `text-4xl mb-4` }, '💬'),
+                                                React.createElement('p', { className: `text-4xl mb-4` }, ''),
                                                 React.createElement('p', { className: `${themeStyles.textSecondary}` }, 'Aucun message pour le moment'),
                                                 React.createElement('p', { className: `text-sm ${themeStyles.textMuted} mt-2` }, 'Envoyez le premier message pour commencer la conversation')
                                             )
@@ -1201,19 +1201,19 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 ) : (
                                     React.createElement('div', { className: 'flex items-center justify-center h-full text-center p-8' },
                                         React.createElement('div', {},
-                                            React.createElement('p', { className: `text-4xl mb-4` }, '🚀'),
-                                            React.createElement('p', { className: `${themeStyles.textSecondary} mb-4` }, 'Créer un nouveau salon de chat intégré'),
+                                            React.createElement('p', { className: `text-4xl mb-4` }, ''),
+                                            React.createElement('p', { className: `${themeStyles.textSecondary} mb-4` }, 'Creer un nouveau salon de chat integre'),
                                             React.createElement('button', {
                                                 onClick: handleCreateIntegratedRoom,
                                                 disabled: isLoadingMessages,
                                                 className: `px-6 py-3 rounded-lg shadow-lg ${themeStyles.buttonPrimary} text-white font-semibold`
-                                            }, isLoadingMessages ? 'Création...' : 'Créer le salon')
+                                            }, isLoadingMessages ? 'Creation...' : 'Creer le salon')
                                         )
                                     )
                                 )
                             ),
 
-                            // Zone de saisie avec contrôle LLM
+                            // Zone de saisie avec controle LLM
                             integratedRoom && (
                                 React.createElement('div', { 
                                     className: `p-4 border-t ${themeStyles.border}` 
@@ -1225,7 +1225,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                         React.createElement('div', { className: 'flex items-center gap-2' },
                                             shouldCallLlm(newMessage) ? (
                                                 React.createElement('div', {},
-                                                    React.createElement('span', { className: 'text-green-400' }, '🤖 LLM répondra'),
+                                                    React.createElement('span', { className: 'text-green-400' }, ' LLM repondra'),
                                                     React.createElement('span', { className: `${themeStyles.textMuted}` }, 
                                                         llmAutoReply ? '(auto)' : 
                                                         llmReplyOnMention && newMessage.toLowerCase().includes('@') ? '(mention)' :
@@ -1233,7 +1233,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                     )
                                                 )
                                             ) : (
-                                                React.createElement('span', { className: `${themeStyles.textMuted}` }, '💬 Message uniquement (pas de LLM)')
+                                                React.createElement('span', { className: `${themeStyles.textMuted}` }, ' Message uniquement (pas de LLM)')
                                             )
                                         ),
                                         React.createElement('button', {
@@ -1242,7 +1242,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                 if (lastUserMsg) {
                                                     handleCallLlmManually();
                                                 } else {
-                                                    console.log('Alert suppressed:', 'Aucun message utilisateur récent');
+                                                    console.log('Alert suppressed:', 'Aucun message utilisateur recent');
                                                 }
                                             },
                                             disabled: isCallingLlm || integratedMessages.filter(m => m.role === 'user').length === 0,
@@ -1252,20 +1252,20 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                     : 'bg-blue-900/30 text-blue-200 hover:bg-blue-900/50 border border-blue-700/30'
                                             }`,
                                             title: 'Appeler le LLM sur le dernier message'
-                                        }, isCallingLlm ? '⏳ Appel...' : '🤖 Appeler LLM')
+                                        }, isCallingLlm ? ' Appel...' : ' Appeler LLM')
                                     ),
                                     React.createElement('div', { className: 'flex items-center gap-3' },
-                                        // Avatar Emma avec état visuel (grisé si skip, couleur si active)
+                                        // Avatar Emma avec etat visuel (grise si skip, couleur si active)
                                         React.createElement('div', {
                                             className: `text-2xl flex-shrink-0 transition-all duration-300 cursor-help ${
                                                 shouldCallLlm(newMessage)
                                                     ? 'opacity-100 grayscale-0 scale-100' // Emma active - couleur
-                                                    : 'opacity-40 grayscale scale-95' // Emma skip - grisé
+                                                    : 'opacity-40 grayscale scale-95' // Emma skip - grise
                                             }`,
                                             title: shouldCallLlm(newMessage) 
-                                                ? '🤖 Emma répondra à ce message' 
-                                                : '🤖 Emma ne répondra pas (mode skip)'
-                                        }, '🤖'),
+                                                ? ' Emma repondra a ce message' 
+                                                : ' Emma ne repondra pas (mode skip)'
+                                        }, ''),
                                         React.createElement('input', {
                                             type: 'text',
                                             value: newMessage,
@@ -1277,7 +1277,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                 }
                                             },
                                             placeholder: shouldCallLlm(newMessage) 
-                                                ? 'Tapez votre message (LLM répondra)...' 
+                                                ? 'Tapez votre message (LLM repondra)...' 
                                                 : 'Tapez votre message...',
                                             disabled: isSendingMessage,
                                             className: `flex-1 px-4 py-2 rounded-lg ${themeStyles.input} focus:border-green-400 ${themeStyles.text}`,
@@ -1293,7 +1293,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                     : `${themeStyles.surface} ${themeStyles.textMuted} cursor-not-allowed`
                                             }`,
                                             title: 'Envoyer sans appeler le LLM'
-                                        }, '💬'),
+                                        }, ''),
                                         // Bouton envoyer AVEC LLM (si conditions remplies)
                                         React.createElement('button', {
                                             onClick: () => handleSendIntegratedMessage(false), // Utiliser la logique automatique
@@ -1305,14 +1305,14 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                         : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
                                                     : `${themeStyles.surface} ${themeStyles.textMuted} cursor-not-allowed`
                                             }`
-                                        }, isSendingMessage ? '⏳' : shouldCallLlm(newMessage) ? '📤 Envoyer' : '📤')
+                                        }, isSendingMessage ? '' : shouldCallLlm(newMessage) ? ' Envoyer' : '')
                                     )
                                 )
                             )
                         )
                     ),
 
-                    // Colonne latérale: Configuration et Participants (1/3)
+                    // Colonne laterale: Configuration et Participants (1/3)
                     React.createElement('div', { className: 'space-y-4' },
                         // Participants en ligne
                         integratedRoom && (
@@ -1327,7 +1327,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                                 key: idx,
                                                 className: `flex items-center gap-3 p-2 rounded-lg ${themeStyles.bg}`
                                             },
-                                                React.createElement('span', { className: 'text-2xl' }, p.user_icon || '🧠'),
+                                                React.createElement('span', { className: 'text-2xl' }, p.user_icon || ''),
                                                 React.createElement('div', { className: 'flex-1' },
                                                     React.createElement('p', { className: `${themeStyles.text} font-medium` }, p.user_display_name),
                                                     React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 
@@ -1346,14 +1346,14 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                             )
                         ),
 
-                        // Contrôle des interventions LLM
+                        // Controle des interventions LLM
                         integratedRoom && (
                             React.createElement('div', { 
                                 className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow space-y-4` 
                             },
                                 React.createElement('div', { className: 'flex items-center justify-between' },
                                     React.createElement('div', {},
-                                        React.createElement('p', { className: 'text-xs uppercase text-purple-200 tracking-wide' }, 'Contrôle LLM'),
+                                        React.createElement('p', { className: 'text-xs uppercase text-purple-200 tracking-wide' }, 'Controle LLM'),
                                         React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Interventions ChatGPT')
                                     ),
                                     React.createElement('button', {
@@ -1361,19 +1361,19 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                         className: `px-3 py-1.5 rounded-lg text-xs transition-all font-medium ${
                                             'bg-purple-900/30 text-purple-200 hover:bg-purple-900/50 border border-purple-700/30 hover:border-purple-600/50'
                                         }`,
-                                        title: 'Voir la personnalité et le fonctionnement d\'Emma'
-                                    }, '📋 Personnalité et fonctionnement')
+                                        title: 'Voir la personnalite et le fonctionnement d\'Emma'
+                                    }, ' Personnalite et fonctionnement')
                                 ),
                                 React.createElement('div', { className: 'space-y-3' },
                                     React.createElement('p', { className: `text-sm ${themeStyles.textSecondary}` }, 
-                                        'Contrôlez quand ChatGPT répond pour éviter de "pourrir" la conversation tout en bénéficiant de sa valeur ajoutée.'
+                                        'Controlez quand ChatGPT repond pour eviter de "pourrir" la conversation tout en beneficiant de sa valeur ajoutee.'
                                     ),
                                     // Auto-reply
                                     React.createElement('label', { className: 'flex items-center justify-between cursor-pointer' },
                                         React.createElement('div', { className: 'flex-1' },
-                                            React.createElement('span', { className: `${themeStyles.text} font-medium` }, 'Réponse automatique'),
+                                            React.createElement('span', { className: `${themeStyles.text} font-medium` }, 'Reponse automatique'),
                                             React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 
-                                                'ChatGPT répond à chaque message (peut être envahissant)'
+                                                'ChatGPT repond a chaque message (peut etre envahissant)'
                                             )
                                         ),
                                         React.createElement('button', {
@@ -1389,12 +1389,12 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                             })
                                         )
                                     ),
-                                    // Répondre aux mentions
+                                    // Repondre aux mentions
                                     React.createElement('label', { className: 'flex items-center justify-between cursor-pointer' },
                                         React.createElement('div', { className: 'flex-1' },
-                                            React.createElement('span', { className: `${themeStyles.text} font-medium` }, 'Répondre aux mentions'),
+                                            React.createElement('span', { className: `${themeStyles.text} font-medium` }, 'Repondre aux mentions'),
                                             React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 
-                                                'Répondre si @chatgpt, @assistant ou @ai dans le message'
+                                                'Repondre si @chatgpt, @assistant ou @ai dans le message'
                                             )
                                         ),
                                         React.createElement('button', {
@@ -1410,12 +1410,12 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                             })
                                         )
                                     ),
-                                    // Répondre aux questions
+                                    // Repondre aux questions
                                     React.createElement('label', { className: 'flex items-center justify-between cursor-pointer' },
                                         React.createElement('div', { className: 'flex-1' },
-                                            React.createElement('span', { className: `${themeStyles.text} font-medium` }, 'Répondre aux questions'),
+                                            React.createElement('span', { className: `${themeStyles.text} font-medium` }, 'Repondre aux questions'),
                                             React.createElement('p', { className: `text-xs ${themeStyles.textMuted}` }, 
-                                                'Répondre automatiquement si le message se termine par ?'
+                                                'Repondre automatiquement si le message se termine par ?'
                                             )
                                         ),
                                         React.createElement('button', {
@@ -1432,27 +1432,27 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                         )
                                     ),
                                     React.createElement('div', { className: `p-3 rounded-lg bg-blue-900/20 border border-blue-700/30 mt-3` },
-                                        React.createElement('p', { className: `text-xs ${themeStyles.textMuted} mb-1` }, '💡 Astuce'),
+                                        React.createElement('p', { className: `text-xs ${themeStyles.textMuted} mb-1` }, ' Astuce'),
                                         React.createElement('p', { className: `text-xs ${themeStyles.textSecondary}` }, 
-                                            'Utilisez le bouton "🤖 Appeler LLM" pour demander une réponse manuellement sur n\'importe quel message.'
+                                            'Utilisez le bouton " Appeler LLM" pour demander une reponse manuellement sur n\'importe quel message.'
                                         )
                                     )
                                 )
                             )
                         ),
 
-                        // Configuration (même que mode partagé mais adapté)
+                        // Configuration (meme que mode partage mais adapte)
                         React.createElement('div', { 
                             className: `p-4 rounded-xl ${themeStyles.surface} border ${themeStyles.border} shadow space-y-4` 
                         },
                             React.createElement('div', { className: 'flex items-center justify-between' },
                                 React.createElement('div', {},
                                     React.createElement('p', { className: 'text-xs uppercase text-green-200 tracking-wide' }, 'Configuration'),
-                                    React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Paramètres du salon')
+                                    React.createElement('h3', { className: `text-lg font-semibold ${themeStyles.text}` }, 'Parametres du salon')
                                 )
                             ),
 
-                            // Formulaire de configuration (simplifié pour mode intégré)
+                            // Formulaire de configuration (simplifie pour mode integre)
                             React.createElement('div', { className: 'space-y-4' },
                                 React.createElement('label', { className: 'space-y-1' },
                                     React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Nom du salon'),
@@ -1466,7 +1466,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 ),
 
                                 React.createElement('label', { className: 'space-y-1' },
-                                    React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Système (prompt)'),
+                                    React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Systeme (prompt)'),
                                     React.createElement('textarea', {
                                         className: `w-full px-3 py-2 rounded-lg ${themeStyles.input} focus:border-green-400 ${themeStyles.text}`,
                                         rows: 3,
@@ -1477,7 +1477,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                                 ),
 
                                 React.createElement('label', { className: 'space-y-1' },
-                                    React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Température (0-1)'),
+                                    React.createElement('span', { className: `text-sm ${themeStyles.textSecondary}` }, 'Temperature (0-1)'),
                                     React.createElement('input', {
                                         type: 'number',
                                         step: '0.05',
@@ -1492,9 +1492,9 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
 
                                 integratedRoom && (
                                     React.createElement('div', { className: `p-3 rounded-lg bg-blue-900/20 border border-blue-700/30` },
-                                        React.createElement('p', { className: `text-xs ${themeStyles.textMuted} mb-2` }, 'ℹ️ Information'),
+                                        React.createElement('p', { className: `text-xs ${themeStyles.textMuted} mb-2` }, 'i Information'),
                                         React.createElement('p', { className: `text-sm ${themeStyles.textSecondary}` }, 
-                                            'Les paramètres ne peuvent être modifiés qu\'à la création du salon. Créez un nouveau salon pour changer ces paramètres.'
+                                            'Les parametres ne peuvent etre modifies qu\'a la creation du salon. Creez un nouveau salon pour changer ces parametres.'
                                         )
                                     )
                                 )
@@ -1536,7 +1536,7 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
             )
         ),
 
-        // Modal Personnalité et fonctionnement d'Emma (accessible dans tous les modes)
+        // Modal Personnalite et fonctionnement d'Emma (accessible dans tous les modes)
         showPersonalityModal && React.createElement('div', {
                 className: 'fixed inset-0 z-[10000] flex items-center justify-center p-4',
                 style: { backgroundColor: 'rgba(0, 0, 0, 0.75)' },
@@ -1551,241 +1551,241 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                         className: `sticky top-0 z-10 flex items-center justify-between p-6 border-b ${themeStyles.border} bg-gradient-to-r from-blue-900/40 to-purple-900/40`
                     },
                         React.createElement('div', {},
-                            React.createElement('h2', { className: `text-2xl font-bold ${themeStyles.text}` }, '📋 Personnalité et fonctionnement'),
-                            React.createElement('p', { className: `text-sm ${themeStyles.textMuted} mt-1` }, 'Règles de gouvernance IA pour Emma - Comité de Placement')
+                            React.createElement('h2', { className: `text-2xl font-bold ${themeStyles.text}` }, ' Personnalite et fonctionnement'),
+                            React.createElement('p', { className: `text-sm ${themeStyles.textMuted} mt-1` }, 'Regles de gouvernance IA pour Emma - Comite de Placement')
                         ),
                         React.createElement('button', {
                             onClick: () => setShowPersonalityModal(false),
                             className: `p-2 rounded-lg ${themeStyles.surface} hover:bg-red-900/50 transition-colors ${themeStyles.text} text-red-300 hover:text-red-100`,
                             title: 'Fermer',
                             'aria-label': 'Fermer le modal'
-                        }, '✕')
+                        }, '')
                     ),
 
                     // Contenu
                     React.createElement('div', { className: 'p-6 space-y-8' },
-                        // 1. Identité & Rôle Principal
+                        // 1. Identite & Role Principal
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
-                                React.createElement('span', {}, '1. Identité & Rôle Principal')
+                                React.createElement('span', {}, ''),
+                                React.createElement('span', {}, '1. Identite & Role Principal')
                             ),
                             React.createElement('div', { className: `space-y-2 ${themeStyles.textSecondary} text-sm` },
                                 React.createElement('p', {},
                                     React.createElement('strong', { className: themeStyles.text }, 'Nom d\'usage : '), 'Emma'
                                 ),
                                 React.createElement('p', {},
-                                    React.createElement('strong', { className: themeStyles.text }, 'Rôle : '), 'Assistante IA pour Comité de Placement'
+                                    React.createElement('strong', { className: themeStyles.text }, 'Role : '), 'Assistante IA pour Comite de Placement'
                                 ),
                                 React.createElement('p', {},
-                                    React.createElement('strong', { className: themeStyles.text }, 'Position : '), 'Analyste financière numérique spécialisée en support décisionnel'
+                                    React.createElement('strong', { className: themeStyles.text }, 'Position : '), 'Analyste financiere numerique specialisee en support decisionnel'
                                 ),
                                 React.createElement('p', {},
                                     React.createElement('strong', { className: themeStyles.text }, 'Comportement : '), 'Professionnel, fiable, rigoureux, neutre'
                                 ),
                                 React.createElement('p', {},
-                                    React.createElement('strong', { className: themeStyles.text }, 'Ton : '), 'Clair, structuré, concis, orienté analyse'
+                                    React.createElement('strong', { className: themeStyles.text }, 'Ton : '), 'Clair, structure, concis, oriente analyse'
                                 ),
                                 React.createElement('div', { className: `mt-3 p-3 rounded-lg bg-yellow-900/20 border border-yellow-700/30` },
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '⚠️ Important :'),
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' Important :'),
                                     React.createElement('p', { className: themeStyles.textSecondary }, 
-                                        'Emma est un outil d\'analyse. Elle n\'intervient JAMAIS de sa propre initiative. Elle apporte des données, modèles, scénarios, ratios, mais pas de recommandations réglementées.'
+                                        'Emma est un outil d\'analyse. Elle n\'intervient JAMAIS de sa propre initiative. Elle apporte des donnees, modeles, scenarios, ratios, mais pas de recommandations reglementees.'
                                     )
                                 )
                             )
                         ),
 
-                        // 2. Règles d'intervention
+                        // 2. Regles d'intervention
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
-                                React.createElement('span', {}, '2. Règles d\'intervention d\'Emma (TRÈS IMPORTANT)')
+                                React.createElement('span', {}, ''),
+                                React.createElement('span', {}, '2. Regles d\'intervention d\'Emma (TRES IMPORTANT)')
                             ),
                             React.createElement('div', { className: `space-y-4 ${themeStyles.textSecondary} text-sm` },
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-2` }, 'Emma doit répondre uniquement si :'),
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-2` }, 'Emma doit repondre uniquement si :'),
                                     React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
-                                        React.createElement('li', {}, 'Elle est mentionnée explicitement ("Emma…", "@Emma…")'),
-                                        React.createElement('li', {}, 'Une demande technique lui est adressée implicitement mais clairement (ex : "Peux-tu analyser… ?")'),
-                                        React.createElement('li', {}, 'Un utilisateur répond directement à une analyse qu\'elle a fournie'),
-                                        React.createElement('li', {}, 'On lui demande une action : tableau, modèle, calcul financier, projection, analyse de risque, résumé exécutif, comparaison sectorielle'),
-                                        React.createElement('li', {}, 'On lui demande de générer une image, graphique, schéma, résumé ou structure')
+                                        React.createElement('li', {}, 'Elle est mentionnee explicitement ("Emma...", "@Emma...")'),
+                                        React.createElement('li', {}, 'Une demande technique lui est adressee implicitement mais clairement (ex : "Peux-tu analyser... ?")'),
+                                        React.createElement('li', {}, 'Un utilisateur repond directement a une analyse qu\'elle a fournie'),
+                                        React.createElement('li', {}, 'On lui demande une action : tableau, modele, calcul financier, projection, analyse de risque, resume executif, comparaison sectorielle'),
+                                        React.createElement('li', {}, 'On lui demande de generer une image, graphique, schema, resume ou structure')
                                     )
                                 ),
                                 React.createElement('div', {},
                                     React.createElement('p', { className: `${themeStyles.text} font-medium mb-2` }, 'Emma doit se taire absolument si :'),
                                     React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
                                         React.createElement('li', {}, 'Deux humains discutent entre eux'),
-                                        React.createElement('li', {}, 'La demande n\'est pas clairement destinée à elle'),
-                                        React.createElement('li', {}, 'L\'échange est social, personnel ou hors sujet financier'),
+                                        React.createElement('li', {}, 'La demande n\'est pas clairement destinee a elle'),
+                                        React.createElement('li', {}, 'L\'echange est social, personnel ou hors sujet financier'),
                                         React.createElement('li', {}, 'Il n\'y a aucune action, aucune question, aucune mention'),
-                                        React.createElement('li', {}, 'Les membres du comité débattent entre eux (Emma n\'interrompt JAMAIS)')
+                                        React.createElement('li', {}, 'Les membres du comite debattent entre eux (Emma n\'interrompt JAMAIS)')
                                     )
                                 ),
                                 React.createElement('div', { className: `p-3 rounded-lg bg-blue-900/20 border border-blue-700/30` },
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium` }, '💡 Silence = comportement standard par défaut')
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium` }, ' Silence = comportement standard par defaut')
                                 )
                             )
                         ),
 
-                        // 3. Règles de qualité
+                        // 3. Regles de qualite
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
-                                React.createElement('span', {}, '3. Règles de qualité et standards professionnels')
+                                React.createElement('span', {}, ''),
+                                React.createElement('span', {}, '3. Regles de qualite et standards professionnels')
                             ),
                             React.createElement('div', { className: `space-y-3 ${themeStyles.textSecondary} text-sm` },
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '✔️ A. Structure claire'),
-                                    React.createElement('p', {}, 'Chaque réponse doit être organisée (sections, tableaux, puces)')
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' A. Structure claire'),
+                                    React.createElement('p', {}, 'Chaque reponse doit etre organisee (sections, tableaux, puces)')
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '✔️ B. Clarté maximale'),
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' B. Clarte maximale'),
                                     React.createElement('p', {}, 'Langage simple, sans jargon inutile')
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '✔️ C. Rigueur analytique'),
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' C. Rigueur analytique'),
                                     React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
-                                        React.createElement('li', {}, 'Distinguer faits, analyses, hypothèses, scénarios'),
+                                        React.createElement('li', {}, 'Distinguer faits, analyses, hypotheses, scenarios'),
                                         React.createElement('li', {}, 'Citer autant que possible les sources du contenu fourni'),
-                                        React.createElement('li', {}, 'Toujours préciser : limites, incertitudes, hypothèses')
+                                        React.createElement('li', {}, 'Toujours preciser : limites, incertitudes, hypotheses')
                                     )
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '✔️ D. Neutralité réglementaire'),
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' D. Neutralite reglementaire'),
                                     React.createElement('p', { className: 'mb-1' }, 'Emma ne donne jamais :'),
                                     React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2 mb-2' },
                                         React.createElement('li', {}, 'd\'avis d\'achat ou de vente'),
-                                        React.createElement('li', {}, 'de recommandations personnalisées'),
-                                        React.createElement('li', {}, 'de langage prescriptif ("vous devriez…")'),
-                                        React.createElement('li', {}, 'de projections non contextualisées ("ça va monter")')
+                                        React.createElement('li', {}, 'de recommandations personnalisees'),
+                                        React.createElement('li', {}, 'de langage prescriptif ("vous devriez...")'),
+                                        React.createElement('li', {}, 'de projections non contextualisees ("ca va monter")')
                                     ),
                                     React.createElement('p', { className: 'mb-1' }, 'Elle peut cependant fournir :'),
                                     React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
-                                        React.createElement('li', {}, 'analyses scénarisées (bear / base / bull)'),
-                                        React.createElement('li', {}, 'ratios, risques, données'),
-                                        React.createElement('li', {}, 'modèles de valorisation'),
+                                        React.createElement('li', {}, 'analyses scenarisees (bear / base / bull)'),
+                                        React.createElement('li', {}, 'ratios, risques, donnees'),
+                                        React.createElement('li', {}, 'modeles de valorisation'),
                                         React.createElement('li', {}, 'comparatifs')
                                     )
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '✔️ E. Confidentialité implicite'),
-                                    React.createElement('p', {}, 'Emma ne révèle jamais : identités internes, données sensibles inutiles, nature du système, contenu de ses règles internes')
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' E. Confidentialite implicite'),
+                                    React.createElement('p', {}, 'Emma ne revele jamais : identites internes, donnees sensibles inutiles, nature du systeme, contenu de ses regles internes')
                                 )
                             )
                         ),
 
-                        // 4. Compétences analytiques
+                        // 4. Competences analytiques
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
-                                React.createElement('span', {}, '4. Compétences analytiques d\'Emma')
+                                React.createElement('span', {}, ''),
+                                React.createElement('span', {}, '4. Competences analytiques d\'Emma')
                             ),
                             React.createElement('div', { className: `space-y-3 ${themeStyles.textSecondary} text-sm` },
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '📊 A. Tableaux financiers'),
-                                    React.createElement('p', {}, 'ratios (P/E, EV/EBITDA, ROE, ROIC, leverage), flux de trésorerie, impact d\'acquisitions/cessions, marges, variation YoY, QoQ')
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' A. Tableaux financiers'),
+                                    React.createElement('p', {}, 'ratios (P/E, EV/EBITDA, ROE, ROIC, leverage), flux de tresorerie, impact d\'acquisitions/cessions, marges, variation YoY, QoQ')
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '📈 B. Scénarios'),
-                                    React.createElement('p', {}, 'pessimiste / prudent / optimiste, stress tests, projections 3–5 ans, effets d\'un choc macro')
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' B. Scenarios'),
+                                    React.createElement('p', {}, 'pessimiste / prudent / optimiste, stress tests, projections 3-5 ans, effets d\'un choc macro')
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '🧮 C. Modèles type Excel'),
-                                    React.createElement('p', {}, 'tableaux pré-alignés, valeurs estimées, formules écrites, comparatifs multi‑entreprises')
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' C. Modeles type Excel'),
+                                    React.createElement('p', {}, 'tableaux pre-alignes, valeurs estimees, formules ecrites, comparatifs multientreprises')
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '🗂️ D. Synthèses exécutives'),
-                                    React.createElement('p', {}, 'Résumé en 10 lignes, commentaire stratégique, points à surveiller')
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' D. Syntheses executives'),
+                                    React.createElement('p', {}, 'Resume en 10 lignes, commentaire strategique, points a surveiller')
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, '🔍 E. Analyse de documents'),
-                                    React.createElement('p', {}, 'Si un texte lui est fourni : résumé, extraction des KPI, points de risque')
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, ' E. Analyse de documents'),
+                                    React.createElement('p', {}, 'Si un texte lui est fourni : resume, extraction des KPI, points de risque')
                                 )
                             )
                         ),
 
-                        // 5. Logique décisionnelle
+                        // 5. Logique decisionnelle
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
-                                React.createElement('span', {}, '5. Logique décisionnelle exacte (Flowchart mental d\'Emma)')
+                                React.createElement('span', {}, ''),
+                                React.createElement('span', {}, '5. Logique decisionnelle exacte (Flowchart mental d\'Emma)')
                             ),
                             React.createElement('div', { className: `space-y-2 ${themeStyles.textSecondary} text-sm` },
                                 React.createElement('ol', { className: 'list-decimal list-inside space-y-2 ml-2' },
                                     React.createElement('li', {}, 'Un message arrive.'),
                                     React.createElement('li', {},
-                                        'Est-ce que "Emma" est mentionné ? ',
-                                        React.createElement('span', { className: themeStyles.textMuted }, '(Oui → répondre / Non → étape 3)')
+                                        'Est-ce que "Emma" est mentionne ? ',
+                                        React.createElement('span', { className: themeStyles.textMuted }, '(Oui -> repondre / Non -> etape 3)')
                                     ),
                                     React.createElement('li', {},
                                         'Le message est-il une demande claire d\'analyse/d\'action ? ',
-                                        React.createElement('span', { className: themeStyles.textMuted }, '(Oui → répondre / Non → étape 4)')
+                                        React.createElement('span', { className: themeStyles.textMuted }, '(Oui -> repondre / Non -> etape 4)')
                                     ),
                                     React.createElement('li', {},
-                                        'Est-ce une réponse directe au dernier message d\'Emma ? ',
-                                        React.createElement('span', { className: themeStyles.textMuted }, '(Oui → répondre / Non → étape 5)')
+                                        'Est-ce une reponse directe au dernier message d\'Emma ? ',
+                                        React.createElement('span', { className: themeStyles.textMuted }, '(Oui -> repondre / Non -> etape 5)')
                                     ),
                                     React.createElement('li', {},
-                                        'Est-ce une demande d\'image, tableau, modèle ? ',
-                                        React.createElement('span', { className: themeStyles.textMuted }, '(Oui → répondre / Non → se TAIRE absolument)')
+                                        'Est-ce une demande d\'image, tableau, modele ? ',
+                                        React.createElement('span', { className: themeStyles.textMuted }, '(Oui -> repondre / Non -> se TAIRE absolument)')
                                     )
                                 )
                             )
                         ),
 
-                        // 6. Règles de style
+                        // 6. Regles de style
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
-                                React.createElement('span', {}, '6. Règles de style')
+                                React.createElement('span', {}, ''),
+                                React.createElement('span', {}, '6. Regles de style')
                             ),
                             React.createElement('div', { className: `${themeStyles.textSecondary} text-sm` },
-                                React.createElement('p', { className: 'mb-2' }, 'Emma écrit toujours :'),
+                                React.createElement('p', { className: 'mb-2' }, 'Emma ecrit toujours :'),
                                 React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
                                     React.createElement('li', {}, 'en paragraphes courts'),
                                     React.createElement('li', {}, 'avec titres et sous-titres'),
-                                    React.createElement('li', {}, 'avec des tableaux pour les données'),
+                                    React.createElement('li', {}, 'avec des tableaux pour les donnees'),
                                     React.createElement('li', {}, 'avec un ton professionnel'),
-                                    React.createElement('li', {}, 'sans blagues, sauf léger humain si contexte le permet'),
-                                    React.createElement('li', {}, 'sans emojis en mode comité (les emojis peuvent être autorisés en contexte informel, mais pas en comité)')
+                                    React.createElement('li', {}, 'sans blagues, sauf leger humain si contexte le permet'),
+                                    React.createElement('li', {}, 'sans emojis en mode comite (les emojis peuvent etre autorises en contexte informel, mais pas en comite)')
                                 )
                             )
                         ),
 
-                        // 7. Modèle de réponse standard
+                        // 7. Modele de reponse standard
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
-                                React.createElement('span', {}, '7. Modèle de réponse standard d\'Emma')
+                                React.createElement('span', {}, ''),
+                                React.createElement('span', {}, '7. Modele de reponse standard d\'Emma')
                             ),
                             React.createElement('div', { className: `${themeStyles.textSecondary} text-sm` },
-                                React.createElement('p', { className: 'mb-2' }, 'Chaque réponse doit idéalement suivre cette structure :'),
+                                React.createElement('p', { className: 'mb-2' }, 'Chaque reponse doit idealement suivre cette structure :'),
                                 React.createElement('ol', { className: 'list-decimal list-inside space-y-1 ml-2' },
-                                    React.createElement('li', {}, 'Résumé exécutif (optionnel mais recommandé)'),
-                                    React.createElement('li', {}, 'Données clés'),
-                                    React.createElement('li', {}, 'Analyse structurée'),
-                                    React.createElement('li', {}, 'Scénarios / Sensibilités'),
-                                    React.createElement('li', {}, 'Limites / hypothèses / risques'),
-                                    React.createElement('li', {}, 'Prochaines étapes ou options de tableaux/modèles')
+                                    React.createElement('li', {}, 'Resume executif (optionnel mais recommande)'),
+                                    React.createElement('li', {}, 'Donnees cles'),
+                                    React.createElement('li', {}, 'Analyse structuree'),
+                                    React.createElement('li', {}, 'Scenarios / Sensibilites'),
+                                    React.createElement('li', {}, 'Limites / hypotheses / risques'),
+                                    React.createElement('li', {}, 'Prochaines etapes ou options de tableaux/modeles')
                                 )
                             )
                         ),
 
-                        // 8. Règles de sécurité
+                        // 8. Regles de securite
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
-                                React.createElement('span', {}, '8. Règles de sécurité & conformité')
+                                React.createElement('span', {}, ''),
+                                React.createElement('span', {}, '8. Regles de securite & conformite')
                             ),
                             React.createElement('div', { className: `${themeStyles.textSecondary} text-sm` },
                                 React.createElement('p', { className: 'mb-2' }, 'Emma doit :'),
                                 React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
-                                    React.createElement('li', {}, 'éviter toute affirmation catégorique'),
-                                    React.createElement('li', {}, 'toujours contextualiser les prévisions'),
-                                    React.createElement('li', {}, 'ne jamais fournir de conseils personnalisés'),
+                                    React.createElement('li', {}, 'eviter toute affirmation categorique'),
+                                    React.createElement('li', {}, 'toujours contextualiser les previsions'),
+                                    React.createElement('li', {}, 'ne jamais fournir de conseils personnalises'),
                                     React.createElement('li', {}, 'rester dans un cadre d\'analyse uniquement'),
-                                    React.createElement('li', {}, 'préciser que les projections sont incertaines')
+                                    React.createElement('li', {}, 'preciser que les projections sont incertaines')
                                 )
                             )
                         ),
@@ -1793,24 +1793,24 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                         // 9. Persona psychologique
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
+                                React.createElement('span', {}, ''),
                                 React.createElement('span', {}, '9. Persona psychologique d\'Emma')
                             ),
                             React.createElement('div', { className: `space-y-3 ${themeStyles.textSecondary} text-sm` },
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, 'Emma doit apparaître comme :'),
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, 'Emma doit apparaitre comme :'),
                                     React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
-                                        React.createElement('li', {}, 'calme, précise, méthodique'),
-                                        React.createElement('li', {}, 'non‑émotive, professionnelle, patiente'),
+                                        React.createElement('li', {}, 'calme, precise, methodique'),
+                                        React.createElement('li', {}, 'nonemotive, professionnelle, patiente'),
                                         React.createElement('li', {}, 'jamais intrusive'),
-                                        React.createElement('li', {}, 'orientée vers la clarté et la fiabilité')
+                                        React.createElement('li', {}, 'orientee vers la clarte et la fiabilite')
                                     )
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, 'Elle NE doit PAS être :'),
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-1` }, 'Elle NE doit PAS etre :'),
                                     React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
                                         React.createElement('li', {}, 'sarcastique, insistante, directive'),
-                                        React.createElement('li', {}, 'intrusive, émotionnelle, bavarde')
+                                        React.createElement('li', {}, 'intrusive, emotionnelle, bavarde')
                                     )
                                 )
                             )
@@ -1819,27 +1819,27 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                         // 10. Exemples de comportement
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
+                                React.createElement('span', {}, ''),
                                 React.createElement('span', {}, '10. Exemples de comportement')
                             ),
                             React.createElement('div', { className: `space-y-4 ${themeStyles.textSecondary} text-sm` },
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-2` }, '❌ Emma NE DOIT PAS dire :'),
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-2` }, ' Emma NE DOIT PAS dire :'),
                                     React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
-                                        React.createElement('li', {}, '"Je pense que vous devriez acheter…"'),
+                                        React.createElement('li', {}, '"Je pense que vous devriez acheter..."'),
                                         React.createElement('li', {}, '"Salut tout le monde !"'),
-                                        React.createElement('li', {}, '"Je peux répondre même si vous ne m\'avez pas demandé."'),
+                                        React.createElement('li', {}, '"Je peux repondre meme si vous ne m\'avez pas demande."'),
                                         React.createElement('li', {}, '"Je crois que cette action va monter."'),
                                         React.createElement('li', {}, '"Permettez-moi de partager mon opinion."')
                                     )
                                 ),
                                 React.createElement('div', {},
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-2` }, '✔️ Emma DOIT dire :'),
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium mb-2` }, ' Emma DOIT dire :'),
                                     React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
-                                        React.createElement('li', {}, '"Voici trois scénarios possibles selon les hypothèses suivantes."'),
-                                        React.createElement('li', {}, '"Selon vos données, le ratio EV/EBITDA s\'établit à…"'),
-                                        React.createElement('li', {}, '"Voici un tableau prêt à copier dans Excel."'),
-                                        React.createElement('li', {}, '"Je réponds car vous m\'avez mentionnée."')
+                                        React.createElement('li', {}, '"Voici trois scenarios possibles selon les hypotheses suivantes."'),
+                                        React.createElement('li', {}, '"Selon vos donnees, le ratio EV/EBITDA s\'etablit a..."'),
+                                        React.createElement('li', {}, '"Voici un tableau pret a copier dans Excel."'),
+                                        React.createElement('li', {}, '"Je reponds car vous m\'avez mentionnee."')
                                     )
                                 )
                             )
@@ -1848,19 +1848,19 @@ const ChatGPTGroupTab = ({ isDarkMode = true, activeTab, setActiveTab }) => {
                         // 11. Objectif final
                         React.createElement('section', {},
                             React.createElement('h3', { className: `text-xl font-semibold mb-3 ${themeStyles.text} flex items-center gap-2` },
-                                React.createElement('span', {}, '🔹'),
+                                React.createElement('span', {}, ''),
                                 React.createElement('span', {}, '11. Objectif final')
                             ),
                             React.createElement('div', { className: `${themeStyles.textSecondary} text-sm` },
-                                React.createElement('p', { className: 'mb-2' }, 'Emma doit être un assistant stratégique :'),
+                                React.createElement('p', { className: 'mb-2' }, 'Emma doit etre un assistant strategique :'),
                                 React.createElement('ul', { className: 'list-disc list-inside space-y-1 ml-2' },
                                     React.createElement('li', {}, 'efficace, discret, fiable'),
                                     React.createElement('li', {}, 'toujours pertinent, jamais intrusif'),
                                     React.createElement('li', {}, '100 % professionnel')
                                 ),
                                 React.createElement('div', { className: `mt-3 p-3 rounded-lg bg-green-900/20 border border-green-700/30` },
-                                    React.createElement('p', { className: `${themeStyles.text} font-medium` }, '🎯 Mission :'),
-                                    React.createElement('p', {}, 'Elle doit renforcer la qualité du comité, pas influencer les décisions.')
+                                    React.createElement('p', { className: `${themeStyles.text} font-medium` }, ' Mission :'),
+                                    React.createElement('p', {}, 'Elle doit renforcer la qualite du comite, pas influencer les decisions.')
                                 )
                             )
                         )

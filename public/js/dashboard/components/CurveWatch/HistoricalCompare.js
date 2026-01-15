@@ -34,7 +34,7 @@ const CompareTooltip = ({ active, payload, label, colors, compareDate }) => {
         borderBottom: `1px solid ${colors.border}`,
         paddingBottom: '8px'
       }}>
-        Maturité: {label}
+        Maturite: {label}
       </p>
 
       {/* Current values */}
@@ -64,7 +64,7 @@ const CompareTooltip = ({ active, payload, label, colors, compareDate }) => {
       {(compareUS || compareCA) && (
         <div style={{ marginBottom: '8px' }}>
           <div style={{ fontSize: '10px', color: colors.textMuted, marginBottom: '4px', fontWeight: '600' }}>
-            {compareDate || 'DATE COMPARÉE'}
+            {compareDate || 'DATE COMPAREE'}
           </div>
           {compareUS && (
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
@@ -155,7 +155,7 @@ window.HistoricalCompare = ({ currentData, compareData, colors, showUS, showCana
         justifyContent: 'center',
         color: colors.textMuted
       }}>
-        Aucune donnée disponible
+        Aucune donnee disponible
       </div>
     );
   }
@@ -175,9 +175,9 @@ window.HistoricalCompare = ({ currentData, compareData, colors, showUS, showCana
           <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"/>
           <path d="M9 16l2 2 4-4"/>
         </svg>
-        <span style={{ fontSize: '14px' }}>Sélectionnez une date pour comparer</span>
+        <span style={{ fontSize: '14px' }}>Selectionnez une date pour comparer</span>
         <span style={{ fontSize: '11px', maxWidth: '300px', textAlign: 'center' }}>
-          Utilisez le sélecteur de date ci-dessus pour comparer la courbe actuelle avec une date historique
+          Utilisez le selecteur de date ci-dessus pour comparer la courbe actuelle avec une date historique
         </span>
       </div>
     );

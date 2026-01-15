@@ -30,7 +30,7 @@ window.PDFExporter = {
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(24);
         doc.setFont(undefined, 'bold');
-        doc.text('ANALYSE FINANCIÈRE', margin, 25);
+        doc.text('ANALYSE FINANCIERE', margin, 25);
 
         doc.setFontSize(12);
         doc.setFont(undefined, 'normal');
@@ -39,12 +39,12 @@ window.PDFExporter = {
         // Add logo/watermark
         doc.setTextColor(100, 116, 139);
         doc.setFontSize(10);
-        doc.text('Propulsé par JSLAI™', pageWidth - margin - 40, 33);
+        doc.text('Propulse par JSLAITM', pageWidth - margin - 40, 33);
 
         yPos = 50;
 
         // Section 1: Executive Summary
-        this.addSection(doc, 'Résumé Exécutif', yPos);
+        this.addSection(doc, 'Resume Executif', yPos);
         yPos += 10;
 
         doc.setFontSize(10);
@@ -65,11 +65,11 @@ window.PDFExporter = {
         yPos += 10;
 
         // Section 2: Valuation Metrics
-        this.addSection(doc, 'Métriques de Valorisation', yPos);
+        this.addSection(doc, 'Metriques de Valorisation', yPos);
         yPos += 10;
 
         const valuationTable = [
-            ['Méthode', 'Valeur', 'Écart vs Prix'],
+            ['Methode', 'Valeur', 'Ecart vs Prix'],
             ['DCF', `$${analysisData.dcfValue.toFixed(2)}`, `${((analysisData.dcfValue - analysisData.currentPrice) / analysisData.currentPrice * 100).toFixed(1)}%`],
             ['P/E Multiple', `$${analysisData.peValue.toFixed(2)}`, `${((analysisData.peValue - analysisData.currentPrice) / analysisData.currentPrice * 100).toFixed(1)}%`],
             ['P/B Multiple', `$${analysisData.pbValue.toFixed(2)}`, `${((analysisData.pbValue - analysisData.currentPrice) / analysisData.currentPrice * 100).toFixed(1)}%`]
@@ -85,11 +85,11 @@ window.PDFExporter = {
         }
 
         // Section 3: Financial Metrics
-        this.addSection(doc, 'Indicateurs Financiers Clés', yPos);
+        this.addSection(doc, 'Indicateurs Financiers Cles', yPos);
         yPos += 10;
 
         const metricsTable = [
-            ['Métrique', 'Valeur', 'Santé'],
+            ['Metrique', 'Valeur', 'Sante'],
             ['ROE', `${analysisData.metrics.roe.toFixed(2)}%`, this.getHealthIndicator(analysisData.metrics.roe, 15)],
             ['ROA', `${analysisData.metrics.roa.toFixed(2)}%`, this.getHealthIndicator(analysisData.metrics.roa, 8)],
             ['Ratio Courant', analysisData.metrics.currentRatio.toFixed(2), this.getHealthIndicator(analysisData.metrics.currentRatio, 1.5)],
@@ -119,7 +119,7 @@ window.PDFExporter = {
             doc.setFont(undefined, 'normal');
 
             analysisData.aiInsights.strengths.forEach(strength => {
-                const lines = doc.splitTextToSize(`• ${strength}`, contentWidth - 5);
+                const lines = doc.splitTextToSize(`- ${strength}`, contentWidth - 5);
                 lines.forEach(line => {
                     doc.text(line, margin + 5, yPos);
                     yPos += 5;
@@ -135,7 +135,7 @@ window.PDFExporter = {
             doc.setFont(undefined, 'normal');
 
             analysisData.aiInsights.weaknesses.forEach(weakness => {
-                const lines = doc.splitTextToSize(`• ${weakness}`, contentWidth - 5);
+                const lines = doc.splitTextToSize(`- ${weakness}`, contentWidth - 5);
                 lines.forEach(line => {
                     doc.text(line, margin + 5, yPos);
                     yPos += 5;
@@ -150,12 +150,12 @@ window.PDFExporter = {
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
             doc.text(
-                `Page ${i} sur ${pageCount} | Généré le ${new Date().toLocaleString('fr-FR')}`,
+                `Page ${i} sur ${pageCount} | Genere le ${new Date().toLocaleString('fr-FR')}`,
                 margin,
                 pageHeight - 10
             );
             doc.text(
-                'Ce document est fourni à titre informatif uniquement.',
+                'Ce document est fourni a titre informatif uniquement.',
                 pageWidth - margin - 80,
                 pageHeight - 10
             );
@@ -207,9 +207,9 @@ window.PDFExporter = {
     },
 
     getHealthIndicator(value, threshold) {
-        if (value >= threshold) return '✓ Bon';
+        if (value >= threshold) return ' Bon';
         if (value >= threshold * 0.7) return '~ Moyen';
-        return '✗ Faible';
+        return ' Faible';
     },
 
     async loadJsPDF() {

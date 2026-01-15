@@ -1,14 +1,14 @@
 /**
- * Utilitaire pour fetch avec timeout et gestion d'erreur complète
+ * Utilitaire pour fetch avec timeout et gestion d'erreur complete
  * Corrige les bugs de timeout et de chargement infini
  */
 
 /**
- * Fetch avec timeout, retry et gestion d'erreur complète
- * @param {string} url - URL à appeler
+ * Fetch avec timeout, retry et gestion d'erreur complete
+ * @param {string} url - URL a appeler
  * @param {Object} options - Options fetch standard
- * @param {number} timeoutMs - Timeout en millisecondes (défaut: 8000ms)
- * @param {number} maxRetries - Nombre de tentatives (défaut: 1)
+ * @param {number} timeoutMs - Timeout en millisecondes (defaut: 8000ms)
+ * @param {number} maxRetries - Nombre de tentatives (defaut: 1)
  * @returns {Promise<Response>}
  */
 export function fetchWithTimeout(url, options = {}, timeoutMs = 8000, maxRetries = 1) {
@@ -42,9 +42,9 @@ export function fetchWithTimeout(url, options = {}, timeoutMs = 8000, maxRetries
                 clearTimeout(timeoutId);
                 lastError = error;
                 
-                // Retry sur timeout ou erreurs réseau
+                // Retry sur timeout ou erreurs reseau
                 if ((error.name === 'AbortError' || error.message?.includes('network')) && attempt < maxRetries) {
-                    console.warn(`[fetchWithTimeout] Timeout/réseau, retry ${attempt + 1}/${maxRetries}`);
+                    console.warn(`[fetchWithTimeout] Timeout/reseau, retry ${attempt + 1}/${maxRetries}`);
                     await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
                     continue;
                 }
@@ -57,17 +57,17 @@ export function fetchWithTimeout(url, options = {}, timeoutMs = 8000, maxRetries
             }
         }
         
-        // Toutes les tentatives ont échoué
-        reject(new Error(`Timeout après ${timeoutMs}ms pour ${url} (${maxRetries + 1} tentatives)`));
+        // Toutes les tentatives ont echoue
+        reject(new Error(`Timeout apres ${timeoutMs}ms pour ${url} (${maxRetries + 1} tentatives)`));
     });
 }
 
 /**
  * Fetch JSON avec timeout et gestion d'erreur
- * @param {string} url - URL à appeler
+ * @param {string} url - URL a appeler
  * @param {Object} options - Options fetch standard
- * @param {number} timeoutMs - Timeout en millisecondes (défaut: 8000ms)
- * @returns {Promise<Object>} - Données JSON parsées
+ * @param {number} timeoutMs - Timeout en millisecondes (defaut: 8000ms)
+ * @returns {Promise<Object>} - Donnees JSON parsees
  */
 export async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
     const response = await fetchWithTimeout(url, options, timeoutMs);
@@ -79,7 +79,7 @@ export async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) 
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
         const text = await response.text();
-        throw new Error(`Réponse non-JSON de ${url}: ${text.slice(0, 200)}`);
+        throw new Error(`Reponse non-JSON de ${url}: ${text.slice(0, 200)}`);
     }
     
     return await response.json();
@@ -87,9 +87,9 @@ export async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) 
 
 /**
  * Wrapper pour useState avec timeout automatique
- * Nettoie automatiquement l'état de loading après un timeout
+ * Nettoie automatiquement l'etat de loading apres un timeout
  * @param {boolean} initialValue - Valeur initiale
- * @param {number} timeoutMs - Timeout en millisecondes (défaut: 10000ms)
+ * @param {number} timeoutMs - Timeout en millisecondes (defaut: 10000ms)
  * @returns {[boolean, Function, Function]} - [loading, setLoading, clearTimeout]
  */
 export function useLoadingWithTimeout(initialValue = false, timeoutMs = 10000) {
@@ -98,14 +98,14 @@ export function useLoadingWithTimeout(initialValue = false, timeoutMs = 10000) {
     
     React.useEffect(() => {
         if (loading) {
-            // Nettoyer le timeout précédent
+            // Nettoyer le timeout precedent
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
             }
             
-            // Définir un nouveau timeout
+            // Definir un nouveau timeout
             timeoutRef.current = setTimeout(() => {
-                console.warn(`[useLoadingWithTimeout] Timeout: loading state nettoyé après ${timeoutMs}ms`);
+                console.warn(`[useLoadingWithTimeout] Timeout: loading state nettoye apres ${timeoutMs}ms`);
                 setLoading(false);
             }, timeoutMs);
         } else {
@@ -133,7 +133,7 @@ export function useLoadingWithTimeout(initialValue = false, timeoutMs = 10000) {
     return [loading, setLoading, clearTimeout];
 }
 
-// Exposer globalement pour compatibilité
+// Exposer globalement pour compatibilite
 if (typeof window !== 'undefined') {
     window.fetchWithTimeout = fetchWithTimeout;
     window.fetchJsonWithTimeout = fetchJsonWithTimeout;

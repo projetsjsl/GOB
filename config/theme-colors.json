@@ -1,18 +1,18 @@
 {
   "name": "GOB Theme Colors",
   "version": "1.0.0",
-  "description": "Configuration centralisée des couleurs pour le site web et tous les emails",
+  "description": "Configuration centralisee des couleurs pour le site web et tous les emails",
   
   "colors": {
     "primary": {
       "value": "#6366f1",
       "name": "Indigo-500",
-      "description": "Couleur principale du thème"
+      "description": "Couleur principale du theme"
     },
     "primaryDark": {
       "value": "#4f46e5",
       "name": "Indigo-600",
-      "description": "Variante foncée pour textes et accents"
+      "description": "Variante foncee pour textes et accents"
     },
     "primaryLight": {
       "value": "#8b5cf6",
@@ -58,7 +58,7 @@
       "muted": {
         "value": "#9ca3af",
         "name": "Gray-400",
-        "description": "Texte désactivé/muted"
+        "description": "Texte desactive/muted"
       }
     },
     "background": {
@@ -87,7 +87,7 @@
       "light": {
         "value": "#e5e7eb",
         "name": "Gray-200",
-        "description": "Bordures légères"
+        "description": "Bordures legeres"
       },
       "medium": {
         "value": "#d1d5db",
@@ -117,7 +117,7 @@
     },
     "success": {
       "value": "linear-gradient(135deg, #059669 0%, #10b981 100%)",
-      "description": "Gradient pour succès"
+      "description": "Gradient pour succes"
     },
     "warning": {
       "value": "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)",
@@ -162,7 +162,7 @@
       "tickerBoxGradient": "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
       "tickerBoxBorder": "#f59e0b",
       "tickerTextColor": "#92400e",
-      "emoji": "🌅"
+      "emoji": ""
     },
     "midday": {
       "headerGradient": "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
@@ -170,7 +170,7 @@
       "tickerBoxGradient": "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
       "tickerBoxBorder": "#3b82f6",
       "tickerTextColor": "#1e40af",
-      "emoji": "☀️"
+      "emoji": ""
     },
     "evening": {
       "headerGradient": "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)",
@@ -178,7 +178,7 @@
       "tickerBoxGradient": "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
       "tickerBoxBorder": "#8b5cf6",
       "tickerTextColor": "#6b21a8",
-      "emoji": "🌆"
+      "emoji": ""
     }
   }
 }

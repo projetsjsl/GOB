@@ -19,7 +19,7 @@ export function YieldStatsPanel({ data, country, color }: YieldStatsPanelProps) 
   const min = Math.min(...rates)
   const max = Math.max(...rates)
   const avg = rates.reduce((a, b) => a + b, 0) / rates.length
-  const curve = max - min // Différence 30Y - 1M approximativement
+  const curve = max - min // Difference 30Y - 1M approximativement
 
   const current = data[data.length - 1]?.yield || 0
   const previous = data[data.length - 2]?.yield || current

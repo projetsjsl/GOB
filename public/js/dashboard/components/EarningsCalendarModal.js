@@ -125,7 +125,7 @@ const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
                     upcoming: [],
                     historical: []
                 });
-                setError('Aucune donnée d\'earnings disponible pour ce symbole');
+                setError('Aucune donnee d\'earnings disponible pour ce symbole');
             }
 
         } catch (err) {
@@ -173,7 +173,7 @@ const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-white">Earnings Calendar</h2>
-                            <p className="text-gray-400 text-sm">{symbol} • Next earnings & historical surprises</p>
+                            <p className="text-gray-400 text-sm">{symbol} - Next earnings & historical surprises</p>
                         </div>
                     </div>
                     <button title="Action"
@@ -268,7 +268,7 @@ const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
                                 <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
                                     <h3 className="text-lg font-bold text-white mb-4">Upcoming Reports</h3>
                                     <p className="text-gray-400 text-center py-4">
-                                        Aucune date d'earnings à venir disponible
+                                        Aucune date d'earnings a venir disponible
                                     </p>
                                 </div>
                             )}
@@ -330,7 +330,7 @@ const EarningsCalendarModal = ({ symbol, stockData, onClose }) => {
                                 <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
                                     <h3 className="text-lg font-bold text-white mb-4">Historical Earnings</h3>
                                     <p className="text-gray-400 text-center py-4">
-                                        Aucune donnée historique disponible pour ce symbole
+                                        Aucune donnee historique disponible pour ce symbole
                                     </p>
                                 </div>
                             )}

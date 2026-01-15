@@ -116,7 +116,7 @@ window.RateCards = ({ usData, canadaData, colors, showUS, showCanada }) => {
           marginTop: '2px',
           display: 'inline-block'
         }}>
-          {isInverted ? 'INVERSÉE' : 'NORMALE'}
+          {isInverted ? 'INVERSEE' : 'NORMALE'}
         </div>
       </div>
     );

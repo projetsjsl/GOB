@@ -1,6 +1,6 @@
 /**
  * API de Gestion des Conversations Emma
- * Gère la sauvegarde et récupération des conversations avec permissions
+ * Gere la sauvegarde et recuperation des conversations avec permissions
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({
       success: false,
-      error: 'Méthode non autorisée'
+      error: 'Methode non autorisee'
     });
   }
 
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
         });
       }
 
-      // Vérifier les permissions
+      // Verifier les permissions
       const canSave = await checkSavePermission(user_id);
       if (!canSave) {
         return res.status(403).json({
@@ -71,13 +71,13 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: 'Conversation sauvegardée',
+        message: 'Conversation sauvegardee',
         data: data[0]
       });
     }
 
     // ============================================================
-    // ACTION: GET_LATEST - Récupérer la dernière conversation
+    // ACTION: GET_LATEST - Recuperer la derniere conversation
     // ============================================================
     if (action === 'get_latest') {
       if (!user_id) {
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
         });
       }
 
-      // Vérifier les permissions
+      // Verifier les permissions
       const canView = await checkViewPermission(user_id, requesting_user_role);
       if (!canView) {
         return res.status(403).json({
@@ -102,7 +102,7 @@ export default async function handler(req, res) {
         .eq('user_id', user_id)
         .order('updated_at', { ascending: false })
         .limit(1)
-        .maybeSingle(); // Utiliser maybeSingle() au lieu de single() pour éviter l'erreur si pas de résultat
+        .maybeSingle(); // Utiliser maybeSingle() au lieu de single() pour eviter l'erreur si pas de resultat
 
       if (error) {
         console.error('Erreur Supabase get_latest:', error);
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
     }
 
     // ============================================================
-    // ACTION: GET_HISTORY - Récupérer toutes les conversations d'un user
+    // ACTION: GET_HISTORY - Recuperer toutes les conversations d'un user
     // ============================================================
     if (action === 'get_history') {
       if (!user_id) {
@@ -127,7 +127,7 @@ export default async function handler(req, res) {
         });
       }
 
-      // Vérifier les permissions
+      // Verifier les permissions
       const canView = await checkViewPermission(user_id, requesting_user_role);
       if (!canView) {
         return res.status(403).json({
@@ -155,23 +155,23 @@ export default async function handler(req, res) {
     }
 
     // ============================================================
-    // ACTION: GET_ALL_USERS - Récupérer les conversations de TOUS les users (ADMIN ONLY)
+    // ACTION: GET_ALL_USERS - Recuperer les conversations de TOUS les users (ADMIN ONLY)
     // ============================================================
     if (action === 'get_all_users') {
-      // Vérifier que c'est un admin
+      // Verifier que c'est un admin
       if (requesting_user_role !== 'admin') {
         return res.status(403).json({
           success: false,
-          error: 'Accès réservé aux administrateurs'
+          error: 'Acces reserve aux administrateurs'
         });
       }
 
-      // Récupérer toutes les conversations groupées par user
+      // Recuperer toutes les conversations groupees par user
       const { data, error } = await supabase
         .from('conversation_history')
         .select('user_id, session_id, created_at, updated_at, messages')
         .order('updated_at', { ascending: false })
-        .limit(200); // Limiter à 200 dernières conversations
+        .limit(200); // Limiter a 200 dernieres conversations
 
       if (error) {
         console.error('Erreur Supabase get_all_users:', error);
@@ -206,7 +206,7 @@ export default async function handler(req, res) {
         });
       }
 
-      // Récupérer la conversation pour vérifier les permissions
+      // Recuperer la conversation pour verifier les permissions
       const { data: conv, error: fetchError } = await supabase
         .from('conversation_history')
         .select('user_id')
@@ -217,7 +217,7 @@ export default async function handler(req, res) {
         throw fetchError;
       }
 
-      // Vérifier que c'est le propriétaire ou un admin
+      // Verifier que c'est le proprietaire ou un admin
       if (conv.user_id !== user_id && requesting_user_role !== 'admin') {
         return res.status(403).json({
           success: false,
@@ -236,7 +236,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: 'Conversation supprimée'
+        message: 'Conversation supprimee'
       });
     }
 
@@ -260,7 +260,7 @@ export default async function handler(req, res) {
 }
 
 /**
- * Vérifie si un utilisateur peut sauvegarder des conversations
+ * Verifie si un utilisateur peut sauvegarder des conversations
  */
 async function checkSavePermission(user_id) {
   try {
@@ -271,7 +271,7 @@ async function checkSavePermission(user_id) {
       .single();
 
     if (error) {
-      console.error('Erreur vérification permission:', error);
+      console.error('Erreur verification permission:', error);
       return false;
     }
 
@@ -285,7 +285,7 @@ async function checkSavePermission(user_id) {
 }
 
 /**
- * Vérifie si un utilisateur peut voir un historique
+ * Verifie si un utilisateur peut voir un historique
  */
 async function checkViewPermission(target_user_id, requesting_user_role) {
   // Admin peut tout voir

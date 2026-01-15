@@ -1,7 +1,7 @@
 /**
- * Email to SMS - Endpoint pour répondre par email
+ * Email to SMS - Endpoint pour repondre par email
  *
- * Reçoit un webhook de Resend quand un email arrive sur:
+ * Recoit un webhook de Resend quand un email arrive sur:
  * emma-reply+{userId}@gobapps.com
  *
  * Parse l'email, extrait le user ID, et envoie le message par SMS
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('[Email-to-SMS] Webhook reçu');
+    console.log('[Email-to-SMS] Webhook recu');
 
     // 1. PARSER LE WEBHOOK RESEND
     const emailData = req.body;
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     const userId = match[1];
     console.log(`[Email-to-SMS] User ID extrait: ${userId}`);
 
-    // 3. RÉCUPÉRER LE NUMÉRO DE TÉLÉPHONE DE L'UTILISATEUR
+    // 3. RECUPERER LE NUMERO DE TELEPHONE DE L'UTILISATEUR
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -71,17 +71,17 @@ export default async function handler(req, res) {
       .single();
 
     if (dbError || !userProfile) {
-      console.error('[Email-to-SMS] Utilisateur non trouvé:', userId);
+      console.error('[Email-to-SMS] Utilisateur non trouve:', userId);
       return res.status(404).json({ error: 'User not found' });
     }
 
-    console.log(`[Email-to-SMS] Utilisateur trouvé: ${userProfile.name} (${userProfile.phone})`);
+    console.log(`[Email-to-SMS] Utilisateur trouve: ${userProfile.name} (${userProfile.phone})`);
 
     // 4. NETTOYER LE MESSAGE
     // Enlever les signatures, citations, etc.
     let cleanMessage = text;
 
-    // Enlever les citations d'email précédents (lignes commençant par >)
+    // Enlever les citations d'email precedents (lignes commencant par >)
     cleanMessage = cleanMessage
       .split('\n')
       .filter(line => !line.trim().startsWith('>'))
@@ -91,8 +91,8 @@ export default async function handler(req, res) {
     const signaturePatterns = [
       /^--[\s\S]*$/m,
       /^On .* wrote:[\s\S]*$/m,
-      /^Le .* a écrit :[\s\S]*$/m,
-      /^Envoyé depuis .*$/m,
+      /^Le .* a ecrit :[\s\S]*$/m,
+      /^Envoye depuis .*$/m,
       /^Sent from .*$/m
     ];
 
@@ -103,11 +103,11 @@ export default async function handler(req, res) {
     cleanMessage = cleanMessage.trim();
 
     if (!cleanMessage || cleanMessage.length < 1) {
-      console.error('[Email-to-SMS] Message vide après nettoyage');
+      console.error('[Email-to-SMS] Message vide apres nettoyage');
       return res.status(400).json({ error: 'Empty message' });
     }
 
-    console.log(`[Email-to-SMS] Message nettoyé (${cleanMessage.length} chars)`);
+    console.log(`[Email-to-SMS] Message nettoye (${cleanMessage.length} chars)`);
 
     // 5. ENVOYER LE SMS VIA TWILIO
     const twilioClient = twilio(
@@ -121,11 +121,11 @@ export default async function handler(req, res) {
       body: cleanMessage
     });
 
-    console.log(`✅ [Email-to-SMS] SMS envoyé avec succès: ${twilioMessage.sid}`);
+    console.log(` [Email-to-SMS] SMS envoye avec succes: ${twilioMessage.sid}`);
 
-    // 6. SAUVEGARDER DANS LA BASE DE DONNÉES
+    // 6. SAUVEGARDER DANS LA BASE DE DONNEES
     try {
-      // Récupérer la conversation
+      // Recuperer la conversation
       const { data: conversation } = await supabase
         .from('conversations')
         .select('id')
@@ -153,14 +153,14 @@ export default async function handler(req, res) {
             }
           });
 
-        console.log('[Email-to-SMS] Message sauvegardé dans conversation_history');
+        console.log('[Email-to-SMS] Message sauvegarde dans conversation_history');
       }
     } catch (saveError) {
       console.error('[Email-to-SMS] Erreur sauvegarde (non-bloquant):', saveError);
-      // Non-bloquant - le SMS est déjà envoyé
+      // Non-bloquant - le SMS est deja envoye
     }
 
-    // 7. RÉPONSE AU WEBHOOK
+    // 7. REPONSE AU WEBHOOK
     return res.status(200).json({
       success: true,
       userId: userId,

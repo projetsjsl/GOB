@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // SMS MANAGER - Gestion de la configuration SMS
-// ═══════════════════════════════════════════════════════════════
+// 
 
 import { saveDesign, cancelDesignChanges } from './design-manager.js';
 

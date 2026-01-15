@@ -21,7 +21,7 @@ export function CurveVisibilityToggle({ visibleCurves, onToggleCurve, availableC
     <Card className="bg-card border-border">
       <CardHeader className="pb-3">
         <CardTitle className="text-foreground">Courbes Visibles</CardTitle>
-        <CardDescription className="text-muted-foreground">Sélectionnez les courbes à afficher</CardDescription>
+        <CardDescription className="text-muted-foreground">Selectionnez les courbes a afficher</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
         {availableCurves.map((curve) => {

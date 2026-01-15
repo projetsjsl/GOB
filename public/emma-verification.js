@@ -1,9 +1,9 @@
 // ========================================
-// VÉRIFICATION EMMA - SCRIPT DE VALIDATION
+// VERIFICATION EMMA - SCRIPT DE VALIDATION
 // ========================================
 
 /**
- * Script de vérification pour s'assurer que tous les composants Emma sont correctement installés
+ * Script de verification pour s'assurer que tous les composants Emma sont correctement installes
  */
 
 class EmmaVerification {
@@ -13,9 +13,9 @@ class EmmaVerification {
     this.warnings = [];
   }
 
-  // Exécuter toutes les vérifications
+  // Executer toutes les verifications
   async runAllChecks() {
-    console.log('🔍 Début de la vérification Emma...');
+    console.log(' Debut de la verification Emma...');
     
     try {
       await this.checkFiles();
@@ -27,12 +27,12 @@ class EmmaVerification {
       this.displayResults();
       return this.getOverallStatus();
     } catch (error) {
-      console.error('❌ Erreur lors de la vérification:', error);
+      console.error(' Erreur lors de la verification:', error);
       return false;
     }
   }
 
-  // Vérifier la présence des fichiers
+  // Verifier la presence des fichiers
   async checkFiles() {
     const requiredFiles = [
       'emma-financial-profile.js',
@@ -47,77 +47,77 @@ class EmmaVerification {
       try {
         const response = await fetch(file);
         if (response.ok) {
-          this.addResult('✅', `Fichier ${file} trouvé`);
+          this.addResult('', `Fichier ${file} trouve`);
         } else {
-          this.addError(`❌ Fichier ${file} manquant ou inaccessible`);
+          this.addError(` Fichier ${file} manquant ou inaccessible`);
         }
       } catch (error) {
-        this.addError(`❌ Erreur lors de la vérification de ${file}: ${error.message}`);
+        this.addError(` Erreur lors de la verification de ${file}: ${error.message}`);
       }
     }
   }
 
-  // Vérifier les modules ES6
+  // Verifier les modules ES6
   async checkModules() {
     try {
       // Test d'import du profil financier
       const { getFinancialProfile } = await import('./emma-financial-profile.js');
       const profile = getFinancialProfile();
-      this.addResult('✅', 'Module emma-financial-profile.js importé avec succès');
+      this.addResult('', 'Module emma-financial-profile.js importe avec succes');
       
       if (profile && profile.name) {
-        this.addResult('✅', `Profil financier chargé: ${profile.name}`);
+        this.addResult('', `Profil financier charge: ${profile.name}`);
       } else {
-        this.addError('❌ Profil financier invalide');
+        this.addError(' Profil financier invalide');
       }
     } catch (error) {
-      this.addError(`❌ Erreur d'import emma-financial-profile.js: ${error.message}`);
+      this.addError(` Erreur d'import emma-financial-profile.js: ${error.message}`);
     }
 
     try {
       // Test d'import du service Gemini
       const { emmaGeminiService } = await import('./emma-gemini-service.js');
-      this.addResult('✅', 'Module emma-gemini-service.js importé avec succès');
+      this.addResult('', 'Module emma-gemini-service.js importe avec succes');
       
       if (emmaGeminiService && typeof emmaGeminiService.generateResponse === 'function') {
-        this.addResult('✅', 'Service Gemini initialisé correctement');
+        this.addResult('', 'Service Gemini initialise correctement');
       } else {
-        this.addError('❌ Service Gemini invalide');
+        this.addError(' Service Gemini invalide');
       }
     } catch (error) {
-      this.addError(`❌ Erreur d'import emma-gemini-service.js: ${error.message}`);
+      this.addError(` Erreur d'import emma-gemini-service.js: ${error.message}`);
     }
 
     try {
       // Test d'import des composants UI
       const { EmmaChatInterface } = await import('./emma-ui-components.js');
-      this.addResult('✅', 'Module emma-ui-components.js importé avec succès');
+      this.addResult('', 'Module emma-ui-components.js importe avec succes');
       
       if (typeof EmmaChatInterface === 'function') {
-        this.addResult('✅', 'Composants UI disponibles');
+        this.addResult('', 'Composants UI disponibles');
       } else {
-        this.addError('❌ Composants UI invalides');
+        this.addError(' Composants UI invalides');
       }
     } catch (error) {
-      this.addError(`❌ Erreur d'import emma-ui-components.js: ${error.message}`);
+      this.addError(` Erreur d'import emma-ui-components.js: ${error.message}`);
     }
 
     try {
       // Test d'import de la configuration
       const { emmaConfig } = await import('./emma-config.js');
-      this.addResult('✅', 'Module emma-config.js importé avec succès');
+      this.addResult('', 'Module emma-config.js importe avec succes');
       
       if (emmaConfig && emmaConfig.ui) {
-        this.addResult('✅', 'Configuration Emma chargée');
+        this.addResult('', 'Configuration Emma chargee');
       } else {
-        this.addError('❌ Configuration Emma invalide');
+        this.addError(' Configuration Emma invalide');
       }
     } catch (error) {
-      this.addError(`❌ Erreur d'import emma-config.js: ${error.message}`);
+      this.addError(` Erreur d'import emma-config.js: ${error.message}`);
     }
   }
 
-  // Vérifier la configuration
+  // Verifier la configuration
   async checkConfiguration() {
     try {
       const { getFinancialProfile, loadFinancialPrompt } = await import('./emma-financial-profile.js');
@@ -126,72 +126,72 @@ class EmmaVerification {
       const profile = loadFinancialPrompt();
       
       if (profile.prompt && profile.prompt.length > 100) {
-        this.addResult('✅', 'Prompt financier configuré');
+        this.addResult('', 'Prompt financier configure');
       } else {
-        this.addWarning('⚠️ Prompt financier court ou manquant');
+        this.addWarning(' Prompt financier court ou manquant');
       }
 
       if (profile.specialties && profile.specialties.length > 0) {
-        this.addResult('✅', `${profile.specialties.length} spécialités configurées`);
+        this.addResult('', `${profile.specialties.length} specialites configurees`);
       } else {
-        this.addWarning('⚠️ Aucune spécialité configurée');
+        this.addWarning(' Aucune specialite configuree');
       }
 
     } catch (error) {
-      this.addError(`❌ Erreur de configuration: ${error.message}`);
+      this.addError(` Erreur de configuration: ${error.message}`);
     }
   }
 
-  // Vérifier les dépendances
+  // Verifier les dependances
   async checkDependencies() {
-    // Vérifier localStorage
+    // Verifier localStorage
     if (typeof Storage !== 'undefined') {
-      this.addResult('✅', 'localStorage supporté');
+      this.addResult('', 'localStorage supporte');
     } else {
-      this.addError('❌ localStorage non supporté');
+      this.addError(' localStorage non supporte');
     }
 
-    // Vérifier fetch API
+    // Verifier fetch API
     if (typeof fetch !== 'undefined') {
-      this.addResult('✅', 'Fetch API supportée');
+      this.addResult('', 'Fetch API supportee');
     } else {
-      this.addError('❌ Fetch API non supportée');
+      this.addError(' Fetch API non supportee');
     }
 
-    // Vérifier les modules ES6
+    // Verifier les modules ES6
     // Note: import is a keyword and cannot be checked with typeof
     // if (typeof import !== 'undefined') {
-    //   this.addResult('✅', 'Modules ES6 supportés');
+    //   this.addResult('', 'Modules ES6 supportes');
     // } else {
-    //   this.addError('❌ Modules ES6 non supportés');
+    //   this.addError(' Modules ES6 non supportes');
     // }
 
-    // Vérifier les Promises
+    // Verifier les Promises
     if (typeof Promise !== 'undefined') {
-      this.addResult('✅', 'Promises supportées');
+      this.addResult('', 'Promises supportees');
     } else {
-      this.addError('❌ Promises non supportées');
+      this.addError(' Promises non supportees');
     }
   }
 
-  // Vérifier le support du navigateur
+  // Verifier le support du navigateur
   async checkBrowserSupport() {
     const userAgent = navigator.userAgent;
     
-    // Détecter le navigateur
+    // Detecter le navigateur
     if (userAgent.includes('Chrome')) {
-      this.addResult('✅', 'Navigateur Chrome détecté');
+      this.addResult('', 'Navigateur Chrome detecte');
     } else if (userAgent.includes('Firefox')) {
-      this.addResult('✅', 'Navigateur Firefox détecté');
+      this.addResult('', 'Navigateur Firefox detecte');
     } else if (userAgent.includes('Safari')) {
-      this.addResult('✅', 'Navigateur Safari détecté');
+      this.addResult('', 'Navigateur Safari detecte');
     } else if (userAgent.includes('Edge')) {
-      this.addResult('✅', 'Navigateur Edge détecté');
+      this.addResult('', 'Navigateur Edge detecte');
     } else {
-      this.addWarning('⚠️ Navigateur non reconnu - compatibilité non garantie');
+      this.addWarning(' Navigateur non reconnu - compatibilite non garantie');
     }
 
-    // Vérifier la version
+    // Verifier la version
     const isModernBrowser = (
       'fetch' in window &&
       'Promise' in window &&
@@ -201,13 +201,13 @@ class EmmaVerification {
     );
 
     if (isModernBrowser) {
-      this.addResult('✅', 'Navigateur moderne détecté');
+      this.addResult('', 'Navigateur moderne detecte');
     } else {
-      this.addError('❌ Navigateur obsolète - mise à jour recommandée');
+      this.addError(' Navigateur obsolete - mise a jour recommandee');
     }
   }
 
-  // Ajouter un résultat positif
+  // Ajouter un resultat positif
   addResult(icon, message) {
     this.results.push({ icon, message, type: 'success' });
   }
@@ -222,13 +222,13 @@ class EmmaVerification {
     this.warnings.push(message);
   }
 
-  // Afficher les résultats
+  // Afficher les resultats
   displayResults() {
-    console.log('\n📊 RÉSULTATS DE LA VÉRIFICATION EMMA\n');
+    console.log('\n RESULTATS DE LA VERIFICATION EMMA\n');
     
-    // Afficher les succès
+    // Afficher les succes
     if (this.results.length > 0) {
-      console.log('✅ SUCCÈS:');
+      console.log(' SUCCES:');
       this.results.forEach(result => {
         console.log(`  ${result.icon} ${result.message}`);
       });
@@ -236,7 +236,7 @@ class EmmaVerification {
 
     // Afficher les avertissements
     if (this.warnings.length > 0) {
-      console.log('\n⚠️ AVERTISSEMENTS:');
+      console.log('\n AVERTISSEMENTS:');
       this.warnings.forEach(warning => {
         console.log(`  ${warning}`);
       });
@@ -244,20 +244,20 @@ class EmmaVerification {
 
     // Afficher les erreurs
     if (this.errors.length > 0) {
-      console.log('\n❌ ERREURS:');
+      console.log('\n ERREURS:');
       this.errors.forEach(error => {
         console.log(`  ${error}`);
       });
     }
 
-    // Résumé
-    console.log('\n📈 RÉSUMÉ:');
-    console.log(`  ✅ Succès: ${this.results.length}`);
-    console.log(`  ⚠️ Avertissements: ${this.warnings.length}`);
-    console.log(`  ❌ Erreurs: ${this.errors.length}`);
+    // Resume
+    console.log('\n RESUME:');
+    console.log(`   Succes: ${this.results.length}`);
+    console.log(`   Avertissements: ${this.warnings.length}`);
+    console.log(`   Erreurs: ${this.errors.length}`);
     
     const status = this.getOverallStatus();
-    console.log(`\n🎯 STATUT GLOBAL: ${status ? '✅ PRÊT' : '❌ PROBLÈMES DÉTECTÉS'}`);
+    console.log(`\n STATUT GLOBAL: ${status ? ' PRET' : ' PROBLEMES DETECTES'}`);
   }
 
   // Obtenir le statut global
@@ -265,21 +265,21 @@ class EmmaVerification {
     return this.errors.length === 0;
   }
 
-  // Générer un rapport HTML
+  // Generer un rapport HTML
   generateHTMLReport() {
     const status = this.getOverallStatus();
     const statusClass = status ? 'success' : 'error';
-    const statusText = status ? 'PRÊT' : 'PROBLÈMES DÉTECTÉS';
+    const statusText = status ? 'PRET' : 'PROBLEMES DETECTES';
 
     return `
       <div class="emma-verification-report">
-        <h2>🔍 Rapport de Vérification Emma</h2>
+        <h2> Rapport de Verification Emma</h2>
         <div class="status ${statusClass}">
           <strong>Statut: ${statusText}</strong>
         </div>
         
         <div class="results">
-          <h3>✅ Succès (${this.results.length})</h3>
+          <h3> Succes (${this.results.length})</h3>
           <ul>
             ${this.results.map(r => `<li>${r.icon} ${r.message}</li>`).join('')}
           </ul>
@@ -287,7 +287,7 @@ class EmmaVerification {
         
         ${this.warnings.length > 0 ? `
           <div class="warnings">
-            <h3>⚠️ Avertissements (${this.warnings.length})</h3>
+            <h3> Avertissements (${this.warnings.length})</h3>
             <ul>
               ${this.warnings.map(w => `<li>${w}</li>`).join('')}
             </ul>
@@ -296,7 +296,7 @@ class EmmaVerification {
         
         ${this.errors.length > 0 ? `
           <div class="errors">
-            <h3>❌ Erreurs (${this.errors.length})</h3>
+            <h3> Erreurs (${this.errors.length})</h3>
             <ul>
               ${this.errors.map(e => `<li>${e}</li>`).join('')}
             </ul>
@@ -310,11 +310,11 @@ class EmmaVerification {
 // Instance globale
 const emmaVerification = new EmmaVerification();
 
-// Auto-exécution si appelé directement
+// Auto-execution si appele directement
 if (typeof window !== 'undefined') {
   window.emmaVerification = emmaVerification;
   
-  // Exécuter automatiquement au chargement
+  // Executer automatiquement au chargement
   document.addEventListener('DOMContentLoaded', () => {
     emmaVerification.runAllChecks();
   });

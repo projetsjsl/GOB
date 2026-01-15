@@ -1,37 +1,37 @@
 // ============================================================================
 // GEMINI CHAT VALIDATED - Emma En Direct Chatbot (Mode Expert)
-// Version avec validation avancée et gestion d'erreurs améliorée
+// Version avec validation avancee et gestion d'erreurs amelioree
 // ============================================================================
 //
-// 🛡️  GUARDRAILS DE PROTECTION - CONFIGURATION CRITIQUE 🛡️
+//   GUARDRAILS DE PROTECTION - CONFIGURATION CRITIQUE 
 // ============================================================================
-// ⚠️  ATTENTION : Ce fichier contient la configuration validée pour Emma Expert
-// ⚠️  Toute modification peut casser le chatbot de production
-// ⚠️  Toujours tester en local avant de déployer
+//   ATTENTION : Ce fichier contient la configuration validee pour Emma Expert
+//   Toute modification peut casser le chatbot de production
+//   Toujours tester en local avant de deployer
 //
-// ✅ CONFIGURATION VALIDÉE (Testée le 15/10/2025) :
-// - Modèle: gemini-2.0-flash-exp (quota plus élevé)
+//  CONFIGURATION VALIDEE (Testee le 15/10/2025) :
+// - Modele: gemini-2.0-flash-exp (quota plus eleve)
 // - SDK: @google/generative-ai (PAS @google/genai)
 // - Validation: Messages, tokens, safety settings
-// - Mode Expert: useValidatedMode = true par défaut
+// - Mode Expert: useValidatedMode = true par defaut
 // - Temperature: 0.3 (plus conservateur pour mode expert)
-// - Max tokens: 4000 (plus élevé pour analyses détaillées)
+// - Max tokens: 4000 (plus eleve pour analyses detaillees)
 //
-// 🔒 VARIABLES D'ENVIRONNEMENT REQUISES :
-// - GEMINI_API_KEY (AI...) : ✅ Configurée
+//  VARIABLES D'ENVIRONNEMENT REQUISES :
+// - GEMINI_API_KEY (AI...) :  Configuree
 //
-// ❌ INTERDICTIONS ABSOLUES :
-// - Modifier le modèle sans test (gemini-2.0-flash-exp)
+//  INTERDICTIONS ABSOLUES :
+// - Modifier le modele sans test (gemini-2.0-flash-exp)
 // - Changer le SDK (doit rester @google/generative-ai)
-// - Modifier les paramètres de validation sans test
-// - Changer la température sans test (0.3 pour mode expert)
+// - Modifier les parametres de validation sans test
+// - Changer la temperature sans test (0.3 pour mode expert)
 // - Modifier les safety settings sans validation
 //
-// 🔧 DÉPANNAGE RAPIDE :
+//  DEPANNAGE RAPIDE :
 // - 400 = messages invalides ou manquants
-// - 401 = clé API invalide/expirée
-// - 429 = quota dépassé, attendre ou upgrader
-// - 500 = erreur serveur, vérifier logs
+// - 401 = cle API invalide/expiree
+// - 429 = quota depasse, attendre ou upgrader
+// - 500 = erreur serveur, verifier logs
 // ============================================================================
 
 export default async function handler(req, res) {
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Methode non autorisee' });
   }
 
   try {
@@ -54,25 +54,25 @@ export default async function handler(req, res) {
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({
         error: 'Messages requis',
-        details: 'Le paramètre messages doit être un tableau non vide'
+        details: 'Le parametre messages doit etre un tableau non vide'
       });
     }
 
     const geminiApiKey = process.env.GEMINI_API_KEY;
 
     if (!geminiApiKey) {
-      console.log('❌ Clé API Gemini non configurée');
+      console.log(' Cle API Gemini non configuree');
       return res.status(503).json({
         error: 'Service non disponible',
-        message: 'Clé API Gemini non configurée',
+        message: 'Cle API Gemini non configuree',
         help: 'Configurez GEMINI_API_KEY dans Vercel'
       });
     }
 
-    console.log('✅ Messages valides reçus:', messages.length, 'messages');
-    console.log('🔧 Mode validé activé:', useValidatedMode);
+    console.log(' Messages valides recus:', messages.length, 'messages');
+    console.log(' Mode valide active:', useValidatedMode);
 
-    // Validation avancée des messages
+    // Validation avancee des messages
     const validatedMessages = messages.map((msg, index) => {
       if (!msg.role || !msg.content) {
         throw new Error(`Message ${index + 1} invalide: role et content requis`);
@@ -88,8 +88,8 @@ export default async function handler(req, res) {
       };
     });
 
-    console.log('🔧 Initialisation Gemini avec model: gemini-2.0-flash-exp');
-    console.log('📤 Envoi de la requête à Gemini');
+    console.log(' Initialisation Gemini avec model: gemini-2.0-flash-exp');
+    console.log(' Envoi de la requete a Gemini');
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
@@ -119,21 +119,21 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('❌ Erreur Gemini API:', response.status, errorData);
+      console.error(' Erreur Gemini API:', response.status, errorData);
       throw new Error(`Gemini API error: ${response.status} - ${errorData}`);
     }
 
     const data = await response.json();
-    console.log('✅ Réponse Gemini reçue');
+    console.log(' Reponse Gemini recue');
 
     const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!responseText) {
-      console.error('❌ Réponse Gemini vide:', data);
-      throw new Error('Réponse vide de Gemini');
+      console.error(' Reponse Gemini vide:', data);
+      throw new Error('Reponse vide de Gemini');
     }
 
-    console.log('✅ Réponse validée et envoyée');
+    console.log(' Reponse validee et envoyee');
 
     return res.status(200).json({
       success: true,
@@ -149,10 +149,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur lors de l\'appel à Gemini:', error?.message || String(error));
+    console.error(' Erreur lors de l\'appel a Gemini:', error?.message || String(error));
 
     return res.status(500).json({
-      error: 'Erreur lors de l\'appel à Gemini',
+      error: 'Erreur lors de l\'appel a Gemini',
       details: error?.message || String(error),
       timestamp: new Date().toISOString()
     });

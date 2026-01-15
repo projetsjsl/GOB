@@ -1,4 +1,4 @@
-// app-logic.js - Logique complète pour app.html
+// app-logic.js - Logique complete pour app.html
 
 let currentStep = 1;
 let totalSteps = 4;
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('userName').textContent = `${user.name || user.username}`;
     
-    // Charger données sauvegardées si existantes
+    // Charger donnees sauvegardees si existantes
     const savedData = localStorage.getItem('currentFormData');
     if (savedData) {
         formData = JSON.parse(savedData);
@@ -46,7 +46,7 @@ function showToast(message, type = 'info', duration = 3000) {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.innerHTML = `
-        <span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
+        <span>${type === 'success' ? '' : type === 'error' ? '' : 'i'}</span>
         <span>${message}</span>
     `;
     
@@ -69,7 +69,7 @@ function autoSaveForm() {
     setTimeout(() => indicator.classList.remove('show'), 2000);
 }
 
-// Collecter les données du formulaire
+// Collecter les donnees du formulaire
 function collectFormData() {
     const form = document.getElementById('collectionForm');
     const inputs = form.querySelectorAll('input, select, textarea');
@@ -81,7 +81,7 @@ function collectFormData() {
     });
 }
 
-// Remplir le formulaire avec données sauvegardées
+// Remplir le formulaire avec donnees sauvegardees
 function populateForm() {
     Object.keys(formData).forEach(key => {
         const element = document.getElementById(key);
@@ -103,7 +103,7 @@ function attachFormListeners() {
             validateField(input);
         });
         
-        // Validation temps réel pour Phone/NAS
+        // Validation temps reel pour Phone/NAS
         if (input.id === 'phone' || input.id === 'nas') {
             input.addEventListener('input', (e) => formatInput(e.target));
         }
@@ -174,7 +174,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Navigation entre étapes
+// Navigation entre etapes
 function nextStep() {
     const btn = document.getElementById('btnNext');
     if (btn) btn.classList.add('loading');
@@ -234,16 +234,16 @@ function validateStep(step) {
     return isValid;
 }
 
-// Afficher le récapitulatif
+// Afficher le recapitulatif
 function showSummary() {
     collectFormData();
     
     const summaryHtml = `
         <div class="summary-section">
-            <h3>👤 Identité</h3>
+            <h3> Identite</h3>
             <div class="summary-grid">
                 <div class="summary-item">
-                    <div class="summary-item-label">Prénom</div>
+                    <div class="summary-item-label">Prenom</div>
                     <div class="summary-item-value">${formData.firstName || '-'}</div>
                 </div>
                 <div class="summary-item">
@@ -255,7 +255,7 @@ function showSummary() {
                     <div class="summary-item-value">${formData.email || '-'}</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-item-label">Téléphone</div>
+                    <div class="summary-item-label">Telephone</div>
                     <div class="summary-item-value">${formData.phone || '-'}</div>
                 </div>
                 <div class="summary-item">
@@ -270,10 +270,10 @@ function showSummary() {
         </div>
 
         <div class="summary-section">
-            <h3>👨‍👩‍👧 Situation Personnelle</h3>
+            <h3> Situation Personnelle</h3>
             <div class="summary-grid">
                 <div class="summary-item">
-                    <div class="summary-item-label">État Civil</div>
+                    <div class="summary-item-label">Etat Civil</div>
                     <div class="summary-item-value">${formData.civilStatus || '-'}</div>
                 </div>
                 <div class="summary-item">
@@ -292,7 +292,7 @@ function showSummary() {
         </div>
 
         <div class="summary-section">
-            <h3>💰 Situation Financière</h3>
+            <h3> Situation Financiere</h3>
             <div class="summary-grid">
                 <div class="summary-item">
                     <div class="summary-item-label">Revenu Annuel</div>
@@ -311,7 +311,7 @@ function showSummary() {
                     <div class="summary-item-value">${formData.investmentHorizon || '-'}</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-item-label">Tolérance au Risque</div>
+                    <div class="summary-item-label">Tolerance au Risque</div>
                     <div class="summary-item-value">${formData.riskTolerance || '-'}</div>
                 </div>
             </div>
@@ -321,19 +321,19 @@ function showSummary() {
     document.getElementById('summaryContent').innerHTML = summaryHtml;
 }
 
-// Mettre à jour l'affichage
+// Mettre a jour l'affichage
 function updateDisplay() {
-    // Masquer toutes les étapes
+    // Masquer toutes les etapes
     document.querySelectorAll('.step-content').forEach(el => {
         el.classList.remove('active');
     });
 
-    // Afficher l'étape actuelle
+    // Afficher l'etape actuelle
     if (currentStep <= 3) {
         document.getElementById(`step${currentStep}`).classList.add('active');
     } else {
         document.getElementById('summary').classList.add('active');
-        showToast('Récapitulatif prêt - Vérifiez vos informations', 'success');
+        showToast('Recapitulatif pret - Verifiez vos informations', 'success');
     }
 
     updateProgressBar();
@@ -343,7 +343,7 @@ function updateDisplay() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Mise à jour de la barre de progression
+// Mise a jour de la barre de progression
 function updateProgressBar() {
     for (let i = 1; i <= 3; i++) {
         const circle = document.getElementById(`circle${i}`);
@@ -371,7 +371,7 @@ function updateProgressBar() {
     }
 }
 
-// Mise à jour de la navigation
+// Mise a jour de la navigation
 function updateNavigation() {
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
@@ -383,10 +383,10 @@ function updateNavigation() {
     }
 
     if (currentStep >= totalSteps) {
-        nextBtn.textContent = 'Terminé ✓';
+        nextBtn.textContent = 'Termine ';
         nextBtn.disabled = true;
     } else {
-        nextBtn.textContent = 'Suivant →';
+        nextBtn.textContent = 'Suivant ->';
         nextBtn.disabled = false;
     }
 }
@@ -395,15 +395,15 @@ function updateNavigation() {
 function exportToExcel() {
     collectFormData();
 
-    // En-têtes
+    // En-tetes
     const headers = [
-        'Prénom', 'Nom', 'Email', 'Téléphone', 'Adresse',
-        'État Civil', 'Date de Naissance', 'NAS', 'Employeur', 'Poste',
+        'Prenom', 'Nom', 'Email', 'Telephone', 'Adresse',
+        'Etat Civil', 'Date de Naissance', 'NAS', 'Employeur', 'Poste',
         'Revenu Annuel', 'Actifs Immobiliers', 'Actifs Liquides',
-        'Horizon de Placement', 'Tolérance au Risque'
+        'Horizon de Placement', 'Tolerance au Risque'
     ];
 
-    // Données
+    // Donnees
     const row = [
         formData.firstName, formData.lastName, formData.email, formData.phone, formData.address,
         formData.civilStatus, formData.birthdate, formData.nas, formData.employer, formData.jobTitle,
@@ -411,10 +411,10 @@ function exportToExcel() {
         formData.investmentHorizon, formData.riskTolerance
     ];
 
-    // Créer CSV
+    // Creer CSV
     let csv = headers.join('\t') + '\n' + row.join('\t');
 
-    // Télécharger
+    // Telecharger
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -433,53 +433,53 @@ function exportToPDF() {
     collectFormData();
 
     const pdfContent = `
-    ╔════════════════════════════════════════════════════════╗
-    ║        FORMULAIRE DE COLLECTE - ONBOARDING CLIENT      ║
-    ╚════════════════════════════════════════════════════════╝
+    
+            FORMULAIRE DE COLLECTE - ONBOARDING CLIENT      
+    
 
-    IDENTITÉ DU CLIENT
-    ════════════════════════════════════════════════════════
-    Prénom:                    ${formData.firstName || '_'.repeat(30)}
+    IDENTITE DU CLIENT
+    
+    Prenom:                    ${formData.firstName || '_'.repeat(30)}
     Nom:                       ${formData.lastName || '_'.repeat(30)}
     Email:                     ${formData.email || '_'.repeat(30)}
-    Téléphone:                 ${formData.phone || '_'.repeat(30)}
+    Telephone:                 ${formData.phone || '_'.repeat(30)}
     Adresse:                   ${formData.address || '_'.repeat(30)}
     Ville:                     ${formData.city || '_'.repeat(30)}
     Province:                  ${formData.province || '_'.repeat(30)}
     Code Postal:               ${formData.postalCode || '_'.repeat(30)}
 
     SITUATION PERSONNELLE
-    ════════════════════════════════════════════════════════
-    État Civil:                ${formData.civilStatus || '_'.repeat(30)}
+    
+    Etat Civil:                ${formData.civilStatus || '_'.repeat(30)}
     Date de Naissance:         ${formData.birthdate || '_'.repeat(30)}
     NAS:                       ${formData.nas || '_'.repeat(30)}
     Nombre d'Enfants:          ${formData.childrenCount || '_'.repeat(30)}
     Employeur:                 ${formData.employer || '_'.repeat(30)}
     Titre de Poste:            ${formData.jobTitle || '_'.repeat(30)}
 
-    SITUATION FINANCIÈRE
-    ════════════════════════════════════════════════════════
+    SITUATION FINANCIERE
+    
     Revenu Annuel:             $ ${parseInt(formData.annualIncome || 0).toLocaleString('fr-CA')}
     Revenu Conjoint:           $ ${parseInt(formData.spouseIncome || 0).toLocaleString('fr-CA')}
-    Valeur Immobilière:        $ ${parseInt(formData.realEstateValue || 0).toLocaleString('fr-CA')}
+    Valeur Immobiliere:        $ ${parseInt(formData.realEstateValue || 0).toLocaleString('fr-CA')}
     Actifs Liquides:           $ ${parseInt(formData.liquidAssets || 0).toLocaleString('fr-CA')}
     Horizon de Placement:      ${formData.investmentHorizon || '_'.repeat(30)}
-    Tolérance au Risque:       ${formData.riskTolerance || '_'.repeat(30)}
+    Tolerance au Risque:       ${formData.riskTolerance || '_'.repeat(30)}
 
     INFORMATIONS COMPTABLES
-    ════════════════════════════════════════════════════════
+    
     Comptable (Nom):           ${formData.accountantName || '_'.repeat(30)}
-    Comptable (Téléphone):     ${formData.accountantPhone || '_'.repeat(30)}
+    Comptable (Telephone):     ${formData.accountantPhone || '_'.repeat(30)}
 
     SIGNATURE DU CLIENT
-    ════════════════════════════════════════════════════════
+    
     Signature: ___________________________     Date: ${new Date().toLocaleDateString('fr-CA')}
 
-    Généré le: ${new Date().toLocaleString('fr-CA')}
-    ════════════════════════════════════════════════════════
+    Genere le: ${new Date().toLocaleString('fr-CA')}
+    
     `;
 
-    // Télécharger
+    // Telecharger
     const blob = new Blob([pdfContent], { type: 'text/plain;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -493,12 +493,12 @@ function exportToPDF() {
     document.body.removeChild(link);
 
     // Note: Pour vrai PDF, utilisez une librairie comme jsPDF
-    alert('✅ Formulaire exporté en texte.\n\nPour PDF avec mise en page, consultez l\'admin.');
+    alert(' Formulaire exporte en texte.\n\nPour PDF avec mise en page, consultez l\'admin.');
 }
 
 // Nouveau client
 function newClient() {
-    if (confirm('Êtes-vous sûr? Cela effacera le formulaire actuel.')) {
+    if (confirm('Etes-vous sur? Cela effacera le formulaire actuel.')) {
         localStorage.removeItem('currentFormData');
         formData = {};
         document.getElementById('collectionForm').reset();
@@ -507,9 +507,9 @@ function newClient() {
     }
 }
 
-// Déconnexion
+// Deconnexion
 function logout() {
-    if (confirm('Déconnexion?')) {
+    if (confirm('Deconnexion?')) {
         localStorage.removeItem('currentUser');
         localStorage.removeItem('currentFormData');
         window.location.href = 'index.html';

@@ -1,6 +1,6 @@
 /**
- * API Endpoint pour gestion de la configuration système d'Emma
- * Permet de modifier prompts, variables, directives systémiques
+ * API Endpoint pour gestion de la configuration systeme d'Emma
+ * Permet de modifier prompts, variables, directives systemiques
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -28,12 +28,12 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
 
-    // ⚠️ AVERTISSEMENT: Authentification désactivée
-    // Pour activer la sécurité, décommenter les lignes ci-dessous et définir ADMIN_API_KEY dans Vercel
+    //  AVERTISSEMENT: Authentification desactivee
+    // Pour activer la securite, decommenter les lignes ci-dessous et definir ADMIN_API_KEY dans Vercel
     // const authHeader = req.headers.authorization;
     // const isAuthorized = authHeader && authHeader === `Bearer ${process.env.ADMIN_API_KEY}`;
     // if (!isAuthorized && process.env.ADMIN_API_KEY) {
-    //     return res.status(401).json({ error: 'Non autorisé. Token admin requis.' });
+    //     return res.status(401).json({ error: 'Non autorise. Token admin requis.' });
     // }
 
     try {
@@ -55,10 +55,10 @@ export default async function handler(req, res) {
             }
 
             default:
-                return res.status(405).json({ error: 'Méthode non autorisée' });
+                return res.status(405).json({ error: 'Methode non autorisee' });
         }
     } catch (error) {
-        console.error('❌ Erreur API admin Emma:', error);
+        console.error(' Erreur API admin Emma:', error);
         return res.status(500).json({ 
             error: 'Erreur serveur', 
             message: error.message 
@@ -67,12 +67,12 @@ export default async function handler(req, res) {
 }
 
 /**
- * GET - Récupérer la configuration
+ * GET - Recuperer la configuration
  */
 async function handleGet(req, res, section, key) {
     try {
         if (!supabase) {
-            // Fallback: retourner configuration par défaut depuis fichiers
+            // Fallback: retourner configuration par defaut depuis fichiers
             return res.status(200).json({
                 config: getDefaultConfig(section, key),
                 source: 'default'
@@ -94,7 +94,7 @@ async function handleGet(req, res, section, key) {
 
         if (error) {
             console.error('Erreur Supabase:', error);
-            // Fallback vers config par défaut
+            // Fallback vers config par defaut
             const defConfig = await getDefaultConfig(section, key);
             return res.status(200).json({
                 config: defConfig,
@@ -111,11 +111,11 @@ async function handleGet(req, res, section, key) {
             });
         }
 
-        // Organiser par section/catégorie
+        // Organiser par section/categorie
         const config = {};
         data.forEach(item => {
             // DB utilise 'section', mais l'API retourne souvent sous 'category' ou 'section'
-            // On utilise 'section' comme clé de regroupement
+            // On utilise 'section' comme cle de regroupement
             const group = item.section || item.category || 'prompts';
 
             if (!config[group]) {
@@ -149,9 +149,9 @@ async function handleGet(req, res, section, key) {
             };
         });
 
-        // Si key spécifique demandée, retourner seulement ça
+        // Si key specifique demandee, retourner seulement ca
         if (key) {
-            // Trouver dans n'importe quelle catégorie
+            // Trouver dans n'importe quelle categorie
             for (const category of Object.keys(config)) {
                 if (config[category][key]) {
                     return res.status(200).json({
@@ -160,7 +160,7 @@ async function handleGet(req, res, section, key) {
                     });
                 }
             }
-            // Fallback vers default si non trouvé
+            // Fallback vers default si non trouve
             const defConfig = await getDefaultConfig(section, key);
             return res.status(200).json({
                 config: defConfig,
@@ -168,7 +168,7 @@ async function handleGet(req, res, section, key) {
             });
         }
 
-        // Sinon, merger avec config par défaut pour sections manquantes
+        // Sinon, merger avec config par defaut pour sections manquantes
         const defaultConfig = await getDefaultConfig();
         // Merge deep? Or just top level sections? 
         // defaultConfig structure: { prompts: {...}, variables: {...} }
@@ -207,21 +207,21 @@ async function handleSet(req, res, action, key, value, category, explicitSection
 
     try {
         if (!supabase) {
-            // Mode développement: sauvegarder dans fichier local
+            // Mode developpement: sauvegarder dans fichier local
             return res.status(200).json({
                 success: true,
-                message: 'Config sauvegardée (mode dev - fichier local)',
+                message: 'Config sauvegardee (mode dev - fichier local)',
                 key,
                 value: typeof value === 'string' ? value.substring(0, 100) + '...' : value
             });
         }
 
-        // Déterminer le type de valeur
+        // Determiner le type de valeur
         const valueType = typeof value === 'object' ? 'json' :
                          typeof value === 'number' ? 'number' :
                          typeof value === 'boolean' ? 'boolean' : 'string';
 
-        // Logique de détermination de section:
+        // Logique de determination de section:
         // 1. Explicit 'section' param
         // 2. 'category' param
         // 3. 'prompt' fallback
@@ -237,7 +237,7 @@ async function handleSet(req, res, action, key, value, category, explicitSection
             updated_by: req.headers['x-admin-user'] || 'admin'
         };
 
-        // Vérifier si existe déjà
+        // Verifier si existe deja
         const { data: existing } = await supabase
             .from(CONFIG_TABLE)
             .select('id')
@@ -270,7 +270,7 @@ async function handleSet(req, res, action, key, value, category, explicitSection
 
         return res.status(200).json({
             success: true,
-            message: 'Configuration sauvegardée',
+            message: 'Configuration sauvegardee',
             config: {
                 key: result.key,
                 value: result.type === 'json' ? JSON.parse(result.value) : result.value,
@@ -299,7 +299,7 @@ async function handleDelete(req, res, key) {
         if (!supabase) {
             return res.status(200).json({
                 success: true,
-                message: 'Config supprimée (mode dev)',
+                message: 'Config supprimee (mode dev)',
                 key
             });
         }
@@ -313,7 +313,7 @@ async function handleDelete(req, res, key) {
 
         return res.status(200).json({
             success: true,
-            message: 'Configuration supprimée',
+            message: 'Configuration supprimee',
             key
         });
     } catch (error) {
@@ -323,10 +323,10 @@ async function handleDelete(req, res, key) {
 }
 
 /**
- * Configuration par défaut (depuis fichiers système)
+ * Configuration par defaut (depuis fichiers systeme)
  */
 async function getDefaultConfig(section = null, key = null) {
-    // Importer la config depuis les fichiers système
+    // Importer la config depuis les fichiers systeme
     // Note: En production, ces valeurs viennent de /config/emma-cfa-prompt.js et autres
     
     let INTENT_PROMPTS = {};
@@ -350,105 +350,105 @@ async function getDefaultConfig(section = null, key = null) {
             }, {}),
 
             cfa_identity: {
-                value: `Tu es Emma, CFA® - Analyste Financière Senior et Gestionnaire de Portefeuille Institutionnel.
+                value: `Tu es Emma, CFA - Analyste Financiere Senior et Gestionnaire de Portefeuille Institutionnel.
 
-🎓 QUALIFICATIONS:
-- Chartered Financial Analyst (CFA®) Level III
-- 15+ ans d'expérience en gestion de portefeuille institutionnel
-- Spécialisation: Analyse fondamentale quantitative et qualitative
+ QUALIFICATIONS:
+- Chartered Financial Analyst (CFA) Level III
+- 15+ ans d'experience en gestion de portefeuille institutionnel
+- Specialisation: Analyse fondamentale quantitative et qualitative
 - Expertise: Equity research, fixed income, asset allocation`,
                 type: 'string',
-                description: 'Identité et qualifications d\'Emma (CFA)'
+                description: 'Identite et qualifications d\'Emma (CFA)'
             },
             general_identity: {
-                value: `Tu es Emma, une assistante IA polyvalente et intelligente. Tu peux répondre à des questions sur de nombreux sujets, pas seulement la finance. Réponds en français de manière naturelle, accessible et engageante.`,
+                value: `Tu es Emma, une assistante IA polyvalente et intelligente. Tu peux repondre a des questions sur de nombreux sujets, pas seulement la finance. Reponds en francais de maniere naturelle, accessible et engageante.`,
                 type: 'string',
-                description: 'Identité d\'Emma pour questions générales (déprécié - utiliser general_identity_sms ou general_identity_web)'
+                description: 'Identite d\'Emma pour questions generales (deprecie - utiliser general_identity_sms ou general_identity_web)'
             },
             general_identity_sms: {
-                value: `Tu es Emma, une ANALYSTE INTELLIGENTE polyvalente qui utilise Perplexity pour chercher activement des informations RÉELLES et RÉCENTES sur le web.
+                value: `Tu es Emma, une ANALYSTE INTELLIGENTE polyvalente qui utilise Perplexity pour chercher activement des informations REELLES et RECENTES sur le web.
 
-🎯 TON RÔLE (SMS):
-- Tu es une ANALYSTE qui RECHERCHE et SYNTHÉTISE des informations, pas une assistante qui donne des réponses génériques
-- Tu DOIS utiliser Perplexity pour chercher des données factuelles et à jour
-- Tu réponds à des questions sur de nombreux sujets (météo, actualités, sciences, culture, etc.)
-- Tu es agile et adaptative: si une question sort du domaine financier, tu cherches activement la réponse
+ TON ROLE (SMS):
+- Tu es une ANALYSTE qui RECHERCHE et SYNTHETISE des informations, pas une assistante qui donne des reponses generiques
+- Tu DOIS utiliser Perplexity pour chercher des donnees factuelles et a jour
+- Tu reponds a des questions sur de nombreux sujets (meteo, actualites, sciences, culture, etc.)
+- Tu es agile et adaptative: si une question sort du domaine financier, tu cherches activement la reponse
 
-✅ TON COMPORTEMENT (SMS):
-- RECHERCHE ACTIVE: Pour toute question demandant une information spécifique (météo, actualités, données), tu DOIS chercher cette information RÉELLE via Perplexity
-- RÉPONSES DIRECTES: Réponds DIRECTEMENT à la question posée, pas de "Je peux t'aider avec..." ou "Que veux-tu savoir?"
-- FORMAT SMS: Réponse concise (2-3 SMS max), données clés, sources courtes, emojis pour lisibilité
-- DONNÉES RÉELLES: Fournis des données concrètes, chiffres, dates, sources - pas de généralités
-- TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations RÉELLES et UTILES`,
+ TON COMPORTEMENT (SMS):
+- RECHERCHE ACTIVE: Pour toute question demandant une information specifique (meteo, actualites, donnees), tu DOIS chercher cette information REELLE via Perplexity
+- REPONSES DIRECTES: Reponds DIRECTEMENT a la question posee, pas de "Je peux t'aider avec..." ou "Que veux-tu savoir?"
+- FORMAT SMS: Reponse concise (2-3 SMS max), donnees cles, sources courtes, emojis pour lisibilite
+- DONNEES REELLES: Fournis des donnees concretes, chiffres, dates, sources - pas de generalites
+- TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations REELLES et UTILES`,
                 type: 'string',
-                description: 'Identité d\'Emma pour questions générales (SMS) - Analyste agile avec recherche active'
+                description: 'Identite d\'Emma pour questions generales (SMS) - Analyste agile avec recherche active'
             },
             general_identity_web: {
-                value: `Tu es Emma, une ANALYSTE INTELLIGENTE polyvalente qui utilise Perplexity pour chercher activement des informations RÉELLES et RÉCENTES sur le web.
+                value: `Tu es Emma, une ANALYSTE INTELLIGENTE polyvalente qui utilise Perplexity pour chercher activement des informations REELLES et RECENTES sur le web.
 
-🎯 TON RÔLE (WEB/EMAIL):
-- Tu es une ANALYSTE qui RECHERCHE et SYNTHÉTISE des informations, pas une assistante qui donne des réponses génériques
-- Tu DOIS utiliser Perplexity pour chercher des données factuelles et à jour
-- Tu réponds à des questions sur de nombreux sujets (météo, actualités, sciences, culture, etc.)
-- Tu es agile et adaptative: si une question sort du domaine financier, tu cherches activement la réponse
+ TON ROLE (WEB/EMAIL):
+- Tu es une ANALYSTE qui RECHERCHE et SYNTHETISE des informations, pas une assistante qui donne des reponses generiques
+- Tu DOIS utiliser Perplexity pour chercher des donnees factuelles et a jour
+- Tu reponds a des questions sur de nombreux sujets (meteo, actualites, sciences, culture, etc.)
+- Tu es agile et adaptative: si une question sort du domaine financier, tu cherches activement la reponse
 
-✅ TON COMPORTEMENT (WEB/EMAIL):
-- RECHERCHE ACTIVE: Pour toute question demandant une information spécifique (météo, actualités, données), tu DOIS chercher cette information RÉELLE via Perplexity
-- RÉPONSES DIRECTES: Réponds DIRECTEMENT à la question posée, pas de "Je peux t'aider avec..." ou "Que veux-tu savoir?"
-- FORMAT WEB/EMAIL: Réponse détaillée et complète, sources avec liens, structure claire (paragraphes, bullet points)
-- DONNÉES RÉELLES: Fournis des données concrètes, chiffres, dates, sources - pas de généralités
-- TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations RÉELLES et UTILES`,
+ TON COMPORTEMENT (WEB/EMAIL):
+- RECHERCHE ACTIVE: Pour toute question demandant une information specifique (meteo, actualites, donnees), tu DOIS chercher cette information REELLE via Perplexity
+- REPONSES DIRECTES: Reponds DIRECTEMENT a la question posee, pas de "Je peux t'aider avec..." ou "Que veux-tu savoir?"
+- FORMAT WEB/EMAIL: Reponse detaillee et complete, sources avec liens, structure claire (paragraphes, bullet points)
+- DONNEES REELLES: Fournis des donnees concretes, chiffres, dates, sources - pas de generalites
+- TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations REELLES et UTILES`,
                 type: 'string',
-                description: 'Identité d\'Emma pour questions générales (Web/Email) - Analyste agile avec recherche active'
+                description: 'Identite d\'Emma pour questions generales (Web/Email) - Analyste agile avec recherche active'
             },
             general_instructions_sms: {
-                value: `🎯 INSTRUCTIONS POUR QUESTION GÉNÉRALE (HORS FINANCE) - MODE SMS:
-- ⚠️⚠️⚠️ CRITIQUE ABSOLUE: Tu es une ANALYSTE INTELLIGENTE qui DOIT chercher des informations RÉELLES et RÉCENTES
-- 🚫 INTERDIT: Répondre de manière générique sans chercher d'informations réelles
-- ✅ OBLIGATOIRE: Utilise Perplexity pour RECHERCHER activement des données factuelles et à jour sur le web
-- 📊 Exemples de questions qui nécessitent recherche active:
-  • "Météo à Rimouski" → Cherche température actuelle, conditions, prévisions météo Rimouski
-  • "Actualités du jour" → Cherche les actualités récentes (pas de généralités)
-  • "Qu'est-ce que X" → Cherche définition récente et précise de X
-  • "Comment fonctionne Y" → Cherche explication détaillée et à jour de Y
-- ✅ RÈGLE D'OR: Si la question demande une information spécifique (météo, actualités, données), tu DOIS chercher cette information RÉELLE via Perplexity
-- 📱 FORMAT SMS: Réponse concise (2-3 SMS max), données clés, sources courtes, emojis pour lisibilité
-- ❌ NE PAS: Répondre "Je peux t'aider avec..." ou "Que veux-tu savoir?" - réponds DIRECTEMENT à la question
-- ✅ TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations RÉELLES`,
+                value: ` INSTRUCTIONS POUR QUESTION GENERALE (HORS FINANCE) - MODE SMS:
+-  CRITIQUE ABSOLUE: Tu es une ANALYSTE INTELLIGENTE qui DOIT chercher des informations REELLES et RECENTES
+-  INTERDIT: Repondre de maniere generique sans chercher d'informations reelles
+-  OBLIGATOIRE: Utilise Perplexity pour RECHERCHER activement des donnees factuelles et a jour sur le web
+-  Exemples de questions qui necessitent recherche active:
+  - "Meteo a Rimouski" -> Cherche temperature actuelle, conditions, previsions meteo Rimouski
+  - "Actualites du jour" -> Cherche les actualites recentes (pas de generalites)
+  - "Qu'est-ce que X" -> Cherche definition recente et precise de X
+  - "Comment fonctionne Y" -> Cherche explication detaillee et a jour de Y
+-  REGLE D'OR: Si la question demande une information specifique (meteo, actualites, donnees), tu DOIS chercher cette information REELLE via Perplexity
+-  FORMAT SMS: Reponse concise (2-3 SMS max), donnees cles, sources courtes, emojis pour lisibilite
+-  NE PAS: Repondre "Je peux t'aider avec..." ou "Que veux-tu savoir?" - reponds DIRECTEMENT a la question
+-  TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations REELLES`,
                 type: 'string',
-                description: 'Instructions pour questions générales (SMS) - Recherche active obligatoire'
+                description: 'Instructions pour questions generales (SMS) - Recherche active obligatoire'
             },
             general_instructions_web: {
-                value: `🎯 INSTRUCTIONS POUR QUESTION GÉNÉRALE (HORS FINANCE) - MODE WEB/EMAIL:
-- ⚠️⚠️⚠️ CRITIQUE ABSOLUE: Tu es une ANALYSTE INTELLIGENTE qui DOIT chercher des informations RÉELLES et RÉCENTES
-- 🚫 INTERDIT: Répondre de manière générique sans chercher d'informations réelles
-- ✅ OBLIGATOIRE: Utilise Perplexity pour RECHERCHER activement des données factuelles et à jour sur le web
-- 📊 Exemples de questions qui nécessitent recherche active:
-  • "Météo à Rimouski" → Cherche température actuelle, conditions, prévisions météo Rimouski
-  • "Actualités du jour" → Cherche les actualités récentes (pas de généralités)
-  • "Qu'est-ce que X" → Cherche définition récente et précise de X
-  • "Comment fonctionne Y" → Cherche explication détaillée et à jour de Y
-- ✅ RÈGLE D'OR: Si la question demande une information spécifique (météo, actualités, données), tu DOIS chercher cette information RÉELLE via Perplexity
-- 🌐 FORMAT WEB/EMAIL: Réponse détaillée et complète, sources avec liens, structure claire (paragraphes, bullet points)
-- ❌ NE PAS: Répondre "Je peux t'aider avec..." ou "Que veux-tu savoir?" - réponds DIRECTEMENT à la question
-- ✅ TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations RÉELLES`,
+                value: ` INSTRUCTIONS POUR QUESTION GENERALE (HORS FINANCE) - MODE WEB/EMAIL:
+-  CRITIQUE ABSOLUE: Tu es une ANALYSTE INTELLIGENTE qui DOIT chercher des informations REELLES et RECENTES
+-  INTERDIT: Repondre de maniere generique sans chercher d'informations reelles
+-  OBLIGATOIRE: Utilise Perplexity pour RECHERCHER activement des donnees factuelles et a jour sur le web
+-  Exemples de questions qui necessitent recherche active:
+  - "Meteo a Rimouski" -> Cherche temperature actuelle, conditions, previsions meteo Rimouski
+  - "Actualites du jour" -> Cherche les actualites recentes (pas de generalites)
+  - "Qu'est-ce que X" -> Cherche definition recente et precise de X
+  - "Comment fonctionne Y" -> Cherche explication detaillee et a jour de Y
+-  REGLE D'OR: Si la question demande une information specifique (meteo, actualites, donnees), tu DOIS chercher cette information REELLE via Perplexity
+-  FORMAT WEB/EMAIL: Reponse detaillee et complete, sources avec liens, structure claire (paragraphes, bullet points)
+-  NE PAS: Repondre "Je peux t'aider avec..." ou "Que veux-tu savoir?" - reponds DIRECTEMENT a la question
+-  TON: Naturel, accessible, engageant, mais TOUJOURS avec des informations REELLES`,
                 type: 'string',
-                description: 'Instructions pour questions générales (Web/Email) - Recherche active obligatoire'
+                description: 'Instructions pour questions generales (Web/Email) - Recherche active obligatoire'
             },
             system_instructions: {
                 value: `INSTRUCTIONS CRITIQUES:
-1. ❌ ABSOLUMENT INTERDIT DE COPIER DU JSON/CODE DANS TA RÉPONSE
-2. ✅ TU ES UNE ANALYSTE FINANCIÈRE HUMAINE, PAS UN TERMINAL DE DONNÉES
-3. 🚨 RÈGLE ABSOLUE: RÉPONDRE UNIQUEMENT À LA DEMANDE DE L'UTILISATEUR`,
+1.  ABSOLUMENT INTERDIT DE COPIER DU JSON/CODE DANS TA REPONSE
+2.  TU ES UNE ANALYSTE FINANCIERE HUMAINE, PAS UN TERMINAL DE DONNEES
+3.  REGLE ABSOLUE: REPONDRE UNIQUEMENT A LA DEMANDE DE L'UTILISATEUR`,
                 type: 'string',
-                description: 'Instructions système générales'
+                description: 'Instructions systeme generales'
             }
         },
         variables: {
             max_tokens_default: {
                 value: 4000,
                 type: 'number',
-                description: 'Nombre maximum de tokens par défaut pour Perplexity'
+                description: 'Nombre maximum de tokens par defaut pour Perplexity'
             },
             max_tokens_briefing: {
                 value: 10000,
@@ -458,29 +458,29 @@ async function getDefaultConfig(section = null, key = null) {
             temperature: {
                 value: 0.1,
                 type: 'number',
-                description: 'Température pour génération de réponses (0.0-1.0)'
+                description: 'Temperature pour generation de reponses (0.0-1.0)'
             },
             recency_default: {
                 value: 'month',
                 type: 'string',
-                description: 'Filtre de récence par défaut (day/week/month/year)'
+                description: 'Filtre de recence par defaut (day/week/month/year)'
             }
         },
         directives: {
             allow_clarifications: {
                 value: true,
                 type: 'boolean',
-                description: 'Permettre à Emma de poser des questions de clarification'
+                description: 'Permettre a Emma de poser des questions de clarification'
             },
             adaptive_length: {
                 value: true,
                 type: 'boolean',
-                description: 'Longueur de réponse adaptative selon complexité'
+                description: 'Longueur de reponse adaptative selon complexite'
             },
             require_sources: {
                 value: true,
                 type: 'boolean',
-                description: 'Exiger citations de sources pour données factuelles'
+                description: 'Exiger citations de sources pour donnees factuelles'
             },
             min_ratios_simple: {
                 value: 1,
@@ -490,53 +490,53 @@ async function getDefaultConfig(section = null, key = null) {
             min_ratios_comprehensive: {
                 value: 8,
                 type: 'number',
-                description: 'Nombre minimum de ratios pour analyses complètes'
+                description: 'Nombre minimum de ratios pour analyses completes'
             }
         },
         routing: {
             use_perplexity_only_keywords: {
-                value: ['fonds', 'quartile', 'macro', 'stratégie', 'crypto'],
+                value: ['fonds', 'quartile', 'macro', 'strategie', 'crypto'],
                 type: 'json',
-                description: 'Keywords déclenchant Perplexity seul (sans APIs)'
+                description: 'Keywords declenchant Perplexity seul (sans APIs)'
             },
             require_apis_keywords: {
                 value: ['prix actuel', 'ratio exact', 'rsi', 'macd'],
                 type: 'json',
-                description: 'Keywords nécessitant des APIs complémentaires'
+                description: 'Keywords necessitant des APIs complementaires'
             },
             sms_allowed_commands: {
                 value: [
                     'ANALYSE', 'ANALYZE', 
                     'PRIX', 'PRICE', 'COURS', 'QUOTE',
-                    'NEWS', 'ACTUALITES', 'ACTUALITÉS', 'INFOS',
+                    'NEWS', 'ACTUALITES', 'ACTUALITES', 'INFOS',
                     'TOP', // Pour TOP NEWS
                     'SKILLS', 'AIDE', 'HELP', 'COMMANDES',
                     'TEST'
                 ],
                 type: 'json',
-                description: 'Liste des commandes autorisées en mode SMS (Guardrail)'
+                description: 'Liste des commandes autorisees en mode SMS (Guardrail)'
             }
         },
         ai_roles: {
             researcher: {
                 value: { modelId: 'sonar-pro', googleSearch: true, max_tokens: 2000, temperature: 0.2 },
                 type: 'json',
-                description: 'Configuration pour le rôle Researcher (Analyses approfondies)'
+                description: 'Configuration pour le role Researcher (Analyses approfondies)'
             },
             writer: {
                 value: { modelId: 'gpt-4o', googleSearch: false, max_tokens: 2500, temperature: 0.7 },
                 type: 'json',
-                description: 'Configuration pour le rôle Writer (Rédaction de contenu)'
+                description: 'Configuration pour le role Writer (Redaction de contenu)'
             },
             critic: {
                 value: { modelId: 'claude-3-5-sonnet', googleSearch: true, max_tokens: 1500, temperature: 0.3 },
                 type: 'json',
-                description: 'Configuration pour le rôle Critic (Revue et critique)'
+                description: 'Configuration pour le role Critic (Revue et critique)'
             },
             technical: {
                 value: { modelId: 'gemini-2.0-flash', googleSearch: false, max_tokens: 3000, temperature: 0.1 },
                 type: 'json',
-                description: 'Configuration pour le rôle Technical (Code et données)'
+                description: 'Configuration pour le role Technical (Code et donnees)'
             }
         }
     };

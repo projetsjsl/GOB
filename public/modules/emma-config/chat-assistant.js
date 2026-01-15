@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // CHAT ASSISTANT - Assistant IA pour Emma Config
-// ═══════════════════════════════════════════════════════════════
+// 
 
 import { getAllConfigs } from './prompts-manager.js';
 
@@ -20,7 +20,7 @@ export function initChatAssistant() {
 }
 
 /**
- * Crée le widget de chat
+ * Cree le widget de chat
  */
 function createChatWidget() {
     const widget = document.createElement('div');
@@ -28,7 +28,7 @@ function createChatWidget() {
     widget.innerHTML = `
         <!-- Chat Bubble -->
         <button id="chatBubble" class="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center text-white text-2xl z-50 hover:scale-110">
-            💬
+            
             <span id="chatNotification" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full hidden animate-pulse"></span>
         </button>
 
@@ -37,10 +37,10 @@ function createChatWidget() {
             <!-- Header -->
             <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <span class="text-2xl">🤖</span>
+                    <span class="text-2xl"></span>
                     <div>
                         <h3 class="font-bold">Assistant Emma Config</h3>
-                        <p class="text-xs text-indigo-100">Alimenté par Gemini 2.0 Flash</p>
+                        <p class="text-xs text-indigo-100">Alimente par Gemini 2.0 Flash</p>
                     </div>
                 </div>
                 <button id="chatClose" class="hover:bg-white/20 rounded-full p-1 transition">
@@ -53,13 +53,13 @@ function createChatWidget() {
             <!-- Messages Container -->
             <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
                 <div class="text-center text-gray-500 text-sm">
-                    <p>👋 Bonjour! Je suis votre assistant pour Emma Config.</p>
+                    <p> Bonjour! Je suis votre assistant pour Emma Config.</p>
                     <p class="mt-2">Posez-moi des questions sur:</p>
                     <div class="mt-2 text-xs space-y-1">
-                        <div>• Comment utiliser l'interface</div>
-                        <div>• Créer des prompts efficaces</div>
-                        <div>• Architecture des prompts</div>
-                        <div>• Intégration n8n</div>
+                        <div>- Comment utiliser l'interface</div>
+                        <div>- Creer des prompts efficaces</div>
+                        <div>- Architecture des prompts</div>
+                        <div>- Integration n8n</div>
                     </div>
                 </div>
             </div>
@@ -85,7 +85,7 @@ function createChatWidget() {
                 </div>
                 <div class="mt-2 flex items-center justify-between text-xs text-gray-500">
                     <button id="chatClear" class="hover:text-red-600 transition">
-                        🗑️ Effacer l'historique
+                         Effacer l'historique
                     </button>
                     <div id="chatStatus"></div>
                 </div>
@@ -159,7 +159,7 @@ async function sendMessage() {
         // Appeler Gemini
         const response = await callGemini(message, context);
 
-        // Ajouter réponse
+        // Ajouter reponse
         hideTypingIndicator();
         addMessage('assistant', response);
 
@@ -167,7 +167,7 @@ async function sendMessage() {
         saveChatHistory();
     } catch (error) {
         hideTypingIndicator();
-        addMessage('assistant', `❌ Erreur: ${error.message}`);
+        addMessage('assistant', ` Erreur: ${error.message}`);
         console.error('Chat error:', error);
     }
 }
@@ -179,7 +179,7 @@ async function buildContext() {
     const configs = getAllConfigs();
     const configsCount = Object.keys(configs).reduce((acc, cat) => acc + Object.keys(configs[cat]).length, 0);
 
-    // Extraire les keys des prompts avec détails
+    // Extraire les keys des prompts avec details
     const promptKeys = [];
     const briefings = [];
     let totalBriefings = 0;
@@ -211,115 +211,115 @@ async function buildContext() {
     });
 
     const context = `
-Tu es un assistant expert pour Emma Config, l'interface complète de gestion et configuration pour Emma IA (analyste financière CFA).
+Tu es un assistant expert pour Emma Config, l'interface complete de gestion et configuration pour Emma IA (analyste financiere CFA).
 
-═══════════════════════════════════════════════════════════
-📊 CONTEXTE ACTUEL DE L'APPLICATION
-═══════════════════════════════════════════════════════════
+
+ CONTEXTE ACTUEL DE L'APPLICATION
+
 
 STATISTIQUES:
-- Total prompts configurés: ${configsCount}
-- Catégories: ${Object.keys(configs).join(', ')}
-- Briefings configurés: ${totalBriefings}
+- Total prompts configures: ${configsCount}
+- Categories: ${Object.keys(configs).join(', ')}
+- Briefings configures: ${totalBriefings}
 - Briefings actifs: ${activeBriefings}
 
 ARCHITECTURE DE L'APPLICATION:
-- Interface: emma-config.html (modularisée en ES6)
+- Interface: emma-config.html (modularisee en ES6)
 - Modules principaux:
-  • main.js - Initialisation et coordination
-  • prompts-manager.js - Gestion des prompts
-  • dashboard-manager.js - Tableau de bord et visualisations
-  • design-manager.js - Configuration design emails
-  • sms-manager.js - Configuration SMS
-  • delivery-manager.js - Gestion destinataires et envois
-  • chat-assistant.js - Ce chatbot (moi!)
-  • api-client.js - Communication avec Supabase
-  • preview-manager.js - Prévisualisation des emails
-  • ui-helpers.js - Utilitaires UI
+  - main.js - Initialisation et coordination
+  - prompts-manager.js - Gestion des prompts
+  - dashboard-manager.js - Tableau de bord et visualisations
+  - design-manager.js - Configuration design emails
+  - sms-manager.js - Configuration SMS
+  - delivery-manager.js - Gestion destinataires et envois
+  - chat-assistant.js - Ce chatbot (moi!)
+  - api-client.js - Communication avec Supabase
+  - preview-manager.js - Previsualisation des emails
+  - ui-helpers.js - Utilitaires UI
 
 ONGLETS DISPONIBLES:
-1. 📊 Configuration - Vue d'ensemble, stats, architecture visuelle
-2. 📝 Prompts - Gestion détaillée des prompts
-3. 🎨 Design - Personnalisation des emails
-4. 📱 SMS - Configuration SMS
-5. 📖 Aide - Documentation
+1.  Configuration - Vue d'ensemble, stats, architecture visuelle
+2.  Prompts - Gestion detaillee des prompts
+3.  Design - Personnalisation des emails
+4.  SMS - Configuration SMS
+5.  Aide - Documentation
 
-FONCTIONNALITÉS CLÉS:
-✅ Gestion complète des prompts (CRUD)
-✅ Architecture hiérarchique visuelle avec filtrage par relations
-✅ Configuration design emails (couleurs, branding, layout)
-✅ Configuration SMS (segments, signatures)
-✅ Gestion destinataires emails
-✅ Prévisualisation en temps réel (Web/Email/SMS)
-✅ Filtrage et recherche avancés
-✅ Intégration n8n via API Supabase
+FONCTIONNALITES CLES:
+ Gestion complete des prompts (CRUD)
+ Architecture hierarchique visuelle avec filtrage par relations
+ Configuration design emails (couleurs, branding, layout)
+ Configuration SMS (segments, signatures)
+ Gestion destinataires emails
+ Previsualisation en temps reel (Web/Email/SMS)
+ Filtrage et recherche avances
+ Integration n8n via API Supabase
 
-═══════════════════════════════════════════════════════════
-📝 PROMPTS DISPONIBLES (${configsCount} total)
-═══════════════════════════════════════════════════════════
 
-${promptKeys.map(p => `• ${p.key} (${p.category}, ${p.type})
+ PROMPTS DISPONIBLES (${configsCount} total)
+
+
+${promptKeys.map(p => `- ${p.key} (${p.category}, ${p.type})
   Description: ${p.description || 'Aucune description'}
-  ${p.delivery_enabled ? `📧 Livraison active (${p.email_recipients} destinataire${p.email_recipients > 1 ? 's' : ''})` : ''}`).join('\n\n')}
+  ${p.delivery_enabled ? ` Livraison active (${p.email_recipients} destinataire${p.email_recipients > 1 ? 's' : ''})` : ''}`).join('\n\n')}
 
-═══════════════════════════════════════════════════════════
-📧 BRIEFINGS AUTOMATISÉS
-═══════════════════════════════════════════════════════════
 
-${briefings.map(b => `${b.enabled ? '✅' : '❌'} ${b.name}
-   Horaire: ${b.schedule || 'Non configuré'}
-   Clé: ${b.key}`).join('\n\n')}
+ BRIEFINGS AUTOMATISES
 
-═══════════════════════════════════════════════════════════
-🎯 TON RÔLE ET CAPACITÉS
-═══════════════════════════════════════════════════════════
+
+${briefings.map(b => `${b.enabled ? '' : ''} ${b.name}
+   Horaire: ${b.schedule || 'Non configure'}
+   Cle: ${b.key}`).join('\n\n')}
+
+
+ TON ROLE ET CAPACITES
+
 
 TU PEUX AIDER AVEC:
-✅ Comprendre l'interface Emma Config (navigation, fonctionnalités)
-✅ Expliquer l'architecture des prompts et leurs relations
-✅ Créer/modifier des prompts efficaces pour Emma IA
-✅ Configurer le design des emails (couleurs, branding, layout)
-✅ Configurer les SMS (signatures, segments)
-✅ Gérer les destinataires et la livraison
-✅ Intégration n8n (webhooks, API Supabase)
-✅ Utiliser les filtres et visualisations
-✅ Debugging et troubleshooting
-✅ Suggérer des améliorations d'architecture
-✅ Expliquer les fonctionnalités de chaque module
-✅ Fournir des exemples SQL pour Supabase
+ Comprendre l'interface Emma Config (navigation, fonctionnalites)
+ Expliquer l'architecture des prompts et leurs relations
+ Creer/modifier des prompts efficaces pour Emma IA
+ Configurer le design des emails (couleurs, branding, layout)
+ Configurer les SMS (signatures, segments)
+ Gerer les destinataires et la livraison
+ Integration n8n (webhooks, API Supabase)
+ Utiliser les filtres et visualisations
+ Debugging et troubleshooting
+ Suggerer des ameliorations d'architecture
+ Expliquer les fonctionnalites de chaque module
+ Fournir des exemples SQL pour Supabase
 
 TYPES DE PROMPTS:
 - system: Prompts de base (identity CFA, personas)
-- prompt: Prompts d'intent spécialisés (analyse technique, fondamentale, etc.)
-- briefing: Briefings automatisés (matin, midi, soir)
+- prompt: Prompts d'intent specialises (analyse technique, fondamentale, etc.)
+- briefing: Briefings automatises (matin, midi, soir)
 
 ARCHITECTURE DES RELATIONS:
-- Niveau 1: Prompts système (base) → utilisés par
-- Niveau 2: Prompts d'intent (spécialisés) → intégrés dans
-- Niveau 3: Briefings automatisés (envois cron)
+- Niveau 1: Prompts systeme (base) -> utilises par
+- Niveau 2: Prompts d'intent (specialises) -> integres dans
+- Niveau 3: Briefings automatises (envois cron)
 
 FILTRAGE PAR RELATIONS:
-- Cliquer sur "🔗 Voir relations" dans l'architecture
-- Affiche tous les prompts reliés (références + referencedBy)
-- Bouton "Annuler le filtre" pour revenir à la vue globale
+- Cliquer sur " Voir relations" dans l'architecture
+- Affiche tous les prompts relies (references + referencedBy)
+- Bouton "Annuler le filtre" pour revenir a la vue globale
 
 DIRECTIVES:
-- Sois concis et précis
-- Utilise des émojis pour clarifier
+- Sois concis et precis
+- Utilise des emojis pour clarifier
 - Fournis des exemples de code/SQL quand pertinent
-- Reste dans le contexte de Emma Config et Emma IA (analyse financière)
-- Si tu suggères un nouveau prompt, donne le format SQL INSERT complet pour Supabase
-- Explique les fonctionnalités de l'interface quand demandé
+- Reste dans le contexte de Emma Config et Emma IA (analyse financiere)
+- Si tu suggeres un nouveau prompt, donne le format SQL INSERT complet pour Supabase
+- Explique les fonctionnalites de l'interface quand demande
 - Guide l'utilisateur vers les bons onglets/sections
 
-EXEMPLE DE RÉPONSE POUR CRÉER UN PROMPT:
+EXEMPLE DE REPONSE POUR CREER UN PROMPT:
 \`\`\`sql
 INSERT INTO emma_config (category, key, value, description, type, metadata)
 VALUES (
     'prompt',
     'intent_analyse_crypto',
-    'Tu es Emma, analyste CFA spécialisée en cryptomonnaies...',
-    'Analyse spécialisée pour les cryptomonnaies',
+    'Tu es Emma, analyste CFA specialisee en cryptomonnaies...',
+    'Analyse specialisee pour les cryptomonnaies',
     'string',
     '{"channel": "web"}'::jsonb
 );
@@ -330,7 +330,7 @@ VALUES (
 }
 
 /**
- * Appelle l'API Chat Assistant (sécurisée côté serveur)
+ * Appelle l'API Chat Assistant (securisee cote serveur)
  */
 async function callGemini(userMessage, context) {
     const response = await fetch(CHAT_API_ENDPOINT, {
@@ -383,7 +383,7 @@ function addMessage(role, content) {
     // Scroll to bottom
     container.scrollTop = container.scrollHeight;
 
-    // Ajouter à l'historique
+    // Ajouter a l'historique
     if (role === 'user' || role === 'assistant') {
         chatHistory.push({ role, content, timestamp: Date.now() });
     }
@@ -453,7 +453,7 @@ function loadChatHistory() {
 }
 
 /**
- * Ajoute un message à l'UI sans l'ajouter à l'historique
+ * Ajoute un message a l'UI sans l'ajouter a l'historique
  */
 function addMessageToUI(role, content) {
     const container = document.getElementById('chatMessages');
@@ -497,13 +497,13 @@ function clearHistory() {
         const container = document.getElementById('chatMessages');
         container.innerHTML = `
             <div class="text-center text-gray-500 text-sm">
-                <p>👋 Bonjour! Je suis votre assistant pour Emma Config.</p>
+                <p> Bonjour! Je suis votre assistant pour Emma Config.</p>
                 <p class="mt-2">Posez-moi des questions sur:</p>
                 <div class="mt-2 text-xs space-y-1">
-                    <div>• Comment utiliser l'interface</div>
-                    <div>• Créer des prompts efficaces</div>
-                    <div>• Architecture des prompts</div>
-                    <div>• Intégration n8n</div>
+                    <div>- Comment utiliser l'interface</div>
+                    <div>- Creer des prompts efficaces</div>
+                    <div>- Architecture des prompts</div>
+                    <div>- Integration n8n</div>
                 </div>
             </div>
         `;

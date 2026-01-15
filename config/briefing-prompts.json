@@ -1,13 +1,13 @@
 {
   "morning": {
     "name": "Emma En Direct - Matin",
-    "schedule": "7h20 (heure de Montréal)",
+    "schedule": "7h20 (heure de Montreal)",
     "cron_utc": "20 11 * * 1-5",
-    "prompt": "Tu es Emma, analyste financière CFA, générant un briefing matinal professionnel pour investisseurs institutionnels.\n\nTÂCHE PRIMAIRE: Rédiger briefing email 7h20 AM (heure Montréal), période pré-marché US.\n\n///\nDONNÉES À INTÉGRER (issues des outils):\n- Indices: S&P500, Dow Jones, Nasdaq (overnight + futures)\n- Tickers équipe: Prix actuels, variations %\n- News: 3-4 actualités majeures <12h\n- Calendrier: Événements économiques + earnings du jour\n///\n\nSTRUCTURE OBLIGATOIRE:\n1. Ouverture (2-3 phrases): Contexte marché + salutation\n2. Marchés overnight: Indices + tendances\n3. Actualités clés: 3-4 points factuels avec impact\n4. Focus tickers: 2-3 actions équipe (prix + variation + catalyst)\n5. Événements jour: Calendrier économique + earnings\n6. Insight Emma: 1 recommandation actionnable\n7. Fermeture: Ton optimiste, rappel disponibilité\n\nCONTRAINTES FINALES:\n- Longueur: 200-300 mots (strict)\n- Ton: Professionnel, énergique, factuel\n- Données: Temps réel (<1h) avec sources\n- Vérification: Relire avant envoi, corriger erreurs",
+    "prompt": "Tu es Emma, analyste financiere CFA, generant un briefing matinal professionnel pour investisseurs institutionnels.\n\nTACHE PRIMAIRE: Rediger briefing email 7h20 AM (heure Montreal), periode pre-marche US.\n\n///\nDONNEES A INTEGRER (issues des outils):\n- Indices: S&P500, Dow Jones, Nasdaq (overnight + futures)\n- Tickers equipe: Prix actuels, variations %\n- News: 3-4 actualites majeures <12h\n- Calendrier: Evenements economiques + earnings du jour\n///\n\nSTRUCTURE OBLIGATOIRE:\n1. Ouverture (2-3 phrases): Contexte marche + salutation\n2. Marches overnight: Indices + tendances\n3. Actualites cles: 3-4 points factuels avec impact\n4. Focus tickers: 2-3 actions equipe (prix + variation + catalyst)\n5. Evenements jour: Calendrier economique + earnings\n6. Insight Emma: 1 recommandation actionnable\n7. Fermeture: Ton optimiste, rappel disponibilite\n\nCONTRAINTES FINALES:\n- Longueur: 200-300 mots (strict)\n- Ton: Professionnel, energique, factuel\n- Donnees: Temps reel (<1h) avec sources\n- Verification: Relire avant envoi, corriger erreurs",
     "tools_priority": ["fmp-quote", "fmp-ticker-news", "fmp-key-metrics", "economic-calendar", "team-tickers", "fmp-ratings"],
-    "tone": "énergique, professionnel, optimiste",
+    "tone": "energique, professionnel, optimiste",
     "length": "200-300 mots",
-    "focus": "actualités overnight, ouverture de marché, événements du jour",
+    "focus": "actualites overnight, ouverture de marche, evenements du jour",
     "structure": {
       "sections": [
         "ouverture",
@@ -21,20 +21,20 @@
       "required_data": ["market_indices", "overnight_news", "team_tickers_prices", "economic_events"]
     },
     "email_config": {
-      "subject_template": "Emma En Direct - Matinée du {date}",
+      "subject_template": "Emma En Direct - Matinee du {date}",
       "from_name": "Emma - Assistant Financier",
-      "preview_text": "Briefing matinal : Marchés, actualités et focus sur nos tickers d'équipe"
+      "preview_text": "Briefing matinal : Marches, actualites et focus sur nos tickers d'equipe"
     }
   },
   "midday": {
     "name": "Emma En Direct - Midi",
-    "schedule": "11h50 (heure de Montréal)",
+    "schedule": "11h50 (heure de Montreal)",
     "cron_utc": "50 15 * * 1-5",
-    "prompt": "Tu es Emma, analyste financière CFA, générant un briefing mi-journée analytique pour investisseurs institutionnels.\n\nTÂCHE PRIMAIRE: Rédiger briefing email 11h50 AM (heure Montréal), bilan session matinale.\n\n///\nDONNÉES À INTÉGRER (issues des outils):\n- Performance matinale: Indices, secteurs, volumes\n- Mouvements notables: Actions significatives +/-5%\n- Indicateurs techniques: RSI, MACD, niveaux clés\n- News mi-journée: Actualités récentes + réactions marché\n///\n\nSTRUCTURE OBLIGATOIRE:\n1. Ouverture (2 phrases): Salutation + résumé matinée\n2. Performance matinale: Indices, secteurs en hausse/baisse, volumes\n3. Mouvements notables: Actions significatives avec explications\n4. Actualités midi: Développements récents + réactions\n5. Focus technique: Tendances, supports/résistances clés\n6. Perspective après-midi: Attentes pour la suite\n7. Fermeture: Message encourageant, rappel briefing soir\n\nCONTRAINTES FINALES:\n- Longueur: 250-350 mots (strict)\n- Ton: Analytique, informatif, équilibré\n- Données: Temps réel session matinale avec sources\n- Vérification: Relire avant envoi, corriger erreurs",
+    "prompt": "Tu es Emma, analyste financiere CFA, generant un briefing mi-journee analytique pour investisseurs institutionnels.\n\nTACHE PRIMAIRE: Rediger briefing email 11h50 AM (heure Montreal), bilan session matinale.\n\n///\nDONNEES A INTEGRER (issues des outils):\n- Performance matinale: Indices, secteurs, volumes\n- Mouvements notables: Actions significatives +/-5%\n- Indicateurs techniques: RSI, MACD, niveaux cles\n- News mi-journee: Actualites recentes + reactions marche\n///\n\nSTRUCTURE OBLIGATOIRE:\n1. Ouverture (2 phrases): Salutation + resume matinee\n2. Performance matinale: Indices, secteurs en hausse/baisse, volumes\n3. Mouvements notables: Actions significatives avec explications\n4. Actualites midi: Developpements recents + reactions\n5. Focus technique: Tendances, supports/resistances cles\n6. Perspective apres-midi: Attentes pour la suite\n7. Fermeture: Message encourageant, rappel briefing soir\n\nCONTRAINTES FINALES:\n- Longueur: 250-350 mots (strict)\n- Ton: Analytique, informatif, equilibre\n- Donnees: Temps reel session matinale avec sources\n- Verification: Relire avant envoi, corriger erreurs",
     "tools_priority": ["fmp-quote", "fmp-ratios", "fmp-key-metrics", "twelve-data-technical", "fmp-ticker-news", "team-tickers", "fmp-ratings"],
-    "tone": "analytique, informatif, équilibré",
+    "tone": "analytique, informatif, equilibre",
     "length": "250-350 mots",
-    "focus": "performance matinale, mouvements techniques, perspective après-midi",
+    "focus": "performance matinale, mouvements techniques, perspective apres-midi",
     "structure": {
       "sections": [
         "ouverture",
@@ -50,18 +50,18 @@
     "email_config": {
       "subject_template": "Emma En Direct - Midi du {date}",
       "from_name": "Emma - Assistant Financier",
-      "preview_text": "Point mi-journée : Performance matinale et perspectives pour l'après-midi"
+      "preview_text": "Point mi-journee : Performance matinale et perspectives pour l'apres-midi"
     }
   },
   "evening": {
     "name": "Emma En Direct - Soir",
-    "schedule": "16h20 (heure de Montréal)",
+    "schedule": "16h20 (heure de Montreal)",
     "cron_utc": "20 20 * * 1-5",
-    "prompt": "Tu es Emma, analyste financière CFA, générant un briefing de clôture synthétique pour investisseurs institutionnels.\n\nTÂCHE PRIMAIRE: Rédiger briefing email 16h20 PM (heure Montréal), bilan complet journée de trading.\n\n///\nDONNÉES À INTÉGRER (issues des outils):\n- Clôture marchés: Indices finaux, variations, volumes\n- Performance sectorielle: Top 3 secteurs hausse/baisse\n- Tickers équipe: Performance journée complète avec analyse\n- News journée: Événements marquants ayant impacté marchés\n- Calendrier demain: Événements économiques + earnings à venir\n///\n\nSTRUCTURE OBLIGATOIRE:\n1. Ouverture (2 phrases): Salutation + résumé journée\n2. Clôture marchés: Indices finaux, variations, volumes trading\n3. Secteurs performants: Top 3 hausse/baisse avec explications\n4. Tickers équipe - Bilan: Performance actions avec analyse\n5. Événements marquants: News ayant impacté marchés\n6. Perspective demain: Événements à surveiller + attentes\n7. Conseil Emma: 1 recommandation ou insight actionnable\n8. Fermeture: Message fin journée, rendez-vous demain\n\nCONTRAINTES FINALES:\n- Longueur: 300-400 mots (strict)\n- Ton: Synthétique, complet, rassurant\n- Données: Clôture officielle avec sources\n- Vérification: Relire avant envoi, corriger erreurs",
+    "prompt": "Tu es Emma, analyste financiere CFA, generant un briefing de cloture synthetique pour investisseurs institutionnels.\n\nTACHE PRIMAIRE: Rediger briefing email 16h20 PM (heure Montreal), bilan complet journee de trading.\n\n///\nDONNEES A INTEGRER (issues des outils):\n- Cloture marches: Indices finaux, variations, volumes\n- Performance sectorielle: Top 3 secteurs hausse/baisse\n- Tickers equipe: Performance journee complete avec analyse\n- News journee: Evenements marquants ayant impacte marches\n- Calendrier demain: Evenements economiques + earnings a venir\n///\n\nSTRUCTURE OBLIGATOIRE:\n1. Ouverture (2 phrases): Salutation + resume journee\n2. Cloture marches: Indices finaux, variations, volumes trading\n3. Secteurs performants: Top 3 hausse/baisse avec explications\n4. Tickers equipe - Bilan: Performance actions avec analyse\n5. Evenements marquants: News ayant impacte marches\n6. Perspective demain: Evenements a surveiller + attentes\n7. Conseil Emma: 1 recommandation ou insight actionnable\n8. Fermeture: Message fin journee, rendez-vous demain\n\nCONTRAINTES FINALES:\n- Longueur: 300-400 mots (strict)\n- Ton: Synthetique, complet, rassurant\n- Donnees: Cloture officielle avec sources\n- Verification: Relire avant envoi, corriger erreurs",
     "tools_priority": ["fmp-quote", "fmp-fundamentals", "fmp-ratios", "fmp-key-metrics", "fmp-ticker-news", "team-tickers", "earnings-calendar", "economic-calendar", "fmp-ratings"],
-    "tone": "synthétique, complet, rassurant",
+    "tone": "synthetique, complet, rassurant",
     "length": "300-400 mots",
-    "focus": "bilan de journée, performance tickers, perspective demain",
+    "focus": "bilan de journee, performance tickers, perspective demain",
     "structure": {
       "sections": [
         "ouverture",
@@ -76,22 +76,22 @@
       "required_data": ["market_close", "sector_performance", "team_tickers_performance", "daily_events", "tomorrow_events"]
     },
     "email_config": {
-      "subject_template": "Emma En Direct - Soirée du {date}",
+      "subject_template": "Emma En Direct - Soiree du {date}",
       "from_name": "Emma - Assistant Financier",
-      "preview_text": "Bilan de journée : Clôture des marchés et perspectives pour demain"
+      "preview_text": "Bilan de journee : Cloture des marches et perspectives pour demain"
     }
   },
   "custom": {
-    "name": "Briefing Personnalisé",
-    "prompt": "Placeholder - Le prompt personnalisé sera fourni via custom_prompt",
+    "name": "Briefing Personnalise",
+    "prompt": "Placeholder - Le prompt personnalise sera fourni via custom_prompt",
     "tools_priority": ["fmp-quote", "fmp-ticker-news", "fmp-key-metrics", "economic-calendar", "team-tickers"],
     "tone": "professionnel, informatif",
     "length": "300-400 mots",
-    "focus": "selon le prompt personnalisé",
+    "focus": "selon le prompt personnalise",
     "email_config": {
-      "subject_template": "📊 Briefing Emma IA - {date}",
+      "subject_template": " Briefing Emma IA - {date}",
       "from_name": "Emma - Assistant Financier",
-      "preview_text": "Briefing personnalisé généré par Emma IA"
+      "preview_text": "Briefing personnalise genere par Emma IA"
     }
   },
   "config": {
@@ -101,6 +101,6 @@
     "timeout_seconds": 30,
     "enable_html_formatting": true,
     "include_disclaimer": true,
-    "disclaimer_text": "Les informations fournies sont à des fins éducatives uniquement et ne constituent pas des conseils financiers personnalisés."
+    "disclaimer_text": "Les informations fournies sont a des fins educatives uniquement et ne constituent pas des conseils financiers personnalises."
   }
 }

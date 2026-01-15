@@ -1,14 +1,14 @@
 /**
- * API Endpoint pour identifier les tickers qui ne peuvent PAS être récupérés de FMP
- * même après tous les fallbacks et variantes de symboles
+ * API Endpoint pour identifier les tickers qui ne peuvent PAS etre recuperes de FMP
+ * meme apres tous les fallbacks et variantes de symboles
  * 
  * GET /api/admin/unrecoverable-tickers
  *   - Analyse tous les tickers actifs
- *   - Identifie ceux qui échouent définitivement (404, données invalides)
- *   - Retourne un rapport détaillé
+ *   - Identifie ceux qui echouent definitivement (404, donnees invalides)
+ *   - Retourne un rapport detaille
  * 
  * Query params:
- *   - limit: nombre maximum de tickers à tester (default: 1000)
+ *   - limit: nombre maximum de tickers a tester (default: 1000)
  *   - format: 'json' (default) ou 'csv'
  */
 
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
         if (!tickers || tickers.length === 0) {
             return res.status(200).json({
                 success: true,
-                message: 'Aucun ticker actif trouvé',
+                message: 'Aucun ticker actif trouve',
                 unrecoverable: [],
                 recoverable: [],
                 unknown: [],
@@ -101,7 +101,7 @@ export default async function handler(req, res) {
                 const apiUrl = `${apiBaseUrl}/api/fmp-company-data?symbol=${encodeURIComponent(symbol)}`;
                 const response = await fetch(apiUrl);
 
-                // Si 404, le ticker n'existe pas dans FMP même après tous les fallbacks
+                // Si 404, le ticker n'existe pas dans FMP meme apres tous les fallbacks
                 if (response.status === 404) {
                     const errorData = await response.json().catch(() => ({}));
                     unrecoverable.push({
@@ -109,14 +109,14 @@ export default async function handler(req, res) {
                         companyName: ticker.company_name,
                         sector: ticker.sector,
                         source: ticker.source,
-                        reason: '404 - Symbole introuvable dans FMP (tous fallbacks échoués)',
+                        reason: '404 - Symbole introuvable dans FMP (tous fallbacks echoues)',
                         triedSymbols: errorData.tried || [symbol],
                         error: errorData.message || 'Not found'
                     });
                     continue;
                 }
 
-                // Si autre erreur HTTP, c'est peut-être récupérable (rate limit, etc.)
+                // Si autre erreur HTTP, c'est peut-etre recuperable (rate limit, etc.)
                 if (!response.ok) {
                     const errorText = await response.text().catch(() => 'Unknown error');
                     unknown.push({
@@ -130,7 +130,7 @@ export default async function handler(req, res) {
                     continue;
                 }
 
-                // Si succès, vérifier que les données sont valides
+                // Si succes, verifier que les donnees sont valides
                 const data = await response.json();
 
                 if (data.error) {
@@ -145,7 +145,7 @@ export default async function handler(req, res) {
                     continue;
                 }
 
-                // Vérifier que les données sont complètes
+                // Verifier que les donnees sont completes
                 const hasValidData = data.data && Array.isArray(data.data) && data.data.length > 0;
                 const hasValidPrice = data.currentPrice && data.currentPrice > 0;
                 const hasValidInfo = data.info && data.info.name;
@@ -156,7 +156,7 @@ export default async function handler(req, res) {
                         companyName: ticker.company_name,
                         sector: ticker.sector,
                         source: ticker.source,
-                        reason: 'Données incomplètes ou invalides',
+                        reason: 'Donnees incompletes ou invalides',
                         dataYears: data.data?.length || 0,
                         currentPrice: data.currentPrice || 0,
                         hasInfo: !!data.info
@@ -164,7 +164,7 @@ export default async function handler(req, res) {
                     continue;
                 }
 
-                // Ticker récupérable avec succès
+                // Ticker recuperable avec succes
                 recoverable.push({
                     ticker: symbol,
                     companyName: ticker.company_name,
@@ -181,18 +181,18 @@ export default async function handler(req, res) {
                     companyName: ticker.company_name,
                     sector: ticker.sector,
                     source: ticker.source,
-                    reason: 'Erreur réseau ou exception',
+                    reason: 'Erreur reseau ou exception',
                     error: error.message
                 });
             }
 
-            // Délai pour éviter le rate limiting
+            // Delai pour eviter le rate limiting
             if (i < Math.min(tickers.length, parseInt(limit)) - 1) {
                 await new Promise(resolve => setTimeout(resolve, 200));
             }
         }
 
-        // 4. Générer le rapport
+        // 4. Generer le rapport
         const summary = {
             total: tickers.length,
             unrecoverable: unrecoverable.length,
@@ -202,7 +202,7 @@ export default async function handler(req, res) {
             recoverablePercent: ((recoverable.length / tickers.length) * 100).toFixed(1)
         };
 
-        // 5. Grouper les non récupérables par raison
+        // 5. Grouper les non recuperables par raison
         const unrecoverableByReason = {};
         unrecoverable.forEach(t => {
             const reason = t.reason || 'Raison inconnue';
@@ -212,7 +212,7 @@ export default async function handler(req, res) {
             unrecoverableByReason[reason].push(t);
         });
 
-        // 6. Retourner selon le format demandé
+        // 6. Retourner selon le format demande
         if (format === 'csv') {
             // Format CSV
             const csvLines = [
@@ -240,17 +240,17 @@ export default async function handler(req, res) {
         // Format JSON (default)
         return res.status(200).json({
             success: true,
-            message: 'Analyse terminée',
+            message: 'Analyse terminee',
             summary,
             unrecoverable,
             unrecoverableByReason,
-            recoverable: recoverable.length, // Juste le count pour réduire la taille
+            recoverable: recoverable.length, // Juste le count pour reduire la taille
             unknown: unknown.length, // Juste le count
             timestamp: new Date().toISOString()
         });
 
     } catch (error) {
-        console.error('❌ Erreur admin/unrecoverable-tickers:', error);
+        console.error(' Erreur admin/unrecoverable-tickers:', error);
         return res.status(500).json({
             success: false,
             error: error.message || 'Erreur inconnue'

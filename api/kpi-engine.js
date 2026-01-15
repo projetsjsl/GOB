@@ -2,11 +2,11 @@
  * Moteur de calcul KPI
  * 
  * Ce service calcule les valeurs de KPI en utilisant :
- * - Les définitions de KPI (kpi_definitions)
- * - Les variables associées (kpi_variables)
- * - Les métriques stockées (metrics)
+ * - Les definitions de KPI (kpi_definitions)
+ * - Les variables associees (kpi_variables)
+ * - Les metriques stockees (metrics)
  * 
- * Supporte des formules avec opérateurs et fonctions mathématiques.
+ * Supporte des formules avec operateurs et fonctions mathematiques.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -15,13 +15,13 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('SUPABASE_URL et SUPABASE_KEY doivent être définis');
+  throw new Error('SUPABASE_URL et SUPABASE_KEY doivent etre definis');
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
- * Parser de formules sécurisé
+ * Parser de formules securise
  * Supporte: +, -, *, /, ^, ABS, MIN, MAX, AVG, IF, NORMALIZE
  */
 class FormulaParser {
@@ -30,7 +30,7 @@ class FormulaParser {
   }
 
   /**
-   * Évalue une expression mathématique de manière sécurisée
+   * Evalue une expression mathematique de maniere securisee
    */
   evaluate(expression) {
     if (!expression || typeof expression !== 'string') {
@@ -44,10 +44,10 @@ class FormulaParser {
       expr = expr.replace(regex, value !== null && value !== undefined ? value : '0');
     });
 
-    // Remplacer les fonctions par leurs équivalents JavaScript
+    // Remplacer les fonctions par leurs equivalents JavaScript
     expr = this.replaceFunctions(expr);
 
-    // Évaluer de manière sécurisée (pas d'utilisation directe de eval)
+    // Evaluer de maniere securisee (pas d'utilisation directe de eval)
     try {
       // Using Function constructor is intentional here for formula evaluation
       // The expression is sanitized (only math operators and known function names)
@@ -61,13 +61,13 @@ class FormulaParser {
       
       return result;
     } catch (error) {
-      console.error('Erreur évaluation formule:', error, 'Expression:', expr);
+      console.error('Erreur evaluation formule:', error, 'Expression:', expr);
       return null;
     }
   }
 
   /**
-   * Remplace les fonctions personnalisées par du JavaScript
+   * Remplace les fonctions personnalisees par du JavaScript
    */
   replaceFunctions(expr) {
     // ABS(x) -> Math.abs(x)
@@ -97,10 +97,10 @@ class FormulaParser {
 }
 
 /**
- * Charge une définition de KPI avec ses variables
+ * Charge une definition de KPI avec ses variables
  */
 async function loadKPIDefinition(kpiCode) {
-  // Optimisation egress : sélectionner seulement les colonnes nécessaires
+  // Optimisation egress : selectionner seulement les colonnes necessaires
   const { data: kpi, error: kpiError } = await supabase
     .from('kpi_definitions')
     .select('id, name, code, expression, description, category, is_active, is_public, version')
@@ -109,10 +109,10 @@ async function loadKPIDefinition(kpiCode) {
     .single();
 
   if (kpiError || !kpi) {
-    throw new Error(`KPI ${kpiCode} non trouvé ou inactif`);
+    throw new Error(`KPI ${kpiCode} non trouve ou inactif`);
   }
 
-  // Optimisation egress : sélectionner seulement les colonnes nécessaires
+  // Optimisation egress : selectionner seulement les colonnes necessaires
   const { data: variables, error: varsError } = await supabase
     .from('kpi_variables')
     .select('kpi_id, variable_name, metric_code, default_value, order_index')
@@ -127,7 +127,7 @@ async function loadKPIDefinition(kpiCode) {
 }
 
 /**
- * Charge les valeurs de métriques pour un symbole
+ * Charge les valeurs de metriques pour un symbole
  */
 async function loadMetrics(symbol, metricCodes, asOf = null) {
   const query = supabase
@@ -143,10 +143,10 @@ async function loadMetrics(symbol, metricCodes, asOf = null) {
   const { data, error } = await query.order('as_of', { ascending: false });
 
   if (error) {
-    throw new Error(`Erreur chargement métriques: ${error.message}`);
+    throw new Error(`Erreur chargement metriques: ${error.message}`);
   }
 
-  // Retourner la valeur la plus récente pour chaque metric_code
+  // Retourner la valeur la plus recente pour chaque metric_code
   const latest = {};
   const seen = new Set();
 
@@ -162,7 +162,7 @@ async function loadMetrics(symbol, metricCodes, asOf = null) {
 }
 
 /**
- * Applique une transformation à une métrique (ex: CAGR, moyenne)
+ * Applique une transformation a une metrique (ex: CAGR, moyenne)
  */
 function applyTransform(value, transform) {
   if (!transform || !transform.type) {
@@ -188,23 +188,23 @@ function applyTransform(value, transform) {
 }
 
 /**
- * Calcule un KPI pour un symbole donné
+ * Calcule un KPI pour un symbole donne
  */
 async function computeKPI(kpiCode, symbol, asOf = null) {
   const startTime = Date.now();
 
   try {
-    // Charger la définition du KPI
+    // Charger la definition du KPI
     const { kpi, variables } = await loadKPIDefinition(kpiCode);
 
     if (!variables || variables.length === 0) {
-      throw new Error(`Aucune variable définie pour ${kpiCode}`);
+      throw new Error(`Aucune variable definie pour ${kpiCode}`);
     }
 
-    // Récupérer les codes de métriques nécessaires
+    // Recuperer les codes de metriques necessaires
     const metricCodes = variables.map(v => v.metric_code);
 
-    // Charger les valeurs de métriques
+    // Charger les valeurs de metriques
     const metrics = await loadMetrics(symbol, metricCodes, asOf);
 
     // Construire le dictionnaire de variables avec transformations
@@ -215,7 +215,7 @@ async function computeKPI(kpiCode, symbol, asOf = null) {
       const rawValue = metrics[variable.metric_code];
       
       if (rawValue === undefined || rawValue === null) {
-        // Variable manquante - utiliser valeur par défaut si définie
+        // Variable manquante - utiliser valeur par defaut si definie
         variableValues[variable.variable_name] = variable.transform?.default || 0;
         inputsSnapshot[variable.variable_name] = null;
       } else {
@@ -230,18 +230,18 @@ async function computeKPI(kpiCode, symbol, asOf = null) {
       }
     }
 
-    // Évaluer la formule
+    // Evaluer la formule
     const parser = new FormulaParser(variableValues);
     const value = parser.evaluate(kpi.expression);
 
     if (value === null) {
-      throw new Error(`Impossible d'évaluer la formule pour ${kpiCode}`);
+      throw new Error(`Impossible d'evaluer la formule pour ${kpiCode}`);
     }
 
-    // Date de référence (aujourd'hui si non spécifiée)
+    // Date de reference (aujourd'hui si non specifiee)
     const referenceDate = asOf || new Date().toISOString().split('T')[0];
 
-    // Stocker le résultat dans kpi_values
+    // Stocker le resultat dans kpi_values
     const { error: saveError } = await supabase
       .from('kpi_values')
       .upsert({

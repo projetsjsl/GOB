@@ -1,6 +1,6 @@
 /**
  * Service de synchronisation bidirectionnelle entre:
- * - user_preferences (dashboard) ↔ tickers table (3p1)
+ * - user_preferences (dashboard) <-> tickers table (3p1)
  * - Team tickers (portefeuille)
  * Version navigateur (compatible avec Babel/UMD)
  */
@@ -43,11 +43,11 @@
         }
         
         try {
-            // Pour chaque ticker, créer/mettre à jour dans tickers table avec source='watchlist'
+            // Pour chaque ticker, creer/mettre a jour dans tickers table avec source='watchlist'
             const operations = tickers.map(async (ticker) => {
                 const tickerUpper = ticker.toUpperCase().trim();
                 
-                // Vérifier si le ticker existe déjà
+                // Verifier si le ticker existe deja
                 const { data: existing } = await supabase
                     .from('tickers')
                     .select('id, ticker, source, category')
@@ -55,21 +55,21 @@
                     .single();
                 
                 if (existing) {
-                    // Mettre à jour si nécessaire
+                    // Mettre a jour si necessaire
                     const currentSource = existing.source || existing.category;
                     const shouldUpdate = 
                         currentSource !== 'watchlist' && 
                         currentSource !== 'both';
                     
                     if (shouldUpdate) {
-                        // Si c'est 'team', passer à 'both', sinon 'watchlist'
+                        // Si c'est 'team', passer a 'both', sinon 'watchlist'
                         const newSource = currentSource === 'team' ? 'both' : 'watchlist';
                         
                         await supabase
                             .from('tickers')
                             .update({
                                 source: newSource,
-                                category: newSource, // Compatibilité nouveau schéma
+                                category: newSource, // Compatibilite nouveau schema
                                 user_id: userId,
                                 is_active: true,
                                 updated_at: new Date().toISOString()
@@ -77,13 +77,13 @@
                             .eq('id', existing.id);
                     }
                 } else {
-                    // Créer nouveau ticker
+                    // Creer nouveau ticker
                     await supabase
                         .from('tickers')
                         .insert({
                             ticker: tickerUpper,
                             source: 'watchlist',
-                            category: 'watchlist', // Compatibilité nouveau schéma
+                            category: 'watchlist', // Compatibilite nouveau schema
                             user_id: userId,
                             is_active: true,
                             priority: 1
@@ -92,7 +92,7 @@
             });
             
             await Promise.allSettled(operations);
-            console.log(`✅ Synced ${tickers.length} watchlist tickers to tickers table`);
+            console.log(` Synced ${tickers.length} watchlist tickers to tickers table`);
             return true;
         } catch (e) {
             console.error('Error syncing watchlist to tickers table:', e);
@@ -122,7 +122,7 @@
                 .or('source.eq.watchlist,source.eq.both,category.eq.watchlist,category.eq.both');
             
             if (error) {
-                // Essayer avec category si source échoue
+                // Essayer avec category si source echoue
                 const { data: dataCategory } = await supabase
                     .from('tickers')
                     .select('ticker, category')
@@ -149,7 +149,7 @@
                 );
             }
             
-            console.log(`✅ Synced ${tickers.length} tickers from tickers table to user_preferences`);
+            console.log(` Synced ${tickers.length} tickers from tickers table to user_preferences`);
             return tickers;
         } catch (e) {
             console.error('Error syncing tickers table to watchlist:', e);
@@ -158,7 +158,7 @@
     }
 
     /**
-     * Synchronisation bidirectionnelle complète
+     * Synchronisation bidirectionnelle complete
      */
     async function syncBidirectional(userId) {
         if (!userId) {
@@ -203,7 +203,7 @@
                 );
             }
             
-            console.log(`✅ Bidirectional sync complete: ${mergedTickers.length} tickers`);
+            console.log(` Bidirectional sync complete: ${mergedTickers.length} tickers`);
             return { success: true, tickers: mergedTickers };
         } catch (e) {
             console.error('Error bidirectional sync:', e);
@@ -249,7 +249,7 @@
     }
 
     /**
-     * Ajouter un ticker à la watchlist (synchronisé)
+     * Ajouter un ticker a la watchlist (synchronise)
      */
     async function addTickerToWatchlist(ticker, userId = null) {
         if (!ticker) return false;
@@ -291,7 +291,7 @@
     }
 
     /**
-     * Supprimer un ticker de la watchlist (synchronisé)
+     * Supprimer un ticker de la watchlist (synchronise)
      */
     async function removeTickerFromWatchlist(ticker, userId = null) {
         if (!ticker) return false;
@@ -326,7 +326,7 @@
             );
         }
         
-        // 2. Mettre à jour tickers table
+        // 2. Mettre a jour tickers table
         if (supabase) {
             try {
                 // Trouver le ticker
@@ -341,7 +341,7 @@
                     const currentSource = existing.source || existing.category;
                     
                     if (currentSource === 'both') {
-                        // Si 'both', passer à 'team' seulement
+                        // Si 'both', passer a 'team' seulement
                         await supabase
                             .from('tickers')
                             .update({
@@ -351,7 +351,7 @@
                             })
                             .eq('id', existing.id);
                     } else if (currentSource === 'watchlist') {
-                        // Si 'watchlist' seulement, désactiver ou supprimer
+                        // Si 'watchlist' seulement, desactiver ou supprimer
                         await supabase
                             .from('tickers')
                             .update({
@@ -379,5 +379,5 @@
         removeTickerFromWatchlist
     };
 
-    console.log('✅ TickersSyncService chargé');
+    console.log(' TickersSyncService charge');
 })();

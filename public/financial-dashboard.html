@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOB Apps - Dashboard Financier Unifié • Propulsé par JSLAI</title>
+    <title>GOB Apps - Dashboard Financier Unifie - Propulse par JSLAI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
                 window.module = { exports: window.exports };
             }
 
-            // 🔥 FIX: Add require() polyfill for react-grid-layout
+            //  FIX: Add require() polyfill for react-grid-layout
             if (typeof window.require === 'undefined') {
                 window.require = function(moduleName) {
                     // Return window globals for known modules
@@ -70,7 +70,7 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-        /* Réduction globale pour mobile: police et espacements à 50% */
+        /* Reduction globale pour mobile: police et espacements a 50% */
         @media (max-width: 768px) {
             html { font-size: 50%; }
         }
@@ -83,7 +83,7 @@
         const { useState, useEffect, useRef } = React;
 
         const FinancialDashboard = () => {
-            // États principaux
+            // Etats principaux
             const [activeTab, setActiveTab] = useState('stocks');
             const [tickers, setTickers] = useState(['CVS', 'MSFT']);
             const [stockData, setStockData] = useState({});
@@ -100,8 +100,8 @@
 
             // Configuration API
             const API_BASE_URL = window.location.origin;
-            const FINNHUB_API_KEY = 'YOUR_FINNHUB_API_KEY'; // À configurer
-            const NEWSAPI_KEY = 'YOUR_NEWSAPI_KEY'; // À configurer
+            const FINNHUB_API_KEY = 'YOUR_FINNHUB_API_KEY'; // A configurer
+            const NEWSAPI_KEY = 'YOUR_NEWSAPI_KEY'; // A configurer
 
             // Messages
             const showMessage = (text, type = 'info') => {
@@ -109,7 +109,7 @@
                 setTimeout(() => setMessage(null), 5000);
             };
 
-            // Gestion des titres centralisée
+            // Gestion des titres centralisee
             const loadTickers = async () => {
                 try {
                     const response = await fetch('/tickers.json');
@@ -131,7 +131,7 @@
                     });
                     if (response.ok) {
                         setTickers(newTickers);
-                        showMessage('Liste des titres mise à jour', 'success');
+                        showMessage('Liste des titres mise a jour', 'success');
                     }
                 } catch (error) {
                     console.error('Erreur sauvegarde tickers:', error);
@@ -153,7 +153,7 @@
                 saveTickers(newTickers);
             };
 
-            // Données Finnhub
+            // Donnees Finnhub
             const fetchStockData = async (ticker) => {
                 try {
                     const response = await fetch(`${API_BASE_URL}/api/marketdata?endpoint=quote&symbol=${ticker}&source=auto`);
@@ -182,17 +182,17 @@
                 setStockData(newStockData);
                 setLastUpdate(new Date());
                 setLoading(false);
-                showMessage('Données mises à jour', 'success');
+                showMessage('Donnees mises a jour', 'success');
                 
-                // Charger les explications "Why Is It Moving?" après le chargement des stocks
+                // Charger les explications "Why Is It Moving?" apres le chargement des stocks
                 fetchWhyMovingForTickers();
             };
 
-            // Actualités via endpoint unifié (FMP, Finnhub, Finviz, RSS)
+            // Actualites via endpoint unifie (FMP, Finnhub, Finviz, RSS)
             const fetchNews = async () => {
                 try {
                     setLoading(true);
-                    // Utiliser l'endpoint unifié qui agrège toutes les sources
+                    // Utiliser l'endpoint unifie qui agrege toutes les sources
                     const tickersQuery = tickers.length > 0 ? tickers.join(' OR ') : 'market OR economy';
                     const response = await fetch(
                         `${API_BASE_URL}/api/news?q=${encodeURIComponent(tickersQuery)}&limit=30&context=${newsContext}`
@@ -201,7 +201,7 @@
                     const data = await response.json();
                     
                     if (data.success && data.articles) {
-                        // Formater les articles pour compatibilité avec l'UI existante
+                        // Formater les articles pour compatibilite avec l'UI existante
                         const formattedArticles = data.articles.map(article => ({
                             title: article.title || article.headline,
                             description: article.summary || '',
@@ -215,21 +215,21 @@
                             image: article.image
                         }));
                         setNewsData(formattedArticles);
-                        showMessage(`${formattedArticles.length} actualités chargées depuis ${data.sources?.join(', ') || 'sources multiples'}`, 'success');
+                        showMessage(`${formattedArticles.length} actualites chargees depuis ${data.sources?.join(', ') || 'sources multiples'}`, 'success');
                     } else {
                         setNewsData([]);
-                        showMessage('Aucune actualité trouvée', 'warning');
+                        showMessage('Aucune actualite trouvee', 'warning');
                     }
                 } catch (error) {
                     console.error('Erreur fetch news:', error);
-                    showMessage('Erreur chargement actualités', 'error');
+                    showMessage('Erreur chargement actualites', 'error');
                     setNewsData([]);
                 } finally {
                     setLoading(false);
                 }
             };
 
-            // Données Seeking Alpha (conservées de la source actuelle)
+            // Donnees Seeking Alpha (conservees de la source actuelle)
             const fetchSeekingAlphaData = async () => {
                 try {
                     const response = await fetch('/seeking-alpha/stock_analysis.json');
@@ -242,7 +242,7 @@
                 }
             };
 
-            // Fonction pour récupérer "Why Is It Moving?" pour chaque ticker
+            // Fonction pour recuperer "Why Is It Moving?" pour chaque ticker
             const fetchWhyMovingForTickers = async () => {
                 if (tickers.length === 0) return;
                 
@@ -263,13 +263,13 @@
                             }
                         }
                     } catch (error) {
-                        console.error(`Erreur récupération "Why Is It Moving?" pour ${ticker}:`, error);
+                        console.error(`Erreur recuperation "Why Is It Moving?" pour ${ticker}:`, error);
                     }
                 });
                 
                 await Promise.all(promises);
                 setTickerMoveReasons(moveReasonsMap);
-                console.log(`✅ "Why Is It Moving?" chargé pour ${Object.keys(moveReasonsMap).length} tickers`);
+                console.log(` "Why Is It Moving?" charge pour ${Object.keys(moveReasonsMap).length} tickers`);
             };
 
             // Initialisation
@@ -278,11 +278,11 @@
                 refreshAllStocks();
                 fetchNews();
                 fetchSeekingAlphaData();
-                // Charger les explications "Why Is It Moving?" après un court délai
+                // Charger les explications "Why Is It Moving?" apres un court delai
                 setTimeout(() => {
                     fetchWhyMovingForTickers();
                 }, 2000);
-                // Suppression de l'auto-refresh: on ne met à jour que sur arrivée ou clic bouton
+                // Suppression de l'auto-refresh: on ne met a jour que sur arrivee ou clic bouton
             }, []);
 
             // Composant de gestion des titres
@@ -318,7 +318,7 @@
                                         onClick={() => removeTicker(ticker)}
                                         className="text-red-500 hover:text-red-700"
                                     >
-                                        ✕
+                                        
                                     </button>
                                 </div>
                             ))}
@@ -340,13 +340,13 @@
             const StocksTab = () => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold text-white">Données Financières</h2>
+                        <h2 className="text-2xl font-bold text-white">Donnees Financieres</h2>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setShowTickerManager(true)}
                                 className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
                             >
-                                Gérer les Titres
+                                Gerer les Titres
                             </button>
                             <button
                                 onClick={refreshAllStocks}
@@ -360,7 +360,7 @@
 
                     {lastUpdate && (
                         <p className="text-gray-400 text-sm">
-                            Dernière mise à jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
+                            Derniere mise a jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
                         </p>
                     )}
 
@@ -401,13 +401,13 @@
                                                 </span>
                                                 <div className="flex-1">
                                                     <div className="text-xs text-gray-500 mb-1">
-                                                        Pourquoi ça bouge?
+                                                        Pourquoi ca bouge?
                                                     </div>
                                                     <div className="text-xs text-gray-300">
                                                         {tickerMoveReasons[ticker].explanation_enriched || tickerMoveReasons[ticker].explanation}
                                                     </div>
                                                     <div className="text-[10px] text-gray-500 mt-1">
-                                                        {tickerMoveReasons[ticker].date} • {tickerMoveReasons[ticker].source}
+                                                        {tickerMoveReasons[ticker].date} - {tickerMoveReasons[ticker].source}
                                                     </div>
                                                 </div>
                                             </div>
@@ -420,11 +420,11 @@
                 </div>
             );
 
-            // Composant onglet Actualités
+            // Composant onglet Actualites
             const NewsTab = () => (
                 <div className="space-y-6">
                     <div className="flex justify-between items-center flex-wrap gap-4">
-                        <h2 className="text-2xl font-bold text-white">Actualités Financières</h2>
+                        <h2 className="text-2xl font-bold text-white">Actualites Financieres</h2>
                         <div className="flex gap-2 items-center">
                             <select
                                 value={newsContext}
@@ -434,11 +434,11 @@
                                 }}
                                 className="px-3 py-2 bg-gray-700 text-white rounded border border-gray-600"
                             >
-                                <option value="general">🌍 Général</option>
-                                <option value="quebec">🇨🇦 Québec</option>
-                                <option value="french_canada">🇫🇷 Français Canada</option>
-                                <option value="crypto">₿ Crypto</option>
-                                <option value="analysis">📊 Analyse</option>
+                                <option value="general"> General</option>
+                                <option value="quebec"> Quebec</option>
+                                <option value="french_canada"> Francais Canada</option>
+                                <option value="crypto"> Crypto</option>
+                                <option value="analysis"> Analyse</option>
                             </select>
                             <button
                                 onClick={fetchNews}
@@ -477,7 +477,7 @@
                                         rel="noopener noreferrer"
                                         className="inline-block mt-2 text-blue-400 hover:text-blue-300"
                                     >
-                                        Lire l'article →
+                                        Lire l'article ->
                                     </a>
                                 )}
                             </div>
@@ -510,7 +510,7 @@
                                         {stock.raw_text?.substring(0, 200)}...
                                     </p>
                                     <div className="text-sm text-gray-400">
-                                        Mis à jour: {new Date(stock.timestamp).toLocaleString('fr-FR')}
+                                        Mis a jour: {new Date(stock.timestamp).toLocaleString('fr-FR')}
                                     </div>
                                 </div>
                             ))}
@@ -520,9 +520,9 @@
             );
 
             const tabs = [
-                { id: 'stocks', label: '📊 Données Financières', component: StocksTab },
-                { id: 'news', label: '📰 Actualités', component: NewsTab },
-                { id: 'seeking-alpha', label: '📈 Seeking Alpha', component: SeekingAlphaTab }
+                { id: 'stocks', label: ' Donnees Financieres', component: StocksTab },
+                { id: 'news', label: ' Actualites', component: NewsTab },
+                { id: 'seeking-alpha', label: ' Seeking Alpha', component: SeekingAlphaTab }
             ];
             return (
                 <div className="min-h-screen">
@@ -539,10 +539,10 @@
                                 </div>
                                 <div>
                                     <h1 className="text-3xl font-bold text-white mb-2 font-['Inter']">
-                                        GOB Apps - Dashboard Financier Unifié
+                                        GOB Apps - Dashboard Financier Unifie
                                     </h1>
                                     <p className="text-purple-200 font-['Inter']">
-                                        Plateforme financière • Données en temps réel • Propulsée par JSL AI
+                                        Plateforme financiere - Donnees en temps reel - Propulsee par JSL AI
                                     </p>
                                 </div>
                             </div>

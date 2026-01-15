@@ -63,8 +63,8 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
   const extractActions = (snapshot: any): SnapshotAction[] => {
     const actions: SnapshotAction[] = [];
     
-    // Extraire les actions depuis les métadonnées du snapshot
-    // Les métadonnées peuvent être stockées dans snapshot.metadata ou directement dans snapshot
+    // Extraire les actions depuis les metadonnees du snapshot
+    // Les metadonnees peuvent etre stockees dans snapshot.metadata ou directement dans snapshot
     if (snapshot.auto_fetched) {
       actions.push({ type: 'sync', date: snapshot.snapshot_date || snapshot.created_at });
     }
@@ -78,7 +78,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
       actions.push({ type: 'approved', date: snapshot.approved_at || snapshot.snapshot_date });
     }
     
-    // Si metadata contient des actions personnalisées
+    // Si metadata contient des actions personnalisees
     if (snapshot.metadata && snapshot.metadata.actions) {
       snapshot.metadata.actions.forEach((action: any) => {
         actions.push({
@@ -94,10 +94,10 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
 
   const getActionLabel = (type: SnapshotAction['type']): string => {
     switch (type) {
-      case 'sync': return 'Synchronisé le';
-      case 'generated': return 'Généré le';
-      case 'modified': return 'Modifié le';
-      case 'approved': return 'Approuvé le';
+      case 'sync': return 'Synchronise le';
+      case 'generated': return 'Genere le';
+      case 'modified': return 'Modifie le';
+      case 'approved': return 'Approuve le';
     }
   };
 
@@ -113,18 +113,18 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
   };
 
   const handleDelete = async (snapshotId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Empêcher le clic de charger la version
+    e.stopPropagation(); // Empecher le clic de charger la version
     
     const snapshot = snapshots.find(s => s.id === snapshotId);
     if (!snapshot) return;
 
-    // Avertissement spécial si c'est la version actuelle
+    // Avertissement special si c'est la version actuelle
     if (snapshot.isCurrent) {
-      if (!confirm(`⚠️ ATTENTION : Vous êtes sur le point de supprimer la VERSION ACTUELLE (v${snapshot.version}).\n\nCette action est irréversible. Voulez-vous vraiment continuer ?`)) {
+      if (!confirm(` ATTENTION : Vous etes sur le point de supprimer la VERSION ACTUELLE (v${snapshot.version}).\n\nCette action est irreversible. Voulez-vous vraiment continuer ?`)) {
         return;
       }
     } else {
-      if (!confirm(`Supprimer la version v${snapshot.version} du ${formatDate(snapshot.date)} ?\n\nCette action est irréversible.`)) {
+      if (!confirm(`Supprimer la version v${snapshot.version} du ${formatDate(snapshot.date)} ?\n\nCette action est irreversible.`)) {
         return;
       }
     }
@@ -155,8 +155,8 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         title={isOpen 
-          ? "Masquer l'historique des versions\n\nCliquez pour masquer la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardés de cette analyse."
-          : "Afficher l'historique des versions\n\nCliquez pour afficher la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardés de cette analyse.\n\nVous pouvez:\n• Charger une version précédente (mode lecture seule)\n• Comparer différentes versions\n• Supprimer des snapshots"}
+          ? "Masquer l'historique des versions\n\nCliquez pour masquer la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardes de cette analyse."
+          : "Afficher l'historique des versions\n\nCliquez pour afficher la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardes de cette analyse.\n\nVous pouvez:\n- Charger une version precedente (mode lecture seule)\n- Comparer differentes versions\n- Supprimer des snapshots"}
       >
         {isOpen ? (
           <ChevronRightIcon className="w-5 h-5" />
@@ -220,7 +220,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
                           <span className="text-xs bg-green-600 px-2 py-0.5 rounded">Actuel</span>
                         )}
                         {snapshot.isApproved && (
-                          <CheckCircleIcon className="w-4 h-4 text-green-400 cursor-help" title="Version approuvée\n\nCette version a été marquée comme officielle et approuvée.\n\nLes versions approuvées sont utilisées comme référence pour:\n• Comparaison avec les versions futures\n• Indicateur dans le KPI Dashboard\n• Historique des décisions importantes" />
+                          <CheckCircleIcon className="w-4 h-4 text-green-400 cursor-help" title="Version approuvee\n\nCette version a ete marquee comme officielle et approuvee.\n\nLes versions approuvees sont utilisees comme reference pour:\n- Comparaison avec les versions futures\n- Indicateur dans le KPI Dashboard\n- Historique des decisions importantes" />
                         )}
                       </div>
                       <div className="text-xs text-slate-400 mt-1">{formatDate(snapshot.date)}</div>
@@ -232,7 +232,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ ticker, onLoadVersio
                       className={`ml-2 p-1.5 rounded hover:bg-red-600/20 text-slate-400 hover:text-red-400 transition-colors ${
                         deletingId === snapshot.id ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
-                      title="Supprimer cette version\n\n⚠️ ATTENTION: Cette action est irréversible!\n\nSupprime définitivement ce snapshot de l'historique.\n\nUne confirmation sera demandée avant suppression."
+                      title="Supprimer cette version\n\n ATTENTION: Cette action est irreversible!\n\nSupprime definitivement ce snapshot de l'historique.\n\nUne confirmation sera demandee avant suppression."
                       aria-label="Supprimer"
                     >
                       {deletingId === snapshot.id ? (

@@ -1,6 +1,6 @@
 /**
- * Système de gestion des permissions des composants
- * Charge les permissions depuis Supabase et filtre les composants affichés
+ * Systeme de gestion des permissions des composants
+ * Charge les permissions depuis Supabase et filtre les composants affiches
  */
 
 // Cache des permissions
@@ -65,7 +65,7 @@ async function loadUserPermissions() {
             return userPermissions;
         }
         
-        // 2. Récupérer l'utilisateur depuis sessionStorage
+        // 2. Recuperer l'utilisateur depuis sessionStorage
         let userData = null;
         try {
             userData = sessionStorage.getItem('gob-user');
@@ -74,7 +74,7 @@ async function loadUserPermissions() {
         }
         
         if (!userData) {
-            console.warn('[Roles] Aucun utilisateur connecté, using admin fallback');
+            console.warn('[Roles] Aucun utilisateur connecte, using admin fallback');
             userRole = 'admin';
             userPermissions = getDefaultPermissionsForRole('admin');
             return userPermissions;
@@ -130,15 +130,15 @@ async function loadUserPermissions() {
 }
 
 /**
- * Vérifier si un composant est autorisé
+ * Verifier si un composant est autorise
  */
 function hasPermission(componentId) {
-    // Si pas de permissions chargées, tout est autorisé (fallback)
+    // Si pas de permissions chargees, tout est autorise (fallback)
     if (!userPermissions) {
         return true;
     }
 
-    // Si le composant n'est pas dans les permissions, autoriser par défaut
+    // Si le composant n'est pas dans les permissions, autoriser par defaut
     if (!(componentId in userPermissions)) {
         return true;
     }
@@ -148,20 +148,20 @@ function hasPermission(componentId) {
 }
 
 /**
- * Vérifier si l'utilisateur est admin
+ * Verifier si l'utilisateur est admin
  */
 function isAdminUser() {
-    // Vérifier depuis userRole
+    // Verifier depuis userRole
     if (userRole === 'admin') {
         return true;
     }
     
-    // Vérifier depuis window global
+    // Verifier depuis window global
     if (window.__EMMA_ROLE__ === 'admin') {
         return true;
     }
     
-    // Vérifier depuis sessionStorage directement
+    // Verifier depuis sessionStorage directement
     try {
         const userData = sessionStorage.getItem('gob-user');
         if (userData) {
@@ -197,13 +197,13 @@ function filterTabsByPermissions(tabs) {
             return true;
         }
 
-        // Vérifier la permission
+        // Verifier la permission
         return hasPermission(tab.id);
     });
 }
 
 /**
- * Masquer les composants non autorisés dans le DOM
+ * Masquer les composants non autorises dans le DOM
  */
 function hideUnauthorizedComponents() {
     if (!userPermissions || isAdminUser()) {
@@ -232,7 +232,7 @@ function hideUnauthorizedComponents() {
 }
 
 /**
- * Initialiser le système de permissions
+ * Initialiser le systeme de permissions
  */
 async function initRolesPermissions() {
     try {
@@ -245,8 +245,8 @@ async function initRolesPermissions() {
         window.userRole = userRole;
         window.__EMMA_PERMS__ = userPermissions;
         
-        console.log('[Roles] Système de permissions initialisé');
-        console.log('[Roles] Rôle:', userRole);
+        console.log('[Roles] Systeme de permissions initialise');
+        console.log('[Roles] Role:', userRole);
         console.log('[Roles] Permissions:', Object.keys(userPermissions || {}));
     } catch (error) {
         console.error('[Roles] Init error:', error);

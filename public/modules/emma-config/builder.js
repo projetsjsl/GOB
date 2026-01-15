@@ -1,15 +1,15 @@
 /**
  * VISUAL BUILDER MANAGER
- * Gère le Drag & Drop et l'édition visuelle des emails
+ * Gere le Drag & Drop et l'edition visuelle des emails
  */
 
 import { showStatus } from './ui-helpers.js';
 
-// État local
+// Etat local
 let blocks = [];
 let selectedBlockId = null;
 
-// Types de blocs et configurations par défaut
+// Types de blocs et configurations par defaut
 const BLOCK_DEFAULTS = {
     header: {
         type: 'header',
@@ -47,12 +47,12 @@ const BLOCK_DEFAULTS = {
  * Initialisation du Builder
  */
 export function initBuilder() {
-    console.log('🏗️ Init Visual Builder...');
+    console.log(' Init Visual Builder...');
     
     setupDragAndDrop();
     setupCanvasInteractions();
     
-    // Charger un état initial vide ou démo
+    // Charger un etat initial vide ou demo
     // blocks = [];
     // renderCanvas(); 
     // (Laisse vide pour l'instant avec le placeholder)
@@ -74,7 +74,7 @@ function setupDragAndDrop() {
 
     // Zone de drop
     canvas.addEventListener('dragover', (e) => {
-        e.preventDefault(); // Nécessaire pour permettre le drop
+        e.preventDefault(); // Necessaire pour permettre le drop
         e.dataTransfer.dropEffect = 'copy';
         canvas.classList.add('bg-indigo-50', 'border-indigo-300');
     });
@@ -106,7 +106,7 @@ function addBlock(type) {
     blocks.push(newBlock);
     renderCanvas();
     selectBlock(newBlock.id);
-    showStatus('Bloc ajouté', 'success');
+    showStatus('Bloc ajoute', 'success');
 }
 
 /**
@@ -122,16 +122,16 @@ function deleteBlock(id) {
 }
 
 /**
- * Sélectionne un bloc
+ * Selectionne un bloc
  */
 function selectBlock(id) {
     selectedBlockId = id;
-    renderCanvas(); // Pour mettre à jour la classe .selected
+    renderCanvas(); // Pour mettre a jour la classe .selected
     renderPropertiesPanel();
 }
 
 /**
- * Met à jour une propriété d'un bloc
+ * Met a jour une propriete d'un bloc
  */
 function updateBlockProperty(id, key, value) {
     const block = blocks.find(b => b.id === id);
@@ -150,7 +150,7 @@ function renderCanvas() {
     if (blocks.length === 0) {
         container.innerHTML = `
             <div class="h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 bg-gray-50/50">
-                <p>Glissez et déposez des blocs ici</p>
+                <p>Glissez et deposez des blocs ici</p>
             </div>`;
         return;
     }
@@ -165,19 +165,19 @@ function renderCanvas() {
             selectBlock(block.id);
         };
 
-        // Bouton supprimer (visible au survol ou sélection)
+        // Bouton supprimer (visible au survol ou selection)
         const deleteBtn = document.createElement('button');
         deleteBtn.className = `absolute -right-3 -top-3 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-sm text-xs opacity-0 group-hover:opacity-100 transition-opacity ${selectedBlockId === block.id ? 'opacity-100' : ''}`;
-        deleteBtn.innerHTML = '✕';
+        deleteBtn.innerHTML = '';
         deleteBtn.onclick = (e) => {
             e.stopPropagation();
             deleteBlock(block.id);
         };
         el.appendChild(deleteBtn);
 
-        // Contenu du bloc (Prévisualisation simplifiée)
+        // Contenu du bloc (Previsualisation simplifiee)
         const content = document.createElement('div');
-        content.className = 'p-4 pointer-events-none'; // Click-through pour sélectionner le wrapper
+        content.className = 'p-4 pointer-events-none'; // Click-through pour selectionner le wrapper
         content.innerHTML = renderBlockPreview(block);
         
         el.appendChild(content);
@@ -186,7 +186,7 @@ function renderCanvas() {
 }
 
 /**
- * Rendu HTML simplifié pour le Canvas (Preview)
+ * Rendu HTML simplifie pour le Canvas (Preview)
  */
 function renderBlockPreview(block) {
     switch (block.type) {
@@ -224,7 +224,7 @@ function renderBlockPreview(block) {
 }
 
 /**
- * Rendu du Panneau de Propriétés
+ * Rendu du Panneau de Proprietes
  */
 function renderPropertiesPanel() {
     const panel = document.getElementById('inspector-panel');
@@ -232,8 +232,8 @@ function renderPropertiesPanel() {
     if (!selectedBlockId) {
         panel.innerHTML = `
             <div class="text-center text-gray-400 mt-20">
-                <div class="text-4xl mb-2">👆</div>
-                <p class="text-sm">Sélectionnez un bloc</p>
+                <div class="text-4xl mb-2"></div>
+                <p class="text-sm">Selectionnez un bloc</p>
             </div>`;
         return;
     }
@@ -247,7 +247,7 @@ function renderPropertiesPanel() {
             <span class="text-xs text-gray-400 font-mono">${block.id.split('_')[1]}</span>
         </div>`;
 
-    // Génération champs dynamique selon type
+    // Generation champs dynamique selon type
     if (block.type === 'header') {
         formHtml += createInput('Titre', 'title', block.title);
         formHtml += createInput('Sous-titre', 'subtitle', block.subtitle);
@@ -257,7 +257,7 @@ function renderPropertiesPanel() {
         formHtml += createTextarea('Contenu', 'content', block.content);
     }
     else if (block.type === 'button') {
-        formHtml += createInput('Libellé', 'label', block.label);
+        formHtml += createInput('Libelle', 'label', block.label);
         formHtml += createInput('URL', 'url', block.url);
         formHtml += createColorInput('Couleur', 'color', block.color);
     }
@@ -343,7 +343,7 @@ function attachPropertyListeners(blockId) {
 }
 
 /**
- * Setup interactions génériques canvas
+ * Setup interactions generiques canvas
  */
 function setupCanvasInteractions() {
     // Click outside to deselect

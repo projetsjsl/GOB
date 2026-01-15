@@ -8,7 +8,7 @@ const WORKFLOWS = {
     id: 'hotel-booking', 
     name: 'Hotel Search', 
     description: 'Search hotels on Booking.com', 
-    icon: '🏨', 
+    icon: '', 
     category: 'travel',
     variables: [{ name: 'location', label: 'City/Location', type: 'text', required: true, placeholder: 'Paris' }],
     taskTemplate: 'Search hotels in {location} on Booking.com' 
@@ -17,7 +17,7 @@ const WORKFLOWS = {
     id: 'github-search', 
     name: 'GitHub Search', 
     description: 'Find repositories', 
-    icon: '💻', 
+    icon: '', 
     category: 'development',
     variables: [{ name: 'query', label: 'Search Query', type: 'text', required: true, placeholder: 'react typescript' }],
     taskTemplate: 'Find {query} repositories on GitHub' 
@@ -26,7 +26,7 @@ const WORKFLOWS = {
     id: 'amazon-product', 
     name: 'Amazon Search', 
     description: 'Search products', 
-    icon: '🛒', 
+    icon: '', 
     category: 'shopping',
     variables: [{ name: 'product', label: 'Product Name', type: 'text', required: true, placeholder: 'wireless headphones' }],
     taskTemplate: 'Search for {product} on Amazon' 
@@ -35,7 +35,7 @@ const WORKFLOWS = {
     id: 'linkedin-jobs', 
     name: 'LinkedIn Jobs', 
     description: 'Find jobs', 
-    icon: '💼', 
+    icon: '', 
     category: 'career',
     variables: [{ name: 'title', label: 'Job Title', type: 'text', required: true, placeholder: 'Software Engineer' }],
     taskTemplate: 'Find {title} jobs on LinkedIn' 
@@ -44,7 +44,7 @@ const WORKFLOWS = {
     id: 'youtube-videos', 
     name: 'YouTube Search', 
     description: 'Search videos', 
-    icon: '📺', 
+    icon: '', 
     category: 'media',
     variables: [{ name: 'query', label: 'Search Query', type: 'text', required: true, placeholder: 'javascript tutorial' }],
     taskTemplate: 'Search for {query} videos on YouTube' 
@@ -53,7 +53,7 @@ const WORKFLOWS = {
     id: 'web-research', 
     name: 'Web Research', 
     description: 'Research a topic', 
-    icon: '🔬', 
+    icon: '', 
     category: 'research',
     variables: [{ name: 'topic', label: 'Research Topic', type: 'text', required: true, placeholder: 'AI trends 2024' }],
     taskTemplate: 'Research {topic} on Google' 
@@ -62,7 +62,7 @@ const WORKFLOWS = {
     id: 'social-monitor', 
     name: 'Social Monitor', 
     description: 'Monitor social media', 
-    icon: '📱', 
+    icon: '', 
     category: 'social',
     variables: [{ name: 'keyword', label: 'Keyword', type: 'text', required: true, placeholder: '@company or #hashtag' }],
     taskTemplate: 'Search for {keyword} on Twitter' 
@@ -71,7 +71,7 @@ const WORKFLOWS = {
     id: 'price-tracker', 
     name: 'Price Tracker', 
     description: 'Track prices', 
-    icon: '💰', 
+    icon: '', 
     category: 'shopping',
     variables: [{ name: 'product', label: 'Product', type: 'text', required: true }],
     taskTemplate: 'Check price for {product}' 
@@ -79,14 +79,14 @@ const WORKFLOWS = {
 };
 
 const CATEGORIES = [
-  { id: 'all', name: 'All', icon: '📋' }, 
-  { id: 'travel', name: 'Travel', icon: '✈️' },
-  { id: 'shopping', name: 'Shopping', icon: '🛍️' }, 
-  { id: 'development', name: 'Development', icon: '💻' },
-  { id: 'career', name: 'Career', icon: '💼' }, 
-  { id: 'research', name: 'Research', icon: '🔬' },
-  { id: 'social', name: 'Social', icon: '📱' }, 
-  { id: 'media', name: 'Media', icon: '🎬' }
+  { id: 'all', name: 'All', icon: '' }, 
+  { id: 'travel', name: 'Travel', icon: '' },
+  { id: 'shopping', name: 'Shopping', icon: '' }, 
+  { id: 'development', name: 'Development', icon: '' },
+  { id: 'career', name: 'Career', icon: '' }, 
+  { id: 'research', name: 'Research', icon: '' },
+  { id: 'social', name: 'Social', icon: '' }, 
+  { id: 'media', name: 'Media', icon: '' }
 ];
 
 export default async function handler(req, res) {

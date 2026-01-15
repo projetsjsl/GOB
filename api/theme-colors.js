@@ -1,8 +1,8 @@
 /**
- * API endpoint pour servir la configuration des couleurs du thème
+ * API endpoint pour servir la configuration des couleurs du theme
  * 
- * Permet aux workflows n8n et autres services externes d'accéder
- * aux couleurs centralisées sans avoir à charger le fichier directement.
+ * Permet aux workflows n8n et autres services externes d'acceder
+ * aux couleurs centralisees sans avoir a charger le fichier directement.
  */
 
 import { readFileSync } from 'fs';
@@ -18,7 +18,7 @@ function loadThemeConfig() {
     const configContent = readFileSync(configPath, 'utf-8');
     return JSON.parse(configContent);
   } catch (error) {
-    console.error('❌ Erreur chargement config couleurs:', error);
+    console.error(' Erreur chargement config couleurs:', error);
     throw new Error('Failed to load theme configuration');
   }
 }
@@ -36,14 +36,14 @@ export default async function handler(req, res) {
   try {
     const config = loadThemeConfig();
     
-    // Retourner la config complète
+    // Retourner la config complete
     return res.status(200).json({
       success: true,
       theme: config
     });
 
   } catch (error) {
-    console.error('❌ Erreur API theme-colors:', error);
+    console.error(' Erreur API theme-colors:', error);
     return res.status(500).json({
       success: false,
       error: error.message

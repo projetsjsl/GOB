@@ -38,13 +38,13 @@
 
     // Suggestions rapides pour AskEmma
     window.DASHBOARD_CONSTANTS.askEmmaSuggestions = [
-        "Analyse complète de Microsoft",
+        "Analyse complete de Microsoft",
         "Comparer Tesla vs Nvidia",
-        "Résultats récents d'Apple",
-        "Actualités IA récentes",
-        "Vue globale des marchés",
+        "Resultats recents d'Apple",
+        "Actualites IA recentes",
+        "Vue globale des marches",
         "Valorisation Amazon (DCF)",
-        "Explique-moi le Score JSLAI™",
+        "Explique-moi le Score JSLAITM",
         "Analyse des dividendes BCE",
         "Comment utiliser l'onglet JLab ?"
     ];

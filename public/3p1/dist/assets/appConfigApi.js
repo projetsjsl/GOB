@@ -64,9 +64,9 @@ async function loadAppConfig() {
           throw new Error(`HTTP ${response.status}`);
         }
       } catch (apiError) {
-        console.warn("⚠️ API app-config failed:", apiError);
+        console.warn(" API app-config failed:", apiError);
         if (isLocalhost) {
-          console.log("🔄 Localhost - Chargement direct config depuis Supabase...");
+          console.log(" Localhost - Chargement direct config depuis Supabase...");
           const { getSupabaseClient } = await __vitePreload(async () => {
             const { getSupabaseClient: getSupabaseClient2 } = await import("./index.js").then((n) => n.B);
             return { getSupabaseClient: getSupabaseClient2 };
@@ -76,13 +76,13 @@ async function loadAppConfig() {
             const { data, error } = await supabase.from("app_config").select("config_key, config_value");
             if (!error && data) {
               configData = data;
-              console.log(`✅ ${configData.length} configs chargées directement depuis Supabase`);
+              console.log(` ${configData.length} configs chargees directement depuis Supabase`);
             }
           }
         }
       }
       if (configData.length === 0) {
-        console.warn("⚠️ Aucune config trouvée, utilisation des valeurs par défaut");
+        console.warn(" Aucune config trouvee, utilisation des valeurs par defaut");
         configCache = DEFAULT_CONFIG;
         configCacheTimestamp = now;
         return DEFAULT_CONFIG;
@@ -106,10 +106,10 @@ async function loadAppConfig() {
       const finalConfig = { ...DEFAULT_CONFIG, ...config };
       configCache = finalConfig;
       configCacheTimestamp = now;
-      console.log("✅ Configurations chargées depuis Supabase");
+      console.log(" Configurations chargees depuis Supabase");
       return finalConfig;
     } catch (error) {
-      console.error("❌ Erreur chargement configurations depuis Supabase:", error);
+      console.error(" Erreur chargement configurations depuis Supabase:", error);
       configCache = DEFAULT_CONFIG;
       configCacheTimestamp = now;
       return DEFAULT_CONFIG;

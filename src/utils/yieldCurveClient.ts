@@ -38,12 +38,12 @@ export async function fetchYieldCurve(options: FetchOptions = {}): Promise<Yield
     // Return cached data if available, otherwise return inflight request
     const cached = cache.get(cacheKey);
     if (cached) {
-      console.log(`🛑 yieldCurveClient RATE LIMITED (${cacheKey}) - returning cached`);
+      console.log(` yieldCurveClient RATE LIMITED (${cacheKey}) - returning cached`);
       return cached.data;
     }
     const inflightReq = inflight.get(cacheKey);
     if (inflightReq) {
-      console.log(`🛑 yieldCurveClient RATE LIMITED (${cacheKey}) - joining inflight`);
+      console.log(` yieldCurveClient RATE LIMITED (${cacheKey}) - joining inflight`);
       return inflightReq;
     }
   }

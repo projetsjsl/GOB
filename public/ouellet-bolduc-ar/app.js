@@ -93,7 +93,7 @@ function initShare(shareUrl) {
   if (copyBtn) {
     copyBtn.addEventListener("click", async () => {
       await copyToClipboard(shareUrl);
-      copyBtn.textContent = "Lien copié";
+      copyBtn.textContent = "Lien copie";
       setTimeout(() => (copyBtn.textContent = "Copier le lien"), 1800);
     });
   }
@@ -103,8 +103,8 @@ function initShare(shareUrl) {
       if (navigator.share) {
         try {
           await navigator.share({
-            title: "Démo AR Ouellet-Bolduc",
-            text: "Ouvrez la démo AR et le viewer 3D.",
+            title: "Demo AR Ouellet-Bolduc",
+            text: "Ouvrez la demo AR et le viewer 3D.",
             url: shareUrl,
           });
         } catch {

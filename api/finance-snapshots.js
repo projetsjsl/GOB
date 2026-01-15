@@ -66,7 +66,7 @@ export default async function handler(req, res) {
                 return res.status(405).json({ error: 'Method not allowed' });
         }
     } catch (error) {
-        console.error('❌ Finance snapshots API error:', error);
+        console.error(' Finance snapshots API error:', error);
         console.error('Error stack:', error.stack);
         console.error('Request method:', req.method);
         console.error('Request body keys:', req.body ? Object.keys(req.body) : 'no body');
@@ -119,7 +119,7 @@ async function getSnapshots(req, res, supabase) {
             const tickerSet = new Set(data.map(row => row.ticker));
             const tickers = Array.from(tickerSet);
 
-            console.log(`📊 KPI Bulk Query: ${tickers.length} approved tickers returned`);
+            console.log(` KPI Bulk Query: ${tickers.length} approved tickers returned`);
             return res.status(200).json({
                 success: true,
                 count: tickers.length,
@@ -218,7 +218,7 @@ async function createSnapshot(req, res, supabase) {
         is_watchlist = false,
         auto_fetched = false,
         user_id = null,
-        sync_metadata = null // Métadonnées de synchronisation
+        sync_metadata = null // Metadonnees de synchronisation
     } = req.body;
 
     // Validation
@@ -235,11 +235,11 @@ async function createSnapshot(req, res, supabase) {
         });
     }
 
-    // Vérifier la taille des données (limite approximative de 1MB pour JSONB)
+    // Verifier la taille des donnees (limite approximative de 1MB pour JSONB)
     try {
         const dataSize = JSON.stringify({ annual_data, assumptions, company_info }).length;
         if (dataSize > 1000000) { // 1MB
-            console.warn(`⚠️ Large payload for ${ticker}: ${(dataSize / 1024).toFixed(2)}KB`);
+            console.warn(` Large payload for ${ticker}: ${(dataSize / 1024).toFixed(2)}KB`);
         }
     } catch (sizeError) {
         console.warn('Could not calculate payload size:', sizeError);
@@ -249,11 +249,11 @@ async function createSnapshot(req, res, supabase) {
     const isCurrentValue = is_current !== undefined ? Boolean(is_current) : true;
     const snapshotDate = new Date().toISOString().split('T')[0];
 
-    // Nettoyer annual_data : supprimer les champs non standard et valider les valeurs numériques
+    // Nettoyer annual_data : supprimer les champs non standard et valider les valeurs numeriques
     let cleanedAnnualData = [];
     try {
         if (Array.isArray(annual_data) && annual_data.length > 0) {
-            // Fonction helper pour nettoyer les valeurs numériques
+            // Fonction helper pour nettoyer les valeurs numeriques
             const cleanNumber = (val) => {
                 if (val === null || val === undefined) return 0;
                 const num = Number(val);
@@ -288,7 +288,7 @@ async function createSnapshot(req, res, supabase) {
                 // Ajouter les champs optionnels seulement s'ils existent
                 if (row.isEstimate !== undefined) cleaned.isEstimate = Boolean(row.isEstimate);
                 if (row.autoFetched !== undefined) cleaned.autoFetched = Boolean(row.autoFetched);
-                // Note: dataSource est conservé car c'est un champ valide dans AnnualData
+                // Note: dataSource est conserve car c'est un champ valide dans AnnualData
                 if (row.dataSource && ['fmp-verified', 'fmp-adjusted', 'manual', 'calculated'].includes(row.dataSource)) {
                     cleaned.dataSource = row.dataSource;
                 }
@@ -299,11 +299,11 @@ async function createSnapshot(req, res, supabase) {
             cleanedAnnualData = [];
         } else {
             // Si ce n'est pas un array, essayer de le convertir ou utiliser un array vide
-            console.warn(`⚠️ annual_data is not an array for ${cleanTicker}, using empty array`);
+            console.warn(` annual_data is not an array for ${cleanTicker}, using empty array`);
             cleanedAnnualData = [];
         }
     } catch (cleanError) {
-        console.error(`❌ Error cleaning annual_data for ${cleanTicker}:`, cleanError);
+        console.error(` Error cleaning annual_data for ${cleanTicker}:`, cleanError);
         cleanedAnnualData = [];
     }
 
@@ -318,12 +318,12 @@ async function createSnapshot(req, res, supabase) {
             ? company_info 
             : {};
     } catch (cleanError) {
-        console.error(`❌ Error cleaning assumptions/company_info for ${cleanTicker}:`, cleanError);
+        console.error(` Error cleaning assumptions/company_info for ${cleanTicker}:`, cleanError);
         cleanedAssumptions = {};
         cleanedCompanyInfo = {};
     }
 
-    // Create snapshot - Construire l'objet d'insertion de manière conditionnelle
+    // Create snapshot - Construire l'objet d'insertion de maniere conditionnelle
     const insertData = {
         ticker: cleanTicker,
         profile_id: profile_id || cleanTicker,
@@ -333,19 +333,19 @@ async function createSnapshot(req, res, supabase) {
         is_current: isCurrentValue,
         is_watchlist: is_watchlist !== undefined ? Boolean(is_watchlist) : false,
         auto_fetched: auto_fetched !== undefined ? Boolean(auto_fetched) : false,
-        annual_data: cleanedAnnualData, // Utiliser les données nettoyées
+        annual_data: cleanedAnnualData, // Utiliser les donnees nettoyees
         assumptions: cleanedAssumptions,
         company_info: cleanedCompanyInfo
     };
     
-    // Ajouter sync_metadata seulement si fourni (colonne peut ne pas exister si migration non appliquée)
+    // Ajouter sync_metadata seulement si fourni (colonne peut ne pas exister si migration non appliquee)
     if (sync_metadata !== null && sync_metadata !== undefined) {
         insertData.sync_metadata = sync_metadata;
     }
 
-    // Log pour debug (seulement en développement)
+    // Log pour debug (seulement en developpement)
     if (process.env.NODE_ENV === 'development') {
-        console.log(`📝 Attempting to create snapshot for ${cleanTicker}:`, {
+        console.log(` Attempting to create snapshot for ${cleanTicker}:`, {
             ticker: insertData.ticker,
             annual_data_length: cleanedAnnualData.length,
             has_assumptions: Object.keys(cleanedAssumptions).length > 0,
@@ -370,7 +370,7 @@ async function createSnapshot(req, res, supabase) {
         });
 
         if (error) {
-            console.error(`❌ Create snapshot error for ${cleanTicker}:`, error);
+            console.error(` Create snapshot error for ${cleanTicker}:`, error);
             return res.status(500).json({ 
                 error: 'Failed to create snapshot',
                 details: error.message,
@@ -380,7 +380,7 @@ async function createSnapshot(req, res, supabase) {
             });
         }
 
-        console.log(`✅ Created snapshot for ${cleanTicker} (version ${data.version})`);
+        console.log(` Created snapshot for ${cleanTicker} (version ${data.version})`);
         return res.status(201).json(data);
     }
 
@@ -391,7 +391,7 @@ async function createSnapshot(req, res, supabase) {
         .single();
 
     if (error) {
-        console.error(`❌ Create snapshot error for ${cleanTicker}:`, error);
+        console.error(` Create snapshot error for ${cleanTicker}:`, error);
         console.error('Error details:', {
             message: error.message,
             code: error.code,
@@ -408,10 +408,10 @@ async function createSnapshot(req, res, supabase) {
         });
     }
 
-    console.log(`✅ Created snapshot for ${cleanTicker} (version ${data.version})`);
+    console.log(` Created snapshot for ${cleanTicker} (version ${data.version})`);
     return res.status(201).json(data);
     } catch (snapshotError) {
-        console.error(`❌ Unexpected error in createSnapshot for ${req.body?.ticker || 'unknown'}:`, snapshotError);
+        console.error(` Unexpected error in createSnapshot for ${req.body?.ticker || 'unknown'}:`, snapshotError);
         console.error('Error stack:', snapshotError.stack);
         return res.status(500).json({ 
             error: 'Failed to create snapshot',

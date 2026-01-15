@@ -27,7 +27,7 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
             }
         } catch (error) {
             console.error('Erreur chargement destinataires:', error);
-            alert('❌ Erreur lors du chargement: ' + error.message);
+            alert(' Erreur lors du chargement: ' + error.message);
         } finally {
             setLoading(false);
         }
@@ -36,7 +36,7 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
     // Ajouter un nouveau destinataire
     const addRecipient = async () => {
         if (!newEmail.email || !newEmail.email.includes('@')) {
-            alert('❌ Veuillez entrer une adresse email valide');
+            alert(' Veuillez entrer une adresse email valide');
             return;
         }
 
@@ -59,19 +59,19 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
             if (result.success) {
                 setNewEmail({ email: '', label: '' });
                 await loadRecipients();
-                alert('✅ Destinataire ajouté avec succès !');
+                alert(' Destinataire ajoute avec succes !');
             } else {
-                alert('❌ Erreur: ' + result.error);
+                alert(' Erreur: ' + result.error);
             }
         } catch (error) {
             console.error('Erreur ajout destinataire:', error);
-            alert('❌ Erreur lors de l\'ajout: ' + error.message);
+            alert(' Erreur lors de l\'ajout: ' + error.message);
         } finally {
             setSaving({ ...saving, add: false });
         }
     };
 
-    // Mettre à jour un destinataire (toggle case à cocher)
+    // Mettre a jour un destinataire (toggle case a cocher)
     const updateRecipient = async (id, field, value) => {
         setSaving({ ...saving, [id]: true });
         try {
@@ -85,26 +85,26 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
             });
             const result = await response.json();
             if (result.success) {
-                // Mettre à jour localement
+                // Mettre a jour localement
                 setRecipients(recipients.map(r =>
                     r.id === id ? { ...r, [field]: value } : r
                 ));
             } else {
-                alert('❌ Erreur: ' + result.error);
+                alert(' Erreur: ' + result.error);
                 await loadRecipients(); // Recharger en cas d'erreur
             }
         } catch (error) {
-            console.error('Erreur mise à jour destinataire:', error);
-            alert('❌ Erreur lors de la mise à jour: ' + error.message);
+            console.error('Erreur mise a jour destinataire:', error);
+            alert(' Erreur lors de la mise a jour: ' + error.message);
             await loadRecipients(); // Recharger en cas d'erreur
         } finally {
             setSaving({ ...saving, [id]: false });
         }
     };
 
-    // Mettre à jour l'email de preview
+    // Mettre a jour l'email de preview
     const updatePreviewEmail = async (email) => {
-        // Trouver le destinataire actuel avec is_preview=true et le désactiver
+        // Trouver le destinataire actuel avec is_preview=true et le desactiver
         const currentPreview = recipients.find(r => r.is_preview && r.active);
         if (currentPreview) {
             await updateRecipient(currentPreview.id, 'is_preview', false);
@@ -120,7 +120,7 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
 
     // Supprimer un destinataire
     const deleteRecipient = async (id) => {
-        if (!confirm('Êtes-vous sûr de vouloir supprimer ce destinataire ?')) {
+        if (!confirm('Etes-vous sur de vouloir supprimer ce destinataire ?')) {
             return;
         }
 
@@ -132,13 +132,13 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
             const result = await response.json();
             if (result.success) {
                 await loadRecipients();
-                alert('✅ Destinataire supprimé avec succès !');
+                alert(' Destinataire supprime avec succes !');
             } else {
-                alert('❌ Erreur: ' + result.error);
+                alert(' Erreur: ' + result.error);
             }
         } catch (error) {
             console.error('Erreur suppression destinataire:', error);
-            alert('❌ Erreur lors de la suppression: ' + error.message);
+            alert(' Erreur lors de la suppression: ' + error.message);
         } finally {
             setSaving({ ...saving, [id]: false });
         }
@@ -163,7 +163,7 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
                 <label className={`text-sm font-semibold mb-2 block transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                 }`}>
-                    📬 Email pour Previews (Tests Manuels)
+                     Email pour Previews (Tests Manuels)
                 </label>
                 <select
                     value={previewEmail}
@@ -183,11 +183,11 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
                 <p className={`text-xs mt-2 transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 }`}>
-                    Cette adresse recevra les emails de prévisualisation lors des tests manuels
+                    Cette adresse recevra les emails de previsualisation lors des tests manuels
                 </p>
             </div>
 
-            {/* Tableau des destinataires avec colonnes de cases à cocher */}
+            {/* Tableau des destinataires avec colonnes de cases a cocher */}
             <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                 isDarkMode ? 'bg-gray-900 border-gray-600' : 'bg-gray-50 border-gray-200'
             }`}>
@@ -216,19 +216,19 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
                                             Label
                                         </th>
                                         <th className={`text-center py-3 px-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            🌅 Matin
+                                             Matin
                                         </th>
                                         <th className={`text-center py-3 px-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            ☀️ Midi
+                                             Midi
                                         </th>
                                         <th className={`text-center py-3 px-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            🌙 Soir
+                                             Soir
                                         </th>
                                         <th className={`text-center py-3 px-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            📝 Perso
+                                             Perso
                                         </th>
                                         <th className={`text-center py-3 px-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            📬 Preview
+                                             Preview
                                         </th>
                                         <th className={`text-center py-3 px-4 font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Actions
@@ -308,7 +308,7 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
                                                         }`}
                                                         disabled={saving[recipient.id]}
                                                     >
-                                                        {recipient.active ? 'Désactiver' : 'Activer'}
+                                                        {recipient.active ? 'Desactiver' : 'Activer'}
                                                     </button>
                                                     <button
                                                         onClick={() => deleteRecipient(recipient.id)}
@@ -323,7 +323,7 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
                                     ) : (
                                         <tr>
                                             <td colSpan="8" className={`py-8 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                Aucun destinataire configuré
+                                                Aucun destinataire configure
                                             </td>
                                         </tr>
                                     )}
@@ -335,19 +335,19 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
                         <div className={`mt-4 p-3 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                             <div className="grid grid-cols-4 gap-4 text-sm">
                                 <div>
-                                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>🌅 Matin:</span>
+                                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}> Matin:</span>
                                     <span className={`ml-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{countActive('morning')}</span>
                                 </div>
                                 <div>
-                                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>☀️ Midi:</span>
+                                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}> Midi:</span>
                                     <span className={`ml-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{countActive('midday')}</span>
                                 </div>
                                 <div>
-                                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>🌙 Soir:</span>
+                                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}> Soir:</span>
                                     <span className={`ml-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{countActive('evening')}</span>
                                 </div>
                                 <div>
-                                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>📝 Perso:</span>
+                                    <span className={`font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}> Perso:</span>
                                     <span className={`ml-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{countActive('custom')}</span>
                                 </div>
                             </div>
@@ -392,7 +392,7 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
                                             : 'bg-purple-600 hover:bg-purple-700 text-white'
                                     }`}
                                 >
-                                    {saving.add ? '⏳' : '➕'} Ajouter
+                                    {saving.add ? '' : ''} Ajouter
                                 </button>
                             </div>
                         </div>
@@ -403,7 +403,7 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
                                 onClick={loadRecipients}
                                 className="px-6 py-2 rounded-lg font-medium bg-gray-600 hover:bg-gray-700 text-white transition-colors duration-300"
                             >
-                                🔄 Recharger
+                                 Recharger
                             </button>
                         </div>
 
@@ -411,7 +411,7 @@ export const EmailRecipientsManager: React.FC<TabProps> = (props) => {
                         <div className={`mt-4 p-3 rounded-lg text-sm transition-colors duration-300 ${
                             isDarkMode ? 'bg-blue-900/20 text-blue-300' : 'bg-blue-50 text-blue-800'
                         }`}>
-                            💡 <strong>Note:</strong> Les modifications sont sauvegardées dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">Supabase</code> et utilisées automatiquement par n8n lors de l'envoi des briefings. Cochez les cases pour indiquer quels emails doivent recevoir chaque type de briefing.
+                             <strong>Note:</strong> Les modifications sont sauvegardees dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">Supabase</code> et utilisees automatiquement par n8n lors de l'envoi des briefings. Cochez les cases pour indiquer quels emails doivent recevoir chaque type de briefing.
                         </div>
                     </>
                 )}

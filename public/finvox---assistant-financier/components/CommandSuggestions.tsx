@@ -27,7 +27,7 @@ const CommandSuggestions: React.FC<CommandSuggestionsProps> = ({ onCommandSelect
     <div className="w-full flex flex-col gap-3">
       <div className="flex items-center justify-between">
          <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold ml-1">
-          {search ? 'Résultats de recherche' : 'Commandes Disponibles'}
+          {search ? 'Resultats de recherche' : 'Commandes Disponibles'}
         </p>
       </div>
       
@@ -82,7 +82,7 @@ const CommandSuggestions: React.FC<CommandSuggestionsProps> = ({ onCommandSelect
               <span className={`text-[10px] font-bold uppercase tracking-wider mb-1 px-1.5 py-0.5 rounded
                 ${cmd.category === 'Bourse' ? 'bg-blue-500/10 text-blue-400' :
                   cmd.category === 'Analyse' ? 'bg-purple-500/10 text-purple-400' :
-                  cmd.category === 'Économie' ? 'bg-green-500/10 text-green-400' :
+                  cmd.category === 'Economie' ? 'bg-green-500/10 text-green-400' :
                   cmd.category === 'Politique' ? 'bg-red-500/10 text-red-400' :
                   cmd.category === 'Portefeuille' ? 'bg-yellow-500/10 text-yellow-400' :
                   cmd.category === 'Actu' ? 'bg-pink-500/10 text-pink-400' :
@@ -98,7 +98,7 @@ const CommandSuggestions: React.FC<CommandSuggestionsProps> = ({ onCommandSelect
                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                  </svg>
-                 Aucune commande trouvée.
+                 Aucune commande trouvee.
              </div>
         )}
       </div>
@@ -125,7 +125,7 @@ const CommandSuggestions: React.FC<CommandSuggestionsProps> = ({ onCommandSelect
                   className="text-xs text-slate-500 hover:text-emerald-400 transition-colors font-medium flex items-center justify-center gap-1 mx-auto"
                   disabled={disabled}
               >
-                  Réduire la liste
+                  Reduire la liste
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
                   </svg>

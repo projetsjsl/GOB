@@ -65,7 +65,7 @@
     
     // Log in development mode
     if (ENV_CONFIG.ENABLE_DEBUG_LOGGING) {
-        console.log('🔧 Environment config loaded:', {
+        console.log(' Environment config loaded:', {
             ...ENV_CONFIG,
             SUPABASE_ANON_KEY: ENV_CONFIG.SUPABASE_ANON_KEY ? '***configured***' : 'not set'
         });

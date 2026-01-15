@@ -1,14 +1,14 @@
 /**
  * Yield Curve API Endpoint
  *
- * Récupère les données de la courbe des taux (yield curve) pour US et Canada
- * Sources de données: FRED API, Bank of Canada API, FMP API
- * Stockage: Supabase pour cache et données historiques
+ * Recupere les donnees de la courbe des taux (yield curve) pour US et Canada
+ * Sources de donnees: FRED API, Bank of Canada API, FMP API
+ * Stockage: Supabase pour cache et donnees historiques
  *
  * Endpoints:
  * - GET /api/yield-curve?country=us (ou canada)
- * - GET /api/yield-curve?country=both (défaut)
- * - GET /api/yield-curve?country=us&date=2024-01-15 (données historiques)
+ * - GET /api/yield-curve?country=both (defaut)
+ * - GET /api/yield-curve?country=us&date=2024-01-15 (donnees historiques)
  */
 import { createSupabaseClient } from '../lib/supabase-config.js';
 
@@ -59,7 +59,7 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = DEFAULT_FETCH_TIM
   }
 }
 
-// Configuration des taux par maturité
+// Configuration des taux par maturite
 const US_TREASURY_RATES = {
   '1M': 'DGS1MO',   // 1 mois
   '3M': 'DGS3MO',   // 3 mois
@@ -77,7 +77,7 @@ const US_TREASURY_RATES = {
 // Updated Bank of Canada series IDs (December 2024)
 // Old V39xxx series are deprecated
 const CANADA_RATES = {
-  // Treasury Bills (Bons du Trésor) - from tbill_all group
+  // Treasury Bills (Bons du Tresor) - from tbill_all group
   '1M': 'V80691342',
   '3M': 'V80691344',
   '6M': 'V80691345',
@@ -106,7 +106,7 @@ const CANADA_FALLBACK = [
   { maturity: '30Y', rate: 3.83 }
 ];
 
-// Convertir la maturité en mois pour le tri
+// Convertir la maturite en mois pour le tri
 function maturityToMonths(maturity) {
   const value = parseFloat(maturity);
   if (maturity.includes('M')) return value;
@@ -116,16 +116,16 @@ function maturityToMonths(maturity) {
 
 
 /**
- * Récupère les données depuis FRED API
- * Récupère l'historique pour calculer la variation sur 1 mois
- * @param {string} seriesId - ID de la série FRED
- * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour données historiques)
+ * Recupere les donnees depuis FRED API
+ * Recupere l'historique pour calculer la variation sur 1 mois
+ * @param {string} seriesId - ID de la serie FRED
+ * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour donnees historiques)
  */
 async function fetchFromFRED(seriesId, targetDate = null) {
   const FRED_API_KEY = process.env.FRED_API_KEY;
 
   if (!FRED_API_KEY) {
-    console.warn('⚠️ FRED_API_KEY non configurée');
+    console.warn(' FRED_API_KEY non configuree');
     return null;
   }
 
@@ -133,8 +133,8 @@ async function fetchFromFRED(seriesId, targetDate = null) {
     let url;
     
     if (targetDate) {
-      // Récupérer les données pour une date spécifique (historique)
-      // FRED nécessite une plage de dates, on prend 30 jours autour de la date cible
+      // Recuperer les donnees pour une date specifique (historique)
+      // FRED necessite une plage de dates, on prend 30 jours autour de la date cible
       const target = new Date(targetDate);
       const startDate = new Date(target);
       startDate.setDate(startDate.getDate() - 15);
@@ -143,21 +143,21 @@ async function fetchFromFRED(seriesId, targetDate = null) {
       
       url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&observation_start=${startDate.toISOString().split('T')[0]}&observation_end=${endDate.toISOString().split('T')[0]}&sort_order=desc`;
     } else {
-      // Récupérer les 30 dernières observations (données actuelles)
+      // Recuperer les 30 dernieres observations (donnees actuelles)
       url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json&sort_order=desc&limit=30`;
     }
 
     const response = await fetchWithTimeout(url);
 
     if (!response.ok) {
-      console.warn(`⚠️ FRED API erreur pour ${seriesId}: ${response.status}`);
+      console.warn(` FRED API erreur pour ${seriesId}: ${response.status}`);
       return null;
     }
 
     const data = await response.json();
 
     if (data.observations && data.observations.length > 0) {
-      // Nettoyer les données (' . ' valeurs manquantes)
+      // Nettoyer les donnees (' . ' valeurs manquantes)
       const validObs = data.observations.filter(o => o.value !== '.' && o.value !== null);
       
       if (validObs.length === 0) return null;
@@ -165,20 +165,20 @@ async function fetchFromFRED(seriesId, targetDate = null) {
       let targetObs;
       
       if (targetDate) {
-        // Pour données historiques, trouver l'observation la plus proche de la date cible
+        // Pour donnees historiques, trouver l'observation la plus proche de la date cible
         const target = new Date(targetDate);
         targetObs = validObs.find(obs => {
           const obsDate = new Date(obs.date);
           return obsDate <= target;
-        }) || validObs[validObs.length - 1]; // Prendre la plus récente disponible si pas d'exact match
+        }) || validObs[validObs.length - 1]; // Prendre la plus recente disponible si pas d'exact match
       } else {
-        // Pour données actuelles, prendre la plus récente
+        // Pour donnees actuelles, prendre la plus recente
         targetObs = validObs[0];
       }
 
       if (!targetObs) return null;
 
-      // Chercher ~1 mois en arrière (seulement pour données actuelles)
+      // Chercher ~1 mois en arriere (seulement pour donnees actuelles)
       let prevObs = null;
       if (!targetDate) {
         const prevIndex = Math.min(21, validObs.length - 1);
@@ -195,21 +195,21 @@ async function fetchFromFRED(seriesId, targetDate = null) {
 
     return null;
   } catch (error) {
-    console.error(`❌ Erreur FRED pour ${seriesId}:`, error.message);
+    console.error(` Erreur FRED pour ${seriesId}:`, error.message);
     return null;
   }
 }
 
 /**
- * Récupère les données directement depuis Treasury.gov (NO API KEY REQUIRED)
- * Source officielle du gouvernement américain - très fiable
+ * Recupere les donnees directement depuis Treasury.gov (NO API KEY REQUIRED)
+ * Source officielle du gouvernement americain - tres fiable
  */
 async function fetchFromTreasuryGov() {
   try {
     const currentYear = new Date().getFullYear();
     const url = `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/${currentYear}/all?type=daily_treasury_yield_curve&field_tdr_date_value=${currentYear}&page&_format=csv`;
 
-    console.log('📊 Tentative Treasury.gov (source officielle, sans API key)...');
+    console.log(' Tentative Treasury.gov (source officielle, sans API key)...');
 
     const response = await fetchWithTimeout(url, {
       headers: {
@@ -220,7 +220,7 @@ async function fetchFromTreasuryGov() {
     });
 
     if (!response.ok) {
-      console.warn(`⚠️ Treasury.gov erreur: ${response.status}`);
+      console.warn(` Treasury.gov erreur: ${response.status}`);
       return null;
     }
 
@@ -228,7 +228,7 @@ async function fetchFromTreasuryGov() {
     const lines = csvText.trim().split('\n');
 
     if (lines.length < 2) {
-      console.warn('⚠️ Treasury.gov: données insuffisantes');
+      console.warn(' Treasury.gov: donnees insuffisantes');
       return null;
     }
 
@@ -266,7 +266,7 @@ async function fetchFromTreasuryGov() {
     }
 
     if (!latestRow) {
-      console.warn('⚠️ Treasury.gov: pas de données valides');
+      console.warn(' Treasury.gov: pas de donnees valides');
       return null;
     }
 
@@ -282,23 +282,23 @@ async function fetchFromTreasuryGov() {
       }
     }
 
-    console.log(`✅ Treasury.gov: ${Object.keys(result).length - 1} taux récupérés`);
+    console.log(` Treasury.gov: ${Object.keys(result).length - 1} taux recuperes`);
     return result;
 
   } catch (error) {
-    console.error('❌ Erreur Treasury.gov:', error.message);
+    console.error(' Erreur Treasury.gov:', error.message);
     return null;
   }
 }
 
 /**
- * Récupère les données depuis FMP API (fallback pour US Treasury)
+ * Recupere les donnees depuis FMP API (fallback pour US Treasury)
  */
 async function fetchFromFMP() {
   const FMP_API_KEY = process.env.FMP_API_KEY;
 
   if (!FMP_API_KEY) {
-    console.warn('⚠️ FMP_API_KEY non configurée');
+    console.warn(' FMP_API_KEY non configuree');
     return null;
   }
 
@@ -308,7 +308,7 @@ async function fetchFromFMP() {
     const response = await fetchWithTimeout(url, {}, 10000);
 
     if (!response.ok) {
-      console.warn(`⚠️ FMP API erreur: ${response.status}`);
+      console.warn(` FMP API erreur: ${response.status}`);
       return null;
     }
 
@@ -321,7 +321,7 @@ async function fetchFromFMP() {
     // FMP retourne les taux au format: { date, month1, month2, month3, year1, year2, etc. }
     const latest = data[0];
 
-    console.log('✅ FMP: taux US récupérés');
+    console.log(' FMP: taux US recuperes');
     return {
       '1M': latest.month1 || null,
       '2M': latest.month2 || null,
@@ -338,31 +338,31 @@ async function fetchFromFMP() {
       date: latest.date
     };
   } catch (error) {
-    console.error('❌ Erreur FMP:', error.message);
+    console.error(' Erreur FMP:', error.message);
     return null;
   }
 }
 
 /**
- * Récupère la courbe des taux US Treasury
- * Ordre de priorité pour fiabilité maximale:
- * 1. Treasury.gov (source officielle, PAS DE CLÉ API REQUISE)
+ * Recupere la courbe des taux US Treasury
+ * Ordre de priorite pour fiabilite maximale:
+ * 1. Treasury.gov (source officielle, PAS DE CLE API REQUISE)
  * 2. FMP (1 seul appel API)
- * 3. FRED (multiples appels, nécessite API key)
- * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour données historiques)
+ * 3. FRED (multiples appels, necessite API key)
+ * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour donnees historiques)
  */
 async function getUSTreasury(targetDate = null) {
-  console.log(`📊 Récupération des taux US Treasury${targetDate ? ` pour la date ${targetDate}` : ' (actuels)'}...`);
+  console.log(` Recuperation des taux US Treasury${targetDate ? ` pour la date ${targetDate}` : ' (actuels)'}...`);
 
   const rates = {};
   let source = 'Treasury.gov';
   let fetchDate = null;
 
-  // Pour données historiques, utiliser FRED (plus complet pour l'historique)
+  // Pour donnees historiques, utiliser FRED (plus complet pour l'historique)
   if (targetDate) {
-    console.log('📊 Données historiques - utilisation de FRED...');
+    console.log(' Donnees historiques - utilisation de FRED...');
     source = 'FRED';
-    // Paralléliser les appels FRED pour l'historique
+    // Paralleliser les appels FRED pour l'historique
     const freddPromises = Object.entries(US_TREASURY_RATES).map(async ([maturity, seriesId]) => {
       const data = await fetchFromFRED(seriesId, targetDate);
       return data ? { maturity, data } : null;
@@ -376,8 +376,8 @@ async function getUSTreasury(targetDate = null) {
       }
     }
   } else {
-    // Données actuelles: essayer Treasury.gov EN PREMIER (source officielle, pas de clé API!)
-    console.log('📊 Données actuelles - tentative Treasury.gov (source officielle, sans API key)...');
+    // Donnees actuelles: essayer Treasury.gov EN PREMIER (source officielle, pas de cle API!)
+    console.log(' Donnees actuelles - tentative Treasury.gov (source officielle, sans API key)...');
     const treasuryData = await fetchFromTreasuryGov();
 
     if (treasuryData) {
@@ -391,10 +391,10 @@ async function getUSTreasury(targetDate = null) {
       }
     }
 
-    // Fallback 1: FMP si Treasury.gov a échoué ou incomplet
+    // Fallback 1: FMP si Treasury.gov a echoue ou incomplet
     let validRates = Object.keys(rates).length;
     if (validRates < 5) {
-      console.log(`⚠️ Treasury.gov incomplet (${validRates} taux), tentative FMP...`);
+      console.log(` Treasury.gov incomplet (${validRates} taux), tentative FMP...`);
       const fmpData = await fetchFromFMP();
 
       if (fmpData) {
@@ -409,10 +409,10 @@ async function getUSTreasury(targetDate = null) {
       }
     }
 
-    // Fallback 2: FRED si les sources précédentes ont échoué
+    // Fallback 2: FRED si les sources precedentes ont echoue
     validRates = Object.keys(rates).length;
     if (validRates < 5) {
-      console.log(`⚠️ Sources insuffisantes (${validRates} taux), fallback FRED...`);
+      console.log(` Sources insuffisantes (${validRates} taux), fallback FRED...`);
       source = 'FRED';
 
       const freddPromises = Object.entries(US_TREASURY_RATES).map(async ([maturity, seriesId]) => {
@@ -433,7 +433,7 @@ async function getUSTreasury(targetDate = null) {
     }
   }
 
-  // Convertir en array et trier par maturité
+  // Convertir en array et trier par maturite
   const ratesArray = Object.entries(rates)
     .map(([maturity, data]) => ({
       maturity,
@@ -444,8 +444,8 @@ async function getUSTreasury(targetDate = null) {
     }))
     .sort((a, b) => a.months - b.months);
 
-  // Log final source utilisée
-  console.log(`✅ US Treasury: ${ratesArray.length} taux via ${source}`);
+  // Log final source utilisee
+  console.log(` US Treasury: ${ratesArray.length} taux via ${source}`);
 
   return {
     country: 'US',
@@ -458,8 +458,8 @@ async function getUSTreasury(targetDate = null) {
 }
 
 /**
- * Récupère les données depuis Bank of Canada Valet API pour une date spécifique
- * @param {string} seriesId - ID de la série BoC
+ * Recupere les donnees depuis Bank of Canada Valet API pour une date specifique
+ * @param {string} seriesId - ID de la serie BoC
  * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel)
  * @param {number} retryCount - Compteur de tentatives pour retry automatique
  */
@@ -471,7 +471,7 @@ async function fetchFromBoC(seriesId, targetDate = null, retryCount = 0) {
     let url;
 
     if (targetDate) {
-      // Pour données historiques, récupérer une plage autour de la date cible
+      // Pour donnees historiques, recuperer une plage autour de la date cible
       const target = new Date(targetDate);
       const startDate = new Date(target);
       startDate.setDate(startDate.getDate() - 30);
@@ -480,7 +480,7 @@ async function fetchFromBoC(seriesId, targetDate = null, retryCount = 0) {
 
       url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?start_date=${startDate.toISOString().split('T')[0]}&end_date=${endDate.toISOString().split('T')[0]}`;
     } else {
-      // Récupérer les 30 derniers jours pour trouver la comparaison M-1
+      // Recuperer les 30 derniers jours pour trouver la comparaison M-1
       url = `https://www.bankofcanada.ca/valet/observations/${seriesId}/json?recent=30`;
     }
 
@@ -498,7 +498,7 @@ async function fetchFromBoC(seriesId, targetDate = null, retryCount = 0) {
     if (!response.ok) {
       // Only log once to avoid spam (first attempt only)
       if (retryCount === 0) {
-        console.warn(`⚠️ BoC API erreur pour ${seriesId}: ${response.status}`);
+        console.warn(` BoC API erreur pour ${seriesId}: ${response.status}`);
       }
       return null;
     }
@@ -506,20 +506,20 @@ async function fetchFromBoC(seriesId, targetDate = null, retryCount = 0) {
     const data = await response.json();
 
     if (data.observations && data.observations.length > 0) {
-      // Trier par date décroissante (le plus récent en premier)
+      // Trier par date decroissante (le plus recent en premier)
       const sortedObs = data.observations.sort((a, b) => new Date(b.d) - new Date(a.d));
       
       let targetObservation;
       
       if (targetDate) {
-        // Pour données historiques, trouver l'observation la plus proche de la date cible
+        // Pour donnees historiques, trouver l'observation la plus proche de la date cible
         const target = new Date(targetDate);
         targetObservation = sortedObs.find(obs => {
           const obsDate = new Date(obs.d);
           return obsDate <= target;
         }) || sortedObs[sortedObs.length - 1];
       } else {
-        // Pour données actuelles, prendre la plus récente
+        // Pour donnees actuelles, prendre la plus recente
         targetObservation = sortedObs[0];
       }
       
@@ -529,7 +529,7 @@ async function fetchFromBoC(seriesId, targetDate = null, retryCount = 0) {
 
       if (!value || value === null) return null;
 
-      // Chercher la valeur il y a environ 1 mois (~20-22 jours de trading) - seulement pour données actuelles
+      // Chercher la valeur il y a environ 1 mois (~20-22 jours de trading) - seulement pour donnees actuelles
       let prevValue = null;
       if (!targetDate) {
         const prevIndex = Math.min(21, sortedObs.length - 1);
@@ -547,13 +547,13 @@ async function fetchFromBoC(seriesId, targetDate = null, retryCount = 0) {
 
     return null;
   } catch (error) {
-    console.error(`❌ Erreur BoC pour ${seriesId}:`, error.message);
+    console.error(` Erreur BoC pour ${seriesId}:`, error.message);
     return null;
   }
 }
 
 /**
- * Récupère tous les taux Canada via les groupes API (1-2 appels au lieu de 10+)
+ * Recupere tous les taux Canada via les groupes API (1-2 appels au lieu de 10+)
  * Plus rapide et plus fiable que les appels individuels
  */
 async function fetchCanadaFromGroups() {
@@ -642,28 +642,28 @@ async function fetchCanadaFromGroups() {
       }
     }
 
-    console.log(`✅ Bank of Canada group API: ${Object.keys(rates).length} taux récupérés`);
+    console.log(` Bank of Canada group API: ${Object.keys(rates).length} taux recuperes`);
     return { rates, fetchDate };
 
   } catch (error) {
-    console.error('❌ Erreur Bank of Canada group API:', error.message);
+    console.error(' Erreur Bank of Canada group API:', error.message);
     return { rates: {}, fetchDate: null };
   }
 }
 
 /**
- * Récupère la courbe des taux Canada
- * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour données historiques)
+ * Recupere la courbe des taux Canada
+ * @param {string} targetDate - Date cible au format YYYY-MM-DD (optionnel, pour donnees historiques)
  */
 async function getCanadaRates(targetDate = null) {
-  console.log(`📊 Récupération des taux Canada (via Bank of Canada)${targetDate ? ` pour la date ${targetDate}` : ' (actuels)'}...`);
+  console.log(` Recuperation des taux Canada (via Bank of Canada)${targetDate ? ` pour la date ${targetDate}` : ' (actuels)'}...`);
 
   let rates = {};
   let fetchDate = null;
 
   // For current data, try the optimized group API first (2 calls instead of 10+)
   if (!targetDate) {
-    console.log('📊 Tentative via group API (optimisé)...');
+    console.log(' Tentative via group API (optimise)...');
     const groupResult = await fetchCanadaFromGroups();
     rates = groupResult.rates;
     fetchDate = groupResult.fetchDate;
@@ -671,7 +671,7 @@ async function getCanadaRates(targetDate = null) {
 
   // Fallback to individual series calls if group API failed or for historical data
   if (Object.keys(rates).length < 5) {
-    console.log('📊 Fallback: appels individuels Bank of Canada...');
+    console.log(' Fallback: appels individuels Bank of Canada...');
     const bocPromises = Object.entries(CANADA_RATES).map(async ([maturity, seriesId]) => {
       const data = await fetchFromBoC(seriesId, targetDate);
       return data ? { maturity, data } : null;
@@ -686,7 +686,7 @@ async function getCanadaRates(targetDate = null) {
     }
   }
 
-  // Convertir en array et trier par maturité
+  // Convertir en array et trier par maturite
   let ratesArray = Object.entries(rates)
     .map(([maturity, data]) => ({
       maturity,
@@ -698,7 +698,7 @@ async function getCanadaRates(targetDate = null) {
     .sort((a, b) => a.months - b.months);
 
   if (ratesArray.length === 0) {
-    console.warn('⚠️ Aucun taux Canada via API - utilisation des valeurs par défaut');
+    console.warn(' Aucun taux Canada via API - utilisation des valeurs par defaut');
     ratesArray = CANADA_FALLBACK.map(item => ({
       maturity: item.maturity,
       rate: item.rate,
@@ -720,9 +720,9 @@ async function getCanadaRates(targetDate = null) {
 }
 
 /**
- * Récupère les données depuis Supabase
+ * Recupere les donnees depuis Supabase
  * @param {string} country - 'us' ou 'canada'
- * @param {string} date - Date au format YYYY-MM-DD (null pour données actuelles)
+ * @param {string} date - Date au format YYYY-MM-DD (null pour donnees actuelles)
  */
 async function getFromSupabase(country, date = null) {
   try {
@@ -737,7 +737,7 @@ async function getFromSupabase(country, date = null) {
       .limit(1);
     
     if (date) {
-      // Pour données historiques, chercher la date exacte ou la plus proche
+      // Pour donnees historiques, chercher la date exacte ou la plus proche
       query = supabase
         .from('yield_curve_data')
         .select('*')
@@ -750,16 +750,16 @@ async function getFromSupabase(country, date = null) {
     const { data, error } = await query;
     
     if (error) {
-      console.warn(`⚠️ Erreur Supabase pour ${country}:`, error.message);
+      console.warn(` Erreur Supabase pour ${country}:`, error.message);
       return null;
     }
     
     if (data && data.length > 0) {
       const record = data[0];
-      console.log(`✅ Données ${country} trouvées dans Supabase pour ${record.data_date}`);
+      console.log(` Donnees ${country} trouvees dans Supabase pour ${record.data_date}`);
       
       // Convertir le format Supabase vers le format API
-      // Les rates sont stockés en JSONB et sont déjà au bon format
+      // Les rates sont stockes en JSONB et sont deja au bon format
       return {
         country: record.country === 'us' ? 'US' : 'Canada',
         currency: record.currency,
@@ -774,19 +774,19 @@ async function getFromSupabase(country, date = null) {
     
     return null;
   } catch (error) {
-    console.warn(`⚠️ Supabase non disponible pour ${country}:`, error.message);
+    console.warn(` Supabase non disponible pour ${country}:`, error.message);
     return null;
   }
 }
 
 /**
- * Stocke les données dans Supabase
+ * Stocke les donnees dans Supabase
  * @param {string} country - 'us' ou 'canada'
- * @param {object} yieldData - Données de yield curve
+ * @param {object} yieldData - Donnees de yield curve
  */
 async function saveToSupabase(country, yieldData) {
   try {
-    const supabase = createSupabaseClient(true); // Service role pour écriture
+    const supabase = createSupabaseClient(true); // Service role pour ecriture
     if (!supabase) return;
     
     // Calculer spread_10y_2y si disponible
@@ -819,12 +819,12 @@ async function saveToSupabase(country, yieldData) {
       .upsert(record, { onConflict: 'country,data_date' });
     
     if (error) {
-      console.warn(`⚠️ Erreur sauvegarde Supabase pour ${country}:`, error.message);
+      console.warn(` Erreur sauvegarde Supabase pour ${country}:`, error.message);
     } else {
-      console.log(`✅ Données ${country} sauvegardées dans Supabase pour ${yieldData.date}`);
+      console.log(` Donnees ${country} sauvegardees dans Supabase pour ${yieldData.date}`);
     }
   } catch (error) {
-    console.warn(`⚠️ Supabase non disponible pour sauvegarde:`, error.message);
+    console.warn(` Supabase non disponible pour sauvegarde:`, error.message);
   }
 }
 
@@ -860,13 +860,13 @@ async function getHistoricalData(country, period = '1m') {
       .order('data_date', { ascending: true });
 
     if (error) {
-      console.warn(`⚠️ Erreur Supabase history pour ${country}:`, error.message);
+      console.warn(` Erreur Supabase history pour ${country}:`, error.message);
       return [];
     }
 
     return data || [];
   } catch (error) {
-    console.warn(`⚠️ Supabase non disponible pour historique:`, error.message);
+    console.warn(` Supabase non disponible pour historique:`, error.message);
     return [];
   }
 }
@@ -896,12 +896,12 @@ export default async function handler(req, res) {
     }
 
     const { country = 'both', date = null, history = null, period = '1m' } = req.query;
-    console.log(`📡 [API yield-curve] country=${country}, date=${date}, history=${history}`);
+    console.log(` [API yield-curve] country=${country}, date=${date}, history=${history}`);
 
     // Handle history request
     if (history === 'true') {
       try {
-        console.log(`📊 Requête historique: country=${country}, period=${period}`);
+        console.log(` Requete historique: country=${country}, period=${period}`);
 
         const result = {
           timestamp: new Date().toISOString(),
@@ -920,12 +920,12 @@ export default async function handler(req, res) {
         res.setHeader('Cache-Control', CACHE_CONTROL);
         return res.status(200).json(result);
       } catch (histError) {
-        console.error('❌ Erreur historique:', histError);
+        console.error(' Erreur historique:', histError);
         throw histError;
       }
     }
 
-    console.log(`🔍 Requête yield curve: country=${country}, date=${date || 'actuelle'}`);
+    console.log(` Requete yield curve: country=${country}, date=${date || 'actuelle'}`);
 
     const result = {
       timestamp: new Date().toISOString(),
@@ -933,16 +933,16 @@ export default async function handler(req, res) {
       historicalDate: date || null
     };
 
-    // Récupérer les données selon le pays demandé
+    // Recuperer les donnees selon le pays demande
     if (country === 'us' || country === 'both') {
       try {
-        console.log('🔍 US Data - Checking Supabase...');
+        console.log(' US Data - Checking Supabase...');
         let usData = await getFromSupabase('us', date);
         const today = new Date().toISOString().split('T')[0];
         const shouldFetchFromAPI = !usData || (!date && usData.date !== today);
         
         if (shouldFetchFromAPI) {
-          console.log('📡 US Data - Fetching from API...');
+          console.log(' US Data - Fetching from API...');
           usData = await getUSTreasury(date);
           if (usData && usData.rates && usData.rates.length > 0) {
             await saveToSupabase('us', usData);
@@ -950,19 +950,19 @@ export default async function handler(req, res) {
         }
         if (usData) result.data.us = usData;
       } catch (usError) {
-        console.error('❌ Erreur US Data:', usError);
+        console.error(' Erreur US Data:', usError);
       }
     }
 
     if (country === 'canada' || country === 'both') {
       try {
-        console.log('🔍 Canada Data - Checking Supabase...');
+        console.log(' Canada Data - Checking Supabase...');
         let canadaData = await getFromSupabase('canada', date);
         const today = new Date().toISOString().split('T')[0];
         const shouldFetchFromAPI = !canadaData || (!date && canadaData.date !== today);
         
         if (shouldFetchFromAPI) {
-          console.log('📡 Canada Data - Fetching from API...');
+          console.log(' Canada Data - Fetching from API...');
           canadaData = await getCanadaRates(date);
           if (canadaData && canadaData.rates && canadaData.rates.length > 0) {
             await saveToSupabase('canada', canadaData);
@@ -970,11 +970,11 @@ export default async function handler(req, res) {
         }
         if (canadaData) result.data.canada = canadaData;
       } catch (caError) {
-        console.error('❌ Erreur Canada Data:', caError);
+        console.error(' Erreur Canada Data:', caError);
       }
     }
 
-    // Recalculer le spread si nécessaire
+    // Recalculer le spread si necessaire
     if (result.data.us && result.data.us.rates && !result.data.us.spread_10y_2y) {
       const rate10Y = result.data.us.rates.find(r => r.maturity === '10Y');
       const rate2Y = result.data.us.rates.find(r => r.maturity === '2Y');
@@ -984,12 +984,12 @@ export default async function handler(req, res) {
       }
     }
 
-    console.log(`✅ Yield curve OK: US=${result.data.us?.count || 0}, CA=${result.data.canada?.count || 0}`);
+    console.log(` Yield curve OK: US=${result.data.us?.count || 0}, CA=${result.data.canada?.count || 0}`);
     res.setHeader('Cache-Control', CACHE_CONTROL);
     return res.status(200).json(result);
 
   } catch (error) {
-    console.error('❌ Erreur Fatale yield-curve:', error);
+    console.error(' Erreur Fatale yield-curve:', error);
     res.setHeader('Cache-Control', 'no-store');
     return res.status(500).json({
       error: 'Internal Server Error',

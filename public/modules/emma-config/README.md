@@ -6,46 +6,46 @@ Ce dossier contient les modules JavaScript pour l'interface de configuration Emm
 
 ```
 emma-config/
-├── api-client.js          - Appels API centralisés (158 lignes)
-├── ui-helpers.js          - Utilitaires UI (128 lignes)
-├── preview-manager.js     - Gestion previews Web/SMS/Email (361 lignes)
-├── design-manager.js      - Gestion design emails (186 lignes)
-├── sms-manager.js         - Gestion SMS (19 lignes)
-├── delivery-manager.js    - Gestion destinataires/planification (287 lignes)
-├── prompts-manager.js     - Logique principale prompts (322 lignes)
-└── main.js                - Initialisation et coordination (134 lignes)
+ api-client.js          - Appels API centralises (158 lignes)
+ ui-helpers.js          - Utilitaires UI (128 lignes)
+ preview-manager.js     - Gestion previews Web/SMS/Email (361 lignes)
+ design-manager.js      - Gestion design emails (186 lignes)
+ sms-manager.js         - Gestion SMS (19 lignes)
+ delivery-manager.js    - Gestion destinataires/planification (287 lignes)
+ prompts-manager.js     - Logique principale prompts (322 lignes)
+ main.js                - Initialisation et coordination (134 lignes)
 ```
 
-## Dépendances entre modules
+## Dependances entre modules
 
 ```
 main.js
-├── ui-helpers.js (switchMainTab, clearFilters)
-├── preview-manager.js (updatePreview, updateChannelBadges)
-├── design-manager.js (loadDesignConfig, saveDesign, etc.)
-├── sms-manager.js (saveSms, cancelSmsChanges)
-├── delivery-manager.js (showAddRecipientForm, addRecipient, etc.)
-└── prompts-manager.js (loadConfigs, saveConfig, deleteConfig, etc.)
+ ui-helpers.js (switchMainTab, clearFilters)
+ preview-manager.js (updatePreview, updateChannelBadges)
+ design-manager.js (loadDesignConfig, saveDesign, etc.)
+ sms-manager.js (saveSms, cancelSmsChanges)
+ delivery-manager.js (showAddRecipientForm, addRecipient, etc.)
+ prompts-manager.js (loadConfigs, saveConfig, deleteConfig, etc.)
 
 prompts-manager.js
-├── api-client.js (loadAllConfigs, saveCurrentConfig, deleteCurrentConfig)
-├── ui-helpers.js (showStatus, getSectionEmoji, getChannelBadge, getChannelEmoji)
-├── preview-manager.js (updatePreview, updateChannelBadges)
-└── delivery-manager.js (loadDeliveryConfig)
+ api-client.js (loadAllConfigs, saveCurrentConfig, deleteCurrentConfig)
+ ui-helpers.js (showStatus, getSectionEmoji, getChannelBadge, getChannelEmoji)
+ preview-manager.js (updatePreview, updateChannelBadges)
+ delivery-manager.js (loadDeliveryConfig)
 
 preview-manager.js
-└── api-client.js (fetchFormattedPreview)
+ api-client.js (fetchFormattedPreview)
 
 design-manager.js
-├── api-client.js (loadDesignConfig, saveDesignConfig)
-└── ui-helpers.js (showStatus)
+ api-client.js (loadDesignConfig, saveDesignConfig)
+ ui-helpers.js (showStatus)
 
 delivery-manager.js
-├── api-client.js (loadDeliveryConfig, saveDeliveryConfig, sendBriefingNow)
-└── ui-helpers.js (showStatus)
+ api-client.js (loadDeliveryConfig, saveDeliveryConfig, sendBriefingNow)
+ ui-helpers.js (showStatus)
 
 sms-manager.js
-└── design-manager.js (saveDesign, cancelDesignChanges)
+ design-manager.js (saveDesign, cancelDesignChanges)
 ```
 
 ## Utilisation
@@ -59,7 +59,7 @@ sms-manager.js
 </script>
 ```
 
-### Fonctions globales (exposées via window)
+### Fonctions globales (exposees via window)
 
 Ces fonctions sont accessibles dans les `onclick` HTML:
 
@@ -78,9 +78,9 @@ Ces fonctions sont accessibles dans les `onclick` HTML:
 - `window.saveDeliveryConfig()`
 - `window.sendBriefingNow()`
 
-## Ajout d'une nouvelle fonctionnalité
+## Ajout d'une nouvelle fonctionnalite
 
-### 1. Déterminer le module approprié
+### 1. Determiner le module approprie
 
 - **API**: `api-client.js`
 - **Interface utilisateur**: `ui-helpers.js`
@@ -94,13 +94,13 @@ Ces fonctions sont accessibles dans les `onclick` HTML:
 ### 2. Ajouter la fonction au module
 
 ```javascript
-// Dans le module approprié
+// Dans le module approprie
 export function maNouvelleFonction() {
     // Votre code ici
 }
 ```
 
-### 3. Importer dans main.js (si nécessaire)
+### 3. Importer dans main.js (si necessaire)
 
 ```javascript
 import { maNouvelleFonction } from './module.js';
@@ -114,25 +114,25 @@ document.getElementById('monBouton').addEventListener('click', maNouvelleFonctio
 
 ## Bonnes pratiques
 
-### ✅ À FAIRE
+###  A FAIRE
 
-- Exporter uniquement ce qui est utilisé ailleurs
+- Exporter uniquement ce qui est utilise ailleurs
 - Garder les fonctions pures quand c'est possible
 - Documenter les fonctions complexes avec JSDoc
 - Utiliser des noms de fonctions descriptifs
-- Regrouper les fonctions par responsabilité
+- Regrouper les fonctions par responsabilite
 
-### ❌ À ÉVITER
+###  A EVITER
 
-- Variables globales non nécessaires
-- Dépendances circulaires entre modules
+- Variables globales non necessaires
+- Dependances circulaires entre modules
 - Fonctions trop longues (>50 lignes)
-- Code dupliqué entre modules
-- Mutation de state partagé
+- Code duplique entre modules
+- Mutation de state partage
 
 ## Tests
 
-Pour tester un module isolément:
+Pour tester un module isolement:
 
 ```javascript
 // test.js
@@ -144,12 +144,12 @@ console.assert(functionName() === expectedResult);
 
 ## Performance
 
-- ✅ Modules chargés en parallèle (HTTP/2)
-- ✅ Cache navigateur par module
-- ✅ Tree-shaking automatique (modules ES6)
-- ✅ Pas de bundling nécessaire
+-  Modules charges en parallele (HTTP/2)
+-  Cache navigateur par module
+-  Tree-shaking automatique (modules ES6)
+-  Pas de bundling necessaire
 
-## Compatibilité
+## Compatibilite
 
 - Chrome 61+
 - Firefox 60+
@@ -159,7 +159,7 @@ console.assert(functionName() === expectedResult);
 ## Taille totale
 
 - **8 modules**: 1,595 lignes (~76 KB)
-- **Gzippé**: ~20 KB
+- **Gzippe**: ~20 KB
 
 ## Maintenance
 
@@ -180,10 +180,10 @@ try {
     // Votre code
 } catch (error) {
     console.error('Erreur:', error);
-    showStatus('❌ Une erreur est survenue', 'error');
+    showStatus(' Une erreur est survenue', 'error');
 }
 ```
 
-## Documentation complète
+## Documentation complete
 
 Voir: `/MODULARISATION-EMMA-CONFIG-RAPPORT.md`

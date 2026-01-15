@@ -1,40 +1,40 @@
-# 🚀 Guide de Déploiement Emma
+#  Guide de Deploiement Emma
 
-## 📋 Prérequis
+##  Prerequis
 
-- Serveur web (Apache, Nginx, ou serveur de développement)
+- Serveur web (Apache, Nginx, ou serveur de developpement)
 - Navigateur moderne supportant les modules ES6
-- Clé API Gemini (optionnelle pour les tests)
+- Cle API Gemini (optionnelle pour les tests)
 
-## 📁 Structure des Fichiers
+##  Structure des Fichiers
 
 ```
 GOB/public/
-├── emma-financial-profile.js      # Profil financier d'Emma
-├── emma-gemini-service.js         # Service d'intégration Gemini
-├── emma-ui-components.js          # Composants d'interface
-├── emma-styles.css               # Styles CSS
-├── emma-dashboard-integration.js  # Intégration principale
-├── emma-config.js                # Configuration
-├── emma-demo.html                # Page de démonstration
-├── emma-test.html                # Page de test
-├── README-EMMA.md               # Documentation
-├── DEPLOYMENT.md                # Ce guide
-└── beta-combined-dashboard.html  # Dashboard principal (modifié)
+ emma-financial-profile.js      # Profil financier d'Emma
+ emma-gemini-service.js         # Service d'integration Gemini
+ emma-ui-components.js          # Composants d'interface
+ emma-styles.css               # Styles CSS
+ emma-dashboard-integration.js  # Integration principale
+ emma-config.js                # Configuration
+ emma-demo.html                # Page de demonstration
+ emma-test.html                # Page de test
+ README-EMMA.md               # Documentation
+ DEPLOYMENT.md                # Ce guide
+ beta-combined-dashboard.html  # Dashboard principal (modifie)
 ```
 
-## 🔧 Installation
+##  Installation
 
 ### 1. Copier les Fichiers
 
-Copiez tous les fichiers Emma dans le répertoire `GOB/public/` :
+Copiez tous les fichiers Emma dans le repertoire `GOB/public/` :
 
 ```bash
-# Vérifier que tous les fichiers sont présents
+# Verifier que tous les fichiers sont presents
 ls -la GOB/public/emma-*
 ```
 
-### 2. Vérifier les Permissions
+### 2. Verifier les Permissions
 
 Assurez-vous que les fichiers sont accessibles en lecture :
 
@@ -44,26 +44,26 @@ chmod 644 GOB/public/emma-*
 
 ### 3. Tester le Serveur
 
-Démarrez un serveur de développement local :
+Demarrez un serveur de developpement local :
 
 ```bash
 # Avec Python
 cd GOB/public
 python -m http.server 8000
 
-# Avec Node.js (si http-server est installé)
+# Avec Node.js (si http-server est installe)
 npx http-server -p 8000
 
 # Avec PHP
 php -S localhost:8000
 ```
 
-## 🌐 Déploiement Web
+##  Deploiement Web
 
 ### Serveur Apache
 
-1. Copiez les fichiers dans le répertoire web
-2. Configurez les en-têtes CORS si nécessaire :
+1. Copiez les fichiers dans le repertoire web
+2. Configurez les en-tetes CORS si necessaire :
 
 ```apache
 # .htaccess
@@ -94,18 +94,18 @@ server {
 }
 ```
 
-## 🧪 Tests de Déploiement
+##  Tests de Deploiement
 
 ### 1. Test de Base
 
 Ouvrez dans votre navigateur :
-- `http://localhost:8000/emma-demo.html` - Démonstration
+- `http://localhost:8000/emma-demo.html` - Demonstration
 - `http://localhost:8000/emma-test.html` - Tests
 - `http://localhost:8000/beta-combined-dashboard.html` - Dashboard complet
 
 ### 2. Test des Modules ES6
 
-Vérifiez dans la console du navigateur (F12) :
+Verifiez dans la console du navigateur (F12) :
 ```javascript
 // Test d'import
 import { emmaConfig } from './emma-config.js';
@@ -115,22 +115,22 @@ console.log('Configuration Emma:', emmaConfig);
 ### 3. Test de l'API Gemini
 
 1. Allez dans l'onglet "Ask Emma"
-2. Cliquez sur "⚙️ Configuration Gemini"
-3. Entrez votre clé API
+2. Cliquez sur " Configuration Gemini"
+3. Entrez votre cle API
 4. Testez la connexion
 
-## 🔒 Configuration de Sécurité
+##  Configuration de Securite
 
-### HTTPS (Recommandé)
+### HTTPS (Recommande)
 
 Pour la production, utilisez HTTPS :
 
 ```bash
-# Générer un certificat auto-signé pour les tests
+# Generer un certificat auto-signe pour les tests
 openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
 ```
 
-### Headers de Sécurité
+### Headers de Securite
 
 ```apache
 # .htaccess
@@ -140,7 +140,7 @@ Header always set X-XSS-Protection "1; mode=block"
 Header always set Referrer-Policy "strict-origin-when-cross-origin"
 ```
 
-## 📊 Monitoring
+##  Monitoring
 
 ### Logs de Performance
 
@@ -157,7 +157,7 @@ const performanceMonitor = {
 };
 ```
 
-### Métriques d'Utilisation
+### Metriques d'Utilisation
 
 ```javascript
 // Statistiques d'utilisation
@@ -171,9 +171,9 @@ const usageStats = {
 };
 ```
 
-## 🐛 Dépannage
+##  Depannage
 
-### Problèmes Courants
+### Problemes Courants
 
 #### Erreur CORS
 ```
@@ -181,21 +181,21 @@ Access to script at 'file:///...' from origin 'null' has been blocked by CORS po
 ```
 **Solution** : Utilisez un serveur web, pas l'ouverture directe de fichier.
 
-#### Modules ES6 non supportés
+#### Modules ES6 non supportes
 ```
 Uncaught SyntaxError: Cannot use import statement outside a module
 ```
-**Solution** : Vérifiez que les scripts utilisent `type="module"`.
+**Solution** : Verifiez que les scripts utilisent `type="module"`.
 
-#### API Gemini bloquée
+#### API Gemini bloquee
 ```
 Failed to fetch
 ```
-**Solution** : Vérifiez la clé API et les restrictions CORS.
+**Solution** : Verifiez la cle API et les restrictions CORS.
 
-### Logs de Débogage
+### Logs de Debogage
 
-Activez les logs détaillés :
+Activez les logs detailles :
 
 ```javascript
 // Dans emma-config.js
@@ -205,7 +205,7 @@ testing: {
 }
 ```
 
-## 📈 Optimisation
+##  Optimisation
 
 ### Compression
 
@@ -240,9 +240,9 @@ Activez la compression gzip :
 </IfModule>
 ```
 
-## 🔄 Mise à Jour
+##  Mise a Jour
 
-### Procédure de Mise à Jour
+### Procedure de Mise a Jour
 
 1. Sauvegardez la configuration actuelle :
 ```bash
@@ -255,39 +255,39 @@ cp GOB/public/emma-config.js GOB/public/emma-config.backup.js
 cp -r nouveau-dossier/emma-* GOB/public/
 ```
 
-3. Testez la mise à jour :
+3. Testez la mise a jour :
 ```bash
-# Vérifier que tout fonctionne
+# Verifier que tout fonctionne
 curl -I http://localhost:8000/emma-demo.html
 ```
 
 ### Rollback
 
-En cas de problème :
+En cas de probleme :
 
 ```bash
 # Restaurer la configuration
 cp GOB/public/emma-config.backup.js GOB/public/emma-config.js
 
-# Redémarrer le serveur
+# Redemarrer le serveur
 sudo systemctl restart apache2  # ou nginx
 ```
 
-## 📞 Support
+##  Support
 
-### Vérifications Rapides
+### Verifications Rapides
 
-1. **Fichiers présents** : `ls -la GOB/public/emma-*`
+1. **Fichiers presents** : `ls -la GOB/public/emma-*`
 2. **Serveur actif** : `curl -I http://localhost:8000/`
-3. **Console propre** : Ouvrir F12, vérifier les erreurs
+3. **Console propre** : Ouvrir F12, verifier les erreurs
 4. **API fonctionnelle** : Tester la connexion Gemini
 
 ### Contacts
 
 - Documentation : `README-EMMA.md`
 - Tests : `emma-test.html`
-- Démonstration : `emma-demo.html`
+- Demonstration : `emma-demo.html`
 
 ---
 
-**Emma** - Déployée avec succès ! 🚀
+**Emma** - Deployee avec succes ! 

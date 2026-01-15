@@ -1,8 +1,8 @@
 /**
  * TREASURY RATES API
- * Récupère les taux obligataires US et Canada
+ * Recupere les taux obligataires US et Canada
  *
- * ⚠️ NOTE: This endpoint overlaps with /api/yield-curve which is more complete:
+ *  NOTE: This endpoint overlaps with /api/yield-curve which is more complete:
  * - yield-curve.js: Has Treasury.gov as primary source (no API key needed)
  * - yield-curve.js: Stores data in Supabase cache
  * - yield-curve.js: Includes 1-month change tracking
@@ -16,7 +16,7 @@
  * Usage:
  * GET /api/treasury-rates?country=US
  * GET /api/treasury-rates?country=CA
- * GET /api/treasury-rates?country=both (défaut)
+ * GET /api/treasury-rates?country=both (defaut)
  */
 
 export default async function handler(req, res) {
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
 
     if (req.method !== 'GET') {
         return res.status(405).json({
-            error: 'Méthode non autorisée',
+            error: 'Methode non autorisee',
             allowed: ['GET']
         });
     }
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
             });
         }
 
-        console.log(`📊 [Treasury Rates] Fetching rates for: ${normalizedCountry}`);
+        console.log(` [Treasury Rates] Fetching rates for: ${normalizedCountry}`);
 
         const results = {};
 
@@ -82,7 +82,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('❌ [Treasury Rates] Error:', error);
+        console.error(' [Treasury Rates] Error:', error);
         return res.status(500).json({
             error: 'Erreur serveur',
             message: error.message
@@ -140,16 +140,16 @@ async function fetchUSTreasuryRates() {
                     await sleep(100);
 
                 } catch (error) {
-                    console.warn(`⚠️ [FRED] Error fetching ${maturity}:`, error.message);
+                    console.warn(` [FRED] Error fetching ${maturity}:`, error.message);
                 }
             }
 
-            console.log(`✅ [FRED] Fetched ${Object.keys(rates).length}/11 US rates`);
+            console.log(` [FRED] Fetched ${Object.keys(rates).length}/11 US rates`);
         }
 
         // Fallback to FMP if FRED failed or incomplete
         if (Object.keys(rates).length < 8) {
-            console.log('🔄 [FMP] Using fallback for US rates...');
+            console.log(' [FMP] Using fallback for US rates...');
             const fmpRates = await fetchFMPTreasuryRates('US');
             Object.assign(rates, fmpRates);
         }
@@ -174,7 +174,7 @@ async function fetchUSTreasuryRates() {
         return rates;
 
     } catch (error) {
-        console.error('❌ [US Treasury] Error:', error.message);
+        console.error(' [US Treasury] Error:', error.message);
         return {};
     }
 }
@@ -256,11 +256,11 @@ async function fetchCanadaTreasuryRates() {
             }
         }
 
-        console.log(`✅ [BoC] Fetched ${Object.keys(rates).length} Canada rates`);
+        console.log(` [BoC] Fetched ${Object.keys(rates).length} Canada rates`);
 
         // Fallback to FMP if BoC failed or incomplete
         if (Object.keys(rates).length < 6) {
-            console.log('🔄 [FMP] Using fallback for Canada rates...');
+            console.log(' [FMP] Using fallback for Canada rates...');
             const fmpRates = await fetchFMPTreasuryRates('CA');
             Object.assign(rates, fmpRates);
         }
@@ -285,7 +285,7 @@ async function fetchCanadaTreasuryRates() {
         return rates;
 
     } catch (error) {
-        console.error('❌ [Canada Treasury] Error:', error.message);
+        console.error(' [Canada Treasury] Error:', error.message);
         return {};
     }
 }
@@ -326,11 +326,11 @@ async function fetchFMPTreasuryRates(country) {
             }
         });
 
-        console.log(`✅ [FMP] Fetched ${Object.keys(rates).length} ${country} rates`);
+        console.log(` [FMP] Fetched ${Object.keys(rates).length} ${country} rates`);
         return rates;
 
     } catch (error) {
-        console.error('❌ [FMP Treasury] Error:', error.message);
+        console.error(' [FMP Treasury] Error:', error.message);
         return {};
     }
 }
@@ -369,7 +369,7 @@ async function fetchFedFundsRate() {
         };
 
     } catch (error) {
-        console.error('❌ [Fed Funds] Error:', error.message);
+        console.error(' [Fed Funds] Error:', error.message);
         return {
             rate: 4.625,
             date: new Date().toISOString().split('T')[0],
@@ -408,7 +408,7 @@ async function fetchBoCOvernightRate() {
         };
 
     } catch (error) {
-        console.error('❌ [BoC Rate] Error:', error.message);
+        console.error(' [BoC Rate] Error:', error.message);
         return {
             rate: 4.50,
             date: new Date().toISOString().split('T')[0],

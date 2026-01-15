@@ -4,11 +4,11 @@
  * Ce fichier consolide tous les styles du design system pour les fichiers HTML standalone
  * comme beta-combined-dashboard.html qui n'utilisent pas Vite.
  * 
- * Généré depuis src/styles/ pour être accessible depuis public/css/
+ * Genere depuis src/styles/ pour etre accessible depuis public/css/
  */
 
 /* =====================================================
- * IMPORTS - Fichiers CSS consolidés
+ * IMPORTS - Fichiers CSS consolides
  * ===================================================== */
 
 /* Animations et transitions */
@@ -17,7 +17,7 @@
 /* Fonts et typographie */
 @import './fonts.css';
 
-/* React Grid Layout personnalisé */
+/* React Grid Layout personnalise */
 @import './react-grid-layout-custom.css';
 
 /* Composants Emma IA */
@@ -26,10 +26,10 @@
 /* Styles pour les tabs */
 @import './tab-styles.css';
 
-/* Fixes pour icônes Iconoir */
+/* Fixes pour icones Iconoir */
 @import './iconoir-fixes.css';
 
-/* Effets UI avancés (glassmorphism, shine, glow, shimmer, ripple) */
+/* Effets UI avances (glassmorphism, shine, glow, shimmer, ripple) */
 @import './ui-effects.css';
 
 /* Effets pour cartes (stock, news) */
@@ -38,13 +38,13 @@
 /* Styles responsive mobile */
 @import './mobile-responsive.css';
 
-/* Styles scrollbar personnalisés */
+/* Styles scrollbar personnalises */
 @import './scrollbar-styles.css';
 
 /* Utilitaires CSS (line-clamp, etc.) */
 @import './utilities.css';
 
-/* Effets UI avancés (glassmorphism, shine, glow, shimmer, ripple) */
+/* Effets UI avances (glassmorphism, shine, glow, shimmer, ripple) */
 @import './ui-effects.css';
 
 /* Effets pour cartes (stock, news) */
@@ -53,7 +53,7 @@
 /* Styles responsive mobile */
 @import './mobile-responsive.css';
 
-/* Styles scrollbar personnalisés */
+/* Styles scrollbar personnalises */
 @import './scrollbar-styles.css';
 
 /* =====================================================
@@ -67,7 +67,7 @@
   --gob-primary-dark: #4f46e5;
   --gob-secondary: #7c3aed;
   
-  /* Couleurs d'état */
+  /* Couleurs d'etat */
   --gob-success: #10b981;
   --gob-danger: #ef4444;
   --gob-warning: #f59e0b;
@@ -267,7 +267,7 @@
 }
 
 /* =====================================================
- * 3. ACCESSIBILITÉ WCAG
+ * 3. ACCESSIBILITE WCAG
  * ===================================================== */
 
 /* Focus visible pour navigation clavier */
@@ -276,7 +276,7 @@
     outline-offset: 2px;
 }
 
-/* Contraste amélioré pour texte */
+/* Contraste ameliore pour texte */
 .text-low-contrast {
     color: var(--gob-text-secondary);
 }
@@ -310,13 +310,13 @@
     border-width: 0;
 }
 
-/* Amélioration du contraste pour les boutons */
+/* Amelioration du contraste pour les boutons */
 button:not(:disabled) {
     min-height: 44px; /* Taille minimale pour touch */
     min-width: 44px;
 }
 
-/* Indicateurs d'état pour lecteurs d'écran */
+/* Indicateurs d'etat pour lecteurs d'ecran */
 [aria-busy="true"]::before {
     content: "Chargement en cours...";
     position: absolute;
@@ -335,7 +335,7 @@ button:not(:disabled) {
  * 4. STYLES GLOBAUX POUR COMPOSANTS
  * ===================================================== */
 
-/* Scrollbar personnalisée */
+/* Scrollbar personnalisee */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -367,7 +367,7 @@ button:not(:disabled) {
     scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
 }
 
-/* Transitions douces pour changement de thème */
+/* Transitions douces pour changement de theme */
 * {
     transition: background-color var(--gob-transition-normal) ease,
                 color var(--gob-transition-normal) ease,

@@ -20,7 +20,7 @@ const SectionCard: React.FC<{ title: string; points: string[]; tone?: 'green' | 
       <ul className="space-y-1 text-sm">
         {points.map((p, idx) => (
           <li key={idx} className={isDark ? 'text-gray-200' : 'text-gray-800'}>
-            • {p}
+            - {p}
           </li>
         ))}
       </ul>
@@ -34,9 +34,9 @@ const TestOnlyTab: React.FC<TabProps> = ({ isDarkMode = true }) => {
       <div className="flex items-center justify-between">
         <div>
           <p className={`text-xs uppercase tracking-wide ${isDarkMode ? 'text-green-300' : 'text-green-700'}`}>Test Only</p>
-          <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Plan fonctionnel inspiré des sites finance</h2>
+          <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Plan fonctionnel inspire des sites finance</h2>
           <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
-            Maquette de fonctionnalités à valider avant intégration.
+            Maquette de fonctionnalites a valider avant integration.
           </p>
         </div>
       </div>
@@ -47,19 +47,19 @@ const TestOnlyTab: React.FC<TabProps> = ({ isDarkMode = true }) => {
           tone="blue"
           isDark={isDarkMode}
           points={[
-            'Résumé compact: prix, % jour, 52w range, volume, sector/industry, market cap, dividend.',
-            'Sous-vues: Vue valeur (ratios FCF yield, EV/EBIT, ROE/ROIC, marges), Graphique interactif (TradingView), News ciblées ticker.',
-            'Bloc “thèse en 30s” + bull/bear case structuré.'
+            'Resume compact: prix, % jour, 52w range, volume, sector/industry, market cap, dividend.',
+            'Sous-vues: Vue valeur (ratios FCF yield, EV/EBIT, ROE/ROIC, marges), Graphique interactif (TradingView), News ciblees ticker.',
+            'Bloc "these en 30s" + bull/bear case structure.'
           ]}
         />
         <SectionCard
-          title="Screener valeur modernisé"
+          title="Screener valeur modernise"
           tone="green"
           isDark={isDarkMode}
           points={[
-            'Filtres pré-emballés par style: valeur, dividende, qualité, croissance, momentum.',
-            'Colonnes clés: P/E fwd, EV/EBIT, FCF yield, CROIC, marges, score qualité, décote estimée.',
-            'Heatmap sectorielle simple (couleur = perf, saturation = décote).'
+            'Filtres pre-emballes par style: valeur, dividende, qualite, croissance, momentum.',
+            'Colonnes cles: P/E fwd, EV/EBIT, FCF yield, CROIC, marges, score qualite, decote estimee.',
+            'Heatmap sectorielle simple (couleur = perf, saturation = decote).'
           ]}
         />
         <SectionCard
@@ -68,30 +68,30 @@ const TestOnlyTab: React.FC<TabProps> = ({ isDarkMode = true }) => {
           isDark={isDarkMode}
           points={[
             'Top: perf (YTD/1Y/since inception) + risque simple (vol, max drawdown).',
-            'Milieu: allocations par classe, secteur, pays; comparaison cible vs réel, bouton “diagnostic value”.',
-            'Bas: liste titres avec contribution perf/risque, alertes sur concentration et “value traps”.'
+            'Milieu: allocations par classe, secteur, pays; comparaison cible vs reel, bouton "diagnostic value".',
+            'Bas: liste titres avec contribution perf/risque, alertes sur concentration et "value traps".'
           ]}
         />
         <SectionCard
-          title="UX & pédagogie"
+          title="UX & pedagogie"
           tone="orange"
           isDark={isDarkMode}
           points={[
-            'Thème sombre clair, sections verticales avec ancres; peu d’onglets.',
-            'Micro-copy “?” pour ratios (FCF yield, EV/EBIT, ROE/ROIC) orientée investisseur valeur.',
-            'Aucune pub/sponsor mélangé aux données; hiérarchie forte (thèse puis détails).'
+            "Theme sombre clair, sections verticales avec ancres; peu d'onglets.",
+            'Micro-copy "?" pour ratios (FCF yield, EV/EBIT, ROE/ROIC) orientee investisseur valeur.',
+            'Aucune pub/sponsor melange aux donnees; hierarchie forte (these puis details).'
           ]}
         />
       </div>
 
       <SectionCard
-        title="Architecture de données (à connecter)"
+        title="Architecture de donnees (a connecter)"
         tone="blue"
         isDark={isDarkMode}
         points={[
-          'Sources: Supabase (scrapes Seeking Alpha), APIs marché (quote/fundamentals/news), cache Supabase daily.',
-          'Pipelines: Scraping (Admin JSLai) → Supabase raw → Analyse batch (Perplexity) → seeking_alpha_analysis.',
-          'Surface: Fiche titre et Screener consomment les analyses stockées; Portfolio agrège comptes + diagnostics.'
+          'Sources: Supabase (scrapes Seeking Alpha), APIs marche (quote/fundamentals/news), cache Supabase daily.',
+          'Pipelines: Scraping (Admin JSLai) -> Supabase raw -> Analyse batch (Perplexity) -> seeking_alpha_analysis.',
+          'Surface: Fiche titre et Screener consomment les analyses stockees; Portfolio agrege comptes + diagnostics.'
         ]}
       />
     </div>

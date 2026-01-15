@@ -104,7 +104,7 @@ export function YieldComparisonTable({ usData, caData, onExport }: YieldComparis
                       {row.caYield.toFixed(3)}
                     </span>
                   ) : (
-                    <span className="text-muted-foreground">—</span>
+                    <span className="text-muted-foreground">-</span>
                   )}
                 </TableCell>
                 <TableCell className="text-right">
@@ -121,7 +121,7 @@ export function YieldComparisonTable({ usData, caData, onExport }: YieldComparis
                         </span>
                       </>
                     ) : (
-                      <span className="text-muted-foreground">—</span>
+                      <span className="text-muted-foreground">-</span>
                     )}
                   </span>
                 </TableCell>

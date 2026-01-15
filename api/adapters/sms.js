@@ -1,13 +1,13 @@
 /**
  * Adaptateur SMS - Twilio
  *
- * Reçoit les SMS via Twilio webhook, appelle /api/chat,
- * et renvoie la réponse par SMS.
+ * Recoit les SMS via Twilio webhook, appelle /api/chat,
+ * et renvoie la reponse par SMS.
  *
  * Twilio Configuration:
- * - Account SID: Configuré via TWILIO_ACCOUNT_SID env var
- * - Auth Token: Configuré via TWILIO_AUTH_TOKEN env var
- * - Phone Number: Configuré via TWILIO_PHONE_NUMBER env var
+ * - Account SID: Configure via TWILIO_ACCOUNT_SID env var
+ * - Auth Token: Configure via TWILIO_AUTH_TOKEN env var
+ * - Phone Number: Configure via TWILIO_PHONE_NUMBER env var
  * - Webhook URL: https://your-app.vercel.app/api/adapters/sms
  */
 
@@ -34,9 +34,9 @@ const getTwilioClient = () => {
 /**
  * Handler POST /api/adapters/sms
  *
- * Reçoit webhook de Twilio avec format:
- * - From: +14385443662 (numéro de l'expéditeur)
- * - To: +1234567890 (notre numéro Twilio)
+ * Recoit webhook de Twilio avec format:
+ * - From: +14385443662 (numero de l'expediteur)
+ * - To: +1234567890 (notre numero Twilio)
  * - Body: "Analyse AAPL"
  */
 export default async function handler(req, res) {
@@ -57,23 +57,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('[SMS Adapter] Webhook Twilio reçu');
+    console.log('[SMS Adapter] Webhook Twilio recu');
     console.log('[SMS Adapter] Method:', req.method);
     console.log('[SMS Adapter] Content-Type:', req.headers['content-type']);
     console.log('[SMS Adapter] Body type:', typeof req.body);
     console.log('[SMS Adapter] Body keys:', req.body ? Object.keys(req.body) : 'null');
 
-    // 1. PARSER LES DONNÉES TWILIO
-    // Twilio envoie les données en application/x-www-form-urlencoded
+    // 1. PARSER LES DONNEES TWILIO
+    // Twilio envoie les donnees en application/x-www-form-urlencoded
     let twilioData;
 
     // Vercel parse automatiquement application/x-www-form-urlencoded en objet
     if (req.body && typeof req.body === 'object' && (req.body.From || req.body.Body)) {
-      // Déjà parsé par Vercel
+      // Deja parse par Vercel
       twilioData = req.body;
-      console.log('[SMS Adapter] Body déjà parsé par Vercel');
+      console.log('[SMS Adapter] Body deja parse par Vercel');
     } else if (typeof req.body === 'string') {
-      // Parser manuellement si nécessaire
+      // Parser manuellement si necessaire
       console.log('[SMS Adapter] Parsing manuel du body string');
       const params = new URLSearchParams(req.body);
       twilioData = {
@@ -83,14 +83,14 @@ export default async function handler(req, res) {
         MessageSid: params.get('MessageSid')
       };
     } else if (req.body && typeof req.body === 'object') {
-      // Essayer d'extraire directement les propriétés
+      // Essayer d'extraire directement les proprietes
       twilioData = {
         From: req.body.From || req.body.from,
         To: req.body.To || req.body.to,
         Body: req.body.Body || req.body.body || req.body.message,
         MessageSid: req.body.MessageSid || req.body.messageSid || req.body.SmsMessageSid
       };
-      console.log('[SMS Adapter] Extraction directe des propriétés');
+      console.log('[SMS Adapter] Extraction directe des proprietes');
     } else {
       console.error('[SMS Adapter] Format body invalide:', {
         type: typeof req.body,
@@ -106,18 +106,18 @@ export default async function handler(req, res) {
 
     let { From: senderPhone, Body: messageBody, MessageSid } = twilioData;
 
-    // ✅ FIX: Nettoyer le numéro de téléphone (enlever = au début si présent)
-    // Problème: n8n peut envoyer =+15551111111 au lieu de +15551111111
+    //  FIX: Nettoyer le numero de telephone (enlever = au debut si present)
+    // Probleme: n8n peut envoyer =+15551111111 au lieu de +15551111111
     if (senderPhone && typeof senderPhone === 'string') {
       senderPhone = senderPhone.trim();
-      // Enlever = au début si présent (problème d'URL encoding)
+      // Enlever = au debut si present (probleme d'URL encoding)
       if (senderPhone.startsWith('=')) {
         senderPhone = senderPhone.substring(1);
-        console.log(`[SMS Adapter] ⚠️ Numéro nettoyé (enlevé = au début): ${senderPhone}`);
+        console.log(`[SMS Adapter]  Numero nettoye (enleve = au debut): ${senderPhone}`);
       }
       // Valider format (doit commencer par +)
       if (!senderPhone.startsWith('+')) {
-        console.error(`[SMS Adapter] ❌ Format numéro invalide: ${senderPhone}`);
+        console.error(`[SMS Adapter]  Format numero invalide: ${senderPhone}`);
         return res.status(400).json({
           success: false,
           error: 'Invalid phone number format',
@@ -126,22 +126,22 @@ export default async function handler(req, res) {
       }
     }
 
-    // ✅ FIX: Nettoyer le message (enlever = au début si présent)
-    // Problème: n8n peut envoyer =TEST... ou =ANALYSE AAPL... au lieu de TEST... ou ANALYSE AAPL...
+    //  FIX: Nettoyer le message (enlever = au debut si present)
+    // Probleme: n8n peut envoyer =TEST... ou =ANALYSE AAPL... au lieu de TEST... ou ANALYSE AAPL...
     if (messageBody && typeof messageBody === 'string') {
       const originalMessage = messageBody;
       messageBody = messageBody.trim();
-      // Enlever = au début si présent (problème d'URL encoding)
+      // Enlever = au debut si present (probleme d'URL encoding)
       if (messageBody.startsWith('=')) {
         messageBody = messageBody.substring(1);
-        console.log(`[SMS Adapter] ⚠️ Message nettoyé (enlevé = au début): "${originalMessage}" → "${messageBody}"`);
+        console.log(`[SMS Adapter]  Message nettoye (enleve = au debut): "${originalMessage}" -> "${messageBody}"`);
       }
     }
 
     console.log(`[SMS Adapter] SMS de ${senderPhone}: "${messageBody}"`);
 
     if (!senderPhone || !messageBody) {
-      console.error('[SMS Adapter] Données Twilio invalides:', twilioData);
+      console.error('[SMS Adapter] Donnees Twilio invalides:', twilioData);
       return res.status(400).json({
         success: false,
         error: 'Missing From or Body parameters'
@@ -150,19 +150,19 @@ export default async function handler(req, res) {
 
     // 2. VALIDER LE MESSAGE
     if (messageBody.trim().length === 0) {
-      return await sendSMS(senderPhone, 'Message vide reçu. Envoyez une question pour Emma IA.');
+      return await sendSMS(senderPhone, 'Message vide recu. Envoyez une question pour Emma IA.');
     }
 
-    // 3. DÉTECTER LES COMMANDES D'INVITATION (Admin uniquement)
+    // 3. DETECTER LES COMMANDES D'INVITATION (Admin uniquement)
     if (isKnownContact(senderPhone) && isInvitationCommand(messageBody)) {
-      console.log('[SMS Adapter] Commande d\'invitation détectée');
+      console.log('[SMS Adapter] Commande d\'invitation detectee');
 
       try {
         const invitationResult = await handleInvitationCommand(messageBody, senderPhone);
 
-        console.log(`[SMS Adapter] Résultat invitation: ${invitationResult.success ? 'Succès' : 'Échec'}`);
+        console.log(`[SMS Adapter] Resultat invitation: ${invitationResult.success ? 'Succes' : 'Echec'}`);
 
-        // Répondre à l'admin via TwiML
+        // Repondre a l'admin via TwiML
         res.setHeader('Content-Type', 'text/xml');
         return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -174,57 +174,57 @@ export default async function handler(req, res) {
         res.setHeader('Content-Type', 'text/xml');
         return res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Message>❌ Erreur lors de l'envoi de l'invitation. Vérifiez les logs.</Message>
+  <Message> Erreur lors de l'envoi de l'invitation. Verifiez les logs.</Message>
 </Response>`);
       }
     }
 
-    // 4. VÉRIFICATION ANTI-SPAM (optionnel)
-    // TODO: Implémenter rate limiting basé sur le numéro de téléphone
+    // 4. VERIFICATION ANTI-SPAM (optionnel)
+    // TODO: Implementer rate limiting base sur le numero de telephone
 
-    // ✅ FIX TIMEOUT N8N: Répondre immédiatement à n8n (< 5s) et traiter en arrière-plan
+    //  FIX TIMEOUT N8N: Repondre immediatement a n8n (< 5s) et traiter en arriere-plan
     // n8n a un timeout de 5s, mais l'API Emma peut prendre 30-90s
-    // Solution: Répondre immédiatement avec TwiML, traiter en arrière-plan
+    // Solution: Repondre immediatement avec TwiML, traiter en arriere-plan
     
-    // ✅ FIX MODE TEST: En mode test, générer réponse simulée immédiate pour dashboard
+    //  FIX MODE TEST: En mode test, generer reponse simulee immediate pour dashboard
     const isTest = isTestPhoneNumber(senderPhone);
-    let immediateResponse = '👩🏻 Message reçu! J\'analyse ta demande, je te reviens! 📈🔍⏳';
+    let immediateResponse = ' Message recu! J\'analyse ta demande, je te reviens! ';
     
     if (isTest) {
-      console.log('[SMS Adapter] 🧪 Mode test: Génération réponse simulée immédiate pour dashboard...');
+      console.log('[SMS Adapter]  Mode test: Generation reponse simulee immediate pour dashboard...');
       try {
-        // Générer réponse simulée immédiatement (sans attendre API chat)
+        // Generer reponse simulee immediatement (sans attendre API chat)
         const simulatedResponse = await generateSimulatedResponse(messageBody, senderPhone);
         immediateResponse = simulatedResponse;
-        console.log(`[SMS Adapter] 🧪 Réponse simulée générée (${simulatedResponse.length} chars) - Envoyée immédiatement à n8n`);
+        console.log(`[SMS Adapter]  Reponse simulee generee (${simulatedResponse.length} chars) - Envoyee immediatement a n8n`);
       } catch (simError) {
-        console.error('[SMS Adapter] Erreur génération réponse simulée immédiate:', simError);
-        // Fallback: message par défaut
+        console.error('[SMS Adapter] Erreur generation reponse simulee immediate:', simError);
+        // Fallback: message par defaut
       }
     }
     
-    // 5. PRÉPARER LA TÂCHE DE FOND (ARRIÈRE-PLAN)
-    // On la définit mais on ne l'attend pas tout de suite
+    // 5. PREPARER LA TACHE DE FOND (ARRIERE-PLAN)
+    // On la definit mais on ne l'attend pas tout de suite
     const backgroundTask = (async () => {
-      // Si mode test, on ne fait rien en arrière-plan (réponse déjà simulée)
+      // Si mode test, on ne fait rien en arriere-plan (reponse deja simulee)
       if (isTest) {
-        console.log('[SMS Adapter] 🧪 Mode test: Skip background task');
+        console.log('[SMS Adapter]  Mode test: Skip background task');
         return;
       }
 
       try {
-        // 4.5. ENVOYER UN SMS DE CONFIRMATION IMMÉDIAT (UX) (Si pas déjà fait pour n8n)
-        // En prod, n8n a reçu le XML mais l'utilisateur sur son mobile ne voit rien encore
+        // 4.5. ENVOYER UN SMS DE CONFIRMATION IMMEDIAT (UX) (Si pas deja fait pour n8n)
+        // En prod, n8n a recu le XML mais l'utilisateur sur son mobile ne voit rien encore
         // sauf si le XML Twilio envoie un SMS. Le XML envoyait "Analyse en cours..."
-        // On envoie QUAND MÊME un SMS de confirmation "Message reçu" pour être sûr
-        // Ou on s'abstient pour éviter le doublon ?
-        // Le XML renvoyé à Twilio : <Message>⏳ Analyse en cours...</Message>
-        // Donc l'utilisateur REÇOIT ce message.
-        // Envoyer un 2ème message "Message reçu" est redondant.
+        // On envoie QUAND MEME un SMS de confirmation "Message recu" pour etre sur
+        // Ou on s'abstient pour eviter le doublon ?
+        // Le XML renvoye a Twilio : <Message> Analyse en cours...</Message>
+        // Donc l'utilisateur RECOIT ce message.
+        // Envoyer un 2eme message "Message recu" est redondant.
         // On log juste.
-        console.log('[SMS Adapter] Confirmation envoyée via TwiML (XML)');
+        console.log('[SMS Adapter] Confirmation envoyee via TwiML (XML)');
 
-        // 5. APPELER L'API CHAT CENTRALISÉE
+        // 5. APPELER L'API CHAT CENTRALISEE
         let chatResponse;
         try {
           // Import dynamique
@@ -257,15 +257,15 @@ export default async function handler(req, res) {
 
           await chatModule.default(chatRequest, chatRes);
 
-          // Validation réponse
+          // Validation reponse
           if (!chatResponseData) throw new Error('Chat API returned no data');
           if (!chatResponseData.success) {
-            console.error('[SMS Adapter] ❌ Chat API error:', JSON.stringify(chatResponseData, null, 2));
+            console.error('[SMS Adapter]  Chat API error:', JSON.stringify(chatResponseData, null, 2));
             throw new Error(`Chat API error: ${chatResponseData.error}`);
           }
 
           chatResponse = chatResponseData;
-          console.log(`[SMS Adapter] ✅ Réponse reçue de /api/chat (${chatResponse.response?.length || 0} chars)`);
+          console.log(`[SMS Adapter]  Reponse recue de /api/chat (${chatResponse.response?.length || 0} chars)`);
 
         } catch (error) {
           console.error('[SMS Adapter] Erreur appel /api/chat:', error);
@@ -274,18 +274,18 @@ export default async function handler(req, res) {
           throw error;
         }
 
-        // 6. ENVOYER LA RÉPONSE PAR SMS
+        // 6. ENVOYER LA REPONSE PAR SMS
         try {
           let response = chatResponse.response;
 
           // Protection anti-spam / Limite SMS
-          // Au lieu de rejeter, on tronque à ~3 SMS (4400 chars + suffixe)
+          // Au lieu de rejeter, on tronque a ~3 SMS (4400 chars + suffixe)
           if (response.length > 4500) {
-            console.warn(`[SMS Adapter] Réponse trop longue (${response.length} chars), tronquée à 4500.`);
+            console.warn(`[SMS Adapter] Reponse trop longue (${response.length} chars), tronquee a 4500.`);
             response = response.substring(0, 4400) + "\n\n[...Suite trop longue pour SMS]";
           }
 
-          console.log(`[SMS Adapter] Envoi réponse finale via Twilio API`);
+          console.log(`[SMS Adapter] Envoi reponse finale via Twilio API`);
           await sendSMS(senderPhone, response);
 
           // 6.5. EMAIL (Non-bloquant)
@@ -300,7 +300,7 @@ export default async function handler(req, res) {
               model: chatResponse.metadata?.model,
               timestamp: new Date().toISOString()
             }
-          }).catch(e => console.error('⚠️ Email notification failed:', e.message));
+          }).catch(e => console.error(' Email notification failed:', e.message));
 
         } catch (error) {
           console.error('[SMS Adapter] Erreur envoi SMS final:', error);
@@ -308,12 +308,12 @@ export default async function handler(req, res) {
         }
 
       } catch (error) {
-        console.error('[SMS Adapter] ❌ CRITICAL BACKGROUND ERROR:', error);
+        console.error('[SMS Adapter]  CRITICAL BACKGROUND ERROR:', error);
         // RESCUE SMS
         try {
           await sendSMS(
             senderPhone,
-            '❌ Désolé, une erreur technique est survenue. Veuillez réessayer.'
+            ' Desole, une erreur technique est survenue. Veuillez reessayer.'
           );
         } catch (e) {
           console.error('Failed to send rescue SMS:', e);
@@ -321,11 +321,11 @@ export default async function handler(req, res) {
       }
     })();
 
-    // ✅ FIX: Enregistrer la tâche de fond AVANT de répondre
+    //  FIX: Enregistrer la tache de fond AVANT de repondre
     // Cela garantit que Vercel est au courant qu'il doit attendre
     waitUntil(backgroundTask);
 
-    // 7. RÉPONDRE AU WEBHOOK (immédiatement)
+    // 7. REPONDRE AU WEBHOOK (immediatement)
     res.setHeader('Content-Type', 'text/xml');
     res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -336,15 +336,15 @@ export default async function handler(req, res) {
     return;
 
   } catch (error) {
-    console.error('[SMS Adapter] Erreur générale Handler:', error);
-    console.error('[SMS Adapter] Erreur générale:', error);
+    console.error('[SMS Adapter] Erreur generale Handler:', error);
+    console.error('[SMS Adapter] Erreur generale:', error);
 
     // Tenter d'envoyer un SMS d'erreur
     try {
       if (req.body.From) {
         await sendSMS(
           req.body.From,
-          '❌ Erreur système. Contactez le support GOB si le problème persiste.'
+          ' Erreur systeme. Contactez le support GOB si le probleme persiste.'
         );
       }
     } catch (smsError) {
@@ -360,10 +360,10 @@ export default async function handler(req, res) {
 }
 
 /**
- * Génère une réponse simulée basée sur l'intent détecté (mode test uniquement)
+ * Genere une reponse simulee basee sur l'intent detecte (mode test uniquement)
  * @param {string} message - Message de l'utilisateur
- * @param {string} phoneNumber - Numéro de téléphone (pour contexte)
- * @returns {Promise<string>} Réponse simulée formatée pour SMS
+ * @param {string} phoneNumber - Numero de telephone (pour contexte)
+ * @returns {Promise<string>} Reponse simulee formatee pour SMS
  */
 async function generateSimulatedResponse(message, phoneNumber) {
   try {
@@ -374,148 +374,148 @@ async function generateSimulatedResponse(message, phoneNumber) {
     const tickers = TickerExtractor.extract(message);
     const primaryTicker = tickers.length > 0 ? tickers[0] : null;
     
-    console.log(`[SMS Adapter] 🧪 Intent détecté: ${intent}, Ticker: ${primaryTicker || 'aucun'}`);
+    console.log(`[SMS Adapter]  Intent detecte: ${intent}, Ticker: ${primaryTicker || 'aucun'}`);
     
-    // Générer réponse selon intent
+    // Generer reponse selon intent
     let response = '';
     
     switch (intent) {
       case 'comprehensive_analysis':
       case 'fundamentals':
         if (primaryTicker) {
-          response = `📊 ANALYSE ${primaryTicker} (Mode Test)\n\n` +
-            `💰 Prix: ~$150.25 (+2.3%)\n` +
-            `📈 P/E: 28.5x\n` +
-            `💵 Marge: 25.8%\n` +
-            `📊 RSI: 58\n` +
-            `🎯 Score JSLAI: 78/100\n\n` +
-            `✅ Solide, croissance stable. Bon point d'entrée.`;
+          response = ` ANALYSE ${primaryTicker} (Mode Test)\n\n` +
+            ` Prix: ~$150.25 (+2.3%)\n` +
+            ` P/E: 28.5x\n` +
+            ` Marge: 25.8%\n` +
+            ` RSI: 58\n` +
+            ` Score JSLAI: 78/100\n\n` +
+            ` Solide, croissance stable. Bon point d'entree.`;
         } else {
-          response = `📊 Analyse complète demandée\n\n` +
-            `Indiquez un ticker (ex: ANALYSE AAPL) pour une analyse détaillée.`;
+          response = ` Analyse complete demandee\n\n` +
+            `Indiquez un ticker (ex: ANALYSE AAPL) pour une analyse detaillee.`;
         }
         break;
         
       case 'stock_price':
         if (primaryTicker) {
-          response = `💰 ${primaryTicker}: ~$150.25\n` +
-            `📈 +2.3% aujourd'hui\n` +
-            `📊 Volume: 45M\n` +
-            `🕐 Dernière mise à jour: maintenant`;
+          response = ` ${primaryTicker}: ~$150.25\n` +
+            ` +2.3% aujourd'hui\n` +
+            ` Volume: 45M\n` +
+            ` Derniere mise a jour: maintenant`;
         } else {
-          response = `💰 Indiquez un ticker pour le prix (ex: PRIX AAPL)`;
+          response = ` Indiquez un ticker pour le prix (ex: PRIX AAPL)`;
         }
         break;
         
       case 'technical_analysis':
         if (primaryTicker) {
-          response = `📈 ANALYSE TECHNIQUE ${primaryTicker}\n\n` +
-            `📊 RSI: 58 (neutre)\n` +
-            `📉 MACD: Signal haussier\n` +
-            `📈 Support: $145\n` +
-            `📉 Résistance: $155\n` +
-            `✅ Tendance: Haussière`;
+          response = ` ANALYSE TECHNIQUE ${primaryTicker}\n\n` +
+            ` RSI: 58 (neutre)\n` +
+            ` MACD: Signal haussier\n` +
+            ` Support: $145\n` +
+            ` Resistance: $155\n` +
+            ` Tendance: Haussiere`;
         } else {
-          response = `📈 Indiquez un ticker pour l'analyse technique`;
+          response = ` Indiquez un ticker pour l'analyse technique`;
         }
         break;
         
       case 'news':
         if (primaryTicker) {
-          response = `📰 ACTUALITÉS ${primaryTicker}\n\n` +
-            `• Résultats Q4 dépassent attentes\n` +
-            `• Guidance positive pour 2025\n` +
-            `• Analystes maintiennent Buy\n\n` +
-            `📅 Il y a 2h`;
+          response = ` ACTUALITES ${primaryTicker}\n\n` +
+            `- Resultats Q4 depassent attentes\n` +
+            `- Guidance positive pour 2025\n` +
+            `- Analystes maintiennent Buy\n\n` +
+            ` Il y a 2h`;
         } else {
-          response = `📰 Indiquez un ticker pour les actualités (ex: NEWS AAPL)`;
+          response = ` Indiquez un ticker pour les actualites (ex: NEWS AAPL)`;
         }
         break;
         
       case 'greeting':
-        response = `👋 Bonjour ! Je suis Emma, ton assistante financière IA.\n\n` +
-          `Je peux analyser des actions, donner des prix, actualités, et plus.\n\n` +
-          `Exemples:\n• ANALYSE AAPL\n• PRIX TSLA\n• NEWS MSFT`;
+        response = ` Bonjour ! Je suis Emma, ton assistante financiere IA.\n\n` +
+          `Je peux analyser des actions, donner des prix, actualites, et plus.\n\n` +
+          `Exemples:\n- ANALYSE AAPL\n- PRIX TSLA\n- NEWS MSFT`;
         break;
         
       case 'help':
-        response = `🆘 AIDE EMMA\n\n` +
-          `📊 ANALYSE [TICKER] - Analyse complète\n` +
-          `💰 PRIX [TICKER] - Prix actuel\n` +
-          `📈 RSI [TICKER] - Indicateurs techniques\n` +
-          `📰 NEWS [TICKER] - Actualités récentes\n` +
-          `📋 LISTE - Votre watchlist\n\n` +
-          `💡 Mode TEST - Réponses simulées`;
+        response = ` AIDE EMMA\n\n` +
+          ` ANALYSE [TICKER] - Analyse complete\n` +
+          ` PRIX [TICKER] - Prix actuel\n` +
+          ` RSI [TICKER] - Indicateurs techniques\n` +
+          ` NEWS [TICKER] - Actualites recentes\n` +
+          ` LISTE - Votre watchlist\n\n` +
+          ` Mode TEST - Reponses simulees`;
         break;
         
       case 'recommendation':
         if (primaryTicker) {
-          response = `💡 RECOMMANDATION ${primaryTicker}\n\n` +
-            `🎯 ACHETER\n` +
-            `📊 Score JSLAI: 78/100\n` +
-            `💰 Prix cible: $165\n` +
-            `⏱️ Horizon: 12 mois\n\n` +
-            `✅ Solide fondamentaux, bonne croissance.`;
+          response = ` RECOMMANDATION ${primaryTicker}\n\n` +
+            ` ACHETER\n` +
+            ` Score JSLAI: 78/100\n` +
+            ` Prix cible: $165\n` +
+            ` Horizon: 12 mois\n\n` +
+            ` Solide fondamentaux, bonne croissance.`;
         } else {
-          response = `💡 Indiquez un ticker pour une recommandation`;
+          response = ` Indiquez un ticker pour une recommandation`;
         }
         break;
         
       case 'market_overview':
-        response = `🌍 MARCHÉ ACTUEL\n\n` +
-          `📈 S&P 500: +0.8%\n` +
-          `📊 NASDAQ: +1.2%\n` +
-          `📉 DOW: +0.5%\n\n` +
-          `✅ Sentiment: Positif\n` +
-          `📊 Secteurs: Tech en tête`;
+        response = ` MARCHE ACTUEL\n\n` +
+          ` S&P 500: +0.8%\n` +
+          ` NASDAQ: +1.2%\n` +
+          ` DOW: +0.5%\n\n` +
+          ` Sentiment: Positif\n` +
+          ` Secteurs: Tech en tete`;
         break;
         
       default:
         if (primaryTicker) {
-          response = `📊 ${primaryTicker} (Mode Test)\n\n` +
-            `💰 Prix: ~$150.25\n` +
-            `📈 Variation: +2.3%\n\n` +
-            `💡 Utilisez ANALYSE ${primaryTicker} pour plus de détails.`;
+          response = ` ${primaryTicker} (Mode Test)\n\n` +
+            ` Prix: ~$150.25\n` +
+            ` Variation: +2.3%\n\n` +
+            ` Utilisez ANALYSE ${primaryTicker} pour plus de details.`;
         } else {
-          response = `👋 Je suis Emma, assistante financière IA.\n\n` +
-            `Je peux analyser des actions, donner des prix, actualités, etc.\n\n` +
-            `Exemples:\n• ANALYSE AAPL\n• PRIX TSLA\n• NEWS MSFT`;
+          response = ` Je suis Emma, assistante financiere IA.\n\n` +
+            `Je peux analyser des actions, donner des prix, actualites, etc.\n\n` +
+            `Exemples:\n- ANALYSE AAPL\n- PRIX TSLA\n- NEWS MSFT`;
         }
     }
     
-    // Ajouter emoji Emma au début de façon intelligente
-    // Éviter le "Double Salut" (ex: "👩🏻 Salut! Salut Daniel")
+    // Ajouter emoji Emma au debut de facon intelligente
+    // Eviter le "Double Salut" (ex: " Salut! Salut Daniel")
     const greetingRegex = /^(salut|bonjour|hello|hi|hey|coucou|bonsoir)/i;
     
-    if (!response.startsWith('👩🏻') && !response.startsWith('👋') && !response.startsWith('📊') && !response.startsWith('💰') && !response.startsWith('📈') && !response.startsWith('📰') && !response.startsWith('🆘') && !response.startsWith('💡') && !response.startsWith('🌍')) {
-      // Si la réponse commence déjà par une salutation, on insère l'emoji AVANT
+    if (!response.startsWith('') && !response.startsWith('') && !response.startsWith('') && !response.startsWith('') && !response.startsWith('') && !response.startsWith('') && !response.startsWith('') && !response.startsWith('') && !response.startsWith('')) {
+      // Si la reponse commence deja par une salutation, on insere l'emoji AVANT
       if (greetingRegex.test(response)) {
-         response = `👩🏻 ${response}`;
+         response = ` ${response}`;
       } else {
-         response = `👩🏻 ${response}`;
+         response = ` ${response}`;
       }
     }
     
     return response;
     
   } catch (error) {
-    console.error('[SMS Adapter] Erreur génération réponse simulée:', error);
-    // Fallback: réponse générique
-    return `👩🏻 Mode TEST - Réponse simulée\n\nJe suis Emma, assistante financière IA. En mode test, je génère des réponses simulées.\n\nPour une vraie analyse, utilisez gobapps.com`;
+    console.error('[SMS Adapter] Erreur generation reponse simulee:', error);
+    // Fallback: reponse generique
+    return ` Mode TEST - Reponse simulee\n\nJe suis Emma, assistante financiere IA. En mode test, je genere des reponses simulees.\n\nPour une vraie analyse, utilisez gobapps.com`;
   }
 }
 
 /**
- * Détecte si un numéro est un numéro de test/fictif
- * @param {string} phoneNumber - Numéro de téléphone à vérifier
- * @returns {boolean} true si c'est un numéro de test
+ * Detecte si un numero est un numero de test/fictif
+ * @param {string} phoneNumber - Numero de telephone a verifier
+ * @returns {boolean} true si c'est un numero de test
  */
 function isTestPhoneNumber(phoneNumber) {
   if (!phoneNumber || typeof phoneNumber !== 'string') return false;
   
-  const cleaned = phoneNumber.trim().replace(/^=/, ''); // Enlever = au début
+  const cleaned = phoneNumber.trim().replace(/^=/, ''); // Enlever = au debut
   
-  // Patterns de numéros de test communs (SEULEMENT numéros 555)
+  // Patterns de numeros de test communs (SEULEMENT numeros 555)
   const testPatterns = [
     /^\+1555\d{7}$/,        // +1555XXXXXXX (US test numbers)
     /^\+15551\d{6}$/,       // +15551XXXXXX (US test numbers)
@@ -523,13 +523,13 @@ function isTestPhoneNumber(phoneNumber) {
     /^\+1555111\d{4}$/,     // +1555111XXXX (US test numbers)
     /^\+1555222\d{4}$/,     // +1555222XXXX (US test numbers)
     /^\+1555987\d{4}$/,     // +1555987XXXX (US test numbers)
-    // ✅ FIX: Removed /^\+1\d{10}$/ - was matching ALL US numbers as test!
+    //  FIX: Removed /^\+1\d{10}$/ - was matching ALL US numbers as test!
   ];
   
-  // Vérifier si le numéro correspond à un pattern de test
+  // Verifier si le numero correspond a un pattern de test
   const isTestPattern = testPatterns.some(pattern => pattern.test(cleaned));
   
-  // Vérifier aussi si c'est un numéro connu de test
+  // Verifier aussi si c'est un numero connu de test
   const knownTestNumbers = [
     '+15551111111',
     '+15551234567',
@@ -546,20 +546,20 @@ function isTestPhoneNumber(phoneNumber) {
 /**
  * Envoie un SMS via Twilio
  *
- * @param {string} to - Numéro du destinataire
- * @param {string} message - Message à envoyer
+ * @param {string} to - Numero du destinataire
+ * @param {string} message - Message a envoyer
  * @param {boolean} simulate - Forcer mode simulation (optionnel)
- * @returns {Promise<object>} Résultat Twilio
+ * @returns {Promise<object>} Resultat Twilio
  */
 async function sendSMS(to, message, simulate = false) {
   try {
-    // ✅ FIX: Nettoyer et valider le numéro de téléphone
+    //  FIX: Nettoyer et valider le numero de telephone
     if (to && typeof to === 'string') {
       to = to.trim();
-      // Enlever = au début si présent (problème d'URL encoding)
+      // Enlever = au debut si present (probleme d'URL encoding)
       if (to.startsWith('=')) {
         to = to.substring(1);
-        console.log(`[SMS Adapter] ⚠️ Numéro nettoyé (enlevé = au début): ${to}`);
+        console.log(`[SMS Adapter]  Numero nettoye (enleve = au debut): ${to}`);
       }
       // Valider format (doit commencer par +)
       if (!to.startsWith('+')) {
@@ -569,22 +569,22 @@ async function sendSMS(to, message, simulate = false) {
       throw new Error(`Invalid phone number type: ${typeof to}, value: ${to}`);
     }
 
-    // ✅ FIX: Détecter automatiquement les numéros de test et activer simulation
-    // Évite d'appeler Twilio avec des numéros invalides
+    //  FIX: Detecter automatiquement les numeros de test et activer simulation
+    // Evite d'appeler Twilio avec des numeros invalides
     if (!simulate && isTestPhoneNumber(to)) {
-      console.log(`[SMS Adapter] 🧪 Numéro de test détecté: ${to} → Mode simulation activé automatiquement`);
+      console.log(`[SMS Adapter]  Numero de test detecte: ${to} -> Mode simulation active automatiquement`);
       simulate = true;
     }
 
-    // 🧪 MODE SIMULATION: Ne pas envoyer de vrai SMS
+    //  MODE SIMULATION: Ne pas envoyer de vrai SMS
     if (simulate) {
-      console.log(`[SMS Adapter] 🧪 MODE SIMULATION - SMS NON ENVOYÉ à ${to} (${message.length} chars)`);
-      console.log(`[SMS Adapter] 🧪 Contenu simulé: "${message.substring(0, 100)}..."`);
+      console.log(`[SMS Adapter]  MODE SIMULATION - SMS NON ENVOYE a ${to} (${message.length} chars)`);
+      console.log(`[SMS Adapter]  Contenu simule: "${message.substring(0, 100)}..."`);
       return { 
         success: true, 
         simulated: true, 
         messageCount: message.length > 1600 ? Math.ceil(message.length / 1500) : 1,
-        message: 'SMS simulé (pas envoyé)'
+        message: 'SMS simule (pas envoye)'
       };
     }
 
@@ -595,22 +595,22 @@ async function sendSMS(to, message, simulate = false) {
       throw new Error('TWILIO_PHONE_NUMBER is not configured');
     }
 
-    console.log(`[SMS Adapter] Envoi SMS à ${to} (${message.length} chars)`);
+    console.log(`[SMS Adapter] Envoi SMS a ${to} (${message.length} chars)`);
 
-    // Twilio limite: 1600 caractères par SMS
-    // Si dépassement, on envoie plusieurs SMS
+    // Twilio limite: 1600 caracteres par SMS
+    // Si depassement, on envoie plusieurs SMS
     if (message.length > 1600) {
-      console.log('[SMS Adapter] Message trop long, découpage en plusieurs SMS');
+      console.log('[SMS Adapter] Message trop long, decoupage en plusieurs SMS');
 
-      // Limite réelle: 1600 (Twilio) - 30 (préfixe "👩🏻 Partie X/Y\n\n") - 70 (marge sécurité)
+      // Limite reelle: 1600 (Twilio) - 30 (prefixe " Partie X/Y\n\n") - 70 (marge securite)
       const chunks = chunkMessage(message, 1500);
 
       // Envoyer les SMS dans l'ORDRE NORMAL (1, 2, 3...)
-      // Les réseaux modernes trient souvent par timestamp de réception
+      // Les reseaux modernes trient souvent par timestamp de reception
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        // 🚨 PAS d'emoji 📱 dans le préfixe (force UCS-2 = coût ×2.3)
-        const prefix = chunks.length > 1 ? `👩🏻 Partie ${i + 1}/${chunks.length}\n\n` : '👩🏻 ';
+        //  PAS d'emoji  dans le prefixe (force UCS-2 = cout x2.3)
+        const prefix = chunks.length > 1 ? ` Partie ${i + 1}/${chunks.length}\n\n` : ' ';
 
         await client.messages.create({
           from: twilioPhoneNumber,
@@ -618,20 +618,20 @@ async function sendSMS(to, message, simulate = false) {
           body: prefix + chunk
         });
 
-        // Délai explicite entre les SMS pour garantir l'ordre de réception
+        // Delai explicite entre les SMS pour garantir l'ordre de reception
         // 5 secondes garantit que le premier message a un timestamp distinct du second
         if (i < chunks.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 5000));
         }
       }
 
-      console.log(`[SMS Adapter] ${chunks.length} SMS envoyés avec succès`);
+      console.log(`[SMS Adapter] ${chunks.length} SMS envoyes avec succes`);
       return { success: true, messageCount: chunks.length };
 
     } else {
-      // Message simple (< 1600 chars) - Ajouter emoji Emma au début SI PAS DÉJÀ PRÉSENT
-      const hasEmmaEmoji = message.startsWith('👩🏻');
-      const finalMessage = hasEmmaEmoji ? message : `👩🏻 ${message}`;
+      // Message simple (< 1600 chars) - Ajouter emoji Emma au debut SI PAS DEJA PRESENT
+      const hasEmmaEmoji = message.startsWith('');
+      const finalMessage = hasEmmaEmoji ? message : ` ${message}`;
       
       const result = await client.messages.create({
         from: twilioPhoneNumber,
@@ -639,7 +639,7 @@ async function sendSMS(to, message, simulate = false) {
         body: finalMessage
       });
 
-      console.log(`[SMS Adapter] SMS envoyé avec succès - SID: ${result.sid}`);
+      console.log(`[SMS Adapter] SMS envoye avec succes - SID: ${result.sid}`);
       return result;
     }
 
@@ -650,10 +650,10 @@ async function sendSMS(to, message, simulate = false) {
 }
 
 /**
- * Échappe les caractères XML spéciaux
+ * Echappe les caracteres XML speciaux
  *
- * @param {string} text - Le texte à échapper
- * @returns {string} Texte avec caractères XML échappés
+ * @param {string} text - Le texte a echapper
+ * @returns {string} Texte avec caracteres XML echappes
  */
 function escapeXml(text) {
   return text
@@ -665,10 +665,10 @@ function escapeXml(text) {
 }
 
 /**
- * Découpe un message en chunks pour SMS
- * AMÉLIORATION: Respecte les sections complètes (titres + contenu)
+ * Decoupe un message en chunks pour SMS
+ * AMELIORATION: Respecte les sections completes (titres + contenu)
  *
- * @param {string} text - Le texte à découper
+ * @param {string} text - Le texte a decouper
  * @param {number} maxLength - Longueur max par chunk
  * @returns {string[]} Tableau de chunks
  */
@@ -676,14 +676,14 @@ function chunkMessage(text, maxLength) {
   const chunks = [];
   let currentChunk = '';
 
-  // 🎯 AMÉLIORATION: Découper par sections (paragraphes) au lieu de phrases
-  // Cela évite de couper un titre de son contenu
+  //  AMELIORATION: Decouper par sections (paragraphes) au lieu de phrases
+  // Cela evite de couper un titre de son contenu
   const paragraphs = text.split(/\n\n+/);
 
   for (const paragraph of paragraphs) {
     const paragraphWithSpacing = currentChunk ? '\n\n' + paragraph : paragraph;
     
-    // Si ajouter ce paragraphe ne dépasse pas la limite
+    // Si ajouter ce paragraphe ne depasse pas la limite
     if ((currentChunk + paragraphWithSpacing).length <= maxLength) {
       currentChunk += paragraphWithSpacing;
     } else {
@@ -693,7 +693,7 @@ function chunkMessage(text, maxLength) {
         currentChunk = '';
       }
       
-      // Si le paragraphe seul est trop long, le découper par phrases
+      // Si le paragraphe seul est trop long, le decouper par phrases
       if (paragraph.length > maxLength) {
         const sentences = paragraph.split(/(?<=[.!?])\s+/);
         
@@ -743,14 +743,14 @@ function chunkMessage(text, maxLength) {
 export { sendSMS };
 
 /**
- * Exemple de requête Twilio:
+ * Exemple de requete Twilio:
  *
  * POST /api/adapters/sms
  * Content-Type: application/x-www-form-urlencoded
  *
  * From=+14385443662&To=+1234567890&Body=Analyse+AAPL&MessageSid=SM1234567890
  *
- * Réponse TwiML:
+ * Reponse TwiML:
  * <?xml version="1.0" encoding="UTF-8"?>
  * <Response></Response>
  */

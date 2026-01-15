@@ -1,15 +1,15 @@
 /**
  * Adaptateur Facebook Messenger
  *
- * Reçoit les messages via Messenger webhook,
- * appelle /api/chat, et renvoie la réponse via Messenger Send API.
+ * Recoit les messages via Messenger webhook,
+ * appelle /api/chat, et renvoie la reponse via Messenger Send API.
  *
  * Configuration requise:
- * 1. Créer une app Facebook sur developers.facebook.com
+ * 1. Creer une app Facebook sur developers.facebook.com
  * 2. Ajouter le produit "Messenger"
- * 3. Générer un Page Access Token
+ * 3. Generer un Page Access Token
  * 4. Configurer le webhook URL: https://your-app.vercel.app/api/adapters/messenger
- * 5. Souscrire aux événements: messages, messaging_postbacks
+ * 5. Souscrire aux evenements: messages, messaging_postbacks
  */
 
 /**
@@ -43,8 +43,8 @@ export default async function handler(req, res) {
 }
 
 /**
- * Vérification du webhook (GET)
- * Facebook envoie cette requête pour vérifier l'authenticité du webhook
+ * Verification du webhook (GET)
+ * Facebook envoie cette requete pour verifier l'authenticite du webhook
  */
 function handleVerification(req, res) {
   const VERIFY_TOKEN = process.env.MESSENGER_VERIFY_TOKEN || 'gob_emma_verify_token_2025';
@@ -81,10 +81,10 @@ async function handleWebhook(req, res) {
       });
     }
 
-    // Répondre immédiatement à Facebook (obligatoire)
+    // Repondre immediatement a Facebook (obligatoire)
     res.status(200).send('EVENT_RECEIVED');
 
-    // Traiter les événements de manière asynchrone
+    // Traiter les evenements de maniere asynchrone
     for (const pageEntry of entry) {
       const webhookEvent = pageEntry.messaging?.[0];
 
@@ -105,7 +105,7 @@ async function handleWebhook(req, res) {
 
   } catch (error) {
     console.error('[Messenger Adapter] Error handling webhook:', error);
-    // Ne pas renvoyer d'erreur à Facebook, on a déjà répondu 200
+    // Ne pas renvoyer d'erreur a Facebook, on a deja repondu 200
   }
 }
 
@@ -127,7 +127,7 @@ async function processMessage(event) {
     // Envoyer "typing..." pour montrer que le bot traite
     await sendTypingIndicator(senderId, true);
 
-    // 1. APPELER L'API CHAT CENTRALISÉE
+    // 1. APPELER L'API CHAT CENTRALISEE
     let chatResponse;
     try {
       const chatModule = await import('../chat.js');
@@ -164,23 +164,23 @@ async function processMessage(event) {
       }
 
       chatResponse = chatResponseData;
-      console.log(`[Messenger Adapter] Réponse reçue de /api/chat`);
+      console.log(`[Messenger Adapter] Reponse recue de /api/chat`);
 
     } catch (error) {
       console.error('[Messenger Adapter] Erreur appel /api/chat:', error);
       await sendTypingIndicator(senderId, false);
       await sendTextMessage(
         senderId,
-        '❌ Désolé, une erreur est survenue. Réessayez dans quelques instants.'
+        ' Desole, une erreur est survenue. Reessayez dans quelques instants.'
       );
       return;
     }
 
-    // 2. ENVOYER LA RÉPONSE VIA MESSENGER
+    // 2. ENVOYER LA REPONSE VIA MESSENGER
     await sendTypingIndicator(senderId, false);
     await sendTextMessage(senderId, chatResponse.response);
 
-    console.log('[Messenger Adapter] Message envoyé avec succès');
+    console.log('[Messenger Adapter] Message envoye avec succes');
 
   } catch (error) {
     console.error('[Messenger Adapter] Erreur processMessage:', error);
@@ -198,14 +198,14 @@ async function sendTextMessage(recipientId, text) {
       throw new Error('MESSENGER_PAGE_ACCESS_TOKEN is not configured');
     }
 
-    // Messenger limite: 2000 caractères par message
+    // Messenger limite: 2000 caracteres par message
     if (text.length > 2000) {
-      console.log('[Messenger Adapter] Message trop long, découpage');
+      console.log('[Messenger Adapter] Message trop long, decoupage');
       const chunks = chunkMessage(text, 1900);
 
       for (const chunk of chunks) {
         await sendTextMessage(recipientId, chunk);
-        // Délai entre les messages
+        // Delai entre les messages
         await new Promise(resolve => setTimeout(resolve, 500));
       }
 
@@ -232,7 +232,7 @@ async function sendTextMessage(recipientId, text) {
     }
 
     const result = await response.json();
-    console.log(`[Messenger Adapter] Message envoyé - ID: ${result.message_id}`);
+    console.log(`[Messenger Adapter] Message envoye - ID: ${result.message_id}`);
 
     return result;
 
@@ -276,7 +276,7 @@ async function sendTypingIndicator(recipientId, isTyping = true) {
 }
 
 /**
- * Envoie une réponse rapide (Quick Reply)
+ * Envoie une reponse rapide (Quick Reply)
  */
 async function sendQuickReply(recipientId, text, quickReplies) {
   try {
@@ -321,7 +321,7 @@ async function sendQuickReply(recipientId, text, quickReplies) {
 }
 
 /**
- * Découpe un message en chunks
+ * Decoupe un message en chunks
  */
 function chunkMessage(text, maxLength) {
   const chunks = [];
@@ -353,9 +353,9 @@ function chunkMessage(text, maxLength) {
  * Configuration Facebook App:
  *
  * 1. Aller sur developers.facebook.com
- * 2. Créer une app → Type: Business
+ * 2. Creer une app -> Type: Business
  * 3. Ajouter Messenger
- * 4. Générer un Page Access Token
+ * 4. Generer un Page Access Token
  * 5. Webhooks:
  *    - Callback URL: https://your-app.vercel.app/api/adapters/messenger
  *    - Verify Token: gob_emma_verify_token_2025 (ou votre token custom)

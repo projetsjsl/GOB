@@ -1,15 +1,15 @@
 /**
  * Adaptateur Email - ImprovMX + Resend
  *
- * Reçoit les emails via webhook n8n (ImprovMX forward),
- * appelle /api/chat, et renvoie la réponse par email via Resend.
+ * Recoit les emails via webhook n8n (ImprovMX forward),
+ * appelle /api/chat, et renvoie la reponse par email via Resend.
  *
  * Flow:
- * 1. Email arrive à emma@gobapps.com (ImprovMX)
+ * 1. Email arrive a emma@gobapps.com (ImprovMX)
  * 2. ImprovMX forward vers n8n webhook
  * 3. n8n parse et call /api/adapters/email
  * 4. Cet endpoint appelle /api/chat
- * 5. Réponse envoyée via Resend
+ * 5. Reponse envoyee via Resend
  */
 
 import { Resend } from 'resend';
@@ -55,13 +55,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('[Email Adapter] Webhook email reçu');
+    console.log('[Email Adapter] Webhook email recu');
 
-    // 1. PARSER LES DONNÉES EMAIL
+    // 1. PARSER LES DONNEES EMAIL
     const { from, to, subject, text, html } = req.body;
 
     if (!from || (!text && !html)) {
-      console.error('[Email Adapter] Données email invalides:', req.body);
+      console.error('[Email Adapter] Donnees email invalides:', req.body);
       return res.status(400).json({
         success: false,
         error: 'Missing from, text, or html parameters',
@@ -76,11 +76,11 @@ export default async function handler(req, res) {
           text: 'Contenu texte de email (ou html)',
           html: 'Contenu HTML de email (optionnel si text present)'
         },
-        note: 'Cet endpoint est conçu pour recevoir des webhooks n8n/ImprovMX, pas des appels directs'
+        note: 'Cet endpoint est concu pour recevoir des webhooks n8n/ImprovMX, pas des appels directs'
       });
     }
 
-    // Extraire le contenu textuel (priorité: text, sinon strip HTML)
+    // Extraire le contenu textuel (priorite: text, sinon strip HTML)
     const messageBody = text || stripHTML(html);
 
     console.log(`[Email Adapter] Email de ${from}, Sujet: "${subject}"`);
@@ -91,20 +91,20 @@ export default async function handler(req, res) {
       return await sendEmail(
         from,
         'Re: ' + (subject || 'Message vide'),
-        'Votre message était vide. Veuillez envoyer une question pour Emma IA.'
+        'Votre message etait vide. Veuillez envoyer une question pour Emma IA.'
       );
     }
 
-    // Vérifier que ce n'est pas une réponse automatique
+    // Verifier que ce n'est pas une reponse automatique
     if (isAutoReply(subject, messageBody)) {
-      console.log('[Email Adapter] Auto-reply détecté, ignoré');
+      console.log('[Email Adapter] Auto-reply detecte, ignore');
       return res.status(200).json({
         success: true,
         message: 'Auto-reply ignored'
       });
     }
 
-    // 3. APPELER L'API CHAT CENTRALISÉE
+    // 3. APPELER L'API CHAT CENTRALISEE
     let chatResponse;
     try {
       const chatModule = await import('../chat.js');
@@ -142,20 +142,20 @@ export default async function handler(req, res) {
       }
 
       chatResponse = chatResponseData;
-      console.log(`[Email Adapter] Réponse reçue de /api/chat`);
+      console.log(`[Email Adapter] Reponse recue de /api/chat`);
 
     } catch (error) {
       console.error('[Email Adapter] Erreur appel /api/chat:', error);
       return await sendEmail(
         from,
         'Re: ' + (subject || 'Votre question'),
-        '❌ Désolé, une erreur est survenue lors du traitement de votre demande. Veuillez réessayer dans quelques instants.\n\nÉquipe GOB'
+        ' Desole, une erreur est survenue lors du traitement de votre demande. Veuillez reessayer dans quelques instants.\n\nEquipe GOB'
       );
     }
 
-    // 4. ENVOYER LA RÉPONSE PAR EMAIL
+    // 4. ENVOYER LA REPONSE PAR EMAIL
     try {
-      // La réponse est déjà formatée en HTML par channel-adapter
+      // La reponse est deja formatee en HTML par channel-adapter
       await sendEmail(
         from,
         'Re: ' + (subject || 'Votre question'),
@@ -179,7 +179,7 @@ export default async function handler(req, res) {
     }
 
   } catch (error) {
-    console.error('[Email Adapter] Erreur générale:', error);
+    console.error('[Email Adapter] Erreur generale:', error);
 
     // Tenter d'envoyer un email d'erreur
     try {
@@ -187,7 +187,7 @@ export default async function handler(req, res) {
         await sendEmail(
           req.body.from,
           'Re: ' + (req.body.subject || 'Erreur'),
-          '❌ Une erreur système est survenue. Si le problème persiste, contactez le support GOB.\n\nÉquipe GOB'
+          ' Une erreur systeme est survenue. Si le probleme persiste, contactez le support GOB.\n\nEquipe GOB'
         );
       }
     } catch (emailError) {
@@ -209,14 +209,14 @@ export default async function handler(req, res) {
  * @param {string} subject - Sujet de l'email
  * @param {string} content - Contenu (text ou HTML)
  * @param {boolean} isHTML - Si true, content est du HTML
- * @returns {Promise<object>} Résultat Resend
+ * @returns {Promise<object>} Resultat Resend
  */
 async function sendEmail(to, subject, content, isHTML = false) {
   try {
     const resend = getResendClient();
     const fromEmail = process.env.EMAIL_FROM || 'emma@gob.ai';
 
-    console.log(`[Email Adapter] Envoi email à ${to}`);
+    console.log(`[Email Adapter] Envoi email a ${to}`);
 
     const emailData = {
       from: fromEmail,
@@ -232,7 +232,7 @@ async function sendEmail(to, subject, content, isHTML = false) {
 
     const result = await resend.emails.send(emailData);
 
-    console.log(`[Email Adapter] Email envoyé avec succès - ID: ${result.id}`);
+    console.log(`[Email Adapter] Email envoye avec succes - ID: ${result.id}`);
     return result;
 
   } catch (error) {
@@ -244,24 +244,24 @@ async function sendEmail(to, subject, content, isHTML = false) {
 /**
  * Supprime les balises HTML d'un texte
  *
- * @param {string} html - HTML à convertir
+ * @param {string} html - HTML a convertir
  * @returns {string} Texte brut
  */
 function stripHTML(html) {
   if (!html) return '';
 
-  // Remplacer les balises communes par des équivalents texte
+  // Remplacer les balises communes par des equivalents texte
   let text = html
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<\/p>/gi, '\n\n')
     .replace(/<\/div>/gi, '\n')
-    .replace(/<li>/gi, '• ')
+    .replace(/<li>/gi, '- ')
     .replace(/<\/li>/gi, '\n');
 
   // Supprimer toutes les autres balises
   text = text.replace(/<[^>]*>/g, '');
 
-  // Décoder les entités HTML
+  // Decoder les entites HTML
   text = text
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
@@ -277,7 +277,7 @@ function stripHTML(html) {
 }
 
 /**
- * Détecte si c'est une réponse automatique (Out of Office, etc.)
+ * Detecte si c'est une reponse automatique (Out of Office, etc.)
  *
  * @param {string} subject - Sujet de l'email
  * @param {string} body - Corps de l'email
@@ -310,7 +310,7 @@ function isAutoReply(subject, body) {
 }
 
 /**
- * Exemple de requête n8n:
+ * Exemple de requete n8n:
  *
  * POST /api/adapters/email
  * {

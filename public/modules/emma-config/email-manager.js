@@ -4,7 +4,7 @@
  */
 
 export const emailManager = {
-    // État local
+    // Etat local
     state: {
         lastRecipient: '',
         lastSubject: '',
@@ -14,7 +14,7 @@ export const emailManager = {
 
     // Initialisation du module
     init() {
-        console.log('📧 Email Manager initialized');
+        console.log(' Email Manager initialized');
         this.render();
     },
 
@@ -25,13 +25,13 @@ export const emailManager = {
 
         container.innerHTML = `
             <div class="max-w-4xl mx-auto p-6">
-                <!-- En-tête -->
+                <!-- En-tete -->
                 <div class="mb-8">
                     <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                        <span class="text-3xl">📧</span> Gestion Email (Resend)
+                        <span class="text-3xl"></span> Gestion Email (Resend)
                     </h2>
                     <p class="text-gray-600 mt-2">
-                        Testez l'envoi d'emails transactionnels et vérifiez la configuration de l'API Resend.
+                        Testez l'envoi d'emails transactionnels et verifiez la configuration de l'API Resend.
                     </p>
                 </div>
 
@@ -41,7 +41,7 @@ export const emailManager = {
                     <!-- Colonne Gauche: Formulaire de test -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                            🚀 Envoyer un test
+                             Envoyer un test
                         </h3>
                         
                         <div class="space-y-4">
@@ -51,7 +51,7 @@ export const emailManager = {
                                     class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                                     placeholder="ex: votre-email@exemple.com"
                                     value="${this.state.lastRecipient || 'projetsjsl@gmail.com'}">
-                                <p class="text-xs text-gray-500 mt-1">L'email sera envoyé via l'API <code>/api/send-email</code></p>
+                                <p class="text-xs text-gray-500 mt-1">L'email sera envoye via l'API <code>/api/send-email</code></p>
                             </div>
 
                             <div>
@@ -68,8 +68,8 @@ export const emailManager = {
                                     class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-mono text-gray-600"
                                     placeholder="<p>Bonjour...</p>"><div style="font-family: sans-serif; padding: 20px; background: #f3f4f6;">
   <div style="background: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
-    <h1 style="color: #4f46e5; margin-top: 0;">Test Emma Config 🚀</h1>
-    <p>Ceci est un email de test envoyé depuis le panneau d'administration.</p>
+    <h1 style="color: #4f46e5; margin-top: 0;">Test Emma Config </h1>
+    <p>Ceci est un email de test envoye depuis le panneau d'administration.</p>
     <p>Heure: <strong>${new Date().toLocaleTimeString()}</strong></p>
     <br>
     <a href="#" style="background: #4f46e5; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Bouton Test</a>
@@ -81,7 +81,7 @@ export const emailManager = {
                                 <button id="btnSendTest" 
                                     class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-lg shadow transition-colors flex justify-center items-center gap-2">
                                     <span>Envoyer le test</span>
-                                    <span id="sendSpinner" class="hidden animate-spin">⏳</span>
+                                    <span id="sendSpinner" class="hidden animate-spin"></span>
                                 </button>
                             </div>
                         </div>
@@ -106,7 +106,7 @@ export const emailManager = {
                                     </div>
                                 </div>
                                 <div class="text-xs text-gray-400 mt-2 px-1">
-                                    <p>Les clés API sont gérées côté serveur (.env)</p>
+                                    <p>Les cles API sont gerees cote serveur (.env)</p>
                                 </div>
                             </div>
                         </div>
@@ -118,7 +118,7 @@ export const emailManager = {
                                 <button id="btnClearLogs" class="text-xs text-gray-500 hover:text-white transition">Effacer</button>
                             </div>
                             <div id="emailConsoleOutput" class="flex-1 p-4 overflow-y-auto font-mono text-xs text-green-400 space-y-1">
-                                <div class="opacity-50">> Prêt. En attente d'action...</div>
+                                <div class="opacity-50">> Pret. En attente d'action...</div>
                             </div>
                         </div>
 
@@ -130,7 +130,7 @@ export const emailManager = {
         // Bind events
         document.getElementById('btnSendTest').addEventListener('click', () => this.handleSend());
         document.getElementById('btnClearLogs').addEventListener('click', () => {
-            document.getElementById('emailConsoleOutput').innerHTML = '<div class="opacity-50">> Logs effacés.</div>';
+            document.getElementById('emailConsoleOutput').innerHTML = '<div class="opacity-50">> Logs effaces.</div>';
         });
     },
 
@@ -172,15 +172,15 @@ export const emailManager = {
             const data = await response.json();
 
             if (response.ok) {
-                this.log(`✅ SUCCÈS: Email envoyé! ID: ${data.emailId || 'N/A'}`, 'success');
-                this.log(`> Réponse: ${JSON.stringify(data, null, 2)}`);
+                this.log(` SUCCES: Email envoye! ID: ${data.emailId || 'N/A'}`, 'success');
+                this.log(`> Reponse: ${JSON.stringify(data, null, 2)}`);
             } else {
-                this.log(`❌ ERREUR: ${data.message || 'Erreur inconnue'}`, 'error');
-                this.log(`> Détails: ${JSON.stringify(data, null, 2)}`);
+                this.log(` ERREUR: ${data.message || 'Erreur inconnue'}`, 'error');
+                this.log(`> Details: ${JSON.stringify(data, null, 2)}`);
             }
 
         } catch (error) {
-            this.log(`‼️ EXCEPTION: ${error.message}`, 'error');
+            this.log(`!! EXCEPTION: ${error.message}`, 'error');
         } finally {
             // UI Reset
             btn.disabled = false;

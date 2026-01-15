@@ -20,14 +20,14 @@ export default async function handler(req, res) {
     const from = new Date().toISOString().split('T')[0];
     const to = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    // Cascade fallback: FMP → Yahoo Finance → Static fallback
+    // Cascade fallback: FMP -> Yahoo Finance -> Static fallback
     let events = null;
     let source = 'fallback';
     let errors = [];
 
     // Try 1: FMP (Primary)
     try {
-        console.log('🔄 [1/2] Trying FMP Dividends...');
+        console.log(' [1/2] Trying FMP Dividends...');
         const FMP_API_KEY = process.env.FMP_API_KEY;
 
         if (FMP_API_KEY) {
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
                 if (Array.isArray(fmpData) && fmpData.length > 0) {
                     events = parseFMPDividends(fmpData);
                     source = 'fmp';
-                    console.log(`✅ FMP: ${events.length} days of dividends`);
+                    console.log(` FMP: ${events.length} days of dividends`);
                 }
             } else {
                 throw new Error(`HTTP ${response.status}`);
@@ -51,27 +51,27 @@ export default async function handler(req, res) {
         }
     } catch (error) {
         errors.push(`FMP: ${error.message}`);
-        console.log(`⚠️ FMP failed: ${error.message}`);
+        console.log(` FMP failed: ${error.message}`);
     }
 
     // Try 2: Yahoo Finance (Fallback)
     if (!events) {
         try {
-            console.log('🔄 [2/2] Trying Yahoo Finance...');
+            console.log(' [2/2] Trying Yahoo Finance...');
             // Yahoo Finance doesn't have a direct dividend calendar API
             // Use static fallback as alternative
             events = getFallbackDividendsData();
             source = 'yahoo_limited';
-            console.log(`✅ Yahoo Finance: Using limited fallback data`);
+            console.log(` Yahoo Finance: Using limited fallback data`);
         } catch (error) {
             errors.push(`Yahoo: ${error.message}`);
-            console.log(`⚠️ Yahoo failed: ${error.message}`);
+            console.log(` Yahoo failed: ${error.message}`);
         }
     }
 
     // Final fallback: Static data
     if (!events) {
-        console.log('📦 Using static fallback data');
+        console.log(' Using static fallback data');
         events = getFallbackDividendsData();
         source = 'static_fallback';
     }
@@ -99,8 +99,8 @@ function parseFMPDividends(fmpData) {
             day: 'numeric'
         });
 
-        // Déterminer le type d'événement (Ex-Date, Record Date, Pay Date, Declaration Date)
-        let eventType = 'Ex-Date'; // Par défaut
+        // Determiner le type d'evenement (Ex-Date, Record Date, Pay Date, Declaration Date)
+        let eventType = 'Ex-Date'; // Par defaut
         if (item.recordDate && item.date === item.recordDate) {
             eventType = 'Record Date';
         } else if (item.paymentDate && item.date === item.paymentDate) {
@@ -147,7 +147,7 @@ function parseFMPDividends(fmpData) {
 function getFallbackDividendsData() {
     const year = new Date().getFullYear();
     const nextYear = year + 1;
-    // Team tickers avec dividendes estimés (trimestres à venir)
+    // Team tickers avec dividendes estimes (trimestres a venir)
     const teamDividends = [
         { symbol: 'JNJ', date: `Mon, Nov 25, ${year}`, type: 'Ex-Date', amount: '$1.24', prev: '$1.19', yield: '3.2%' },
         { symbol: 'JPM', date: `Fri, Jan 3, ${nextYear}`, type: 'Ex-Date', amount: '$1.25', prev: '$1.15', yield: '2.1%' },
@@ -166,9 +166,9 @@ function getFallbackDividendsData() {
         { symbol: 'MFC', date: `Tue, Dec 3, ${year}`, type: 'Ex-Date', amount: 'C$0.38', prev: 'C$0.38', yield: '4.2%' },
         { symbol: 'TRP', date: `Fri, Dec 20, ${year}`, type: 'Ex-Date', amount: 'C$0.99', prev: 'C$0.96', yield: '6.8%' },
         { symbol: 'NTR', date: `Fri, Dec 27, ${year}`, type: 'Ex-Date', amount: '$0.52', prev: '$0.52', yield: '4.1%' },
-        { symbol: 'DEO', date: `Thu, Nov 14, ${year}`, type: 'Ex-Date', amount: '£0.4285', prev: '£0.4107', yield: '2.4%' },
-        { symbol: 'UL', date: `Thu, Nov 7, ${year}`, type: 'Ex-Date', amount: '€0.4268', prev: '€0.4108', yield: '3.8%' },
-        { symbol: 'LVMHF', date: `Thu, Dec 5, ${year}`, type: 'Ex-Date', amount: '€6.00', prev: '€5.00', yield: '1.8%' },
+        { symbol: 'DEO', date: `Thu, Nov 14, ${year}`, type: 'Ex-Date', amount: 'GBP0.4285', prev: 'GBP0.4107', yield: '2.4%' },
+        { symbol: 'UL', date: `Thu, Nov 7, ${year}`, type: 'Ex-Date', amount: 'EUR0.4268', prev: 'EUR0.4108', yield: '3.8%' },
+        { symbol: 'LVMHF', date: `Thu, Dec 5, ${year}`, type: 'Ex-Date', amount: 'EUR6.00', prev: 'EUR5.00', yield: '1.8%' },
         { symbol: 'NSRGY', date: `Fri, Apr 18, ${nextYear}`, type: 'Ex-Date', amount: 'CHF 1.50', prev: 'CHF 1.42', yield: '3.1%' },
         { symbol: 'MG', date: `Fri, Dec 13, ${year}`, type: 'Ex-Date', amount: 'C$0.105', prev: 'C$0.10', yield: '4.5%' }
     ];

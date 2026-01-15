@@ -1,14 +1,14 @@
 /**
  * CurveWatchV0 - CEO Designer Edition v6
  * Premium Financial Terminal UI/UX + Admin Panel
- * ═══════════════════════════════════════════════════════════════════
+ * 
  */
 
 const { useState, useEffect, useCallback, useMemo, useRef } = React;
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // ADMIN CONFIGURATION - Default visibility settings
-// ═══════════════════════════════════════════════════════════════════
+// 
 const DEFAULT_ADMIN_CONFIG = {
     // Header elements
     header: {
@@ -53,9 +53,9 @@ const DEFAULT_ADMIN_CONFIG = {
 
 const STORAGE_KEY = 'curvewatch_admin_config';
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // ADMIN HOOKS - Persistence & State Management
-// ═══════════════════════════════════════════════════════════════════
+// 
 const useAdminConfig = () => {
     const [config, setConfig] = useState(() => {
         try {
@@ -123,9 +123,9 @@ const getDeepValue = (obj, path) => {
     return path.split('.').reduce((acc, key) => acc?.[key], obj);
 };
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // ADMIN PANEL COMPONENT
-// ═══════════════════════════════════════════════════════════════════
+// 
 const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
     const [activeTab, setActiveTab] = useState('sections');
     
@@ -165,10 +165,10 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
     );
 
     const tabs = [
-        { id: 'sections', label: 'Sections', icon: '📊' },
-        { id: 'header', label: 'Header', icon: '🎯' },
-        { id: 'sidebar', label: 'Sidebar', icon: '📋' },
-        { id: 'ui', label: 'Interface', icon: '✨' },
+        { id: 'sections', label: 'Sections', icon: '' },
+        { id: 'header', label: 'Header', icon: '' },
+        { id: 'sidebar', label: 'Sidebar', icon: '' },
+        { id: 'ui', label: 'Interface', icon: '' },
     ];
 
     return (
@@ -185,7 +185,7 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
                 <div className="flex items-center justify-between p-6 border-b border-white/5 bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-lg">
-                            ⚙️
+                            
                         </div>
                         <div>
                             <h2 className="text-lg font-bold text-white">Panneau Admin</h2>
@@ -196,7 +196,7 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
                         onClick={onClose}
                         className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-all"
                     >
-                        ✕
+                        
                     </button>
                 </div>
 
@@ -229,10 +229,10 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
                                 <Toggle label="Boutons Export" path="sections.hero.exportButtons" />
                             </SectionGroup>
                             
-                            <SectionGroup title="KPIs & Données">
-                                <Toggle label="Résumé KPIs" path="sections.kpiSummary.enabled" description="Cartes FED Rate, BOC Rate, Pentes" />
+                            <SectionGroup title="KPIs & Donnees">
+                                <Toggle label="Resume KPIs" path="sections.kpiSummary.enabled" description="Cartes FED Rate, BOC Rate, Pentes" />
                                 <Toggle label="Courbes de Rendement" path="sections.yieldCurves.enabled" description="Graphique principal des courbes" />
-                                <Toggle label="Grille de Comparaison" path="sections.comparisonGrid.enabled" description="Matrice des rendements par maturité" />
+                                <Toggle label="Grille de Comparaison" path="sections.comparisonGrid.enabled" description="Matrice des rendements par maturite" />
                             </SectionGroup>
 
                             <SectionGroup title="Analyse des Spreads">
@@ -241,18 +241,18 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
                                 <Toggle label="Analyse des Spreads" path="sections.spreads.spreadAnalysis" />
                             </SectionGroup>
 
-                            <SectionGroup title="Métriques Avancées">
+                            <SectionGroup title="Metriques Avancees">
                                 <Toggle label="Section Analytics" path="sections.analytics.enabled" />
                                 <Toggle label="Taux Forward" path="sections.analytics.forwardRates" />
                                 <Toggle label="Spreads Papillon" path="sections.analytics.butterflies" />
-                                <Toggle label="Métriques de Courbe" path="sections.analytics.curveMetrics" />
+                                <Toggle label="Metriques de Courbe" path="sections.analytics.curveMetrics" />
                             </SectionGroup>
 
                             <SectionGroup title="Historique">
                                 <Toggle label="Section Historique" path="sections.historical.enabled" />
-                                <Toggle label="Spread Historique par Maturité" path="sections.historical.spreadHistory" />
+                                <Toggle label="Spread Historique par Maturite" path="sections.historical.spreadHistory" />
                                 <Toggle label="Graphique Spread Historique" path="sections.historical.spreadHistoryChart" />
-                                <Toggle label="Historique Décisions de Taux" path="sections.historical.rateDecisions" />
+                                <Toggle label="Historique Decisions de Taux" path="sections.historical.rateDecisions" />
                             </SectionGroup>
                         </>
                     )}
@@ -261,15 +261,15 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
                         <>
                             <SectionGroup title="Barre de Header">
                                 <Toggle label="Header complet" path="header.enabled" description="Afficher/masquer tout le header" />
-                                <Toggle label="Sélecteur de Pays" path="header.countrySelector" description="Drapeaux US/Canada" />
-                                <Toggle label="Sélecteur d'Interpolation" path="header.interpolationSelector" description="Moteur de calcul" />
-                                <Toggle label="Sélecteur de Date" path="header.dateSelector" />
+                                <Toggle label="Selecteur de Pays" path="header.countrySelector" description="Drapeaux US/Canada" />
+                                <Toggle label="Selecteur d'Interpolation" path="header.interpolationSelector" description="Moteur de calcul" />
+                                <Toggle label="Selecteur de Date" path="header.dateSelector" />
                                 <Toggle label="Bouton Actualiser" path="header.refreshButton" />
                                 <Toggle label="Label JLab Terminal" path="header.brandLabel" />
                             </SectionGroup>
 
                             <SectionGroup title="Navigation">
-                                <Toggle label="Navigation Flottante" path="floatingNav.enabled" description="Barre latérale avec icônes" />
+                                <Toggle label="Navigation Flottante" path="floatingNav.enabled" description="Barre laterale avec icones" />
                                 <Toggle label="Footer" path="footer.enabled" />
                             </SectionGroup>
                         </>
@@ -277,10 +277,10 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
 
                     {activeTab === 'sidebar' && (
                         <>
-                            <SectionGroup title="Panneau Latéral">
-                                <Toggle label="Sidebar complète" path="sidebar.enabled" description="Afficher/masquer la sidebar" />
-                                <Toggle label="Panneau de Contrôles" path="sidebar.controlsPanel" description="Pays, interpolation, date" />
-                                <Toggle label="Sélecteur de Maturités" path="sidebar.maturitySelector" description="Boutons 3M, 6M, 1Y..." />
+                            <SectionGroup title="Panneau Lateral">
+                                <Toggle label="Sidebar complete" path="sidebar.enabled" description="Afficher/masquer la sidebar" />
+                                <Toggle label="Panneau de Controles" path="sidebar.controlsPanel" description="Pays, interpolation, date" />
+                                <Toggle label="Selecteur de Maturites" path="sidebar.maturitySelector" description="Boutons 3M, 6M, 1Y..." />
                             </SectionGroup>
                         </>
                     )}
@@ -288,9 +288,9 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
                     {activeTab === 'ui' && (
                         <>
                             <SectionGroup title="Effets Visuels">
-                                <Toggle label="Animations" path="ui.animations" description="Transitions et animations d'entrée" />
+                                <Toggle label="Animations" path="ui.animations" description="Transitions et animations d'entree" />
                                 <Toggle label="Effets Glow" path="ui.glowEffects" description="Lueurs sur les badges et boutons" />
-                                <Toggle label="Glassmorphism" path="ui.glassmorphism" description="Effet verre dépoli sur les cartes" />
+                                <Toggle label="Glassmorphism" path="ui.glassmorphism" description="Effet verre depoli sur les cartes" />
                             </SectionGroup>
                         </>
                     )}
@@ -302,7 +302,7 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
                         onClick={resetConfig}
                         className="px-4 py-2 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all"
                     >
-                        🔄 Réinitialiser
+                         Reinitialiser
                     </button>
                     <div className="flex gap-2">
                         <button 
@@ -315,7 +315,7 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
                             onClick={onClose}
                             className="px-4 py-2 text-sm font-bold text-white bg-gradient-to-r from-violet-500 to-fuchsia-600 hover:from-violet-400 hover:to-fuchsia-500 rounded-lg transition-all shadow-lg shadow-violet-500/20"
                         >
-                            ✓ Appliquer
+                             Appliquer
                         </button>
                     </div>
                 </div>
@@ -324,9 +324,9 @@ const AdminPanel = ({ isOpen, onClose, config, updateConfig, resetConfig }) => {
     );
 };
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // DESIGN SYSTEM - Premium CSS Variables & Animations
-// ═══════════════════════════════════════════════════════════════════
+// 
 const CSS_PREMIUM = `
     :root {
         /* Core Palette */
@@ -509,9 +509,9 @@ const CSS_PREMIUM = `
     .ripple::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(255,255,255,0.15), transparent 60%); transform: scale(0); opacity: 1; transition: none; }
     .ripple:active::after { animation: ripple 0.4s ease-out; }
 
-    /* ═══════════════════════════════════════════════════════════════════
+    /* 
        RESPONSIVE DESIGN - Mobile, Tablet, Desktop
-       ═══════════════════════════════════════════════════════════════════ */
+        */
     
     /* Mobile First - Base styles for small screens */
     @media (max-width: 640px) {
@@ -611,9 +611,9 @@ const CSS_PREMIUM = `
     }
 `;
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // COMPOSANTS UTILITAIRES PREMIUM
-// ═══════════════════════════════════════════════════════════════════
+// 
 
 const SectionHeader = ({ number, color, title, subtitle, visible = true }) => {
     if (!visible) return null;
@@ -632,10 +632,10 @@ const FloatingNav = ({ currentSection, visible = true }) => {
     if (!visible) return null;
     
     const sections = [
-        { id: 'overview', label: 'Aperçu', icon: '📊' },
-        { id: 'comparison', label: 'Courbes', icon: '📈' },
-        { id: 'analytics', label: 'Analytique', icon: '🔍' },
-        { id: 'historical', label: 'Historique', icon: '📉' },
+        { id: 'overview', label: 'Apercu', icon: '' },
+        { id: 'comparison', label: 'Courbes', icon: '' },
+        { id: 'analytics', label: 'Analytique', icon: '' },
+        { id: 'historical', label: 'Historique', icon: '' },
     ];
     
     return (
@@ -645,7 +645,7 @@ const FloatingNav = ({ currentSection, visible = true }) => {
                 className="float-nav-btn ripple"
                 title="Haut de page"
                 aria-label="Aller en haut de page"
-            >⬆️</button>
+            ></button>
             <div className="h-px bg-white/5" />
             {sections.map(s => (
                 <button
@@ -653,7 +653,7 @@ const FloatingNav = ({ currentSection, visible = true }) => {
                     onClick={() => document.getElementById(`section-${s.id}`)?.scrollIntoView({ behavior: 'smooth' })}
                     className={`float-nav-btn ripple ${currentSection === s.id ? 'active' : ''}`}
                     title={s.label}
-                    aria-label={`Aller à la section ${s.label}`}
+                    aria-label={`Aller a la section ${s.label}`}
                     aria-current={currentSection === s.id ? 'true' : undefined}
                 >{s.icon}</button>
             ))}
@@ -663,7 +663,7 @@ const FloatingNav = ({ currentSection, visible = true }) => {
                 className="float-nav-btn ripple"
                 title="Bas de page"
                 aria-label="Aller en bas de page"
-            >⬇️</button>
+            ></button>
         </div>
     );
 };
@@ -682,9 +682,9 @@ const PremiumLoader = () => (
     </div>
 );
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // CHARGEMENT DES COMPOSANTS V0
-// ═══════════════════════════════════════════════════════════════════
+// 
 const useV0Components = () => {
     const [ready, setReady] = useState(false);
     
@@ -731,9 +731,9 @@ const useV0Components = () => {
     return ready;
 };
 
-// ═══════════════════════════════════════════════════════════════════
+// 
 // COMPOSANT PRINCIPAL - CEO Designer Edition v6 + Admin Panel
-// ═══════════════════════════════════════════════════════════════════
+// 
 export const CurveWatchV0 = () => {
     const componentsReady = useV0Components();
     const [data, setData] = useState(null);
@@ -745,7 +745,7 @@ export const CurveWatchV0 = () => {
     const { config, updateConfig, resetConfig } = useAdminConfig();
     const adminClickRef = useRef({ count: 0, timer: null });
 
-    // États de la page
+    // Etats de la page
     const [selectedCountries, setSelectedCountries] = useState(["US", "CA"]);
     const [interpolationMethod, setInterpolationMethod] = useState("cubic-spline");
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
@@ -923,7 +923,7 @@ export const CurveWatchV0 = () => {
                                     <div className="flex items-center gap-2 sm:gap-3">
                                         <span className="hidden sm:block text-[10px] font-black text-zinc-600 uppercase tracking-widest">Pays</span>
                                         <div className="flex gap-1 sm:gap-2">
-                                            {[{ code: "US", flag: "🇺🇸", label: "États-Unis" }, { code: "CA", flag: "🇨🇦", label: "Canada" }].map(c => (
+                                            {[{ code: "US", flag: "", label: "Etats-Unis" }, { code: "CA", flag: "", label: "Canada" }].map(c => (
                                                 <button key={c.code} onClick={() => toggleCountry(c.code)} className={`country-pill ${selectedCountries.includes(c.code) ? 'selected' : ''}`} title={c.label}>{c.flag}</button>
                                             ))}
                                         </div>
@@ -937,7 +937,7 @@ export const CurveWatchV0 = () => {
                                             <window.Select value={interpolationMethod} onValueChange={setInterpolationMethod}>
                                                 <window.SelectTrigger className="input-premium h-9 sm:h-10 w-36 sm:w-44 text-[11px] sm:text-[12px]"><window.SelectValue /></window.SelectTrigger>
                                                 <window.SelectContent>
-                                                    <window.SelectItem value="linear">Linéaire</window.SelectItem>
+                                                    <window.SelectItem value="linear">Lineaire</window.SelectItem>
                                                     <window.SelectItem value="cubic-spline">Spline Cubique</window.SelectItem>
                                                     <window.SelectItem value="nelson-siegel">Nelson-Siegel</window.SelectItem>
                                                     <window.SelectItem value="monotone-cubic">Monotone Cubique</window.SelectItem>
@@ -971,7 +971,7 @@ export const CurveWatchV0 = () => {
                                 {config.header.refreshButton && (
                                     <button onClick={loadData} className="btn-premium text-[10px] sm:text-[11px] font-bold tracking-wide px-3 sm:px-5 py-2 sm:py-2.5">
                                         <span className="hidden sm:inline">Actualiser</span>
-                                        <span className="sm:hidden">↻</span>
+                                        <span className="sm:hidden"></span>
                                     </button>
                                 )}
                             </div>
@@ -1005,25 +1005,25 @@ export const CurveWatchV0 = () => {
                                             <div className="w-3 sm:w-4 h-3 sm:h-4 rounded bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                                                 <span className="text-[7px] sm:text-[8px] font-black text-white">J</span>
                                             </div>
-                                            <span className="text-[9px] sm:text-[10px] font-semibold text-blue-400">Propulsé par <span className="text-white">JLab Terminal</span></span>
+                                            <span className="text-[9px] sm:text-[10px] font-semibold text-blue-400">Propulse par <span className="text-white">JLab Terminal</span></span>
                                         </div>
                                     </div>
                                 )}
                                 {config.sections.hero.subtitle && (
-                                    <p className="text-xs sm:text-sm text-zinc-600 mt-2 sm:mt-3 font-semibold tracking-wide">Intelligence Obligataire en Temps Réel • Trésor US & Canada • <span className="text-zinc-500">Une solution JSLAI</span></p>
+                                    <p className="text-xs sm:text-sm text-zinc-600 mt-2 sm:mt-3 font-semibold tracking-wide">Intelligence Obligataire en Temps Reel - Tresor US & Canada - <span className="text-zinc-500">Une solution JSLAI</span></p>
                                 )}
                                 {/* Export buttons - mobile below, desktop right */}
                                 {config.sections.hero.exportButtons && (
                                     <div className="flex gap-2 sm:gap-3 mt-4 lg:hidden export-buttons">
-                                        <button className="btn-ghost text-[10px] sm:text-[11px] font-semibold px-3 py-2">📊 CSV</button>
-                                        <button className="btn-ghost text-[10px] sm:text-[11px] font-semibold px-3 py-2">📋 PDF</button>
+                                        <button className="btn-ghost text-[10px] sm:text-[11px] font-semibold px-3 py-2"> CSV</button>
+                                        <button className="btn-ghost text-[10px] sm:text-[11px] font-semibold px-3 py-2"> PDF</button>
                                     </div>
                                 )}
                             </div>
                             {config.sections.hero.exportButtons && (
                                 <div className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 gap-3 export-buttons">
-                                    <button className="btn-ghost text-[11px] font-semibold">📊 Exporter CSV</button>
-                                    <button className="btn-ghost text-[11px] font-semibold">📋 Rapport PDF</button>
+                                    <button className="btn-ghost text-[11px] font-semibold"> Exporter CSV</button>
+                                    <button className="btn-ghost text-[11px] font-semibold"> Rapport PDF</button>
                                 </div>
                             )}
                         </div>
@@ -1084,7 +1084,7 @@ export const CurveWatchV0 = () => {
                     {/* SECTION 3: COMPARISON GRID - FULL WIDTH */}
                     {config.sections.comparisonGrid.enabled && (
                         <section className={`${anim} stagger-3`}>
-                            <SectionHeader number="3" color="emerald" title="Matrice des Rendements" subtitle="Comparaison par maturité" />
+                            <SectionHeader number="3" color="emerald" title="Matrice des Rendements" subtitle="Comparaison par maturite" />
                             <div className="section-card p-6">
                                 {window.CurveComparisonGrid && <window.CurveComparisonGrid usData={filteredUsData} caData={filteredCaData} />}
                             </div>
@@ -1094,7 +1094,7 @@ export const CurveWatchV0 = () => {
                     {/* SECTION 4: SPREADS - FULL WIDTH */}
                     {config.sections.spreads.enabled && (
                         <section className={`${anim} stagger-4`}>
-                            <SectionHeader number="4" color="purple" title="Écarts de Rendement" subtitle="Analyse des spreads et risques" />
+                            <SectionHeader number="4" color="purple" title="Ecarts de Rendement" subtitle="Analyse des spreads et risques" />
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {config.sections.spreads.spreadChart && window.CountrySpreadChart && (
                                     <div className="section-card p-6 chart-fullwidth"><window.CountrySpreadChart usData={filteredUsData} caData={filteredCaData} /></div>
@@ -1109,7 +1109,7 @@ export const CurveWatchV0 = () => {
                     {/* SECTION 5: ANALYTICS - FULL WIDTH */}
                     {config.sections.analytics.enabled && (
                         <section id="section-analytics" className={`scroll-mt-20 ${anim} stagger-5`}>
-                            <SectionHeader number="5" color="amber" title="Métriques Avancées" subtitle="Forward rates, butterflies et métriques de courbe" />
+                            <SectionHeader number="5" color="amber" title="Metriques Avancees" subtitle="Forward rates, butterflies et metriques de courbe" />
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 {config.sections.analytics.forwardRates && window.ForwardRatesChart && window.calculateForwardRates && (
                                     <div className="section-card p-6 lg:col-span-2 chart-fullwidth"><window.ForwardRatesChart forwards={window.calculateForwardRates(usData)} spotRate={usData.find(p => p.maturity === "10Y")?.yield} /></div>
@@ -1127,7 +1127,7 @@ export const CurveWatchV0 = () => {
                     {/* SECTION 6: HISTORICAL - FULL WIDTH */}
                     {config.sections.historical.enabled && (
                         <section id="section-historical" className="scroll-mt-20 pb-20">
-                            <SectionHeader number="6" color="rose" title="Contexte Historique" subtitle="Évolution temporelle et décisions de taux" />
+                            <SectionHeader number="6" color="rose" title="Contexte Historique" subtitle="Evolution temporelle et decisions de taux" />
                             {/* Full-width spread history chart */}
                             {config.sections.historical.spreadHistoryChart && window.SpreadHistoryChart && (
                                 <div className="section-card p-6 mb-6 chart-fullwidth"><window.SpreadHistoryChart /></div>
@@ -1158,7 +1158,7 @@ export const CurveWatchV0 = () => {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-sm font-black text-white tracking-wide">CurveWatch</span>
-                                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Propulsé par <span className="text-blue-400 font-semibold">JLab Terminal</span></span>
+                                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Propulse par <span className="text-blue-400 font-semibold">JLab Terminal</span></span>
                                     </div>
                                 </div>
                                 <div className="h-8 w-px bg-white/10 hidden md:block" />
@@ -1172,7 +1172,7 @@ export const CurveWatchV0 = () => {
                             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900/50 border border-zinc-800">
                                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                                 <span className="text-[11px] text-zinc-400">v7.0</span>
-                                <span className="text-[10px] text-zinc-600">•</span>
+                                <span className="text-[10px] text-zinc-600">-</span>
                                 <span className="text-[10px] text-zinc-500">Intelligence Obligataire</span>
                             </div>
                             
@@ -1184,14 +1184,14 @@ export const CurveWatchV0 = () => {
                                     <span className="px-2 py-0.5 rounded bg-red-500/10 text-red-400 text-[10px] font-medium">BOC</span>
                                     <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-medium">FMP</span>
                                 </div>
-                                <span className="text-zinc-600">Mise à jour: {new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                <span className="text-zinc-600">Mise a jour: {new Date().toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                             </div>
                         </div>
                         
                         {/* Copyright */}
                         <div className="mt-6 pt-6 border-t border-white/5 text-center">
                             <p className="text-[10px] text-zinc-700">
-                                © {new Date().getFullYear()} JSLAI Inc. Tous droits réservés. JLab Terminal™ est une marque de JSLAI.
+                                 {new Date().getFullYear()} JSLAI Inc. Tous droits reserves. JLab TerminalTM est une marque de JSLAI.
                             </p>
                         </div>
                     </div>
@@ -1204,5 +1204,5 @@ export const CurveWatchV0 = () => {
 // Export global
 if (typeof window !== 'undefined') {
     window.CurveWatchV0 = CurveWatchV0;
-    console.log('✅ CurveWatchV0 v7.0 - Courbes Historiques + Propulsé par JLab Terminal de JSLAI');
+    console.log(' CurveWatchV0 v7.0 - Courbes Historiques + Propulse par JLab Terminal de JSLAI');
 }

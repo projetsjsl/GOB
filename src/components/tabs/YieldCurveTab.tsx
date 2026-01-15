@@ -73,7 +73,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                             await loadCurveWatchComponents();
                             setComponentsLoaded(true);
                         } catch (err) {
-                            console.error('❌ Error loading CurveWatch components:', err);
+                            console.error(' Error loading CurveWatch components:', err);
                             setError('Failed to load CurveWatch components');
                         }
                     };
@@ -83,7 +83,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
 
                 const darkMode = isDarkMode;
 
-                const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
+                const formatRate = (value) => (value === null || value === undefined ? '-' : Number(value).toFixed(2));
                 const renderRateTable = (title, dataset, badgeEmoji) => (
                     <div className={`p-4 rounded-lg border ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
                         <div className="flex items-center justify-between mb-2">
@@ -91,7 +91,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                 <span>{badgeEmoji}</span>
                                 <span>{title}</span>
                             </div>
-                            <span className="text-xs opacity-70">{dataset?.date || '—'}</span>
+                            <span className="text-xs opacity-70">{dataset?.date || '-'}</span>
                         </div>
                         {dataset?.rates?.length ? (
                             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
@@ -103,12 +103,12 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-sm opacity-70">Données non disponibles.</p>
+                            <p className="text-sm opacity-70">Donnees non disponibles.</p>
                         )}
                     </div>
                 );
 
-                // Récupérer les données de la yield curve
+                // Recuperer les donnees de la yield curve
                 const fetchYieldCurveData = useCallback(async (forceRefresh = false) => {
                     setLoading(true);
                     setError(null);
@@ -123,26 +123,26 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                         setYieldData(data);
                         setLoading(false);
                     } catch (err) {
-                        console.error('❌ Erreur yield curve:', err);
+                        console.error(' Erreur yield curve:', err);
                         setError(err instanceof Error ? err.message : String(err));
                         setLoading(false);
                     }
                 }, [apiBase, selectedCountry]);
 
-                // Charger les données au montage et quand le pays change
+                // Charger les donnees au montage et quand le pays change
                 useEffect(() => {
                     fetchYieldCurveData();
                 }, [fetchYieldCurveData]);
 
-                // Créer/mettre à jour le graphique Chart.js
+                // Creer/mettre a jour le graphique Chart.js
                 useEffect(() => {
                     if (!yieldData || !chartRef.current) return;
                     if (typeof Chart === 'undefined') {
-                        console.error('❌ Chart.js n\'est pas chargé');
+                        console.error(' Chart.js n\'est pas charge');
                         return;
                     }
 
-                    // Détruire l'ancien graphique
+                    // Detruire l'ancien graphique
                     if (chartInstance.current) {
                         chartInstance.current.destroy();
                     }
@@ -151,7 +151,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
 
                     const datasets = [];
 
-                    // Données US
+                    // Donnees US
                     if (yieldData.data.us && yieldData.data.us.rates) {
                         datasets.push({
                             label: 'US Treasury',
@@ -171,7 +171,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                         });
                     }
 
-                    // Données Canada
+                    // Donnees Canada
                     if (yieldData.data.canada && yieldData.data.canada.rates) {
                         datasets.push({
                             label: 'Canada Bonds',
@@ -191,9 +191,9 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                         });
                     }
 
-                    // Ne créer le graphique que s'il y a des données
+                    // Ne creer le graphique que s'il y a des donnees
                     if (datasets.length === 0) {
-                        console.warn('⚠️ Aucune donnée disponible pour le graphique yield curve');
+                        console.warn(' Aucune donnee disponible pour le graphique yield curve');
                         return;
                     }
 
@@ -233,7 +233,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                     type: 'category',
                                     title: {
                                         display: true,
-                                        text: 'Maturité',
+                                        text: 'Maturite',
                                         color: isDarkMode ? '#9ca3af' : '#6b7280',
                                         font: { size: 14, weight: 'bold' }
                                     },
@@ -285,7 +285,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
 
                 return (
                     <div className="space-y-6">
-                        {/* En-tête avec contrôles */}
+                        {/* En-tete avec controles */}
                         <div className={`p-6 rounded-lg transition-colors duration-300 ${
                             darkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
@@ -294,12 +294,12 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                     <h2 className={`text-2xl font-bold mb-2 transition-colors duration-300 ${
                                         darkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        📈 Courbe des Taux (Yield Curve)
+                                         Courbe des Taux (Yield Curve)
                                     </h2>
                                     <p className={`text-sm transition-colors duration-300 ${
                                         darkMode ? 'text-gray-400' : 'text-gray-600'
                                     }`}>
-                                        Visualisation des taux obligataires US Treasury et Canada par maturité
+                                        Visualisation des taux obligataires US Treasury et Canada par maturite
                                     </p>
                                 </div>
                                 <div className="flex gap-3">
@@ -321,12 +321,12 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                         disabled={loading}
                                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
                                     >
-                                        {loading ? '🔄 Chargement...' : '🔄 Actualiser'}
+                                        {loading ? ' Chargement...' : ' Actualiser'}
                                     </button>
                                 </div>
                             </div>
 
-                            {/* Indicateur de récession (spread 10Y-2Y) */}
+                            {/* Indicateur de recession (spread 10Y-2Y) */}
                             {yieldData?.data?.us?.spread_10y_2y !== undefined && (
                                 <div className={`p-4 rounded-lg border-l-4 ${
                                     yieldData.data.us.inverted
@@ -340,7 +340,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                                     ? 'text-red-800 dark:text-red-300'
                                                     : 'text-green-800 dark:text-green-300'
                                             }`}>
-                                                {yieldData.data.us.inverted ? '⚠️ Courbe Inversée' : '✅ Courbe Normale'}
+                                                {yieldData.data.us.inverted ? ' Courbe Inversee' : ' Courbe Normale'}
                                             </h3>
                                             <p className={`text-sm ${
                                                 darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -352,8 +352,8 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                             darkMode ? 'text-gray-400' : 'text-gray-600'
                                         }`}>
                                             {yieldData.data.us.inverted
-                                                ? 'Indicateur historique de récession potentielle'
-                                                : 'Conditions économiques normales'}
+                                                ? 'Indicateur historique de recession potentielle'
+                                                : 'Conditions economiques normales'}
                                         </div>
                                     </div>
                                 </div>
@@ -367,7 +367,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                             }`}>
                                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
                                 <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
-                                    Chargement des données...
+                                    Chargement des donnees...
                                 </p>
                             </div>
                         )}
@@ -379,7 +379,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                 <h3 className={`font-bold mb-2 ${
                                     darkMode ? 'text-red-300' : 'text-red-800'
                                 }`}>
-                                    ❌ Erreur
+                                     Erreur
                                 </h3>
                                 <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
                                     {error}
@@ -405,29 +405,29 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                         <h3 className={`font-bold mb-2 ${
                                             darkMode ? 'text-yellow-300' : 'text-yellow-800'
                                         }`}>
-                                            {componentsLoaded ? '⚠️ Composant CurveWatch non chargé' : '🔄 Chargement des composants CurveWatch...'}
+                                            {componentsLoaded ? ' Composant CurveWatch non charge' : ' Chargement des composants CurveWatch...'}
                                         </h3>
                                         <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
                                             {componentsLoaded
                                                 ? 'Le composant CurveWatch est en cours de chargement. Veuillez patienter ou actualiser la page.'
-                                                : 'Initialisation des composants avancés de visualisation de courbe des taux...'}
+                                                : 'Initialisation des composants avances de visualisation de courbe des taux...'}
                                         </p>
                                     </div>
                                 )}
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                                    {yieldData.data.us && renderRateTable('US Treasury', yieldData.data.us, '🇺🇸')}
-                                    {yieldData.data.canada && renderRateTable('Obligations Canada', yieldData.data.canada, '🇨🇦')}
+                                    {yieldData.data.us && renderRateTable('US Treasury', yieldData.data.us, '')}
+                                    {yieldData.data.canada && renderRateTable('Obligations Canada', yieldData.data.canada, '')}
                                 </div>
 
-                                {/* Tableau des maturités */}
+                                {/* Tableau des maturites */}
                                 <div className={`p-6 rounded-lg transition-colors duration-300 ${
                                     darkMode ? 'bg-gray-800' : 'bg-white'
                                 }`}>
                                     <h3 className={`text-xl font-bold mb-4 ${
                                         darkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        📊 Tableau des Maturités
+                                         Tableau des Maturites
                                     </h3>
 
                                     <div className="overflow-x-auto">
@@ -439,34 +439,34 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                                     <th className={`px-3 py-2 text-left font-bold text-xs ${
                                                         darkMode ? 'text-gray-300' : 'text-gray-700'
                                                     }`}>
-                                                        Maturité
+                                                        Maturite
                                                     </th>
                                                     {yieldData.data.us && (
                                                         <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                             darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
-                                                            🇺🇸 US Treasury (%)
+                                                             US Treasury (%)
                                                         </th>
                                                     )}
                                                     {yieldData.data.canada && (
                                                         <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                             darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
-                                                            🇨🇦 Canada Bonds (%)
+                                                             Canada Bonds (%)
                                                         </th>
                                                     )}
                                                     {yieldData.data.us && yieldData.data.canada && (
                                                         <th className={`px-3 py-2 text-right font-bold text-xs ${
                                                             darkMode ? 'text-gray-300' : 'text-gray-700'
                                                         }`}>
-                                                            Écart (bps)
+                                                            Ecart (bps)
                                                         </th>
                                                     )}
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {(() => {
-                                                    // Créer une liste unique de toutes les maturités
+                                                    // Creer une liste unique de toutes les maturites
                                                     const maturities = new Set();
                                                     if (yieldData.data.us) {
                                                         yieldData.data.us.rates.forEach(r => maturities.add(r.maturity));
@@ -524,7 +524,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                         </table>
                                     </div>
 
-                                    {/* Métadonnées */}
+                                    {/* Metadonnees */}
                                     <div className={`mt-4 pt-4 border-t ${
                                         darkMode ? 'border-gray-700' : 'border-gray-200'
                                     }`}>
@@ -573,14 +573,14 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
                                     </div>
                                 </div>
 
-                                {/* Note explicative - supprimée */}
+                                {/* Note explicative - supprimee */}
                             </>
                         )}
                     </div>
                 );
             };
 
-            // Fonction helper pour convertir maturité en mois (doit être définie en dehors du composant)
+            // Fonction helper pour convertir maturite en mois (doit etre definie en dehors du composant)
             function maturityToMonths(maturity) {
                 const value = parseFloat(maturity);
                 if (maturity.includes('M')) return value;
@@ -589,7 +589,7 @@ export const YieldCurveTab: React.FC<TabProps> = (props) => {
             }
 
             // ============================================================================
-            // COMPOSANT MARCHÉS & ÉCONOMIE
+            // COMPOSANT MARCHES & ECONOMIE
             // ============================================================================
 
 

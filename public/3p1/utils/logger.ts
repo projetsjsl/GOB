@@ -124,7 +124,7 @@ class Logger {
   success(message: string, ...args: unknown[]): void {
     if (!this.config.enabled) return;
     console.log(
-      `%c[${this.config.prefix}] ✅ %c${message}`,
+      `%c[${this.config.prefix}]  %c${message}`,
       'color: #22c55e; font-weight: bold',
       'color: inherit',
       ...args

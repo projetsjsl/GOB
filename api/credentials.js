@@ -21,9 +21,9 @@ export default async function handler(req, res) {
     }
 
     try {
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // GET - Check if a credential exists (from Vercel env)
-        // ═══════════════════════════════════════════════════════════════
+        // 
         if (req.method === 'GET') {
             const { key, action } = req.query;
 
@@ -78,9 +78,9 @@ export default async function handler(req, res) {
             }
         }
 
-        // ═══════════════════════════════════════════════════════════════
+        // 
         // POST - Test a credential
-        // ═══════════════════════════════════════════════════════════════
+        // 
         if (req.method === 'POST') {
             const { key, testEndpoint } = req.body;
 

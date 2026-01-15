@@ -148,16 +148,16 @@ export async function POST(req: NextRequest) {
         const prov = getProvider();
         if (!prov) { send({ type: 'error', message: 'No provider. Add BROWSERBASE/BROWSERLESS/STEEL env vars.' }); controller.close(); return; }
         send({ type: 'init', mode: 'real', provider: prov.provider, version: '5.0' });
-        send({ type: 'status', message: `🔌 Connecting ${PROVIDERS[prov.provider].name}...` });
+        send({ type: 'status', message: ` Connecting ${PROVIDERS[prov.provider].name}...` });
         const session = await PROVIDERS[prov.provider].createSession(prov.config);
         send({ type: 'session', sessionId: session.sessionId, debugUrl: session.debugUrl, provider: prov.provider });
-        send({ type: 'status', message: '🌐 Browser connected!' });
+        send({ type: 'status', message: ' Browser connected!' });
         const { chromium } = await import('playwright-core');
         browser = await chromium.connectOverCDP(session.wsUrl);
         const ctx = browser.contexts()[0];
         const page = ctx.pages()[0] || await ctx.newPage();
         await page.setViewportSize({ width: 1280, height: 800 });
-        send({ type: 'status', message: '🧠 Planning with Claude AI...' });
+        send({ type: 'status', message: ' Planning with Claude AI...' });
         const actions = await planActions(task, { url: page.url(), title: await page.title().catch(() => '') }, process.env.ANTHROPIC_API_KEY);
         send({ type: 'actions', actions: actions.map((a: any) => ({...a, status: 'pending'})) });
         const results: any[] = [];
@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
               metrics: expertMode ? { duration: Date.now()-startTime, memory: 80+Math.round(Math.random()*40) } : undefined });
           } catch { send({ type: 'action_complete', index: i, success: result.success, error: result.error, url: page.url() }); }
         }
-        send({ type: 'complete', results, finalUrl: page.url(), message: `✅ ${results.length} results`, provider: prov.provider,
+        send({ type: 'complete', results, finalUrl: page.url(), message: ` ${results.length} results`, provider: prov.provider,
           stats: { totalTime: Date.now()-startTime, actions: actions.length, results: results.length } });
       } catch (e: any) { send({ type: 'error', message: e.message }); }
       finally { if (browser) try { await browser.close(); } catch {} controller.close(); }

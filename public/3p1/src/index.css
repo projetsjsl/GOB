@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* BUG #3P1-1 FIX: Empêcher la troncature avec espaces au milieu des mots */
-/* Override global pour les textes de LandingPage - Règle très spécifique */
+/* BUG #3P1-1 FIX: Empecher la troncature avec espaces au milieu des mots */
+/* Override global pour les textes de LandingPage - Regle tres specifique */
 .min-h-screen h1,
 .min-h-screen h2,
 .min-h-screen h3,
@@ -14,7 +14,7 @@
   white-space: normal !important;
 }
 
-/* Override pour tous les éléments de texte dans la page */
+/* Override pour tous les elements de texte dans la page */
 h1, h2, h3, h4, h5, h6, p, span, div {
   word-break: normal !important;
   overflow-wrap: normal !important;
@@ -27,14 +27,14 @@ h1 span, h2 span, h3 span, h4 span, h5 span, h6 span {
   white-space: normal !important;
 }
 
-/* Override spécifique pour les classes Tailwind qui pourraient causer le problème */
+/* Override specifique pour les classes Tailwind qui pourraient causer le probleme */
 .text-5xl, .text-6xl, .text-xl, .text-2xl, .text-3xl, .text-4xl {
   word-break: normal !important;
   overflow-wrap: normal !important;
 }
 
-/* BUG #3P1-1 FIX COMPLÉMENTAIRE: Forcer word-break normal sur TOUS les boutons et leurs spans */
-/* Règle très agressive pour corriger la troncature dans les boutons */
+/* BUG #3P1-1 FIX COMPLEMENTAIRE: Forcer word-break normal sur TOUS les boutons et leurs spans */
+/* Regle tres agressive pour corriger la troncature dans les boutons */
 button,
 button *,
 button span,
@@ -48,7 +48,7 @@ button span *,
   hyphens: none !important;
 }
 
-/* Spécifique pour les boutons de la sidebar */
+/* Specifique pour les boutons de la sidebar */
 .bg-slate-700 span,
 .bg-slate-800 span,
 .bg-green-700 span,
@@ -59,7 +59,7 @@ button span {
   white-space: normal !important;
 }
 
-/* Forcer sur tous les éléments texte dans les boutons */
+/* Forcer sur tous les elements texte dans les boutons */
 button > span,
 button > * > span,
 .flex.items-center span {
@@ -110,11 +110,11 @@ html, body {
     text-size-adjust: 100%; /* Support moderne */
     -webkit-tap-highlight-color: transparent;
   }
-  /* Améliorer la lisibilité sur mobile */
+  /* Ameliorer la lisibilite sur mobile */
   table {
     font-size: 0.75rem;
   }
-  /* Réduire les espacements sur mobile */
+  /* Reduire les espacements sur mobile */
   .space-y-6 > * + * {
     margin-top: 1rem;
   }

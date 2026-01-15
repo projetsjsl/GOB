@@ -1,14 +1,14 @@
 /**
  * API Proxy pour rechercher des symboles FMP
- * Utilise FMP Premium Search endpoint pour résoudre automatiquement les variantes de symboles
+ * Utilise FMP Premium Search endpoint pour resoudre automatiquement les variantes de symboles
  * 
  * Premium Features:
  * - Recherche intelligente de symboles
- * - Résolution automatique des variantes (BRK.B, BRK-B, BRKB, etc.)
+ * - Resolution automatique des variantes (BRK.B, BRK-B, BRKB, etc.)
  * - Support multi-bourses (TSX, TSXV, NASDAQ, NYSE, etc.)
  * - Suggestions de symboles similaires
  * 
- * Date: 6 décembre 2025
+ * Date: 6 decembre 2025
  */
 
 export default async function handler(req, res) {
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
 
         if (!searchRes.ok) {
             const errorText = await searchRes.text();
-            console.error(`❌ FMP Search error: ${searchRes.status} - ${errorText.substring(0, 200)}`);
+            console.error(` FMP Search error: ${searchRes.status} - ${errorText.substring(0, 200)}`);
             return res.status(searchRes.status).json({
                 error: 'FMP Search failed',
                 message: errorText.substring(0, 200)
@@ -56,13 +56,13 @@ export default async function handler(req, res) {
         let searchData = await searchRes.json();
 
         // FMP Search peut retourner directement un tableau OU un objet avec 'results'
-        // Normaliser la réponse
+        // Normaliser la reponse
         if (Array.isArray(searchData)) {
-            // C'est déjà un tableau, utiliser directement
+            // C'est deja un tableau, utiliser directement
         } else if (searchData && typeof searchData === 'object') {
-            // Vérifier si c'est un objet d'erreur
+            // Verifier si c'est un objet d'erreur
             if (searchData['Error Message']) {
-                console.error(`❌ FMP Search Error: ${searchData['Error Message']}`);
+                console.error(` FMP Search Error: ${searchData['Error Message']}`);
                 return res.status(400).json({
                     error: 'FMP Search error',
                     message: searchData['Error Message']
@@ -78,9 +78,9 @@ export default async function handler(req, res) {
             searchData = [];
         }
 
-        // Filtrer et formater les résultats
+        // Filtrer et formater les resultats
         const formattedResults = searchData
-            .filter(result => result.symbol && result.name) // Filtrer les résultats invalides
+            .filter(result => result.symbol && result.name) // Filtrer les resultats invalides
             .map(result => ({
                 symbol: result.symbol,
                 name: result.name,
@@ -92,7 +92,7 @@ export default async function handler(req, res) {
                 score: result.score || null
             }))
             .sort((a, b) => {
-                // Prioriser les résultats exacts
+                // Prioriser les resultats exacts
                 const aExact = a.symbol.toUpperCase() === query.toUpperCase();
                 const bExact = b.symbol.toUpperCase() === query.toUpperCase();
                 if (aExact && !bExact) return -1;
@@ -101,11 +101,11 @@ export default async function handler(req, res) {
                 // Ensuite par score (si disponible)
                 if (a.score && b.score) return b.score - a.score;
                 
-                // Sinon par ordre alphabétique
+                // Sinon par ordre alphabetique
                 return a.symbol.localeCompare(b.symbol);
             });
 
-        console.log(`✅ FMP Search found ${formattedResults.length} results for "${query}"`);
+        console.log(` FMP Search found ${formattedResults.length} results for "${query}"`);
 
         return res.status(200).json({
             query: query,

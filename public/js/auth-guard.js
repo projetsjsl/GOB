@@ -1,6 +1,6 @@
 /**
  * AUTH GUARD - Protection du Dashboard GOB
- * Vérifie l'authentification avant d'accéder au dashboard
+ * Verifie l'authentification avant d'acceder au dashboard
  */
 
 (function () {
@@ -29,12 +29,12 @@
       // Try Supabase auth first
       if (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
         try {
-          console.log('🔓 Auth Guard: Checking Supabase session...');
+          console.log(' Auth Guard: Checking Supabase session...');
           const client = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
           const { data: { session }, error } = await client.auth.getSession();
           
           if (session && session.user) {
-            console.log('✅ Auth Guard: Supabase session found');
+            console.log(' Auth Guard: Supabase session found');
             
             // Get role from profiles table
             const { data: profile } = await client
@@ -62,19 +62,19 @@
             window.__EMMA_ROLE__ = role;
             window.__EMMA_USER_ID__ = session.user.id;
             
-            console.log('✅ Utilisateur authentifié (Supabase):', this.currentUser.display_name, 'Role:', role);
+            console.log(' Utilisateur authentifie (Supabase):', this.currentUser.display_name, 'Role:', role);
             this.displayUserInfo();
             this.createLogoutButton();
             this.applyEmmaPermissions();
             return;
           }
         } catch (e) {
-          console.warn('⚠️ Auth Guard: Supabase session check failed:', e);
+          console.warn(' Auth Guard: Supabase session check failed:', e);
         }
       }
       
       // Fallback to TEST MODE
-      console.log('🔓 Auth Guard (TEST MODE): No session found, using mock user...');
+      console.log(' Auth Guard (TEST MODE): No session found, using mock user...');
       
       const MOCK_USER = {
         id: 'mock-admin-test',
@@ -96,11 +96,11 @@
       try {
         const storage = window.__nativeSessionStorage || sessionStorage;
         if (!storage.getItem(AUTH_STORAGE_KEY)) {
-             console.log('💉 Injecting mock admin session');
+             console.log(' Injecting mock admin session');
              storage.setItem(AUTH_STORAGE_KEY, JSON.stringify(MOCK_USER));
         }
       } catch (e) {
-        console.warn('⚠️ Storage error:', e);
+        console.warn(' Storage error:', e);
       }
 
       // Set globals for roles-permissions.js
@@ -111,7 +111,7 @@
       this.currentUser = MOCK_USER;
       this.permissions = MOCK_USER.permissions;
 
-      console.log('✅ Utilisateur authentifié (MOCK):', this.currentUser.display_name);
+      console.log(' Utilisateur authentifie (MOCK):', this.currentUser.display_name);
       this.displayUserInfo();
       this.createLogoutButton();
       this.applyEmmaPermissions();
@@ -151,7 +151,7 @@
     }
 
     /**
-     * Valide la session auprès du serveur (Bypassed)
+     * Valide la session aupres du serveur (Bypassed)
      */
     async validateSession() {
       return true; // Always return true for testing
@@ -173,22 +173,22 @@
         return;
       }
 
-      // Créer l'élément d'affichage utilisateur
+      // Creer l'element d'affichage utilisateur
       const userInfoDiv = document.createElement('div');
       userInfoDiv.id = 'user-info-display';
       userInfoDiv.className = 'fixed top-4 right-4 bg-white rounded-lg shadow-lg px-4 py-2 flex items-center gap-3 z-50';
       userInfoDiv.style.display = 'none'; // Rendre invisible
 
-      // Icône selon le rôle
+      // Icone selon le role
       const roleIcons = {
-        invite: '👤',
-        client: '💼',
-        daniel: '👨‍💼',
-        gob: '🏢',
-        admin: '⚙️'
+        invite: '',
+        client: '',
+        daniel: '',
+        gob: '',
+        admin: ''
       };
 
-      const icon = roleIcons[this.currentUser.role] || '👤';
+      const icon = roleIcons[this.currentUser.role] || '';
 
       userInfoDiv.innerHTML = `
         <div class="flex items-center gap-2">
@@ -204,7 +204,7 @@
     }
 
     /**
-     * Crée le bouton de déconnexion
+     * Cree le bouton de deconnexion
      */
     createLogoutButton() {
       const logoutBtn = document.createElement('button');
@@ -213,11 +213,11 @@
       logoutBtn.style.display = 'none'; // Rendre invisible
       logoutBtn.innerHTML = `
         <i class="iconoir-log-out"></i>
-        <span>Déconnexion</span>
+        <span>Deconnexion</span>
       `;
 
       logoutBtn.addEventListener('click', () => {
-        if (confirm('Voulez-vous vraiment vous déconnecter?')) {
+        if (confirm('Voulez-vous vraiment vous deconnecter?')) {
           this.logout();
         }
       });
@@ -226,7 +226,7 @@
     }
 
     /**
-     * Applique les permissions Emma selon le rôle
+     * Applique les permissions Emma selon le role
      */
     applyEmmaPermissions() {
       // Stocker les permissions pour Emma
@@ -238,16 +238,16 @@
         canViewAllHistory: this.permissions.view_all_history
       };
 
-      console.log('📋 Permissions Emma configurées:', window.GOB_AUTH);
+      console.log(' Permissions Emma configurees:', window.GOB_AUTH);
 
       // Si l'utilisateur ne peut pas sauvegarder les conversations
       if (!this.permissions.save_conversations) {
-        console.log('⚠️ Utilisateur en mode lecture seule (conversations non sauvegardées)');
+        console.log(' Utilisateur en mode lecture seule (conversations non sauvegardees)');
       }
 
       // Si admin, afficher un indicateur
       if (this.permissions.view_all_history) {
-        console.log('🔓 Mode Admin: Accès à tous les historiques');
+        console.log(' Mode Admin: Acces a tous les historiques');
         this.showAdminIndicator();
       }
     }
@@ -258,19 +258,19 @@
     showAdminIndicator() {
       const adminBadge = document.createElement('div');
       adminBadge.className = 'fixed bottom-4 right-4 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg z-50';
-      adminBadge.textContent = '🔓 Mode Admin';
+      adminBadge.textContent = ' Mode Admin';
       document.body.appendChild(adminBadge);
     }
 
     /**
-     * Déconnexion
+     * Deconnexion
      */
     logout() {
-      console.log('👋 Déconnexion...');
+      console.log(' Deconnexion...');
 
-      // ✅ SÉCURITÉ: Vider tous les storages Emma pour éviter les fuites de données
-      // entre utilisateurs (admin → gob, etc.)
-      console.log('🧹 Nettoyage des données Emma...');
+      //  SECURITE: Vider tous les storages Emma pour eviter les fuites de donnees
+      // entre utilisateurs (admin -> gob, etc.)
+      console.log(' Nettoyage des donnees Emma...');
 
       // 1. Vider sessionStorage Emma (utiliser storage natif si disponible)
       const session = window.__nativeSessionStorage || sessionStorage;
@@ -280,35 +280,35 @@
         session.removeItem('emma-chat-history');
         session.removeItem('emma-intro-shown');
       } catch (e) {
-        console.warn('⚠️ Impossible de vider sessionStorage:', e);
+        console.warn(' Impossible de vider sessionStorage:', e);
       }
 
-      // 2. Vider localStorage Emma et données user-specific
+      // 2. Vider localStorage Emma et donnees user-specific
       const keysToRemove = [];
       try {
         for (let i = 0; i < local.length; i++) {
           const key = local.key(i);
-          // Supprimer toutes les clés Emma et watchlist (données user-specific)
+          // Supprimer toutes les cles Emma et watchlist (donnees user-specific)
           if (key && (key.startsWith('emma-') || key.startsWith('dans-') || key.startsWith('jslai'))) {
             keysToRemove.push(key);
           }
         }
 
         keysToRemove.forEach(key => {
-          console.log(`  🗑️ Suppression: ${key}`);
+          console.log(`   Suppression: ${key}`);
           local.removeItem(key);
         });
 
-        console.log(`✅ ${keysToRemove.length} clés nettoyées`);
+        console.log(` ${keysToRemove.length} cles nettoyees`);
       } catch (e) {
-        console.warn('⚠️ Impossible de nettoyer localStorage:', e);
+        console.warn(' Impossible de nettoyer localStorage:', e);
       }
 
       // 3. Supprimer la session user (utiliser storage natif)
       try {
         session.removeItem(AUTH_STORAGE_KEY);
       } catch (e) {
-        console.warn('⚠️ Impossible de supprimer session:', e);
+        console.warn(' Impossible de supprimer session:', e);
       }
 
       this.redirectToLogin();
@@ -322,31 +322,31 @@
     }
 
     /**
-     * Récupère l'utilisateur courant
+     * Recupere l'utilisateur courant
      */
     getCurrentUser() {
       return this.currentUser;
     }
 
     /**
-     * Récupère les permissions
+     * Recupere les permissions
      */
     getPermissions() {
       return this.permissions;
     }
 
     /**
-     * Vérifie si l'utilisateur a une permission
+     * Verifie si l'utilisateur a une permission
      */
     hasPermission(permission) {
       return this.permissions && this.permissions[permission] === true;
     }
   }
 
-  // Créer l'instance globale
+  // Creer l'instance globale
   window.authGuard = new AuthGuard();
 
-  // Initialiser automatiquement quand le DOM est prêt
+  // Initialiser automatiquement quand le DOM est pret
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       window.authGuard.init();

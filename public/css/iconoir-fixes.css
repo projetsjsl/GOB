@@ -1,15 +1,15 @@
 /**
- * Fixes pour les icônes Iconoir
+ * Fixes pour les icones Iconoir
  * 
  * Extrait depuis beta-combined-dashboard.html
- * Styles pour garantir l'affichage correct des icônes Iconoir
+ * Styles pour garantir l'affichage correct des icones Iconoir
  */
 
 /* =====================================================
  * ICONOIR ICON FIXES
  * ===================================================== */
 
-/* Styles pour garantir l'affichage des icônes Iconoir sur mobile */
+/* Styles pour garantir l'affichage des icones Iconoir sur mobile */
 .iconoir-chart-line,
 .iconoir-trending-up,
 .iconoir-chat-bubble,
@@ -33,7 +33,7 @@
     -moz-osx-font-smoothing: grayscale !important;
 }
 
-/* Effet de glow sur l'icône active */
+/* Effet de glow sur l'icone active */
 nav button:has(i.scale-110) i {
     filter: drop-shadow(0 0 8px currentColor);
 }

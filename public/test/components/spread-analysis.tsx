@@ -37,9 +37,9 @@ export function SpreadAnalysisCard({ spreads }: SpreadAnalysisProps) {
   return (
     <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-foreground">Analyse des Écarts</CardTitle>
+        <CardTitle className="text-foreground">Analyse des Ecarts</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Écarts clés de la courbe des taux (points de base)
+          Ecarts cles de la courbe des taux (points de base)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -63,7 +63,7 @@ export function SpreadAnalysisCard({ spreads }: SpreadAnalysisProps) {
                     className="text-lg font-semibold"
                     style={{ color: isValid ? getColor(item.value) : SPREAD_COLORS.neutral }}
                   >
-                    {isValid ? (valueInBp > 0 ? "+" : "") + valueInBp.toFixed(1) : "—"}
+                    {isValid ? (valueInBp > 0 ? "+" : "") + valueInBp.toFixed(1) : "-"}
                   </span>
                   <span className="text-xs text-muted-foreground">pb</span>
                 </div>

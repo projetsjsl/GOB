@@ -1,14 +1,14 @@
 /**
  * Theme Adapter - Bridge between theme-system.js and design-system tokens
  * 
- * Adapte les thèmes existants pour utiliser les tokens du design system
- * tout en maintenant la compatibilité avec le système de thèmes actuel
+ * Adapte les themes existants pour utiliser les tokens du design system
+ * tout en maintenant la compatibilite avec le systeme de themes actuel
  */
 
 import { GOBDesignTokens } from './tokens';
 
 /**
- * Adapte un thème du système existant pour utiliser les tokens du design system
+ * Adapte un theme du systeme existant pour utiliser les tokens du design system
  */
 export function adaptThemeToDesignSystem(theme: any) {
   return {
@@ -32,17 +32,17 @@ export function adaptThemeToDesignSystem(theme: any) {
     },
     spacing: {
       ...GOBDesignTokens.spacing,
-      ...theme.spacing, // Permettre override si nécessaire
+      ...theme.spacing, // Permettre override si necessaire
     },
     typography: {
       ...GOBDesignTokens.typography,
-      ...theme.typography, // Permettre override si nécessaire
+      ...theme.typography, // Permettre override si necessaire
     },
   };
 }
 
 /**
- * Génère les variables CSS pour un thème donné
+ * Genere les variables CSS pour un theme donne
  */
 export function generateThemeCSSVariables(theme: any): Record<string, string> {
   const adapted = adaptThemeToDesignSystem(theme);

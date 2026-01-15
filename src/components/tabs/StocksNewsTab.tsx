@@ -14,7 +14,7 @@ import {
 } from '../shared/LoadingSkeletons';
 
 const StocksNewsTab: React.FC<TabProps> = memo((props) => {
-        // Récupère les données/handlers depuis la surface globale du dashboard avec fallback props
+        // Recupere les donnees/handlers depuis la surface globale du dashboard avec fallback props
         const dashboard = typeof window !== 'undefined' ? (window as any).BetaCombinedDashboard || {} : {};
         const isDarkMode = props.isDarkMode ?? dashboard.isDarkMode ?? true;
         const tickers = (props.tickers && props.tickers.length > 0 ? props.tickers : dashboard.tickers) ?? [];
@@ -50,11 +50,11 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
         const safeSetActiveTab = typeof setActiveTab === 'function' ? setActiveTab : () => {};
         const safeSetSelectedStock = typeof setSelectedStock === 'function' ? setSelectedStock : () => {};
 
-        const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
+        const [stocksViewMode, setStocksViewMode] = useState('list'); // list par defaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
         
-        // BUG #3 FIX: Pagination et lazy loading pour améliorer performance
-        const [displayedTickersCount, setDisplayedTickersCount] = useState(12); // Limiter à 12 tickers initialement
+        // BUG #3 FIX: Pagination et lazy loading pour ameliorer performance
+        const [displayedTickersCount, setDisplayedTickersCount] = useState(12); // Limiter a 12 tickers initialement
         const [isLoadingMoreTickers, setIsLoadingMoreTickers] = useState(false);
         const loadMoreTickersRef = useRef<HTMLDivElement>(null);
         const TICKERS_PER_PAGE = 12;
@@ -64,7 +64,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
         const heatmapRef = useRef(null);
         const screenerRef = useRef(null);
 
-        // Refs pour suivre l'état d'initialisation des widgets
+        // Refs pour suivre l'etat d'initialisation des widgets
         const marketOverviewInitialized = useRef(false);
         const heatmapInitialized = useRef(false);
         const screenerInitialized = useRef(false);
@@ -211,7 +211,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
 
         // BUG #3 FIX: Intersection Observer pour lazy loading des tickers
         useEffect(() => {
-            // Réinitialiser le compteur quand les tickers changent
+            // Reinitialiser le compteur quand les tickers changent
             if (tickers.length > 0) {
                 setDisplayedTickersCount(TICKERS_PER_PAGE);
             }
@@ -224,7 +224,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                 (entries) => {
                     if (entries[0].isIntersecting) {
                         setIsLoadingMoreTickers(true);
-                        // Debounce pour éviter trop de chargements
+                        // Debounce pour eviter trop de chargements
                         setTimeout(() => {
                             setDisplayedTickersCount(prev => Math.min(prev + TICKERS_PER_PAGE, tickers.length));
                             setIsLoadingMoreTickers(false);
@@ -243,7 +243,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
             };
         }, [displayedTickersCount, tickers.length, isLoadingMoreTickers]);
 
-        // BUG #3 FIX: Mémoriser les tickers affichés pour éviter re-renders inutiles
+        // BUG #3 FIX: Memoriser les tickers affiches pour eviter re-renders inutiles
         const displayedTickers = useMemo(() => {
             return tickers.slice(0, displayedTickersCount);
         }, [tickers, displayedTickersCount]);
@@ -264,12 +264,12 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                     : 'bg-rose-100 border-rose-300 text-rose-700'
                         }`}
                     >
-                        {isBull ? '🐂' : '🐻'}
+                        {isBull ? '' : ''}
                     </span>
                 );
             };
 
-        // Helper functions for news credibility scoring (définies dans le composant)
+        // Helper functions for news credibility scoring (definies dans le composant)
         const getNewsCredibilityScore = (sourceName) => {
             if (!sourceName) return 50;
 
@@ -312,7 +312,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
 
         return (
         <div className="space-y-6">
-            {/* Message d'état si pas de données */}
+            {/* Message d'etat si pas de donnees */}
             {tickers.length === 0 && (
                 <div className={`p-6 rounded-xl border-2 transition-colors duration-300 ${
                     isDarkMode
@@ -320,9 +320,9 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                         : 'bg-yellow-50 border-yellow-200'
                 }`}>
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="text-2xl">⏳</span>
+                        <span className="text-2xl"></span>
                         <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            Chargement des données...
+                            Chargement des donnees...
                         </h3>
                     </div>
                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -339,7 +339,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                 : 'bg-blue-500 hover:bg-blue-600 text-white'
                         }`}
                     >
-                        🔄 Forcer le chargement
+                         Forcer le chargement
                     </button>
                 </div>
             )}
@@ -347,7 +347,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
             <div className="flex justify-between items-center">
                 <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>📊 Titres & nouvelles</h2>
+                }`}> Titres & nouvelles</h2>
                 <div className="flex gap-2">
                     {/* Toggle Vue */}
                     <div className={`flex gap-1 p-1 rounded-lg transition-colors duration-300 ${
@@ -361,7 +361,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                     : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                         >
-                            📋 Liste
+                             Liste
                         </button>
                         <button
                             onClick={() => setStocksViewMode('cards')}
@@ -371,7 +371,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                     : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                         >
-                            🎴 Cartes
+                             Cartes
                         </button>
                         <button
                             onClick={() => setStocksViewMode('table')}
@@ -381,7 +381,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                     : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                         >
-                            📊 Tableau
+                             Tableau
                         </button>
                     </div>
                     <button
@@ -397,18 +397,18 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                 : 'bg-gray-700 hover:bg-gray-600 text-white'
                         }`}
                     >
-                        {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
+                        {loading ? ' Actualisation...' : ' Actualiser'}
                     </button>
                 </div>
             </div>
 
             {lastUpdate && (
                 <p className="text-gray-400 text-sm">
-                    Dernière mise à jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
+                    Derniere mise a jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
                 </p>
             )}
 
-            {/* ===== WIDGETS MARCHÉ (Teaching & TradingView) ===== */}
+            {/* ===== WIDGETS MARCHE (Teaching & TradingView) ===== */}
             <div className="grid grid-cols-1 gap-6 mb-8">
                 {/* Market Overview Widget */}
                 <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
@@ -420,12 +420,12 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                         <h3 className={`text-lg font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            📊 Vue d'ensemble des Marchés (Temps Réel)
+                             Vue d'ensemble des Marches (Temps Reel)
                         </h3>
                         <p className={`text-sm transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                         }`}>
-                            Indices majeurs, Forex, Crypto - Données en direct
+                            Indices majeurs, Forex, Crypto - Donnees en direct
                         </p>
                     </div>
                     <div ref={marketOverviewRef} style={{height: '800px'}}></div>
@@ -442,7 +442,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                             <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                🚀 Screener
+                                 Screener
                             </h3>
                         </div>
                         <div ref={screenerRef} style={{height: '700px'}}></div>
@@ -550,14 +550,14 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                         {item.ticker}
                                                     </span>
                                                     <div className="text-green-500 font-bold text-sm ml-auto flex-shrink-0">
-                                                        +{item.change.toFixed(2)}% ↑
+                                                        +{item.change.toFixed(2)}% ^
                                                     </div>
                                                     <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} flex-shrink-0`}>
                                                         ${item.price.toFixed(2)}
                                                     </div>
                                                 </div>
                                                 
-                                                {/* Espace dédié pour les news avec placeholder */}
+                                                {/* Espace dedie pour les news avec placeholder */}
                                                 <div className={`mt-1 ml-8 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                     {(() => {
                                                         const reason = extractMoveReason(item.ticker, item.change);
@@ -575,7 +575,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                                         </span>
                                                                     ) : (
                                                                         <span className="inline-flex items-start gap-1.5">
-                                                                            <span className="text-blue-400 flex-shrink-0 text-sm">📰</span>
+                                                                            <span className="text-blue-400 flex-shrink-0 text-sm"></span>
                                                                             <span className="leading-relaxed break-words">{reason}</span>
                                                                         </span>
                                                                     )}
@@ -689,14 +689,14 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                         {item.ticker}
                                                     </span>
                                                     <div className="text-red-500 font-bold text-sm ml-auto flex-shrink-0">
-                                                        {item.change.toFixed(2)}% ↓
+                                                        {item.change.toFixed(2)}% v
                                                     </div>
                                                     <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} flex-shrink-0`}>
                                                         ${item.price.toFixed(2)}
                                                     </div>
                                                 </div>
                                                 
-                                                {/* Espace dédié pour les news avec placeholder */}
+                                                {/* Espace dedie pour les news avec placeholder */}
                                                 <div className={`mt-1 ml-8 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                     {(() => {
                                                         const reason = extractMoveReason(item.ticker, item.change);
@@ -714,7 +714,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                                         </span>
                                                                     ) : (
                                                                         <span className="inline-flex items-start gap-1.5">
-                                                                            <span className="text-blue-400 flex-shrink-0 text-sm">📰</span>
+                                                                            <span className="text-blue-400 flex-shrink-0 text-sm"></span>
                                                                             <span className="leading-relaxed break-words">{reason}</span>
                                                                         </span>
                                                                     )}
@@ -870,7 +870,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                         <div className="flex items-center gap-2">
                                             <LucideIcon name="ArrowUpRight" className="w-3 h-3 text-gray-400" />
                                             <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                Cliquer pour analyse complète
+                                                Cliquer pour analyse complete
                                             </span>
                                         </div>
                                     </div>
@@ -892,13 +892,13 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                         <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                             <LucideIcon name="AlertCircle" className="w-12 h-12 mx-auto mb-3 opacity-50" />
                             <p>Aucune recommandation d'analyste disponible pour le moment</p>
-                            <p className="text-sm mt-2">Les données seront chargées lors de la prochaine actualisation</p>
+                            <p className="text-sm mt-2">Les donnees seront chargees lors de la prochaine actualisation</p>
                         </div>
                     )}
                 </div>
             )}
 
-            {/* Debug des données déplacé vers Admin-JSLAI */}
+            {/* Debug des donnees deplace vers Admin-JSLAI */}
 
             {/* Vue LIST - Compacte */}
             {stocksViewMode === 'list' && (
@@ -910,7 +910,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                     }`}>
                         <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📊 Titres - Vue Liste</h2>
+                        }`}> Titres - Vue Liste</h2>
 
                         {tickers.length === 0 ? (
                             <StockListSkeleton count={8} />
@@ -953,7 +953,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                     {companyNames[ticker] || ticker}
                                                 </div>
                                                 
-                                                {/* Espace dédié pour les news avec extractMoveReason */}
+                                                {/* Espace dedie pour les news avec extractMoveReason */}
                                                 <div className={`mt-2 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                     {extractMoveReason(ticker, changePercent) ? (
                                                         <div className={`text-xs flex items-start gap-2 ${
@@ -968,14 +968,14 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                                 </span>
                                                             ) : (
                                                                 <span className="inline-flex items-start gap-1.5">
-                                                                    <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                    <span className="text-blue-400 flex-shrink-0"></span>
                                                                     <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
                                                                 </span>
                                                             )}
                                                         </div>
                                                     ) : tickerLatestNews[ticker] ? (
                                                         <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                            📰 <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
+                                                             <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
                                                         </div>
                                                     ) : (
                                                         <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
@@ -1013,7 +1013,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                     }`}>
                         <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🎴 Titres - Vue Cartes</h2>
+                        }`}> Titres - Vue Cartes</h2>
 
                         {tickers.length === 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1070,7 +1070,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                         {companyNames[ticker] || ticker}
                                                     </div>
                                                     
-                                                    {/* Espace dédié pour les news avec extractMoveReason */}
+                                                    {/* Espace dedie pour les news avec extractMoveReason */}
                                                     <div className={`mt-2 min-h-[24px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                         {extractMoveReason(ticker, changePercent) ? (
                                                             <div className={`text-xs flex items-start gap-2 ${
@@ -1085,14 +1085,14 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                                     </span>
                                                                 ) : (
                                                                     <span className="inline-flex items-start gap-1.5">
-                                                                        <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                        <span className="text-blue-400 flex-shrink-0"></span>
                                                                         <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
                                                                     </span>
                                                                 )}
                                                             </div>
                                                         ) : tickerLatestNews[ticker] ? (
                                                             <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                                📰 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
+                                                                 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
                                                             </div>
                                                         ) : (
                                                             <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
@@ -1108,7 +1108,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                     ? 'bg-green-500/20 text-green-500 border border-green-500/30'
                                                     : 'bg-red-500/20 text-red-500 border border-red-500/30'
                                             }`}>
-                                                {isPositive ? '▲' : '▼'}
+                                                {isPositive ? '' : ''}
                                             </div>
                                         </div>
 
@@ -1160,7 +1160,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                     >
                                         {isLoadingMoreTickers ? (
                                             <span className="flex items-center gap-2">
-                                                <span className="animate-spin">⏳</span>
+                                                <span className="animate-spin"></span>
                                                 Chargement...
                                             </span>
                                         ) : (
@@ -1175,7 +1175,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                 </div>
             )}
 
-            {/* Section Données Financières & Actualités (Finnhub) - PRINCIPALE */}
+            {/* Section Donnees Financieres & Actualites (Finnhub) - PRINCIPALE */}
             {stocksViewMode === 'table' && (
             <div className="mt-8">
                 <div className={`backdrop-blur-sm rounded-2xl p-8 border-2 shadow-2xl transition-colors duration-300 ${
@@ -1187,20 +1187,20 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                         <h2 className={`text-2xl font-bold mb-3 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            📊 Données Financières & Actualités
+                             Donnees Financieres & Actualites
                         </h2>
                         <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${
                             isDarkMode 
                                 ? 'bg-gray-600/20 text-gray-300 border border-gray-500/30' 
                                 : 'bg-gray-700/80 text-gray-200 border border-gray-600/50'
                         }`}>
-                            <span className="mr-2">🔗</span>
+                            <span className="mr-2"></span>
                             Source: Finnhub API
                         </div>
                         <p className={`text-sm mt-3 transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                         }`}>
-                            Données en temps réel avec 3 actualités par titre
+                            Donnees en temps reel avec 3 actualites par titre
                         </p>
                     </div>
                     <div className="overflow-x-auto max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 relative text-sm">
@@ -1211,43 +1211,43 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                 }`}>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>📈 Ticker</th>
+                                    }`}> Ticker</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>💰 Prix</th>
+                                    }`}> Prix</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>📊 Change</th>
+                                    }`}> Change</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>📈 P/E</th>
+                                    }`}> P/E</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>💎 Dividende</th>
+                                    }`}> Dividende</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>🏢 Secteur</th>
+                                    }`}> Secteur</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>⭐ Rating</th>
+                                    }`}> Rating</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>😊 Sentiment</th>
+                                    }`}> Sentiment</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>⚡ Actions</th>
+                                    }`}> Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {tickers.map(ticker => {
-                                    // Données de Finnhub uniquement
+                                    // Donnees de Finnhub uniquement
                                     const finnhubData = stockData[ticker];
                                     const price = finnhubData?.c ? `$${finnhubData.c.toFixed(2)}` : 'N/A';
                                     const change = finnhubData?.d ? `${finnhubData.d > 0 ? '+' : ''}${finnhubData.d.toFixed(2)}` : 'N/A';
                                     const changePercent = finnhubData?.dp ? `${finnhubData.dp > 0 ? '+' : ''}${finnhubData.dp.toFixed(2)}%` : 'N/A';
                                     const changeColor = finnhubData?.d > 0 ? 'text-green-400' : finnhubData?.d < 0 ? 'text-red-400' : 'text-gray-400';
                                     
-                                    // Données de profil Finnhub
+                                    // Donnees de profil Finnhub
                                     const profile = finnhubData?.profile;
                                     const fundamentals = finnhubData?.fundamentals;
                                     const peRatio = fundamentals?.peRatio
@@ -1258,13 +1258,13 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                         : (profile?.dividend ? `${(profile.dividend * 100).toFixed(2)}%` : 'N/A');
                                     const sector = fundamentals?.sector || profile?.industry || 'N/A';
                                     
-                                    // Données de recommandation Finnhub
+                                    // Donnees de recommandation Finnhub
                                     const recommendation = finnhubData?.recommendation;
                                     const rating = recommendation?.length > 0 ? 
                                         (recommendation[0].buy + recommendation[0].strongBuy > recommendation[0].sell + recommendation[0].strongSell ? 'Achat' : 
                                          recommendation[0].sell + recommendation[0].strongSell > recommendation[0].buy + recommendation[0].strongBuy ? 'Vente' : 'Neutre') : 'N/A';
                                     
-                                    // 2 actualités les plus crédibles pour ce ticker
+                                    // 2 actualites les plus credibles pour ce ticker
                                     const tickerNews = sortNewsByCredibility(
                                         newsData.filter(article => {
                                         const text = (article.title + ' ' + article.description).toLowerCase();
@@ -1275,14 +1275,14 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                     // Analyse du sentiment
                                     const analyzeSentiment = (title, description) => {
                                         const text = (title + ' ' + description).toLowerCase();
-                                        const positiveWords = ['hausse', 'croissance', 'gain', 'profit', 'positif', 'amélioration', 'succès', 'fort', 'solide'];
-                                        const negativeWords = ['baisse', 'chute', 'perte', 'négatif', 'déclin', 'faible', 'problème', 'risque', 'inquiétude'];
+                                        const positiveWords = ['hausse', 'croissance', 'gain', 'profit', 'positif', 'amelioration', 'succes', 'fort', 'solide'];
+                                        const negativeWords = ['baisse', 'chute', 'perte', 'negatif', 'declin', 'faible', 'probleme', 'risque', 'inquietude'];
                                         
                                         const positiveCount = positiveWords.filter(word => text.includes(word)).length;
                                         const negativeCount = negativeWords.filter(word => text.includes(word)).length;
                                         
                                         if (positiveCount > negativeCount) return { sentiment: 'Positif', color: 'text-green-400' };
-                                        if (negativeCount > positiveCount) return { sentiment: 'Négatif', color: 'text-red-400' };
+                                        if (negativeCount > positiveCount) return { sentiment: 'Negatif', color: 'text-red-400' };
                                         return { sentiment: 'Neutre', color: 'text-gray-400' };
                                     };
                                     
@@ -1338,12 +1338,12 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                 <td className="py-4 px-3">
                                                     <div className={`flex items-center gap-2 px-3 py-2 rounded-full transition-colors duration-300 ${
                                                         sentiment.sentiment === 'Positif' ? 'bg-green-100 text-green-800' :
-                                                        sentiment.sentiment === 'Négatif' ? 'bg-red-100 text-red-800' :
+                                                        sentiment.sentiment === 'Negatif' ? 'bg-red-100 text-red-800' :
                                                         'bg-gray-100 text-gray-800'
                                                     }`}>
                                                         <span className="text-lg">
-                                                            {sentiment.sentiment === 'Positif' ? '😊' : 
-                                                             sentiment.sentiment === 'Négatif' ? '😟' : '😐'}
+                                                            {sentiment.sentiment === 'Positif' ? '' : 
+                                                             sentiment.sentiment === 'Negatif' ? '' : ''}
                                                         </span>
                                                         <span className="font-semibold">{sentiment.sentiment}</span>
                                                     </div>
@@ -1360,7 +1360,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                                 : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white shadow-blue-400/25'
                                                         }`}
                                                     >
-                                                        📊 Voir dans JLab
+                                                         Voir dans JLab
                                                     </button>
                                                 </td>
                                             </tr>
@@ -1374,7 +1374,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                 }`}>
                                                     <td colSpan="9" className="py-4 px-4">
                                                         <div className="flex items-start gap-3">
-                                                            {/* Icône étoile (sparkles) */}
+                                                            {/* Icone etoile (sparkles) */}
                                                             <div className={`p-2 rounded-full ${
                                                                 isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'
                                                             }`}>
@@ -1387,7 +1387,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                                     <span className={`text-xs font-bold px-2 py-0.5 rounded ${
                                                                         isDarkMode ? 'bg-purple-500/30 text-purple-300' : 'bg-purple-200 text-purple-700'
                                                                     }`}>
-                                                                        🔥 CE QUI BOUGE
+                                                                         CE QUI BOUGE
                                                                     </span>
                                                                     <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                                         {finvizNews[ticker].date}
@@ -1418,7 +1418,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                 </tr>
                                             )}
 
-                                            {/* Lignes d'actualités (3 maximum) - STYLE AMÉLIORÉ */}
+                                            {/* Lignes d'actualites (3 maximum) - STYLE AMELIORE */}
                                             {tickerNews.map((news, newsIndex) => (
                                                 <tr key={`${ticker}-news-${newsIndex}`} className={`border-b-2 transition-all duration-300 hover:scale-[1.01] ${
                                                     isDarkMode 
@@ -1477,7 +1477,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                                         <div className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors duration-300 ${
                                                                             isDarkMode ? 'bg-gray-800' : 'bg-gray-200'
                                                                         }`}>
-                                                                            <span>🕒</span>
+                                                                            <span></span>
                                                                             <span>
                                                                                 {news.publishedAt ? 
                                                                                     new Date(news.publishedAt).toLocaleString('fr-FR') : 
@@ -1496,7 +1496,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                                                         : 'bg-gray-700 hover:bg-gray-600 text-white shadow-lg shadow-gray-400/25'
                                                                                 }`}
                                                                             >
-                                                                                📖 Lire l'article
+                                                                                 Lire l'article
                                                                             </a>
                                                                         )}
                                                                     </div>
@@ -1520,39 +1520,39 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                         <div className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
                             isDarkMode ? 'text-blue-300' : 'text-blue-700'
                         }`}>
-                            📜 Section Principale - Données Financières
+                             Section Principale - Donnees Financieres
                         </div>
                         <div className={`text-sm transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                         }`}>
-                            Faites défiler pour voir toutes les données • Source: Finnhub API • 3 actualités par titre
+                            Faites defiler pour voir toutes les donnees - Source: Finnhub API - 3 actualites par titre
                         </div>
                         <div className={`text-xs mt-2 transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
                         }`}>
-                            Données mises à jour automatiquement toutes les 5 minutes
+                            Donnees mises a jour automatiquement toutes les 5 minutes
                         </div>
                     </div>
                 </div>
             </div>
             )}
 
-            {/* Message si aucune donnée */}
+            {/* Message si aucune donnee */}
             {tickers.length === 0 && (
                 <div className="bg-yellow-900/20 backdrop-blur-sm rounded-lg p-6 border border-yellow-300/20">
                     <div className="flex items-center gap-3">
-                        <span className="text-yellow-400 text-2xl">⚠️</span>
+                        <span className="text-yellow-400 text-2xl"></span>
                         <div>
-                            <h3 className="text-yellow-200 font-semibold">Aucun ticker configuré</h3>
+                            <h3 className="text-yellow-200 font-semibold">Aucun ticker configure</h3>
                             <p className="text-yellow-300/80 text-sm mt-1">
-                                Ajoutez des tickers dans l'onglet Seeking Alpha pour voir les données ici.
+                                Ajoutez des tickers dans l'onglet Seeking Alpha pour voir les donnees ici.
                             </p>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* ===== SECTION ACTUALITÉS SÉPARÉE ===== */}
+            {/* ===== SECTION ACTUALITES SEPAREE ===== */}
             {(newsData.length > 0 || loading) && (
                 <div className="mt-12">
                     <div className={`backdrop-blur-md rounded-3xl p-8 md:p-10 border-2 shadow-2xl transition-all duration-300 relative overflow-hidden ${
@@ -1560,7 +1560,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                             ? 'bg-gradient-to-br from-gray-800/95 via-gray-800/90 to-gray-900/95 border-purple-500/40 shadow-purple-500/20'
                             : 'bg-gradient-to-br from-white/98 via-white/95 to-gray-50/98 border-purple-400/50 shadow-purple-400/20'
                     }`}>
-                        {/* Pattern de fond décoratif */}
+                        {/* Pattern de fond decoratif */}
                         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
                             backgroundImage: `radial-gradient(circle at 2px 2px, ${isDarkMode ? '#a855f7' : '#9333ea'} 1px, transparent 0)`,
                             backgroundSize: '40px 40px'
@@ -1574,7 +1574,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                         }}></div>
                         
                         <div className="relative z-10">
-                            {/* Header amélioré */}
+                            {/* Header ameliore */}
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                                 <div className="flex items-center gap-4">
                                     <div className={`p-3 rounded-2xl ${
@@ -1582,7 +1582,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                             ? 'bg-gradient-to-br from-purple-600/30 to-purple-500/20 border border-purple-500/30' 
                                             : 'bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200'
                                     }`}>
-                                        <span className="text-3xl">📰</span>
+                                        <span className="text-3xl"></span>
                                     </div>
                                     <div>
                                         <h2 className={`text-3xl md:text-4xl font-black transition-colors duration-300 mb-1 ${
@@ -1592,12 +1592,12 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                             fontWeight: 900,
                                             letterSpacing: '-0.02em'
                                         }}>
-                                            Actualités du Marché
+                                            Actualites du Marche
                                         </h2>
                                         <p className={`text-sm transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                         }`}>
-                                            Dernières nouvelles financières en temps réel
+                                            Dernieres nouvelles financieres en temps reel
                                         </p>
                                     </div>
                                 </div>
@@ -1607,7 +1607,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                             ? 'bg-gradient-to-r from-purple-600/40 to-purple-500/30 text-purple-200 border-2 border-purple-500/50 shadow-purple-500/20'
                                             : 'bg-gradient-to-r from-purple-100 to-purple-50 text-purple-700 border-2 border-purple-300 shadow-purple-200/50'
                                     }`}>
-                                        <span className="text-lg mr-2">📊</span>
+                                        <span className="text-lg mr-2"></span>
                                         {newsData.length} articles
                                     </div>
                                 </div>
@@ -1660,7 +1660,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                 animation: 'shimmer 2s infinite'
                                             }}></div>
                                             
-                                            {/* Indicateur de crédibilité coloré à gauche */}
+                                            {/* Indicateur de credibilite colore a gauche */}
                                             <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl ${
                                                 credibilityTier === 'premium'
                                                     ? 'bg-gradient-to-b from-yellow-400 to-yellow-600'
@@ -1674,7 +1674,7 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                             }`}></div>
                                             
                                             <div className="relative z-10">
-                                                {/* Source et crédibilité */}
+                                                {/* Source et credibilite */}
                                                 <div className="flex items-center justify-between mb-4">
                                                     <div className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 ${
                                                         credibilityTier === 'premium'
@@ -1767,8 +1767,8 @@ const StocksNewsTab: React.FC<TabProps> = memo((props) => {
                                                 : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-2 border-purple-300/50'
                                         }`}
                                     >
-                                        <span className="mr-2">📰</span>
-                                        Voir toutes les actualités ({newsData.length})
+                                        <span className="mr-2"></span>
+                                        Voir toutes les actualites ({newsData.length})
                                         <span className="ml-2">→</span>
                                     </button>
                                 </div>

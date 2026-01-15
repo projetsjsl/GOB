@@ -1,5 +1,5 @@
 /**
- * API endpoint pour envoyer un message dans un salon de chat intégré
+ * API endpoint pour envoyer un message dans un salon de chat integre
  * POST /api/groupchat/integrated/send-message
  */
 
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
             roomId,
             userId,
             userDisplayName,
-            userIcon = '🧠',
+            userIcon = '',
             message,
             skipAssistant = false, // Ne pas appeler le LLM automatiquement
             forceAssistant = false // Forcer l'appel du LLM (pour appel manuel)
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
             process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
-        // Vérifier que le salon existe et est actif
+        // Verifier que le salon existe et est actif
         const { data: room, error: roomError } = await supabase
             .from('group_chat_rooms')
             .select('*')
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
         if (roomError || !room) {
             return res.status(404).json({
                 success: false,
-                error: 'Salon non trouvé ou inactif'
+                error: 'Salon non trouve ou inactif'
             });
         }
 
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
             });
         }
 
-        // Mettre à jour la présence de l'utilisateur
+        // Mettre a jour la presence de l'utilisateur
         await supabase
             .from('group_chat_participants')
             .upsert([{
@@ -94,8 +94,8 @@ export default async function handler(req, res) {
                 onConflict: 'room_id,user_id'
             });
 
-        // Appeler l'API OpenAI pour obtenir la réponse
-        // ⚠️ LOGIQUE: Ne pas appeler si skipAssistant=true, OU forcer si forceAssistant=true
+        // Appeler l'API OpenAI pour obtenir la reponse
+        //  LOGIQUE: Ne pas appeler si skipAssistant=true, OU forcer si forceAssistant=true
         const openaiApiKey = process.env.OPENAI_API_KEY;
         let assistantMessage = null;
         let assistantMessageId = null;
@@ -104,7 +104,7 @@ export default async function handler(req, res) {
 
         if (openaiApiKey && shouldCallAssistant) {
             try {
-                // Récupérer les derniers messages pour le contexte
+                // Recuperer les derniers messages pour le contexte
                 const { data: recentMessages, error: historyError } = await supabase
                     .from('group_chat_messages')
                     .select('role, content, user_display_name')
@@ -123,7 +123,7 @@ export default async function handler(req, res) {
                     });
                 }
 
-                // Ajouter l'historique (inversé pour avoir l'ordre chronologique)
+                // Ajouter l'historique (inverse pour avoir l'ordre chronologique)
                 if (recentMessages && !historyError) {
                     recentMessages.reverse().forEach(msg => {
                         messagesForOpenAI.push({
@@ -143,7 +143,7 @@ export default async function handler(req, res) {
                         'Authorization': `Bearer ${openaiApiKey}`
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4o', // ou 'gpt-3.5-turbo' pour économiser
+                        model: 'gpt-4o', // ou 'gpt-3.5-turbo' pour economiser
                         messages: messagesForOpenAI,
                         temperature: room.temperature || 0.7,
                         max_tokens: 2000
@@ -156,14 +156,14 @@ export default async function handler(req, res) {
                     if (openaiData.choices && openaiData.choices[0]) {
                         assistantMessage = openaiData.choices[0].message.content;
                         
-                        // Sauvegarder la réponse de l'assistant
+                        // Sauvegarder la reponse de l'assistant
                         const { data: savedAssistant, error: assistantError } = await supabase
                             .from('group_chat_messages')
                             .insert([{
                                 room_id: roomId,
                                 user_id: 'assistant',
                                 user_display_name: 'ChatGPT',
-                                user_icon: '🤖',
+                                user_icon: '',
                                 role: 'assistant',
                                 content: assistantMessage,
                                 metadata: {
@@ -182,18 +182,18 @@ export default async function handler(req, res) {
                 } else {
                     const errorText = await openaiResponse.text();
                     console.warn('Erreur API OpenAI:', errorText);
-                    // Si c'est un appel forcé, retourner l'erreur
+                    // Si c'est un appel force, retourner l'erreur
                     if (forceAssistant) {
                         return res.status(500).json({
                             success: false,
-                            error: 'Erreur génération réponse ChatGPT',
+                            error: 'Erreur generation reponse ChatGPT',
                             details: errorText
                         });
                     }
                 }
             } catch (openaiError) {
                 console.error('Erreur appel OpenAI:', openaiError);
-                // Si c'est un appel forcé, retourner l'erreur
+                // Si c'est un appel force, retourner l'erreur
                 if (forceAssistant) {
                     return res.status(500).json({
                         success: false,
@@ -201,14 +201,14 @@ export default async function handler(req, res) {
                         details: openaiError.message
                     });
                 }
-                // Sinon, ne pas échouer - on retourne quand même le message utilisateur
+                // Sinon, ne pas echouer - on retourne quand meme le message utilisateur
             }
         } else if (forceAssistant && !openaiApiKey) {
-            // Si on force l'appel mais qu'il n'y a pas de clé API
+            // Si on force l'appel mais qu'il n'y a pas de cle API
             return res.status(503).json({
                 success: false,
-                error: 'OPENAI_API_KEY non configurée',
-                note: 'Configurez OPENAI_API_KEY dans Vercel pour utiliser le chat intégré'
+                error: 'OPENAI_API_KEY non configuree',
+                note: 'Configurez OPENAI_API_KEY dans Vercel pour utiliser le chat integre'
             });
         }
 
@@ -224,7 +224,7 @@ export default async function handler(req, res) {
                 content: assistantMessage,
                 createdAt: new Date().toISOString()
             } : null,
-            note: openaiApiKey ? null : 'OPENAI_API_KEY non configurée - Réponse assistant non générée'
+            note: openaiApiKey ? null : 'OPENAI_API_KEY non configuree - Reponse assistant non generee'
         });
 
     } catch (error) {

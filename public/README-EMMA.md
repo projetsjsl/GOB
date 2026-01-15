@@ -1,88 +1,88 @@
-# Emma - Assistante Financière Intégrée
+# Emma - Assistante Financiere Integree
 
-## 🎯 Vue d'ensemble
+##  Vue d'ensemble
 
-Emma est une assistante virtuelle spécialisée en analyse financière, intégrée dans le dashboard GOB. Elle utilise l'API Gemini de Google pour fournir des réponses intelligentes et personnalisées.
+Emma est une assistante virtuelle specialisee en analyse financiere, integree dans le dashboard GOB. Elle utilise l'API Gemini de Google pour fournir des reponses intelligentes et personnalisees.
 
-## 🚀 Fonctionnalités
+##  Fonctionnalites
 
-### 💬 Chat Intelligent
+###  Chat Intelligent
 - Interface de chat moderne et intuitive
-- Réponses en temps réel via l'API Gemini
+- Reponses en temps reel via l'API Gemini
 - Support des conversations contextuelles
-- Indicateur de frappe animé
+- Indicateur de frappe anime
 
-### ⚙️ Personnalisation Avancée
-- **Éditeur de prompt** : Personnalisez le comportement d'Emma
-- **Configuration Gemini** : Gestion de la clé API
-- **Paramètres de style** : Adaptez le ton et le niveau d'expertise
-- **Sauvegarde automatique** : Vos paramètres sont conservés
+###  Personnalisation Avancee
+- **Editeur de prompt** : Personnalisez le comportement d'Emma
+- **Configuration Gemini** : Gestion de la cle API
+- **Parametres de style** : Adaptez le ton et le niveau d'expertise
+- **Sauvegarde automatique** : Vos parametres sont conserves
 
-### 🎨 Interface Utilisateur
-- Design moderne inspiré de l'image fournie
-- Sidebar avec spécialités et personnalisation
+###  Interface Utilisateur
+- Design moderne inspire de l'image fournie
+- Sidebar avec specialites et personnalisation
 - Zone de chat principale avec avatar Emma
 - Responsive design pour mobile et desktop
 
-## 📁 Structure des Fichiers
+##  Structure des Fichiers
 
 ```
 GOB/public/
-├── emma-financial-profile.js      # Profil financier d'Emma
-├── emma-gemini-service.js         # Service d'intégration Gemini
-├── emma-ui-components.js          # Composants d'interface
-├── emma-styles.css               # Styles CSS
-├── emma-dashboard-integration.js  # Intégration principale
-└── README-EMMA.md               # Cette documentation
+ emma-financial-profile.js      # Profil financier d'Emma
+ emma-gemini-service.js         # Service d'integration Gemini
+ emma-ui-components.js          # Composants d'interface
+ emma-styles.css               # Styles CSS
+ emma-dashboard-integration.js  # Integration principale
+ README-EMMA.md               # Cette documentation
 ```
 
-## 🔧 Configuration
+##  Configuration
 
-### 1. Clé API Gemini
+### 1. Cle API Gemini
 
 1. Allez sur [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Connectez-vous avec votre compte Google
-3. Créez une nouvelle clé API
-4. Dans le dashboard, cliquez sur "⚙️ Configuration Gemini"
-5. Collez votre clé API et testez la connexion
+3. Creez une nouvelle cle API
+4. Dans le dashboard, cliquez sur " Configuration Gemini"
+5. Collez votre cle API et testez la connexion
 
 ### 2. Personnalisation du Prompt
 
-1. Cliquez sur "📝 Éditer le prompt"
+1. Cliquez sur " Editer le prompt"
 2. Modifiez le prompt selon vos besoins
 3. Utilisez les variables disponibles :
    - `{userMessage}` : Message de l'utilisateur
-   - `{dashboardData}` : Données du dashboard
+   - `{dashboardData}` : Donnees du dashboard
    - `{currentTime}` : Heure actuelle
 4. Sauvegardez vos modifications
 
-## 🎯 Utilisation
+##  Utilisation
 
 ### Chat avec Emma
-1. Allez dans l'onglet "🤖 Ask Emma"
+1. Allez dans l'onglet " Ask Emma"
 2. Tapez votre question dans le champ de saisie
-3. Appuyez sur Entrée ou cliquez sur le bouton d'envoi
-4. Emma répondra en utilisant l'API Gemini
+3. Appuyez sur Entree ou cliquez sur le bouton d'envoi
+4. Emma repondra en utilisant l'API Gemini
 
 ### Exemples de Questions
 - "Quel est le cours de AAPL ?"
 - "Peux-tu m'expliquer cette analyse ?"
-- "Comment interpréter ces données financières ?"
-- "Quelles sont les tendances du marché ?"
+- "Comment interpreter ces donnees financieres ?"
+- "Quelles sont les tendances du marche ?"
 
 ### Gestion de la Conversation
 - **Effacer** : Supprime toute la conversation
-- **Exemple** : Insère une question d'exemple
-- **Sauvegarde** : Les conversations sont conservées localement
+- **Exemple** : Insere une question d'exemple
+- **Sauvegarde** : Les conversations sont conservees localement
 
-## 🔒 Sécurité
+##  Securite
 
-- La clé API Gemini est stockée localement dans le navigateur
-- Aucune donnée n'est envoyée à des serveurs tiers (sauf Gemini)
-- Les conversations restent privées
-- Possibilité d'effacer la clé API à tout moment
+- La cle API Gemini est stockee localement dans le navigateur
+- Aucune donnee n'est envoyee a des serveurs tiers (sauf Gemini)
+- Les conversations restent privees
+- Possibilite d'effacer la cle API a tout moment
 
-## 🛠️ Développement
+##  Developpement
 
 ### Structure du Code
 
@@ -91,12 +91,12 @@ GOB/public/
 // Profil financier avec prompt personnalisable
 const profile = {
   id: 'emma-financial-analysis',
-  name: 'Emma - Analyse Financière',
+  name: 'Emma - Analyse Financiere',
   prompt: 'Tu es Emma...',
-  specialties: ['Analyse financière', 'Investissements'],
+  specialties: ['Analyse financiere', 'Investissements'],
   personalization: {
     style: 'Standard',
-    level: 'Intermédiaire',
+    level: 'Intermediaire',
     tone: 'Professionnelle'
   }
 };
@@ -107,25 +107,25 @@ const profile = {
 // Service pour l'API Gemini
 class EmmaGeminiService {
   async generateResponse(userMessage, customPrompt) {
-    // Génère une réponse via l'API Gemini
+    // Genere une reponse via l'API Gemini
   }
   
   async testConnection() {
-    // Teste la connexion à l'API
+    // Teste la connexion a l'API
   }
 }
 ```
 
 #### EmmaDashboardIntegration
 ```javascript
-// Intégration principale dans le dashboard
+// Integration principale dans le dashboard
 class EmmaDashboardIntegration {
   async initialize() {
     // Initialise Emma dans le dashboard
   }
   
   async sendMessage() {
-    // Envoie un message et génère une réponse
+    // Envoie un message et genere une reponse
   }
 }
 ```
@@ -133,7 +133,7 @@ class EmmaDashboardIntegration {
 ### Personnalisation
 
 #### Modifier le Style
-Éditez `emma-styles.css` pour personnaliser l'apparence :
+Editez `emma-styles.css` pour personnaliser l'apparence :
 ```css
 .emma-chat-container {
   /* Styles du conteneur principal */
@@ -144,57 +144,57 @@ class EmmaDashboardIntegration {
 }
 ```
 
-#### Ajouter des Spécialités
+#### Ajouter des Specialites
 Modifiez `emma-financial-profile.js` :
 ```javascript
 specialties: [
-  { id: 'financial-analysis', name: 'Analyse financière', active: true },
-  { id: 'new-specialty', name: 'Nouvelle spécialité', active: false }
+  { id: 'financial-analysis', name: 'Analyse financiere', active: true },
+  { id: 'new-specialty', name: 'Nouvelle specialite', active: false }
 ]
 ```
 
-## 🐛 Dépannage
+##  Depannage
 
-### Problèmes Courants
+### Problemes Courants
 
-#### Emma ne répond pas
-1. Vérifiez que la clé API Gemini est configurée
+#### Emma ne repond pas
+1. Verifiez que la cle API Gemini est configuree
 2. Testez la connexion dans "Configuration Gemini"
-3. Vérifiez la console du navigateur pour les erreurs
+3. Verifiez la console du navigateur pour les erreurs
 
 #### Interface ne s'affiche pas
-1. Vérifiez que tous les fichiers CSS/JS sont chargés
+1. Verifiez que tous les fichiers CSS/JS sont charges
 2. Actualisez la page
-3. Vérifiez la console pour les erreurs de chargement
+3. Verifiez la console pour les erreurs de chargement
 
-#### Prompt non sauvegardé
-1. Cliquez sur "Sauvegarder" après modification
-2. Vérifiez que localStorage est activé
-3. Essayez de réinitialiser le prompt
+#### Prompt non sauvegarde
+1. Cliquez sur "Sauvegarder" apres modification
+2. Verifiez que localStorage est active
+3. Essayez de reinitialiser le prompt
 
-### Logs de Débogage
+### Logs de Debogage
 Ouvrez la console du navigateur (F12) pour voir les logs :
-- ✅ Connexions réussies
-- ❌ Erreurs d'API
-- 🔧 Événements d'interface
+-  Connexions reussies
+-  Erreurs d'API
+-  Evenements d'interface
 
-## 📈 Améliorations Futures
+##  Ameliorations Futures
 
 - [ ] Support de plusieurs langues
-- [ ] Intégration avec d'autres APIs (OpenAI, Claude)
+- [ ] Integration avec d'autres APIs (OpenAI, Claude)
 - [ ] Historique des conversations
 - [ ] Export des conversations
-- [ ] Thèmes personnalisables
-- [ ] Intégration avec les données du dashboard en temps réel
+- [ ] Themes personnalisables
+- [ ] Integration avec les donnees du dashboard en temps reel
 
-## 🤝 Support
+##  Support
 
-Pour toute question ou problème :
-1. Vérifiez cette documentation
+Pour toute question ou probleme :
+1. Verifiez cette documentation
 2. Consultez la console du navigateur
-3. Testez avec une clé API différente
-4. Réinitialisez les paramètres si nécessaire
+3. Testez avec une cle API differente
+4. Reinitialisez les parametres si necessaire
 
 ---
 
-**Emma** - Votre assistante financière intelligente 🚀
+**Emma** - Votre assistante financiere intelligente 

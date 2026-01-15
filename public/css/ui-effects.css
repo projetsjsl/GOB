@@ -1,5 +1,5 @@
 /**
- * Effets UI Avancés
+ * Effets UI Avances
  * 
  * Extrait depuis beta-combined-dashboard.html
  * Glassmorphism, shine, glow, shimmer, ripple effects
@@ -9,7 +9,7 @@
  * GLASSMORPHISM EFFECTS
  * ===================================================== */
 
-/* 🌫️ Glassmorphism Effect */
+/*  Glassmorphism Effect */
 .glass-card {
     background: rgba(255, 255, 255, 0.05);
     -webkit-backdrop-filter: blur(10px);
@@ -30,7 +30,7 @@
  * SHINE EFFECT (Horizontal Sweep)
  * ===================================================== */
 
-/* ✨ Shine Effect (horizontal sweep) */
+/*  Shine Effect (horizontal sweep) */
 .shine-effect {
     position: relative;
     overflow: hidden;
@@ -58,7 +58,7 @@
  * GLOW ANIMATIONS
  * ===================================================== */
 
-/* 🌟 Glow Animation for Important Metrics */
+/*  Glow Animation for Important Metrics */
 .glow-pulse {
     animation: glow-pulse 2s ease-in-out infinite;
 }
@@ -117,7 +117,7 @@
  * SHIMMER EFFECT (Loading States)
  * ===================================================== */
 
-/* 💫 Shimmer Effect for Loading States */
+/*  Shimmer Effect for Loading States */
 .shimmer {
     background: linear-gradient(90deg,
             rgba(255, 255, 255, 0.05) 0%,

@@ -1,30 +1,30 @@
 /**
- * 🤖 MODELS MANAGER - Gestion centralisée des modèles LLM
+ *  MODELS MANAGER - Gestion centralisee des modeles LLM
  * 
- * Gère l'interface CRUD pour le registre des modèles (Supabase: emma_llm_models)
- * Permet d'ajouter, éditer, tester et configurer les modèles disponibles.
+ * Gere l'interface CRUD pour le registre des modeles (Supabase: emma_llm_models)
+ * Permet d'ajouter, editer, tester et configurer les modeles disponibles.
  */
 
-// État local
+// Etat local
 let availableModels = [];
 let currentModelId = null;
 
 // Initialisation
 export function initModelsManager() {
-    console.log('🤖 Initialisation Models Manager...');
+    console.log(' Initialisation Models Manager...');
     
-    // Attacher les écouteurs d'événements
+    // Attacher les ecouteurs d'evenements
     bindEvents();
     
     // Charger la liste initiale
     loadModels();
 }
 
-// Charger les modèles depuis l'API
+// Charger les modeles depuis l'API
 export async function loadModels() {
     try {
         const response = await fetch('/api/admin/llm-models');
-        if (!response.ok) throw new Error('Erreur chargement modèles');
+        if (!response.ok) throw new Error('Erreur chargement modeles');
         
         const data = await response.json();
         availableModels = data.models || [];
@@ -32,14 +32,14 @@ export async function loadModels() {
         renderModelsList();
         updateModelSelectors();
         
-        console.log(`✅ ${availableModels.length} modèles chargés`);
+        console.log(` ${availableModels.length} modeles charges`);
     } catch (error) {
-        console.error('❌ Erreur chargement modèles:', error);
-        showToast('Erreur chargement modèles', 'error');
+        console.error(' Erreur chargement modeles:', error);
+        showToast('Erreur chargement modeles', 'error');
     }
 }
 
-// Rendre la liste des modèles (Model Cards)
+// Rendre la liste des modeles (Model Cards)
 function renderModelsList() {
     const listContainer = document.getElementById('modelsListContainer');
     if (!listContainer) return;
@@ -47,9 +47,9 @@ function renderModelsList() {
     if (availableModels.length === 0) {
         listContainer.innerHTML = `
             <div class="col-span-full text-center p-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed">
-                <p>Aucun modèle configuré.</p>
+                <p>Aucun modele configure.</p>
                 <button onclick="createNewModel()" class="mt-2 text-indigo-600 font-medium hover:underline">
-                    ➕ Ajouter un premier modèle
+                     Ajouter un premier modele
                 </button>
             </div>`;
         return;
@@ -67,11 +67,11 @@ function renderModelsList() {
                 </div>
                 <div class="flex gap-1">
                     <button onclick="editModel('${model.id}')" class="p-1 text-gray-400 hover:text-blue-600 rounded">
-                        ✏️
+                        
                     </button>
                     ${model.enabled ? 
-                        `<span class="text-green-500 text-xs font-bold px-1" title="Actif">●</span>` : 
-                        `<span class="text-red-300 text-xs font-bold px-1" title="Désactivé">●</span>`
+                        `<span class="text-green-500 text-xs font-bold px-1" title="Actif"></span>` : 
+                        `<span class="text-red-300 text-xs font-bold px-1" title="Desactive"></span>`
                     }
                 </div>
             </div>
@@ -99,14 +99,14 @@ function renderModelsList() {
             
             <div class="flex gap-2 mt-auto">
                 <button onclick="testModel('${model.id}')" class="flex-1 text-xs bg-indigo-50 text-indigo-700 py-1.5 rounded hover:bg-indigo-100 transition">
-                    🧪 Tester
+                     Tester
                 </button>
             </div>
         </div>
     `).join('');
 }
 
-// Mise à jour des sélecteurs (dropdowns) dans l'UI existante
+// Mise a jour des selecteurs (dropdowns) dans l'UI existante
 function updateModelSelectors() {
     const selectors = [
         'emmaiaResearcherModel',
@@ -122,7 +122,7 @@ function updateModelSelectors() {
         const currentValue = select.value;
         const currentOptions = Array.from(select.options).map(o => o.value);
         
-        // Ajouter les modèles de la DB s'ils n'existent pas déjà
+        // Ajouter les modeles de la DB s'ils n'existent pas deja
         availableModels.filter(m => m.enabled).forEach(model => {
             if (!currentOptions.includes(model.model_id)) {
                 const option = document.createElement('option');
@@ -134,11 +134,11 @@ function updateModelSelectors() {
     });
 }
 
-// Créer un nouveau modèle
+// Creer un nouveau modele
 export function createNewModel() {
     currentModelId = null;
     openModelModal({
-        name: 'Nouveau Modèle',
+        name: 'Nouveau Modele',
         provider: 'openai',
         model_id: '',
         max_tokens: 4096,
@@ -151,7 +151,7 @@ export function createNewModel() {
     });
 }
 
-// Éditer un modèle existant
+// Editer un modele existant
 export function editModel(id) {
     const model = availableModels.find(m => m.id === id);
     if (!model) return;
@@ -160,7 +160,7 @@ export function editModel(id) {
     openModelModal(model);
 }
 
-// Ouvrir la modale d'édition
+// Ouvrir la modale d'edition
 function openModelModal(model) {
     const modal = document.getElementById('modelEditModal');
     const form = document.getElementById('modelEditForm');
@@ -179,12 +179,12 @@ function openModelModal(model) {
     document.getElementById('modelCostOutput').value = model.cost_output_1m || 0;
     document.getElementById('modelDescription').value = model.description || '';
     
-    document.getElementById('modelModalTitle').textContent = currentModelId ? 'Modifier Modèle' : 'Nouveau Modèle';
+    document.getElementById('modelModalTitle').textContent = currentModelId ? 'Modifier Modele' : 'Nouveau Modele';
     
     modal.classList.remove('hidden');
 }
 
-// Sauvegarder le modèle
+// Sauvegarder le modele
 export async function saveModel() {
     const data = {
         name: document.getElementById('modelName').value,
@@ -214,17 +214,17 @@ export async function saveModel() {
         
         closeModelModal();
         loadModels(); // Recharger la liste
-        showToast('Modèle sauvegardé avec succès', 'success');
+        showToast('Modele sauvegarde avec succes', 'success');
         
     } catch (error) {
-        console.error('❌ Erreur sauvegarde:', error);
+        console.error(' Erreur sauvegarde:', error);
         showToast('Erreur lors de la sauvegarde', 'error');
     }
 }
 
-// Supprimer le modèle
+// Supprimer le modele
 export async function deleteModel() {
-    if (!currentModelId || !confirm('Êtes-vous sûr de vouloir supprimer ce modèle ?')) return;
+    if (!currentModelId || !confirm('Etes-vous sur de vouloir supprimer ce modele ?')) return;
     
     try {
         const response = await fetch(`/api/admin/llm-models?id=${currentModelId}`, {
@@ -235,23 +235,23 @@ export async function deleteModel() {
         
         closeModelModal();
         loadModels();
-        showToast('Modèle supprimé', 'success');
+        showToast('Modele supprime', 'success');
         
     } catch (error) {
-        console.error('❌ Erreur suppression:', error);
+        console.error(' Erreur suppression:', error);
         showToast('Erreur lors de la suppression', 'error');
     }
 }
 
-// Tester le modèle (appel réel)
+// Tester le modele (appel reel)
 export async function testModel(id = null) {
     const modelId = id || currentModelId;
     if (!modelId) return;
     
-    // Si on teste depuis la liste, on cherche le modèle
+    // Si on teste depuis la liste, on cherche le modele
     let model = availableModels.find(m => m.id === modelId);
 
-    // Si on teste depuis la modale d'édition, on prend les valeurs live du formulaire
+    // Si on teste depuis la modale d'edition, on prend les valeurs live du formulaire
     const isEditing = currentModelId === modelId && document.getElementById('modelEditModal') && !document.getElementById('modelEditModal').classList.contains('hidden');
     
     let testConfig = model;
@@ -290,14 +290,14 @@ export async function testModel(id = null) {
         
         if (!data.success) throw new Error(data.error);
         
-        console.log('✅ Test réussi:', data.response);
-        alert(`✅ SUCCÈS - ${testConfig.model_id}\n\n${data.response}`);
-        showToast('Test réussi !', 'success');
+        console.log(' Test reussi:', data.response);
+        alert(` SUCCES - ${testConfig.model_id}\n\n${data.response}`);
+        showToast('Test reussi !', 'success');
         
     } catch (error) {
         console.error('Test Error:', error);
-        alert(`❌ ERREUR API:\n${error.message}`);
-        showToast('Échec du test', 'error');
+        alert(` ERREUR API:\n${error.message}`);
+        showToast('Echec du test', 'error');
     }
 }
 
@@ -318,7 +318,7 @@ function getProviderBadgeColor(provider) {
 }
 
 function showToast(message, type = 'info') {
-    // Utiliser le système de toast existant ou simple alert pour l'instant
+    // Utiliser le systeme de toast existant ou simple alert pour l'instant
     const statusText = document.getElementById('statusText');
     if (statusText) {
         statusText.textContent = message;

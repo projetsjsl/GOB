@@ -8,7 +8,7 @@
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     if (!isLocal && !window.ENABLE_MOCK_API) return;
 
-    console.log('🔶 Mock API Service Authenticated & Active');
+    console.log(' Mock API Service Authenticated & Active');
 
     const originalFetch = window.fetch;
 
@@ -20,7 +20,7 @@
             return originalFetch(url, options);
         }
 
-        console.log(`🔶 Mocking API call: ${urlStr}`);
+        console.log(` Mocking API call: ${urlStr}`);
         
         // Simulate network delay
         await new Promise(r => setTimeout(r, 200));
@@ -45,7 +45,7 @@
             };
         } else if (urlStr.includes('/api/emma-agent') || urlStr.includes('/api/ai-services')) {
             responseBody = {
-                reply: "Je suis en mode simulation locale. Le backend n'est pas connecté.",
+                reply: "Je suis en mode simulation locale. Le backend n'est pas connecte.",
                 usage: { total_tokens: 0 }
             };
         } else if (urlStr.includes('/api/supabase-watchlist')) {

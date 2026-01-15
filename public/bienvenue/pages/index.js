@@ -6,8 +6,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Plateforme d'Intégration RH - Bienvenue</title>
-        <meta name="description" content="Système de gestion complète pour l'intégration des nouveaux employés" />
+        <title>Plateforme d'Integration RH - Bienvenue</title>
+        <meta name="description" content="Systeme de gestion complete pour l'integration des nouveaux employes" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

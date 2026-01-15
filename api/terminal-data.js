@@ -1,11 +1,11 @@
 /**
  * API Endpoint pour Terminal Emma IA
  * 
- * Expose les données Supabase pour le frontend :
- * - Instruments avec métriques
+ * Expose les donnees Supabase pour le frontend :
+ * - Instruments avec metriques
  * - KPI values
  * - Watchlists
- * - Indices de marché
+ * - Indices de marche
  * - Historique des prix
  */
 
@@ -20,7 +20,7 @@ if (supabaseUrl && supabaseKey) {
 }
 
 /**
- * Récupère les instruments avec leurs dernières métriques
+ * Recupere les instruments avec leurs dernieres metriques
  */
 async function getInstruments(filters = {}) {
   const {
@@ -31,7 +31,7 @@ async function getInstruments(filters = {}) {
     search
   } = filters;
 
-  // Optimisation egress : sélectionner seulement les colonnes nécessaires
+  // Optimisation egress : selectionner seulement les colonnes necessaires
   let query = supabase
     .from('instruments')
     .select('id, symbol, name, exchange, country, currency, sector, industry, market_cap, is_active, created_at, updated_at')
@@ -58,14 +58,14 @@ async function getInstruments(filters = {}) {
   const { data, error, count } = await query;
 
   if (error) {
-    throw new Error(`Erreur récupération instruments: ${error.message}`);
+    throw new Error(`Erreur recuperation instruments: ${error.message}`);
   }
 
-  // Récupérer les dernières métriques pour chaque instrument
+  // Recuperer les dernieres metriques pour chaque instrument
   if (data && data.length > 0) {
     const symbols = data.map(i => i.symbol);
     
-    // Récupérer les dernières métriques clés
+    // Recuperer les dernieres metriques cles
     const { data: metrics } = await supabase
       .from('metrics')
       .select('symbol, metric_code, value, as_of')
@@ -73,7 +73,7 @@ async function getInstruments(filters = {}) {
       .in('metric_code', ['PRICE', 'DAILY_CHANGE_PCT', 'MARKET_CAP'])
       .order('as_of', { ascending: false });
 
-    // Grouper les métriques par symbole
+    // Grouper les metriques par symbole
     const metricsBySymbol = {};
     (metrics || []).forEach(m => {
       if (!metricsBySymbol[m.symbol]) {
@@ -97,10 +97,10 @@ async function getInstruments(filters = {}) {
 }
 
 /**
- * Récupère les valeurs de KPI pour des symboles
+ * Recupere les valeurs de KPI pour des symboles
  */
 async function getKPIValues(kpiCode, symbols, asOf = null) {
-  // Récupérer la définition du KPI
+  // Recuperer la definition du KPI
   const { data: kpi } = await supabase
     .from('kpi_definitions')
     .select('id')
@@ -109,7 +109,7 @@ async function getKPIValues(kpiCode, symbols, asOf = null) {
     .single();
 
   if (!kpi) {
-    throw new Error(`KPI ${kpiCode} non trouvé`);
+    throw new Error(`KPI ${kpiCode} non trouve`);
   }
 
   let query = supabase
@@ -125,10 +125,10 @@ async function getKPIValues(kpiCode, symbols, asOf = null) {
   const { data, error } = await query.order('as_of', { ascending: false });
 
   if (error) {
-    throw new Error(`Erreur récupération KPI values: ${error.message}`);
+    throw new Error(`Erreur recuperation KPI values: ${error.message}`);
   }
 
-  // Retourner la valeur la plus récente pour chaque symbole
+  // Retourner la valeur la plus recente pour chaque symbole
   const latest = {};
   const seen = new Set();
 
@@ -147,7 +147,7 @@ async function getKPIValues(kpiCode, symbols, asOf = null) {
 }
 
 /**
- * Récupère les watchlists d'un utilisateur
+ * Recupere les watchlists d'un utilisateur
  */
 async function getWatchlists(userId) {
   const { data, error } = await supabase
@@ -169,19 +169,19 @@ async function getWatchlists(userId) {
     .order('created_at', { ascending: false });
 
   if (error) {
-    throw new Error(`Erreur récupération watchlists: ${error.message}`);
+    throw new Error(`Erreur recuperation watchlists: ${error.message}`);
   }
 
   return data || [];
 }
 
 /**
- * Récupère les indices de marché
+ * Recupere les indices de marche
  */
 async function getMarketIndices() {
   const today = new Date().toISOString().split('T')[0];
   
-  // Optimisation egress : sélectionner seulement les colonnes nécessaires
+  // Optimisation egress : selectionner seulement les colonnes necessaires
   try {
     const { data, error } = await supabase
       .from('market_indices')
@@ -190,25 +190,25 @@ async function getMarketIndices() {
       .order('symbol', { ascending: true });
 
     if (error) {
-      console.warn(`⚠️ market-indices query failed: ${error.message}`);
+      console.warn(` market-indices query failed: ${error.message}`);
       return [];
     }
 
     return data || [];
   } catch (error) {
-    console.warn('⚠️ market-indices fetch failed:', error?.message || String(error));
+    console.warn(' market-indices fetch failed:', error?.message || String(error));
     return [];
   }
 }
 
 /**
- * Récupère l'historique des prix pour un symbole
+ * Recupere l'historique des prix pour un symbole
  */
 async function getPriceHistory(symbol, days = 252) {
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
 
-  // Optimisation egress : sélectionner seulement les colonnes nécessaires pour les graphiques
+  // Optimisation egress : selectionner seulement les colonnes necessaires pour les graphiques
   const { data, error } = await supabase
     .from('price_history')
     .select('date, open, high, low, close, volume')
@@ -217,17 +217,17 @@ async function getPriceHistory(symbol, days = 252) {
     .order('date', { ascending: true });
 
   if (error) {
-    throw new Error(`Erreur récupération historique: ${error.message}`);
+    throw new Error(`Erreur recuperation historique: ${error.message}`);
   }
 
   return data || [];
 }
 
 /**
- * Récupère les métriques pour un symbole
+ * Recupere les metriques pour un symbole
  */
 async function getSymbolMetrics(symbol, metricCodes = null) {
-  // Optimisation egress : sélectionner seulement les colonnes nécessaires
+  // Optimisation egress : selectionner seulement les colonnes necessaires
   let query = supabase
     .from('metrics')
     .select('symbol, metric_code, value, as_of, unit')
@@ -242,10 +242,10 @@ async function getSymbolMetrics(symbol, metricCodes = null) {
   const { data, error } = await query;
 
   if (error) {
-    throw new Error(`Erreur récupération métriques: ${error.message}`);
+    throw new Error(`Erreur recuperation metriques: ${error.message}`);
   }
 
-  // Grouper par metric_code et retourner la valeur la plus récente
+  // Grouper par metric_code et retourner la valeur la plus recente
   const latest = {};
   const seen = new Set();
 
@@ -266,7 +266,7 @@ async function getSymbolMetrics(symbol, metricCodes = null) {
 }
 
 /**
- * Récupère les secteurs disponibles
+ * Recupere les secteurs disponibles
  */
 async function getSectors() {
   const { data, error } = await supabase
@@ -276,7 +276,7 @@ async function getSectors() {
     .eq('is_active', true);
 
   if (error) {
-    throw new Error(`Erreur récupération secteurs: ${error.message}`);
+    throw new Error(`Erreur recuperation secteurs: ${error.message}`);
   }
 
   const sectors = [...new Set((data || []).map(i => i.sector))].sort();
@@ -397,7 +397,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json(result);
   } catch (error) {
-    console.error('❌ Erreur terminal-data:', error);
+    console.error(' Erreur terminal-data:', error);
     return res.status(500).json({
       success: false,
       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',

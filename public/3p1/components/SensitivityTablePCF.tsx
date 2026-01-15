@@ -8,7 +8,7 @@ interface SensitivityTablePCFProps {
 }
 
 export const SensitivityTablePCF: React.FC<SensitivityTablePCFProps> = ({ baseCF, baseGrowth, basePCF }) => {
-  // Vérifier que les valeurs de base sont définies - protection complète contre undefined
+  // Verifier que les valeurs de base sont definies - protection complete contre undefined
   const safeBaseGrowth = (baseGrowth != null && baseGrowth !== undefined && isFinite(baseGrowth)) ? baseGrowth : 0;
   const safeBasePCF = (basePCF != null && basePCF !== undefined && isFinite(basePCF)) ? basePCF : 0;
   const safeBaseCF = (baseCF != null && baseCF !== undefined && isFinite(baseCF)) ? baseCF : 0;
@@ -19,7 +19,7 @@ export const SensitivityTablePCF: React.FC<SensitivityTablePCFProps> = ({ baseCF
 
   return (
     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 print-break-inside-avoid">
-      <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Matrice de Sensibilité P/FCF (Prix Cible 5 ans)</h3>
+      <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Matrice de Sensibilite P/FCF (Prix Cible 5 ans)</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-xs text-center">
           <thead>
@@ -60,7 +60,7 @@ export const SensitivityTablePCF: React.FC<SensitivityTablePCFProps> = ({ baseCF
         </table>
       </div>
       <p className="text-[10px] text-gray-400 mt-2 text-center italic">
-          Axe vertical : P/FCF Cible · Axe horizontal : Croissance CF
+          Axe vertical : P/FCF Cible  Axe horizontal : Croissance CF
       </p>
     </div>
   );

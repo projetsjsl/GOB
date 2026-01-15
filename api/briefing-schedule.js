@@ -1,8 +1,8 @@
 /**
- * API endpoint pour gérer les horaires et l'activation des briefings automatisés
+ * API endpoint pour gerer les horaires et l'activation des briefings automatises
  * 
- * GET : Récupère la configuration des horaires
- * PUT : Met à jour la configuration des horaires
+ * GET : Recupere la configuration des horaires
+ * PUT : Met a jour la configuration des horaires
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -18,7 +18,7 @@ function loadScheduleConfig() {
     const configContent = readFileSync(CONFIG_PATH, 'utf-8');
     return JSON.parse(configContent);
   } catch (error) {
-    console.error('❌ Erreur chargement config schedule:', error);
+    console.error(' Erreur chargement config schedule:', error);
     throw new Error('Failed to load schedule configuration');
   }
 }
@@ -27,7 +27,7 @@ function saveScheduleConfig(config) {
   try {
     writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf-8');
   } catch (error) {
-    console.error('❌ Erreur sauvegarde config schedule:', error);
+    console.error(' Erreur sauvegarde config schedule:', error);
     throw new Error('Failed to save schedule configuration');
   }
 }
@@ -36,7 +36,7 @@ function saveScheduleConfig(config) {
  * Convertit heure/minute/timezone en expression cron UTC
  */
 function generateCronUTC(hour, minute, timezone = 'America/Montreal') {
-  // Conversion basique: America/Montreal = UTC-5 (hiver) ou UTC-4 (été)
+  // Conversion basique: America/Montreal = UTC-5 (hiver) ou UTC-4 (ete)
   // Pour simplifier, on utilise UTC-5 (hiver)
   const utcOffset = -5;
   let utcHour = hour - utcOffset;
@@ -48,7 +48,7 @@ function generateCronUTC(hour, minute, timezone = 'America/Montreal') {
     utcHour -= 24;
   }
   
-  // Format: minute hour * * 1-5 (lundi à vendredi)
+  // Format: minute hour * * 1-5 (lundi a vendredi)
   return `${utcMinute} ${utcHour} * * 1-5`;
 }
 
@@ -74,12 +74,12 @@ export default async function handler(req, res) {
       
       const currentConfig = loadScheduleConfig();
       
-      // Mettre à jour chaque briefing
+      // Mettre a jour chaque briefing
       if (morning !== undefined) {
         if (morning.hour !== undefined) currentConfig.morning.hour = morning.hour;
         if (morning.minute !== undefined) currentConfig.morning.minute = morning.minute;
         if (morning.enabled !== undefined) currentConfig.morning.enabled = morning.enabled;
-        // Régénérer le cron UTC
+        // Regenerer le cron UTC
         currentConfig.morning.cron_utc = generateCronUTC(
           currentConfig.morning.hour,
           currentConfig.morning.minute,
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
       
       return res.status(200).json({
         success: true,
-        message: 'Configuration des horaires mise à jour avec succès',
+        message: 'Configuration des horaires mise a jour avec succes',
         schedule: currentConfig
       });
     }
@@ -128,7 +128,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur API briefing-schedule:', error);
+    console.error(' Erreur API briefing-schedule:', error);
     return res.status(500).json({
       success: false,
       error: error.message

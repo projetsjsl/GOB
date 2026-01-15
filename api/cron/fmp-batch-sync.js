@@ -1,10 +1,10 @@
 /**
  * Cron Job Vercel pour synchroniser UNIQUEMENT LES PRIX FMP vers ticker_price_cache
  * 
- * IMPORTANT : Ce cron synchronise UNIQUEMENT les PRIX (pas les ratios/métriques)
- * Les données fondamentales (ratios, métriques) sont récupérées à la demande dans 3p1
+ * IMPORTANT : Ce cron synchronise UNIQUEMENT les PRIX (pas les ratios/metriques)
+ * Les donnees fondamentales (ratios, metriques) sont recuperees a la demande dans 3p1
  * 
- * Fréquence : Toutes les 15 minutes (optionnel - recommandé: à la demande)
+ * Frequence : Toutes les 15 minutes (optionnel - recommande: a la demande)
  * Configuration dans vercel.json
  * 
  * Note: Vercel Pro permet des crons toutes les minutes
@@ -20,11 +20,11 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY doivent être définis');
+  throw new Error('SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY doivent etre definis');
 }
 
 if (!FMP_API_KEY) {
-  throw new Error('FMP_API_KEY doit être définie');
+  throw new Error('FMP_API_KEY doit etre definie');
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -61,7 +61,7 @@ async function fetchFMPQuotes(symbols) {
       const response = await fetch(url);
       
       if (!response.ok) {
-        console.error(`❌ FMP Error: ${response.status}`);
+        console.error(` FMP Error: ${response.status}`);
         continue;
       }
 
@@ -77,7 +77,7 @@ async function fetchFMPQuotes(symbols) {
         await new Promise(resolve => setTimeout(resolve, 3000));
       }
     } catch (error) {
-      console.error(`❌ Erreur fetch FMP:`, error);
+      console.error(` Erreur fetch FMP:`, error);
       continue;
     }
   }
@@ -86,18 +86,18 @@ async function fetchFMPQuotes(symbols) {
 }
 
 /**
- * ⚠️ SUPPRIMÉ : fetchFMPRatios et combineQuoteAndRatios
- * On synchronise UNIQUEMENT les prix, pas les ratios/métriques
- * Les ratios sont récupérés à la demande dans 3p1 quand nécessaire
+ *  SUPPRIME : fetchFMPRatios et combineQuoteAndRatios
+ * On synchronise UNIQUEMENT les prix, pas les ratios/metriques
+ * Les ratios sont recuperes a la demande dans 3p1 quand necessaire
  */
 
 async function syncAllTickers() {
   const startTime = Date.now();
-  console.log('🔄 [CRON] Démarrage synchronisation batch FMP...');
+  console.log(' [CRON] Demarrage synchronisation batch FMP...');
 
   try {
     const tickers = await getAllActiveTickers();
-    console.log(`✅ ${tickers.length} tickers actifs trouvés`);
+    console.log(` ${tickers.length} tickers actifs trouves`);
 
     if (tickers.length === 0) {
       return { success: true, message: 'Aucun ticker actif', tickersProcessed: 0 };
@@ -105,9 +105,9 @@ async function syncAllTickers() {
 
     // Appeler FMP UNIQUEMENT pour les quotes (prix) - PAS de ratios
     const quotes = await fetchFMPQuotes(tickers);
-    console.log(`✅ ${quotes.length} quotes récupérées`);
+    console.log(` ${quotes.length} quotes recuperees`);
 
-    // Formater les données (PRIX UNIQUEMENT)
+    // Formater les donnees (PRIX UNIQUEMENT)
     const priceData = quotes.map(quote => ({
       symbol: quote.symbol?.toUpperCase(),
       price: quote.price || 0,
@@ -126,7 +126,7 @@ async function syncAllTickers() {
     }
 
     const executionTime = Date.now() - startTime;
-    console.log(`✅ [CRON] Synchronisation PRIX terminée: ${priceData.length} tickers en ${executionTime}ms`);
+    console.log(` [CRON] Synchronisation PRIX terminee: ${priceData.length} tickers en ${executionTime}ms`);
 
     return {
       success: true,
@@ -137,7 +137,7 @@ async function syncAllTickers() {
     };
 
   } catch (error) {
-    console.error('❌ [CRON] Erreur synchronisation batch:', error);
+    console.error(' [CRON] Erreur synchronisation batch:', error);
     return {
       success: false,
       error: error.message,
@@ -155,7 +155,7 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Vérifier que c'est bien un appel cron (Vercel ajoute un header)
+  // Verifier que c'est bien un appel cron (Vercel ajoute un header)
   const authHeader = req.headers['authorization'];
   const isCron = authHeader === `Bearer ${process.env.CRON_SECRET}` || 
                  req.headers['x-vercel-cron'] === '1';

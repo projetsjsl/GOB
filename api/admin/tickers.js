@@ -1,5 +1,5 @@
 /**
- * API Endpoint pour gérer les tickers dans Supabase (CRUD complet)
+ * API Endpoint pour gerer les tickers dans Supabase (CRUD complet)
  * GET    /api/admin/tickers?source=team&is_active=true
  * POST   /api/admin/tickers (body: {ticker, company_name, sector, ...})
  * PUT    /api/admin/tickers/:id (body: {ticker, company_name, ...})
@@ -19,8 +19,8 @@ export default async function handler(req, res) {
   }
 
   const supabaseUrl = process.env.SUPABASE_URL;
-  // Tolérance: certains environnements utilisent SUPABASE_KEY ou seulement l'ANON.
-  // Pour cet endpoint "admin", on privilégie SERVICE_ROLE, puis fallback.
+  // Tolerance: certains environnements utilisent SUPABASE_KEY ou seulement l'ANON.
+  // Pour cet endpoint "admin", on privilegie SERVICE_ROLE, puis fallback.
   const supabaseKey =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.SUPABASE_KEY ||
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
         });
     }
   } catch (error) {
-    console.error('❌ Admin Tickers API Error:', error);
+    console.error(' Admin Tickers API Error:', error);
     return res.status(500).json({ 
       success: false,
       error: error.message 
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
 }
 
 /**
- * GET - Récupérer les tickers avec filtres
+ * GET - Recuperer les tickers avec filtres
  */
 async function handleGet(req, res, supabase) {
   const { 
@@ -73,7 +73,7 @@ async function handleGet(req, res, supabase) {
     order_direction = 'desc'
   } = req.query;
 
-  // ✅ Compatibilité schéma: certaines DB ont `category`/`categories`, d'autres `source`.
+  //  Compatibilite schema: certaines DB ont `category`/`categories`, d'autres `source`.
   // On tente `category` d'abord, puis fallback sur `source` si colonne absente.
   const commonSelect =
     'id, ticker, company_name, sector, industry, country, exchange, currency, market_cap, priority, is_active, user_id, target_price, stop_loss, notes, security_rank, earnings_predictability, price_growth_persistence, price_stability, beta, valueline_updated_at, valueline_proj_low_return, valueline_proj_high_return, created_at, updated_at';
@@ -150,7 +150,7 @@ async function handleGet(req, res, supabase) {
     throw new Error(`Supabase error: ${error.message}`);
   }
 
-  // Normaliser: exposer toujours `source` pour les clients (ex: public/3p1) même si DB = category/cats
+  // Normaliser: exposer toujours `source` pour les clients (ex: public/3p1) meme si DB = category/cats
   const normalized = (data || []).map((row) => {
     const categories = Array.isArray(row.categories) ? row.categories : null;
     const derivedSource =
@@ -177,7 +177,7 @@ async function handleGet(req, res, supabase) {
 }
 
 /**
- * POST - Créer un nouveau ticker
+ * POST - Creer un nouveau ticker
  */
 async function handlePost(req, res, supabase) {
   const {
@@ -216,7 +216,7 @@ async function handlePost(req, res, supabase) {
     });
   }
 
-  // Vérifier si le ticker existe déjà
+  // Verifier si le ticker existe deja
   const { data: existing, error: checkError } = await supabase
     .from('tickers')
     .select('id, ticker, source, category, categories')
@@ -235,7 +235,7 @@ async function handlePost(req, res, supabase) {
     });
   }
 
-  // Créer le nouveau ticker
+  // Creer le nouveau ticker
   const { data, error } = await supabase
     .from('tickers')
     .insert({
@@ -247,7 +247,7 @@ async function handlePost(req, res, supabase) {
       exchange: exchange || null,
       currency: currency,
       market_cap: market_cap || null,
-      // Compatibilité: écrire `category`/`categories` (nouveau) et aussi `source` si la colonne existe
+      // Compatibilite: ecrire `category`/`categories` (nouveau) et aussi `source` si la colonne existe
       category,
       categories,
       priority: parseInt(priority) || 1,
@@ -272,10 +272,10 @@ async function handlePost(req, res, supabase) {
 }
 
 /**
- * PUT - Mettre à jour un ticker existant
+ * PUT - Mettre a jour un ticker existant
  */
 async function handlePut(req, res, supabase) {
-  const { id } = req.query; // ID du ticker à mettre à jour
+  const { id } = req.query; // ID du ticker a mettre a jour
   const updateData = req.body;
 
   if (!id) {
@@ -285,7 +285,7 @@ async function handlePut(req, res, supabase) {
     });
   }
 
-  // Préparer les données de mise à jour (enlever les champs null/undefined)
+  // Preparer les donnees de mise a jour (enlever les champs null/undefined)
   const cleanData = {};
   const allowedFields = [
     'ticker', 'company_name', 'sector', 'industry', 'country', 'exchange',
@@ -319,7 +319,7 @@ async function handlePut(req, res, supabase) {
   // Ajouter updated_at
   cleanData.updated_at = new Date().toISOString();
 
-  // Mettre à jour
+  // Mettre a jour
   const { data, error } = await supabase
     .from('tickers')
     .update(cleanData)
@@ -346,7 +346,7 @@ async function handlePut(req, res, supabase) {
 }
 
 /**
- * DELETE - Supprimer un ticker (ou le désactiver)
+ * DELETE - Supprimer un ticker (ou le desactiver)
  */
 async function handleDelete(req, res, supabase) {
   const { id, hard_delete = 'false' } = req.query;
@@ -358,7 +358,7 @@ async function handleDelete(req, res, supabase) {
     });
   }
 
-  // Vérifier si le ticker existe
+  // Verifier si le ticker existe
   const { data: existing, error: checkError } = await supabase
     .from('tickers')
     .select('id, ticker, source')
@@ -372,7 +372,7 @@ async function handleDelete(req, res, supabase) {
     });
   }
 
-  // Si hard_delete = true, supprimer complètement
+  // Si hard_delete = true, supprimer completement
   if (hard_delete === 'true') {
     const { error } = await supabase
       .from('tickers')
@@ -389,7 +389,7 @@ async function handleDelete(req, res, supabase) {
     });
   }
 
-  // Sinon, désactiver (soft delete)
+  // Sinon, desactiver (soft delete)
   const { data, error } = await supabase
     .from('tickers')
     .update({ 

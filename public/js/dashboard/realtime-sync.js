@@ -8,7 +8,7 @@
     }
     window.__realtimeSyncInitialized = true;
 
-    console.log('📡 Real-time Sync: Initializing...');
+    console.log(' Real-time Sync: Initializing...');
 
     let isConnected = false;
     let sawClient = false;
@@ -23,29 +23,29 @@
                 .on('postgres_changes', 
                     { event: '*', schema: 'public', table: 'tickers' }, 
                     (payload) => {
-                        console.log('📡 Real-time Sync: Ticker update received!', payload);
+                        console.log(' Real-time Sync: Ticker update received!', payload);
                         window.dispatchEvent(new CustomEvent('tickersUpdated', { detail: payload }));
                         if (window.Toast) {
                             const type = payload.eventType;
                             const ticker = payload.new?.ticker || payload.old?.ticker || 'Unknown';
                             const msg = type === 'INSERT' ? 'Nouveau ticker: ' + ticker :
-                                        type === 'DELETE' ? 'Ticker supprimé: ' + ticker :
-                                        'Ticker mis à jour: ' + ticker;
+                                        type === 'DELETE' ? 'Ticker supprime: ' + ticker :
+                                        'Ticker mis a jour: ' + ticker;
                             window.Toast.show(msg, 'info');
                         }
                     }
                 )
                 .subscribe((status) => {
-                    console.log('📡 Real-time Sync: Subscription status:', status);
+                    console.log(' Real-time Sync: Subscription status:', status);
                 });
 
             window.addEventListener('beforeunload', () => {
                 try { supabaseClient.removeChannel(channel); } catch(e) {}
             });
             
-            console.log('✅ Real-time Sync: Subscription active');
+            console.log(' Real-time Sync: Subscription active');
         } catch (e) {
-            console.error('❌ Real-time Sync: Subscription error:', e);
+            console.error(' Real-time Sync: Subscription error:', e);
             isConnected = false;
         }
     }
@@ -56,14 +56,14 @@
         const client = window.__SUPABASE__;
         if (client) {
             sawClient = true;
-            console.log('📡 Real-time Sync: Found global Supabase client');
+            console.log(' Real-time Sync: Found global Supabase client');
             startRealtime(client);
         }
     }
 
     // Listen for supabase:ready event
     window.addEventListener('supabase:ready', (e) => {
-        console.log('📡 Real-time Sync: Received supabase:ready event');
+        console.log(' Real-time Sync: Received supabase:ready event');
         const client = e.detail?.client || window.__SUPABASE__;
         if (client) startRealtime(client);
     });
@@ -82,9 +82,9 @@
         clearInterval(checkInterval);
         if (!isConnected) {
             if (sawClient) {
-                console.warn('⚠️ Real-time Sync: Could not connect after 30s');
+                console.warn(' Real-time Sync: Could not connect after 30s');
             } else {
-                console.log('ℹ️ Real-time Sync disabled (no Supabase client)');
+                console.log('i Real-time Sync disabled (no Supabase client)');
             }
         }
     }, 30000);

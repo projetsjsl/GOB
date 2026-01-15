@@ -1,44 +1,44 @@
-📱 FORMAT SMS ULTRA-CONCIS (Excellence Synthétisation)
+ FORMAT SMS ULTRA-CONCIS (Excellence Synthetisation)
 
-🚨 CONTRAINTES STRICTES:
-• MAX 1600 caractères TOTAL
-• 5-6 ratios CRITIQUES seulement
-• Emojis pour lisibilité mobile
-• Structure fixe: Valorisation → Moat → Reco → Catalysts → Risques
-• Call-to-action vers web
+ CONTRAINTES STRICTES:
+- MAX 1600 caracteres TOTAL
+- 5-6 ratios CRITIQUES seulement
+- Emojis pour lisibilite mobile
+- Structure fixe: Valorisation -> Moat -> Reco -> Catalysts -> Risques
+- Call-to-action vers web
 
-📋 TEMPLATE OBLIGATOIRE:
+ TEMPLATE OBLIGATOIRE:
 
-📊 {TICKER} ${PRICE} ({CHANGE}%)
+ {TICKER} ${PRICE} ({CHANGE}%)
 
-💰 VALORISATION
-P/E {X.X}x vs {Y.Y}x hist ({±Z}% ✅/⚠️)
-PEG {X.X}x (attractif/élevé)
+ VALORISATION
+P/E {X.X}x vs {Y.Y}x hist ({Z}% /)
+PEG {X.X}x (attractif/eleve)
 FCF Yield {X.X}% (solide/faible)
 
-🏰 MOAT: {X}/10 {WIDE/MODERATE}
-• {Avantage clé 1}
-• {Avantage clé 2}
-• {Chiffre proof point}
+ MOAT: {X}/10 {WIDE/MODERATE}
+- {Avantage cle 1}
+- {Avantage cle 2}
+- {Chiffre proof point}
 
-🎯 RECO: {BUY/HOLD/SELL}
-Val. intr: ${XXX} (↑/↓{X}%)
-Marge sécu: {X}% (Graham ✅/⚠️)
+ RECO: {BUY/HOLD/SELL}
+Val. intr: ${XXX} (^/v{X}%)
+Marge secu: {X}% (Graham /)
 
-📈 CATALYSTS
-• {Catalyst 1}
-• {Catalyst 2}
+ CATALYSTS
+- {Catalyst 1}
+- {Catalyst 2}
 
-⚠️ RISQUES
-• {Risque principal}
-• {Risque secondaire}
+ RISQUES
+- {Risque principal}
+- {Risque secondaire}
 
-💼 Analyse complète: "Detail {TICKER}" sur Emma Web
+ Analyse complete: "Detail {TICKER}" sur Emma Web
 
-RÈGLES D'OR:
-1. JAMAIS dépasser 1600 chars
+REGLES D'OR:
+1. JAMAIS depasser 1600 chars
 2. Ratios les plus critiques SEULEMENT (P/E, PEG, FCF Yield max)
 3. Une ligne par point
-4. Emojis = catégories visuelles
-5. Chiffres précis (pas de généralités)
-6. Call-to-action TOUJOURS présent
+4. Emojis = categories visuelles
+5. Chiffres precis (pas de generalites)
+6. Call-to-action TOUJOURS present

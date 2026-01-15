@@ -1,8 +1,8 @@
 /**
  * GOB Design System - Button Component
  * 
- * Composant bouton réutilisable utilisant les tokens du design system
- * Remplace les styles inline et assure la cohérence visuelle
+ * Composant bouton reutilisable utilisant les tokens du design system
+ * Remplace les styles inline et assure la coherence visuelle
  */
 
 import React from 'react';

@@ -14,7 +14,7 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
     const forexHeatmapRef = useRef<HTMLDivElement>(null);
     const economicCalendarRef = useRef<HTMLDivElement>(null);
 
-    // Refs pour suivre l'état d'initialisation des widgets
+    // Refs pour suivre l'etat d'initialisation des widgets
     const marketOverviewInitialized = useRef(false);
     const heatmapInitialized = useRef(false);
     const screenerInitialized = useRef(false);
@@ -227,14 +227,14 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
             <div className="flex justify-between items-center">
                 <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>📊 Marchés & Économie</h2>
+                }`}> Marches & Economie</h2>
             </div>
 
             {/* ===== WIDGETS TRADING VIEW VISUELS ===== */}
             <div className="grid grid-cols-1 gap-6">
                 
                 {/* Market Overview Widget */}
-                <ExpandableComponent title="Vue d'ensemble des Marchés" icon="📊" isDarkMode={isDarkMode}>
+                <ExpandableComponent title="Vue d'ensemble des Marches" icon="" isDarkMode={isDarkMode}>
                     <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
                         isDarkMode
                             ? 'bg-gray-800/50 border-blue-500/30'
@@ -244,12 +244,12 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                             <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                📊 Vue d'ensemble des Marchés (Temps Réel)
+                                 Vue d'ensemble des Marches (Temps Reel)
                             </h3>
                             <p className={`text-sm transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
                             }`}>
-                                Indices majeurs, Forex, Crypto - Données en direct
+                                Indices majeurs, Forex, Crypto - Donnees en direct
                             </p>
                         </div>
                         <div ref={marketOverviewRef} style={{height: '400px'}}></div>
@@ -257,7 +257,7 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 </ExpandableComponent>
 
                 {/* Stock Heatmap Widget */}
-                <ExpandableComponent title="Heatmap Boursière" icon="🔥" isDarkMode={isDarkMode}>
+                <ExpandableComponent title="Heatmap Boursiere" icon="" isDarkMode={isDarkMode}>
                     <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
                         isDarkMode
                             ? 'bg-gray-800/50 border-green-500/30'
@@ -267,7 +267,7 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                             <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                🔥 Heatmap Boursière
+                                 Heatmap Boursiere
                             </h3>
                             <p className={`text-sm transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -280,7 +280,7 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 </ExpandableComponent>
 
                 {/* Forex Heatmap Widget */}
-                <ExpandableComponent title="Forex Heat Map" icon="💱" isDarkMode={isDarkMode}>
+                <ExpandableComponent title="Forex Heat Map" icon="" isDarkMode={isDarkMode}>
                     <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
                         isDarkMode
                             ? 'bg-gray-800/50 border-yellow-500/30'
@@ -290,7 +290,7 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                             <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                💱 Forex Heat Map
+                                 Forex Heat Map
                             </h3>
                             <p className={`text-sm transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -303,7 +303,7 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 </ExpandableComponent>
 
                 {/* Economic Calendar Widget */}
-                <ExpandableComponent title="Calendrier Économique" icon="📅" isDarkMode={isDarkMode}>
+                <ExpandableComponent title="Calendrier Economique" icon="" isDarkMode={isDarkMode}>
                     <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
                         isDarkMode
                             ? 'bg-gray-800/50 border-orange-500/30'
@@ -313,12 +313,12 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                             <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                📅 Calendrier Économique
+                                 Calendrier Economique
                             </h3>
                             <p className={`text-sm transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
                             }`}>
-                                Événements économiques à venir
+                                Evenements economiques a venir
                             </p>
                         </div>
                         <div ref={economicCalendarRef} style={{height: '500px'}}></div>
@@ -326,7 +326,7 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                 </ExpandableComponent>
 
                 {/* Screener Widget - Top Gainers/Losers */}
-                <ExpandableComponent title="Screener - Top Gainers & Losers" icon="🚀" isDarkMode={isDarkMode}>
+                <ExpandableComponent title="Screener - Top Gainers & Losers" icon="" isDarkMode={isDarkMode}>
                     <div className={`rounded-xl overflow-hidden border-2 transition-colors duration-300 ${
                         isDarkMode
                             ? 'bg-gray-800/50 border-purple-500/30'
@@ -336,7 +336,7 @@ export const MarketsEconomyTab: React.FC<TabProps> = (props) => {
                             <h3 className={`text-lg font-bold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                🚀 Screener - Top Gainers & Losers
+                                 Screener - Top Gainers & Losers
                             </h3>
                             <p className={`text-sm transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'

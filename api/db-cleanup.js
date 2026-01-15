@@ -51,7 +51,7 @@ export default async function handler(req, res) {
                 return res.status(405).json({ error: 'Method not allowed' });
         }
     } catch (error) {
-        console.error('❌ DB Cleanup API error:', error);
+        console.error(' DB Cleanup API error:', error);
         return res.status(500).json({ error: 'Internal server error', message: error.message });
     }
 }
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
  * Analyze database for cleanup candidates
  */
 async function analyzeDatabase(req, res, supabase) {
-    console.log('📊 Analyzing database for cleanup...');
+    console.log(' Analyzing database for cleanup...');
 
     // Get all snapshots
     const { data: allSnapshots, error: allError } = await supabase
@@ -124,7 +124,7 @@ async function analyzeDatabase(req, res, supabase) {
         }
     }
 
-    console.log(`📊 Analysis complete:
+    console.log(` Analysis complete:
   - Total snapshots: ${analysis.total}
   - Empty annual_data: ${analysis.skeletonEmpty}
   - No valid EPS: ${analysis.skeletonNoEPS}
@@ -150,7 +150,7 @@ async function cleanupSkeleton(req, res, supabase) {
     const isDryRun = dry_run === 'true';
     const keepCurrent = keep_current === 'true';
 
-    console.log(`🧹 Cleaning skeleton snapshots (dry_run=${isDryRun}, keep_current=${keepCurrent})...`);
+    console.log(` Cleaning skeleton snapshots (dry_run=${isDryRun}, keep_current=${keepCurrent})...`);
 
     // Get all snapshots
     const { data: allSnapshots, error: fetchError } = await supabase
@@ -187,7 +187,7 @@ async function cleanupSkeleton(req, res, supabase) {
         }
     }
 
-    console.log(`🧹 Found ${toDelete.length} skeleton snapshots to delete`);
+    console.log(` Found ${toDelete.length} skeleton snapshots to delete`);
 
     if (isDryRun) {
         return res.status(200).json({
@@ -219,7 +219,7 @@ async function cleanupSkeleton(req, res, supabase) {
         }
     }
 
-    console.log(`✅ Deleted ${deleted} skeleton snapshots`);
+    console.log(` Deleted ${deleted} skeleton snapshots`);
 
     return res.status(200).json({
         success: true,
@@ -235,7 +235,7 @@ async function cleanupDuplicates(req, res, supabase) {
     const { dry_run = 'true' } = req.query;
     const isDryRun = dry_run === 'true';
 
-    console.log(`🧹 Cleaning duplicate snapshots (dry_run=${isDryRun})...`);
+    console.log(` Cleaning duplicate snapshots (dry_run=${isDryRun})...`);
 
     // Get all snapshots grouped by ticker
     const { data: allSnapshots, error: fetchError } = await supabase
@@ -270,7 +270,7 @@ async function cleanupDuplicates(req, res, supabase) {
         }
     }
 
-    console.log(`🧹 Found ${toDelete.length} duplicate snapshots to delete`);
+    console.log(` Found ${toDelete.length} duplicate snapshots to delete`);
 
     if (isDryRun) {
         return res.status(200).json({
@@ -302,7 +302,7 @@ async function cleanupDuplicates(req, res, supabase) {
         }
     }
 
-    console.log(`✅ Deleted ${deleted} duplicate snapshots`);
+    console.log(` Deleted ${deleted} duplicate snapshots`);
 
     return res.status(200).json({
         success: true,

@@ -20,14 +20,14 @@ export default async function handler(req, res) {
     const from = new Date().toISOString().split('T')[0];
     const to = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    // Cascade fallback: FMP → Yahoo Finance → Static fallback
+    // Cascade fallback: FMP -> Yahoo Finance -> Static fallback
     let events = null;
     let source = 'fallback';
     let errors = [];
 
     // Try 1: FMP (Primary)
     try {
-        console.log('🔄 [1/2] Trying FMP Earnings...');
+        console.log(' [1/2] Trying FMP Earnings...');
         const FMP_API_KEY = process.env.FMP_API_KEY;
 
         if (FMP_API_KEY) {
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
                 if (Array.isArray(fmpData) && fmpData.length > 0) {
                     events = parseFMPEarnings(fmpData);
                     source = 'fmp';
-                    console.log(`✅ FMP: ${events.length} days of earnings`);
+                    console.log(` FMP: ${events.length} days of earnings`);
                 }
             } else {
                 throw new Error(`HTTP ${response.status}`);
@@ -51,28 +51,28 @@ export default async function handler(req, res) {
         }
     } catch (error) {
         errors.push(`FMP: ${error.message}`);
-        console.log(`⚠️ FMP failed: ${error.message}`);
+        console.log(` FMP failed: ${error.message}`);
     }
 
     // Try 2: Yahoo Finance (Fallback) - Using marketdata API
     if (!events) {
         try {
-            console.log('🔄 [2/2] Trying Yahoo Finance...');
+            console.log(' [2/2] Trying Yahoo Finance...');
             // Yahoo Finance doesn't have a direct earnings calendar API
             // We'll use a simplified approach with common tickers
             const commonTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA'];
             events = getFallbackEarningsData(); // Use static data as Yahoo doesn't support this
             source = 'yahoo_limited';
-            console.log(`✅ Yahoo Finance: Using limited fallback data`);
+            console.log(` Yahoo Finance: Using limited fallback data`);
         } catch (error) {
             errors.push(`Yahoo: ${error.message}`);
-            console.log(`⚠️ Yahoo failed: ${error.message}`);
+            console.log(` Yahoo failed: ${error.message}`);
         }
     }
 
     // Final fallback: Static data
     if (!events) {
-        console.log('📦 Using static fallback data');
+        console.log(' Using static fallback data');
         events = getFallbackEarningsData();
         source = 'static_fallback';
     }
@@ -100,8 +100,8 @@ function parseFMPEarnings(fmpData) {
             day: 'numeric'
         });
 
-        // Déterminer l'impact basé sur la market cap
-        let impact = 2; // Medium par défaut
+        // Determiner l'impact base sur la market cap
+        let impact = 2; // Medium par defaut
         const marketCap = item.marketCap || 0;
         if (marketCap > 500000000000) { // > $500B
             impact = 3; // High
@@ -109,7 +109,7 @@ function parseFMPEarnings(fmpData) {
             impact = 1; // Low
         }
 
-        // Déterminer le timing
+        // Determiner le timing
         const time = item.time === 'bmo' ? 'Before Market' :
                      item.time === 'amc' ? 'After Market' :
                      item.time || 'TBD';
@@ -144,7 +144,7 @@ function parseFMPEarnings(fmpData) {
 
 function getFallbackEarningsData() {
     const year = new Date().getFullYear();
-    // Team tickers avec dates d'earnings estimées
+    // Team tickers avec dates d'earnings estimees
     const teamEarnings = [
         { symbol: 'GOOGL', date: `Tue, Oct 29, ${year}`, time: 'After Market', eps: '$1.55', prevEps: '$1.44', impact: 3 },
         { symbol: 'JPM', date: `Fri, Oct 11, ${year}`, time: 'Before Market', eps: '$4.10', prevEps: '$4.33', impact: 3 },
@@ -166,9 +166,9 @@ function getFallbackEarningsData() {
         { symbol: 'MFC', date: `Wed, Nov 6, ${year}`, time: 'After Market', eps: 'C$0.85', prevEps: 'C$0.78', impact: 1 },
         { symbol: 'TRP', date: `Fri, Nov 1, ${year}`, time: 'Before Market', eps: 'C$0.78', prevEps: 'C$0.71', impact: 1 },
         { symbol: 'NTR', date: `Fri, Nov 1, ${year}`, time: 'Before Market', eps: '$0.55', prevEps: '$0.39', impact: 1 },
-        { symbol: 'DEO', date: `Thu, Jan 30, ${year + 1}`, time: 'Before Market', eps: '£0.85', prevEps: '£0.82', impact: 1 },
-        { symbol: 'UL', date: `Thu, Feb 13, ${year + 1}`, time: 'Before Market', eps: '€0.68', prevEps: '€0.65', impact: 1 },
-        { symbol: 'LVMHF', date: `Tue, Jan 28, ${year + 1}`, time: 'Before Market', eps: '€12.50', prevEps: '€14.03', impact: 2 },
+        { symbol: 'DEO', date: `Thu, Jan 30, ${year + 1}`, time: 'Before Market', eps: 'GBP0.85', prevEps: 'GBP0.82', impact: 1 },
+        { symbol: 'UL', date: `Thu, Feb 13, ${year + 1}`, time: 'Before Market', eps: 'EUR0.68', prevEps: 'EUR0.65', impact: 1 },
+        { symbol: 'LVMHF', date: `Tue, Jan 28, ${year + 1}`, time: 'Before Market', eps: 'EUR12.50', prevEps: 'EUR14.03', impact: 2 },
         { symbol: 'NSRGY', date: `Thu, Feb 13, ${year + 1}`, time: 'Before Market', eps: 'CHF 1.20', prevEps: 'CHF 1.15', impact: 1 },
         { symbol: 'MG', date: `Mon, Nov 25, ${year}`, time: 'Before Market', eps: 'C$0.45', prevEps: 'C$0.42', impact: 1 }
     ];

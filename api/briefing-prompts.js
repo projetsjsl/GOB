@@ -1,19 +1,19 @@
 /**
- * API Briefing Prompts - Gestion centralisée des prompts de briefing
+ * API Briefing Prompts - Gestion centralisee des prompts de briefing
  * 
- * Permet de récupérer et modifier les prompts depuis config/briefing-prompts.json
- * Utilisé par n8n et l'interface Emma En Direct
+ * Permet de recuperer et modifier les prompts depuis config/briefing-prompts.json
+ * Utilise par n8n et l'interface Emma En Direct
  * 
  * GET /api/briefing-prompts
- *   - Récupère tous les prompts
- *   - Query: ?type=morning|midday|evening (optionnel, pour un type spécifique)
+ *   - Recupere tous les prompts
+ *   - Query: ?type=morning|midday|evening (optionnel, pour un type specifique)
  * 
  * PUT /api/briefing-prompts
- *   - Modifie un prompt spécifique
+ *   - Modifie un prompt specifique
  *   - Body: { type: 'morning'|'midday'|'evening', prompt: '...', ... }
  * 
  * POST /api/briefing-prompts
- *   - Même fonction que PUT (pour compatibilité)
+ *   - Meme fonction que PUT (pour compatibilite)
  */
 
 import { readFileSync, writeFileSync } from 'fs';
@@ -32,7 +32,7 @@ function loadBriefingConfig() {
     const configContent = readFileSync(configPath, 'utf-8');
     return JSON.parse(configContent);
   } catch (error) {
-    console.error('❌ Erreur chargement config briefings:', error);
+    console.error(' Erreur chargement config briefings:', error);
     throw new Error('Failed to load briefing configuration');
   }
 }
@@ -46,7 +46,7 @@ function saveBriefingConfig(config) {
     writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf-8');
     return true;
   } catch (error) {
-    console.error('❌ Erreur sauvegarde config briefings:', error);
+    console.error(' Erreur sauvegarde config briefings:', error);
     throw new Error('Failed to save briefing configuration');
   }
 }
@@ -65,21 +65,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    // GET - Récupérer les prompts
+    // GET - Recuperer les prompts
     if (req.method === 'GET') {
       const config = loadBriefingConfig();
       const type = req.query.type;
 
       if (type) {
-        // ═══════════════════════════════════════════════════════════
-        // CONVERSION FRANÇAIS → ANGLAIS (pour compatibilité)
-        // ═══════════════════════════════════════════════════════════
+        // 
+        // CONVERSION FRANCAIS -> ANGLAIS (pour compatibilite)
+        // 
         const typeMapping = {
-          // Français → Anglais
+          // Francais -> Anglais
           'matin': 'morning',
           'midi': 'midday',
           'soir': 'evening',
-          // Anglais (compatibilité)
+          // Anglais (compatibilite)
           'morning': 'morning',
           'midday': 'midday',
           'evening': 'evening',
@@ -114,7 +114,7 @@ export default async function handler(req, res) {
         return res.status(200).json({
           success: true,
           type: normalizedType,
-          original_type: type, // Conserver le type original pour référence
+          original_type: type, // Conserver le type original pour reference
           config: promptConfig
         });
       }
@@ -158,7 +158,7 @@ export default async function handler(req, res) {
         });
       }
 
-      // Mettre à jour les champs fournis
+      // Mettre a jour les champs fournis
       if (prompt !== undefined) {
         promptConfig.prompt = prompt;
       }
@@ -181,24 +181,24 @@ export default async function handler(req, res) {
       // Sauvegarder
       saveBriefingConfig(config);
 
-      console.log(`✅ Prompt ${type} mis à jour`);
+      console.log(` Prompt ${type} mis a jour`);
 
       return res.status(200).json({
         success: true,
         type: type,
         config: promptConfig,
-        message: `Prompt ${type} mis à jour avec succès`
+        message: `Prompt ${type} mis a jour avec succes`
       });
     }
 
-    // Méthode non supportée
+    // Methode non supportee
     return res.status(405).json({
       success: false,
       error: 'Method not allowed. Use GET, PUT, or POST'
     });
 
   } catch (error) {
-    console.error('❌ Erreur API briefing-prompts:', error);
+    console.error(' Erreur API briefing-prompts:', error);
     return res.status(500).json({
       success: false,
       error: error.message,

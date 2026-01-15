@@ -1,15 +1,15 @@
 // ============================================================================
-// API Endpoint: AI Services Unifié - Emma En Direct
+// API Endpoint: AI Services Unifie - Emma En Direct
 // Regroupe Perplexity, OpenAI et Resend en un seul endpoint
 // ============================================================================
 //
-// 🛡️  GUARDRAILS DE PROTECTION - CONFIGURATION CRITIQUE 🛡️
+//   GUARDRAILS DE PROTECTION - CONFIGURATION CRITIQUE 
 // ============================================================================
-// ⚠️  ATTENTION : Ce fichier contient la configuration validée et fonctionnelle
-// ⚠️  Toute modification peut casser le système de production
-// ⚠️  Toujours tester en local avant de déployer
+//   ATTENTION : Ce fichier contient la configuration validee et fonctionnelle
+//   Toute modification peut casser le systeme de production
+//   Toujours tester en local avant de deployer
 //
-// ✅ CONFIGURATION VALIDÉE (Testée le 15/10/2025) :
+//  CONFIGURATION VALIDEE (Testee le 15/10/2025) :
 // - OpenAI: fetch() direct (PAS le SDK) + gpt-4o + 2000 tokens + temp 0.7
 import { configManager } from '../lib/config-manager.js';
 import { createSupabaseClient } from '../lib/supabase-config.js';
@@ -18,30 +18,30 @@ import { getAllModels, getModelById } from '../lib/llm-registry.js';
 // Initialize config manager (non-blocking)
 configManager.initialize().catch(console.error);
 //
-// 🔒 VARIABLES D'ENVIRONNEMENT REQUISES :
-// - OPENAI_API_KEY (sk-...) : ✅ Configurée
-// - PERPLEXITY_API_KEY (pplx-...) : ✅ Configurée  
-// - ANTHROPIC_API_KEY (sk-ant-...) : ✅ Configurée
-// - TWELVE_DATA_API_KEY (optionnel) : Fallback actualités
+//  VARIABLES D'ENVIRONNEMENT REQUISES :
+// - OPENAI_API_KEY (sk-...) :  Configuree
+// - PERPLEXITY_API_KEY (pplx-...) :  Configuree  
+// - ANTHROPIC_API_KEY (sk-ant-...) :  Configuree
+// - TWELVE_DATA_API_KEY (optionnel) : Fallback actualites
 //
-// ❌ INTERDICTIONS ABSOLUES :
-// - Modifier les modèles sans test (gpt-4o, sonar-pro, claude-3-sonnet)
-// - Ajouter Marketaux (supprimé intentionnellement)
-// - Utiliser le SDK OpenAI (causait des erreurs de déploiement)
+//  INTERDICTIONS ABSOLUES :
+// - Modifier les modeles sans test (gpt-4o, sonar-pro, claude-3-sonnet)
+// - Ajouter Marketaux (supprime intentionnellement)
+// - Utiliser le SDK OpenAI (causait des erreurs de deploiement)
 // - Modifier les timeouts sans validation
-// - Changer les paramètres de température sans test
+// - Changer les parametres de temperature sans test
 //
-// 🔧 DÉPANNAGE RAPIDE :
-// - Demo-mode = clé API manquante dans Vercel
-// - Timeout = réduire max_tokens ou augmenter timeout
-// - 401 = clé API invalide/expirée
-// - 429 = quota dépassé, attendre ou upgrader
+//  DEPANNAGE RAPIDE :
+// - Demo-mode = cle API manquante dans Vercel
+// - Timeout = reduire max_tokens ou augmenter timeout
+// - 401 = cle API invalide/expiree
+// - 429 = quota depasse, attendre ou upgrader
 // ============================================================================
 
 // ============================================================================
 // MONITORING ET STATISTIQUES
 // ============================================================================
-// 📊 Statistiques d'utilisation des modèles
+//  Statistiques d'utilisation des modeles
 const modelStats = {
   totalRequests: 0,
   successfulRequests: 0,
@@ -83,18 +83,18 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST' && req.method !== 'GET' && req.method !== 'DELETE') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Methode non autorisee' });
   }
 
   try {
-    // Pour les requêtes GET et DELETE, utiliser les query parameters
+    // Pour les requetes GET et DELETE, utiliser les query parameters
     if (req.method === 'GET' || req.method === 'DELETE') {
       const { service, ...params } = req.query;
       
       if (service === 'supabase-briefings') {
         return await handleSupabaseBriefings(req, res, params);
       } else if (service === 'monitoring') {
-        // 📊 Endpoint de monitoring
+        //  Endpoint de monitoring
         const uptime = Date.now() - modelStats.lastReset;
         const successRate = modelStats.totalRequests > 0 ? 
           (modelStats.successfulRequests / modelStats.totalRequests * 100).toFixed(2) : 0;
@@ -112,10 +112,10 @@ export default async function handler(req, res) {
           }
         });
       } else if (!service) {
-        // Test de santé simple pour le diagnostic
+        // Test de sante simple pour le diagnostic
         return res.status(200).json({ 
           status: 'healthy',
-          message: 'AI Services endpoint opérationnel',
+          message: 'AI Services endpoint operationnel',
           timestamp: new Date().toISOString(),
           debug: {
             openai_key: process.env.OPENAI_API_KEY ? `sk-...${process.env.OPENAI_API_KEY.slice(-4)}` : 'NOT_FOUND',
@@ -129,11 +129,11 @@ export default async function handler(req, res) {
       }
     }
 
-    // Pour les requêtes POST, utiliser le body
+    // Pour les requetes POST, utiliser le body
     const { service, ...params } = req.body;
 
     if (!service) {
-      return res.status(400).json({ error: 'Paramètre "service" requis' });
+      return res.status(400).json({ error: 'Parametre "service" requis' });
     }
 
     switch (service) {
@@ -177,30 +177,30 @@ export default async function handler(req, res) {
 // ============================================================================
 // PERPLEXITY SEARCH - CONFIGURATION CRITIQUE
 // ============================================================================
-// 🎯 EMMA EN DIRECT 100% PERPLEXITY - SYSTÈME ULTRA-SIMPLIFIÉ
-// ✅ Architecture : 1 requête Perplexity → Prompt complet → Analyse directe → HTML
-// ✅ Plus de Yahoo Finance, plus de variables multiples, plus de complexité
-// ✅ 4 modèles de backup + cache intelligent + monitoring en temps réel
-// ✅ Prompt ultra-détaillé (2000+ mots) = contenu professionnel complet
+//  EMMA EN DIRECT 100% PERPLEXITY - SYSTEME ULTRA-SIMPLIFIE
+//  Architecture : 1 requete Perplexity -> Prompt complet -> Analyse directe -> HTML
+//  Plus de Yahoo Finance, plus de variables multiples, plus de complexite
+//  4 modeles de backup + cache intelligent + monitoring en temps reel
+//  Prompt ultra-detaille (2000+ mots) = contenu professionnel complet
 // ============================================================================
-// 🚀 CACHE SYSTEM : Réduire les appels API pour économiser le quota
+//  CACHE SYSTEM : Reduire les appels API pour economiser le quota
 const cache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 
-// 🎯 MODÈLES PERPLEXITY - HIÉRARCHIE DE BACKUP (DÉFINITION INITIALE)
-// Ces valeurs seront écrasées par configManager si disponible
+//  MODELES PERPLEXITY - HIERARCHIE DE BACKUP (DEFINITION INITIALE)
+// Ces valeurs seront ecrasees par configManager si disponible
 // PERPLEXITY_MODELS removed; model list now fetched from llm-registry
 
-// 📊 CONFIGURATION PAR TYPE D'USAGE
+//  CONFIGURATION PAR TYPE D'USAGE
 // MODEL_CONFIG removed; configurations now sourced from llm-registry
 // ============================================================================
-// 🛡️  GUARDRAIL : Cette fonction utilise la configuration validée
-// ⚠️  NE PAS MODIFIER les paramètres sans test complet
-// ✅ CONFIGURATION TESTÉE : sonar-reasoning-pro + 2000 tokens + temp 0.1 + recency filter
-// ❌ INTERDIT : Ajouter Marketaux (supprimé intentionnellement)
+//   GUARDRAIL : Cette fonction utilise la configuration validee
+//   NE PAS MODIFIER les parametres sans test complet
+//  CONFIGURATION TESTEE : sonar-reasoning-pro + 2000 tokens + temp 0.1 + recency filter
+//  INTERDIT : Ajouter Marketaux (supprime intentionnellement)
 // ============================================================================
-// 🔄 FONCTION DE BACKUP INTELLIGENT
+//  FONCTION DE BACKUP INTELLIGENT
 async function tryPerplexityWithBackup(perplexityKey, prompt, section, recency = 'day') {
   // Fetch model configurations from llm-registry
   const allModels = await getAllModels();
@@ -209,17 +209,17 @@ async function tryPerplexityWithBackup(perplexityKey, prompt, section, recency =
   const models = enabledModels.map(m => m.model_id);
   const maxTokensList = enabledModels.map(m => m.max_tokens);
 
-    // Récupérer la config dynamique pour Perplexity (Rôle Researcher par défaut pour analysis)
+    // Recuperer la config dynamique pour Perplexity (Role Researcher par defaut pour analysis)
     let dynamicConfig = null;
     try {
         const role = section === 'expert_analysis' ? 'critic' : 'researcher';
         const roleConfig = await configManager.get('ai_roles', role);
         if (roleConfig) {
-            console.log(`📡 Config dynamique chargée pour ${role}:`, roleConfig);
+            console.log(` Config dynamique chargee pour ${role}:`, roleConfig);
             dynamicConfig = roleConfig;
         }
     } catch (e) {
-        console.warn('⚠️ Impossible de charger la config dynamique, usage des défauts');
+        console.warn(' Impossible de charger la config dynamique, usage des defauts');
     }
 
     for (let i = 0; i < models.length; i++) {
@@ -257,54 +257,54 @@ async function tryPerplexityWithBackup(perplexityKey, prompt, section, recency =
           totalAttempts: models.length
         };
       } else if (response.status === 401) {
-        // API key invalide ou manquante - ne pas réessayer
-        console.error(`❌ Erreur 401: Clé API Perplexity invalide ou manquante`);
+        // API key invalide ou manquante - ne pas reessayer
+        console.error(` Erreur 401: Cle API Perplexity invalide ou manquante`);
         throw new Error('PERPLEXITY_API_KEY_INVALID');
       } else if (response.status === 429) {
-        console.log(`⚠️ Quota dépassé pour ${model}, tentative avec le modèle suivant...`);
-        continue; // Essayer le modèle suivant
+        console.log(` Quota depasse pour ${model}, tentative avec le modele suivant...`);
+        continue; // Essayer le modele suivant
       } else {
         const errorText = await response.text();
-        console.error(`❌ Erreur ${response.status} avec ${model}: ${errorText}`);
+        console.error(` Erreur ${response.status} avec ${model}: ${errorText}`);
 
-        // Pour les autres erreurs, essayer le modèle suivant
+        // Pour les autres erreurs, essayer le modele suivant
         if (i < models.length - 1) {
-          console.log(`Tentative avec le modèle de secours...`);
+          console.log(`Tentative avec le modele de secours...`);
           continue;
         }
         throw new Error(`Erreur ${response.status} avec ${model}: ${errorText}`);
       }
     } catch (error) {
-      // Si c'est une erreur d'authentification, ne pas réessayer
+      // Si c'est une erreur d'authentification, ne pas reessayer
       if (error.message === 'PERPLEXITY_API_KEY_INVALID') {
         throw error;
       }
 
-      console.log(`⚠️ Erreur avec ${model}: ${error.message}`);
+      console.log(` Erreur avec ${model}: ${error.message}`);
       if (i === models.length - 1) {
-        throw error; // Dernière tentative échouée
+        throw error; // Derniere tentative echouee
       }
-      continue; // Essayer le modèle suivant
+      continue; // Essayer le modele suivant
     }
   }
 
-  throw new Error('Tous les modèles Perplexity ont échoué');
+  throw new Error('Tous les modeles Perplexity ont echoue');
 }
 
 async function handlePerplexity(req, res, { prompt, query, section, recency = 'day', model = 'sonar-reasoning-pro', max_tokens = 2000, temperature = 0.1 }) {
   try {
     const searchQuery = query || prompt;
     if (!searchQuery) {
-      return res.status(400).json({ error: 'Le prompt ou la requête est requis' });
+      return res.status(400).json({ error: 'Le prompt ou la requete est requis' });
     }
 
-    // Vérifier les clés API disponibles pour les actualités
+    // Verifier les cles API disponibles pour les actualites
     const perplexityKey = process.env.PERPLEXITY_API_KEY || process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY;
     const twelveDataKey = process.env.TWELVE_DATA_API_KEY;
     
     // Debug: Log les variables d'environnement disponibles (sans exposer les valeurs)
     if (!perplexityKey) {
-      console.error('❌ PERPLEXITY_API_KEY missing. Available env vars:', {
+      console.error(' PERPLEXITY_API_KEY missing. Available env vars:', {
         hasPerplexityKey: !!process.env.PERPLEXITY_API_KEY,
         hasNextPublicPerplexityKey: !!process.env.NEXT_PUBLIC_PERPLEXITY_API_KEY,
         envKeys: Object.keys(process.env).filter(k => k.includes('PERPLEXITY') || k.includes('API'))
@@ -320,12 +320,12 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
 
     let response;
 
-    // Vérifier le cache pour économiser le quota
+    // Verifier le cache pour economiser le quota
     const cacheKey = `${searchQuery}-${section}`;
     const cached = cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
       console.log(`Cache hit pour ${cacheKey}`);
-      // Mettre à jour les statistiques (cache hit)
+      // Mettre a jour les statistiques (cache hit)
       updateModelStats(cached.model, true, true);
       
       return res.status(200).json({
@@ -346,14 +346,14 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
     // Construire le prompt selon la section
     const enhancedPrompt = buildSectionPrompt(searchQuery, section);
 
-    // Utiliser le système de backup intelligent
+    // Utiliser le systeme de backup intelligent
     const result = await tryPerplexityWithBackup(perplexityKey, enhancedPrompt, section, recency);
     
     const content = result.data.choices[0]?.message?.content || '';
     const tokens = result.data.usage?.total_tokens || 0;
     const sources = extractSources(content);
 
-    // Mettre en cache la réponse
+    // Mettre en cache la reponse
     cache.set(cacheKey, {
       content,
       model: result.model,
@@ -367,7 +367,7 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
       }
     });
 
-    // Mettre à jour les statistiques
+    // Mettre a jour les statistiques
     updateModelStats(result.model, true, false);
     
     return res.status(200).json({
@@ -379,7 +379,7 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
       section,
       query: searchQuery,
       fallback: result.attempt > 1,
-      quota_warning: result.attempt > 1 ? `Backup utilisé: ${result.model} (tentative ${result.attempt}/${result.totalAttempts})` : null,
+      quota_warning: result.attempt > 1 ? `Backup utilise: ${result.model} (tentative ${result.attempt}/${result.totalAttempts})` : null,
       cached: false,
       backup_info: {
         attempt: result.attempt,
@@ -392,15 +392,15 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
   } catch (error) {
     console.error('Erreur Perplexity:', error);
 
-    // Gérer les erreurs d'authentification de manière spécifique
+    // Gerer les erreurs d'authentification de maniere specifique
     if (error.message === 'PERPLEXITY_API_KEY_INVALID') {
       return res.status(401).json({
         success: false,
-        error: 'Clé API Perplexity invalide ou expirée.',
-        details: 'Vérifiez que PERPLEXITY_API_KEY est correctement configurée dans les variables d\'environnement Vercel.',
+        error: 'Cle API Perplexity invalide ou expiree.',
+        details: 'Verifiez que PERPLEXITY_API_KEY est correctement configuree dans les variables d\'environnement Vercel.',
         model: 'error',
         fallback: false,
-        fix: 'Configurez une clé API Perplexity valide dans Vercel: https://vercel.com/dashboard/settings/environment-variables'
+        fix: 'Configurez une cle API Perplexity valide dans Vercel: https://vercel.com/dashboard/settings/environment-variables'
       });
     }
 
@@ -408,7 +408,7 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
     return res.status(500).json({
       success: false,
       error: `Erreur API Perplexity: ${error.message}`,
-      details: 'Une erreur s\'est produite lors de l\'appel à l\'API Perplexity.',
+      details: 'Une erreur s\'est produite lors de l\'appel a l\'API Perplexity.',
       model: 'error',
       fallback: false
     });
@@ -418,9 +418,9 @@ async function handlePerplexity(req, res, { prompt, query, section, recency = 'd
 // ============================================================================
 // OPENAI ANALYSIS - CONFIGURATION CRITIQUE
 // ============================================================================
-// 🛡️  GUARDRAIL : Cette fonction utilise la configuration validée
-// ⚠️  NE PAS MODIFIER les paramètres sans test complet
-// ✅ CONFIGURATION TESTÉE : gpt-4o + fetch() direct + 2000 tokens + temp 0.7
+//   GUARDRAIL : Cette fonction utilise la configuration validee
+//   NE PAS MODIFIER les parametres sans test complet
+//  CONFIGURATION TESTEE : gpt-4o + fetch() direct + 2000 tokens + temp 0.7
 // ============================================================================
 async function handleOpenAI(req, res, { prompt, marketData, news }) {
   try {
@@ -428,22 +428,22 @@ async function handleOpenAI(req, res, { prompt, marketData, news }) {
       return res.status(400).json({ error: 'Le prompt est requis' });
     }
 
-    // Vérifier les clés API disponibles (OpenAI ou Anthropic)
+    // Verifier les cles API disponibles (OpenAI ou Anthropic)
     const openaiKey = process.env.OPENAI_API_KEY;
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
     
-    // ✅ DEBUG CRITIQUE - Garder pour diagnostic
-    // Log des clés API (sans exposer les valeurs complètes)
-    console.log('🔑 Debug API Keys:', {
+    //  DEBUG CRITIQUE - Garder pour diagnostic
+    // Log des cles API (sans exposer les valeurs completes)
+    console.log(' Debug API Keys:', {
       openaiKey: openaiKey ? `sk-...${openaiKey.slice(-4)}` : 'NOT_FOUND',
       anthropicKey: anthropicKey ? `sk-ant-...${anthropicKey.slice(-4)}` : 'NOT_FOUND'
     });
     
-    // ERREUR : Pas de clés API configurées
+    // ERREUR : Pas de cles API configurees
     if (!openaiKey && !anthropicKey) {
       return res.status(400).json({
         success: false,
-        error: 'Aucune clé API configurée. Configurez OPENAI_API_KEY ou ANTHROPIC_API_KEY dans Vercel.',
+        error: 'Aucune cle API configuree. Configurez OPENAI_API_KEY ou ANTHROPIC_API_KEY dans Vercel.',
         model: 'error',
         fallback: false
       });
@@ -452,27 +452,27 @@ async function handleOpenAI(req, res, { prompt, marketData, news }) {
     const contextualPrompt = `
 ${prompt}
 
-DONNÉES FOURNIES :
-━━━━━━━━━━━━━━━━
+DONNEES FOURNIES :
+
 ${JSON.stringify(marketData || {}, null, 2)}
 
-ACTUALITÉS RÉCENTES :
-━━━━━━━━━━━━━━━━
-${news || 'Aucune actualité disponible'}
+ACTUALITES RECENTES :
 
-Rédige maintenant le briefing selon la structure demandée.
+${news || 'Aucune actualite disponible'}
+
+Redige maintenant le briefing selon la structure demandee.
 `;
 
     let response;
     let model;
 
     if (openaiKey) {
-      // ✅ CONFIGURATION QUI FONCTIONNE - NE PAS MODIFIER
+      //  CONFIGURATION QUI FONCTIONNE - NE PAS MODIFIER
       // Utilise fetch() direct vers OpenAI API (PAS le SDK)
-      console.log('🚀 Appel OpenAI avec fetch, clé:', `sk-...${openaiKey.slice(-4)}`);
+      console.log(' Appel OpenAI avec fetch, cle:', `sk-...${openaiKey.slice(-4)}`);
       
 
-        // Récupérer la config dynamique pour OpenAI (Rôle Writer)
+        // Recuperer la config dynamique pour OpenAI (Role Writer)
         let modelId = 'gpt-4o';
         let maxTokens = 2000;
         let temperature = 0.7;
@@ -480,13 +480,13 @@ Rédige maintenant le briefing selon la structure demandée.
         try {
             const writerConfig = await configManager.get('ai_roles', 'writer');
             if (writerConfig) {
-                console.log('📡 Config Writer chargée:', writerConfig);
+                console.log(' Config Writer chargee:', writerConfig);
                 modelId = writerConfig.modelId || 'gpt-4o';
                 maxTokens = writerConfig.max_tokens || 2000;
                 temperature = writerConfig.temperature || 0.7;
             }
         } catch (e) {
-            console.warn('⚠️ Erreur charge config writer, usage défauts');
+            console.warn(' Erreur charge config writer, usage defauts');
         }
 
        response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -505,12 +505,12 @@ Rédige maintenant le briefing selon la structure demandée.
       });
       
       model = 'gpt-4o';
-      console.log('✅ Réponse OpenAI reçue, status:', response.status);
+      console.log(' Reponse OpenAI recue, status:', response.status);
       
       if (!response.ok) {
-        console.error('❌ Erreur OpenAI:', response.status, response.statusText);
+        console.error(' Erreur OpenAI:', response.status, response.statusText);
         const errorText = await response.text();
-        console.error('❌ Détails erreur:', errorText);
+        console.error(' Details erreur:', errorText);
         throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
       }
     } else if (anthropicKey) {
@@ -522,7 +522,7 @@ Rédige maintenant le briefing selon la structure demandée.
       try {
           const criticConfig = await configManager.get('ai_roles', 'critic');
           if (criticConfig) {
-               console.log('📡 Config Critic chargée:', criticConfig);
+               console.log(' Config Critic chargee:', criticConfig);
                modelId = criticConfig.modelId || 'claude-3-sonnet-20240229';
                maxTokens = criticConfig.max_tokens || 2500;
           }
@@ -572,7 +572,7 @@ Rédige maintenant le briefing selon la structure demandée.
     console.error('Erreur OpenAI:', error);
     return res.status(500).json({
       success: false,
-      error: `Erreur API OpenAI: ${error.message}. Vérifiez votre clé API OPENAI_API_KEY.`,
+      error: `Erreur API OpenAI: ${error.message}. Verifiez votre cle API OPENAI_API_KEY.`,
       model: 'error',
       fallback: false
     });
@@ -588,19 +588,19 @@ async function handleQwen(req, res, { prompt, marketData, news }) {
       return res.status(400).json({ error: 'Le prompt est requis' });
     }
 
-    // Vérifier la clé API Alibaba Cloud (DashScope)
+    // Verifier la cle API Alibaba Cloud (DashScope)
     const qwenKey = process.env.ALIBABA_API_KEY || process.env.QWEN_API_KEY;
 
-    // ✅ DEBUG CRITIQUE - Garder pour diagnostic
-    console.log('🔑 Debug Qwen API Key:', {
+    //  DEBUG CRITIQUE - Garder pour diagnostic
+    console.log(' Debug Qwen API Key:', {
       qwenKey: qwenKey ? `sk-...${qwenKey.slice(-4)}` : 'NOT_FOUND'
     });
 
-    // ERREUR : Pas de clé API configurée
+    // ERREUR : Pas de cle API configuree
     if (!qwenKey) {
       return res.status(400).json({
         success: false,
-        error: 'Aucune clé API Qwen configurée. Configurez ALIBABA_API_KEY ou QWEN_API_KEY dans Vercel.',
+        error: 'Aucune cle API Qwen configuree. Configurez ALIBABA_API_KEY ou QWEN_API_KEY dans Vercel.',
         model: 'error',
         fallback: false
       });
@@ -609,18 +609,18 @@ async function handleQwen(req, res, { prompt, marketData, news }) {
     const contextualPrompt = `
 ${prompt}
 
-DONNÉES FOURNIES :
-━━━━━━━━━━━━━━━━
-${JSON.stringify(marketData || {}, null, 2) || 'Aucune donnée de marché'}
+DONNEES FOURNIES :
 
-ACTUALITÉS RÉCENTES :
-━━━━━━━━━━━━━━━━
-${news || 'Aucune actualité disponible'}
+${JSON.stringify(marketData || {}, null, 2) || 'Aucune donnee de marche'}
 
-Rédige maintenant le briefing selon la structure demandée.
+ACTUALITES RECENTES :
+
+${news || 'Aucune actualite disponible'}
+
+Redige maintenant le briefing selon la structure demandee.
 `;
 
-    // Récupérer la config dynamique pour Qwen (Rôle Writer)
+    // Recuperer la config dynamique pour Qwen (Role Writer)
     let modelId = 'qwen-turbo';
     let maxTokens = 2000;
     let temperature = 0.7;
@@ -628,21 +628,21 @@ Rédige maintenant le briefing selon la structure demandée.
     try {
         const writerConfig = await configManager.get('ai_roles', 'writer');
         if (writerConfig) {
-            console.log('📡 Config Writer chargée:', writerConfig);
+            console.log(' Config Writer chargee:', writerConfig);
             modelId = writerConfig.modelId || 'qwen-turbo';
             maxTokens = writerConfig.max_tokens || 2000;
             temperature = writerConfig.temperature || 0.7;
         }
     } catch (e) {
-        console.warn('⚠️ Erreur charge config writer, usage défauts');
+        console.warn(' Erreur charge config writer, usage defauts');
     }
 
-    // Vérifier si le modèle sélectionné est un modèle Qwen
+    // Verifier si le modele selectionne est un modele Qwen
     const allModels = await getAllModels();
     const selectedModel = allModels.find(m => m.model_id === modelId && m.provider === 'alibaba');
 
     if (!selectedModel) {
-      console.log(`⚠️ Modèle ${modelId} non trouvé ou n'appartient pas au provider Alibaba, utilisation de qwen-turbo par défaut`);
+      console.log(` Modele ${modelId} non trouve ou n'appartient pas au provider Alibaba, utilisation de qwen-turbo par defaut`);
       modelId = 'qwen-turbo';
     }
 
@@ -661,11 +661,11 @@ Rédige maintenant le briefing selon la structure demandée.
       signal: AbortSignal.timeout(120000) // 120 secondes timeout
     });
 
-    console.log('✅ Réponse Qwen reçue, status:', response.status);
+    console.log(' Reponse Qwen recue, status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ Erreur Qwen:', response.status, response.statusText, errorText);
+      console.error(' Erreur Qwen:', response.status, response.statusText, errorText);
       throw new Error(`Qwen API error: ${response.status} - ${errorText}`);
     }
 
@@ -685,7 +685,7 @@ Rédige maintenant le briefing selon la structure demandée.
     console.error('Erreur Qwen:', error);
     return res.status(500).json({
       success: false,
-      error: `Erreur API Qwen: ${error.message}. Vérifiez votre clé API ALIBABA_API_KEY.`,
+      error: `Erreur API Qwen: ${error.message}. Verifiez votre cle API ALIBABA_API_KEY.`,
       model: 'error',
       fallback: false
     });
@@ -713,7 +713,7 @@ async function handleResend(req, res, { recipients, subject, html }) {
         subject,
         status: 'simulated',
         fallback: true,
-        message: 'Email simulé - Mode démo sans clé API Resend'
+        message: 'Email simule - Mode demo sans cle API Resend'
       });
     }
 
@@ -757,7 +757,7 @@ async function handleResend(req, res, { recipients, subject, html }) {
       subject: req.body.subject,
       status: 'simulated',
       fallback: true,
-      message: 'Email simulé - Mode démo'
+      message: 'Email simule - Mode demo'
     });
   }
 }
@@ -767,33 +767,33 @@ async function handleResend(req, res, { recipients, subject, html }) {
 // ============================================================================
 function getFallbackNews() {
   return `
-📰 ACTUALITÉS SIMULÉES (Mode Démo)
+ ACTUALITES SIMULEES (Mode Demo)
 
-🏦 BANQUES CENTRALES :
-- Fed maintient les taux inchangés à 5.25-5.50%
+ BANQUES CENTRALES :
+- Fed maintient les taux inchanges a 5.25-5.50%
 - BCE envisage une pause dans la hausse des taux
 - BOJ maintient sa politique accommodante
 
-📊 DONNÉES ÉCONOMIQUES :
+ DONNEES ECONOMIQUES :
 - PMI manufacturier US : 52.1 (vs 51.8 attendu)
-- Chômage US : 3.7% (stable)
+- Chomage US : 3.7% (stable)
 - Inflation PCE : 2.8% (en baisse)
 
-🏢 RÉSULTATS CORPORATIFS :
-- NVDA : Résultats Q3 en hausse de 15%
+ RESULTATS CORPORATIFS :
+- NVDA : Resultats Q3 en hausse de 15%
 - TSLA : Livraisons record au trimestre
-- AAPL : Guidance révisée à la hausse
+- AAPL : Guidance revisee a la hausse
 
-⚡ ÉVÉNEMENTS À SURVEILLER :
-- Publication des données d'emploi US à 14h30
-- Conférence de presse Fed à 15h00
-- Résultats META après clôture
+ EVENEMENTS A SURVEILLER :
+- Publication des donnees d'emploi US a 14h30
+- Conference de presse Fed a 15h00
+- Resultats META apres cloture
 
-Note: Données simulées - Mode démo sans clé API Perplexity
+Note: Donnees simulees - Mode demo sans cle API Perplexity
   `;
 }
 
-// Fonction getFallbackAnalysis SUPPRIMÉE - Plus de contenu demo
+// Fonction getFallbackAnalysis SUPPRIMEE - Plus de contenu demo
 
 // ============================================================================
 // BRIEFING DATA COLLECTOR
@@ -896,18 +896,18 @@ async function handleSupabaseBriefings(req, res, params) {
   } else if (method === 'DELETE') {
     return await handleDeleteBriefing(req, res, params);
   } else {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Methode non autorisee' });
   }
 }
 
 async function handleGetBriefings(req, res, { type, limit = 10, offset = 0, order = 'desc' }) {
   try {
-    // Simuler la récupération depuis Supabase
+    // Simuler la recuperation depuis Supabase
     const mockData = [
       {
         id: 'demo-1',
         type: 'morning',
-        subject: '📊 Briefing Matinal - Demo',
+        subject: ' Briefing Matinal - Demo',
         created_at: new Date().toISOString()
       }
     ];
@@ -918,14 +918,14 @@ async function handleGetBriefings(req, res, { type, limit = 10, offset = 0, orde
       pagination: { limit: parseInt(limit), offset: parseInt(offset), total: mockData.length }
     });
   } catch (error) {
-    return res.status(500).json({ error: 'Erreur lors de la récupération des briefings' });
+    return res.status(500).json({ error: 'Erreur lors de la recuperation des briefings' });
   }
 }
 
 async function handlePostBriefing(req, res, { type, subject, html_content, market_data, analysis }) {
   try {
     if (!type || !subject || !html_content) {
-      return res.status(400).json({ error: 'Paramètres manquants' });
+      return res.status(400).json({ error: 'Parametres manquants' });
     }
 
     const mockBriefing = {
@@ -941,7 +941,7 @@ async function handlePostBriefing(req, res, { type, subject, html_content, marke
     return res.status(201).json({
       success: true,
       data: mockBriefing,
-      message: 'Briefing sauvegardé avec succès (mode démo)'
+      message: 'Briefing sauvegarde avec succes (mode demo)'
     });
   } catch (error) {
     return res.status(500).json({ error: 'Erreur lors de la sauvegarde du briefing' });
@@ -956,7 +956,7 @@ async function handleDeleteBriefing(req, res, { id }) {
 
     return res.status(200).json({
       success: true,
-      message: 'Briefing supprimé avec succès (mode démo)'
+      message: 'Briefing supprime avec succes (mode demo)'
     });
   } catch (error) {
     return res.status(500).json({ error: 'Erreur lors de la suppression du briefing' });
@@ -984,7 +984,7 @@ async function getAsianMarkets() {
       
       if (response.ok) {
         const result = await response.json();
-        // L'API marketdata retourne directement les données, pas dans un objet data
+        // L'API marketdata retourne directement les donnees, pas dans un objet data
         if (result.c !== undefined) {
           data.push({
             symbol: market.symbol,
@@ -1000,7 +1000,7 @@ async function getAsianMarkets() {
     }
   }
   
-  // Si aucune donnée réelle, utiliser les données fallback
+  // Si aucune donnee reelle, utiliser les donnees fallback
   if (data.length === 0) {
     return getFallbackAsianMarkets();
   }
@@ -1025,7 +1025,7 @@ async function getFutures() {
       
       if (response.ok) {
         const result = await response.json();
-        // L'API marketdata retourne directement les données, pas dans un objet data
+        // L'API marketdata retourne directement les donnees, pas dans un objet data
         if (result.c !== undefined) {
           data.push({
             symbol: future.symbol,
@@ -1041,7 +1041,7 @@ async function getFutures() {
     }
   }
   
-  // Si aucune donnée réelle, utiliser les données fallback
+  // Si aucune donnee reelle, utiliser les donnees fallback
   if (data.length === 0) {
     return {
       data: getFallbackFutures(),
@@ -1077,7 +1077,7 @@ async function getUSMarkets() {
       
       if (response.ok) {
         const result = await response.json();
-        // L'API marketdata retourne directement les données, pas dans un objet data
+        // L'API marketdata retourne directement les donnees, pas dans un objet data
         if (result.c !== undefined) {
           data.push({
             symbol: market.symbol,
@@ -1093,7 +1093,7 @@ async function getUSMarkets() {
     }
   }
   
-  // Si aucune donnée réelle, utiliser les données fallback
+  // Si aucune donnee reelle, utiliser les donnees fallback
   if (data.length === 0) {
     return getFallbackUSMarkets();
   }
@@ -1102,7 +1102,7 @@ async function getUSMarkets() {
 }
 
 // ============================================================================
-// YAHOO FINANCE FUNCTIONS - Données directes
+// YAHOO FINANCE FUNCTIONS - Donnees directes
 // ============================================================================
 async function getAsianMarketsYahoo() {
   const symbols = [
@@ -1137,7 +1137,7 @@ async function getAsianMarketsYahoo() {
     }
   }
   
-  // Si aucune donnée réelle, utiliser les données fallback
+  // Si aucune donnee reelle, utiliser les donnees fallback
   if (data.length === 0) {
     return getFallbackAsianMarkets();
   }
@@ -1177,7 +1177,7 @@ async function getFuturesYahoo() {
     }
   }
   
-  // Si aucune donnée réelle, utiliser les données fallback
+  // Si aucune donnee reelle, utiliser les donnees fallback
   if (data.length === 0) {
     return getFallbackFutures();
   }
@@ -1217,7 +1217,7 @@ async function getUSMarketsYahoo() {
     }
   }
   
-  // Si aucune donnée réelle, utiliser les données fallback
+  // Si aucune donnee reelle, utiliser les donnees fallback
   if (data.length === 0) {
     return getFallbackUSMarkets();
   }
@@ -1253,19 +1253,19 @@ async function saveToSupabaseCache(cacheType, data, updateTimes = []) {
     });
 
     if (response.ok) {
-      console.log(`✅ Cache Supabase sauvegardé: ${cacheType}`);
+      console.log(` Cache Supabase sauvegarde: ${cacheType}`);
       return true;
     } else {
-      console.warn(`⚠️ Erreur sauvegarde cache Supabase: ${response.status}`);
+      console.warn(` Erreur sauvegarde cache Supabase: ${response.status}`);
       return false;
     }
   } catch (error) {
-    console.warn(`⚠️ Erreur sauvegarde cache Supabase (non bloquant):`, error.message);
-    return false; // Non bloquant, on continue même si le cache échoue
+    console.warn(` Erreur sauvegarde cache Supabase (non bloquant):`, error.message);
+    return false; // Non bloquant, on continue meme si le cache echoue
   }
 }
 
-// Helper pour récupérer depuis le cache Supabase
+// Helper pour recuperer depuis le cache Supabase
 async function getFromSupabaseCache(cacheType, date = null) {
   try {
     const API_BASE_URL = process.env.VERCEL_URL
@@ -1280,16 +1280,16 @@ async function getFromSupabaseCache(cacheType, date = null) {
     if (response.ok) {
       const result = await response.json();
       if (result.success && result.cached && !result.expired) {
-        console.log(`✅ Cache Supabase trouvé: ${cacheType} (${result.age_hours}h)`);
+        console.log(` Cache Supabase trouve: ${cacheType} (${result.age_hours}h)`);
         return result.data;
       } else if (result.success && result.cached && result.expired) {
-        console.log(`⚠️ Cache Supabase expiré: ${cacheType} (${result.age_hours}h)`);
-        return null; // Cache expiré, on va récupérer depuis l'API
+        console.log(` Cache Supabase expire: ${cacheType} (${result.age_hours}h)`);
+        return null; // Cache expire, on va recuperer depuis l'API
       }
     }
     return null;
   } catch (error) {
-    console.warn(`⚠️ Erreur récupération cache Supabase (non bloquant):`, error.message);
+    console.warn(` Erreur recuperation cache Supabase (non bloquant):`, error.message);
     return null; // Non bloquant, on continue avec l'API
   }
 }
@@ -1312,29 +1312,29 @@ const fetchWithTimeout = async (url, timeout = 8000) => {
   } catch (error) {
     clearTimeout(timeoutId);
     if (error.name === 'AbortError') {
-      throw new Error('Timeout: La requête a pris trop de temps');
+      throw new Error('Timeout: La requete a pris trop de temps');
     }
     throw error;
   }
 };
 
 async function getTopMovers() {
-  // 1. Vérifier le cache mémoire d'abord
+  // 1. Verifier le cache memoire d'abord
   const now = Date.now();
   if (topMoversCache.data && topMoversCache.timestamp && 
       (now - topMoversCache.timestamp) < topMoversCache.ttl) {
-    console.log('📦 Top Movers: Cache mémoire hit');
+    console.log(' Top Movers: Cache memoire hit');
     return {
       ...topMoversCache.data,
       cached: true
     };
   }
 
-  // 2. Vérifier le cache Supabase
+  // 2. Verifier le cache Supabase
   const supabaseCache = await getFromSupabaseCache('top_movers');
   if (supabaseCache) {
-    console.log('📦 Top Movers: Cache Supabase hit');
-    // Mettre à jour le cache mémoire aussi
+    console.log(' Top Movers: Cache Supabase hit');
+    // Mettre a jour le cache memoire aussi
     topMoversCache.data = supabaseCache;
     topMoversCache.timestamp = now;
     return {
@@ -1344,21 +1344,21 @@ async function getTopMovers() {
   }
 
   try {
-    console.log('🔄 Top Movers: Récupération depuis Yahoo Finance...');
+    console.log(' Top Movers: Recuperation depuis Yahoo Finance...');
     const startTime = Date.now();
     
-    // Appels PARALLÈLES au lieu de séquentiels pour améliorer la vitesse
+    // Appels PARALLELES au lieu de sequentiels pour ameliorer la vitesse
     const [gainersResponse, losersResponse] = await Promise.all([
       fetchWithTimeout('https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=true&lang=en-US&region=US&scrIds=day_gainers&count=5&corsDomain=finance.yahoo.com', 8000),
       fetchWithTimeout('https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=true&lang=en-US&region=US&scrIds=day_losers&count=5&corsDomain=finance.yahoo.com', 8000)
     ]);
     
-    // Vérifier que les réponses sont OK
+    // Verifier que les reponses sont OK
     if (!gainersResponse.ok || !losersResponse.ok) {
       throw new Error(`Yahoo Finance API error: ${gainersResponse.status} / ${losersResponse.status}`);
     }
     
-    // Parser les réponses en parallèle aussi
+    // Parser les reponses en parallele aussi
     const [gainersData, losersData] = await Promise.all([
       gainersResponse.json(),
       losersResponse.json()
@@ -1417,7 +1417,7 @@ async function getTopMovers() {
       return 0;
     };
     
-    // Extraire et formater les données avec parsing robuste
+    // Extraire et formater les donnees avec parsing robuste
     const gainers = (gainersData.finance?.result?.[0]?.quotes || [])
       .slice(0, 3)
       .map(quote => {
@@ -1452,7 +1452,7 @@ async function getTopMovers() {
         
         return {
           symbol: quote.symbol || quote.ticker || 'N/A',
-          change: -Math.abs(changePercent), // Toujours négatif pour les losers
+          change: -Math.abs(changePercent), // Toujours negatif pour les losers
           changePercent: -Math.abs(changePercent),
           volume: volume,
           price: price
@@ -1461,7 +1461,7 @@ async function getTopMovers() {
       .filter(stock => stock.symbol !== 'N/A' && stock.changePercent < 0); // Filtrer les invalides
     
     const executionTime = Date.now() - startTime;
-    console.log(`✅ Top Movers: Récupérés en ${executionTime}ms (${gainers.length} gainers, ${losers.length} losers)`);
+    console.log(` Top Movers: Recuperes en ${executionTime}ms (${gainers.length} gainers, ${losers.length} losers)`);
     
     const result = { 
       data: { gainers, losers },
@@ -1472,7 +1472,7 @@ async function getTopMovers() {
       executionTime
     };
     
-    // Mettre en cache mémoire
+    // Mettre en cache memoire
     topMoversCache.data = result;
     topMoversCache.timestamp = now;
     
@@ -1481,11 +1481,11 @@ async function getTopMovers() {
     
     return result;
   } catch (error) {
-    console.error('❌ Erreur getTopMovers:', error.message);
+    console.error(' Erreur getTopMovers:', error.message);
     
-    // Si on a des données en cache (même expirées), les utiliser comme fallback
+    // Si on a des donnees en cache (meme expirees), les utiliser comme fallback
     if (topMoversCache.data) {
-      console.log('⚠️ Top Movers: Utilisation du cache expiré comme fallback');
+      console.log(' Top Movers: Utilisation du cache expire comme fallback');
       return {
         ...topMoversCache.data,
         fallback: true,
@@ -1519,11 +1519,11 @@ async function getTopMovers() {
 
 async function getSectorPerformance() {
   try {
-    // Récupérer les vraies performances sectorielles depuis Yahoo Finance
+    // Recuperer les vraies performances sectorielles depuis Yahoo Finance
     const response = await fetch('https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved?formatted=true&lang=en-US&region=US&scrIds=sector_technology&count=10&corsDomain=finance.yahoo.com');
     const data = await response.json();
     
-    // Pour l'instant, retourner des données réalistes basées sur les indices sectoriels
+    // Pour l'instant, retourner des donnees realistes basees sur les indices sectoriels
     const sectors = [
       { name: 'Technology', change: 1.2 },
       { name: 'Healthcare', change: 0.8 },
@@ -1559,7 +1559,7 @@ async function getSectorPerformance() {
 }
 
 // ============================================================================
-// FALLBACK DATA FUNCTIONS - Données réalistes pour décembre 2024
+// FALLBACK DATA FUNCTIONS - Donnees realistes pour decembre 2024
 // ============================================================================
 function getFallbackAsianMarkets() {
   return [
@@ -1642,7 +1642,7 @@ function getFallbackData(type) {
 // ============================================================================
 async function handleYieldCurves(req, res, params) {
   try {
-    // Priorité Yahoo Finance pour données gratuites
+    // Priorite Yahoo Finance pour donnees gratuites
     const data = await fetchYieldCurvesYahoo();
     
     return res.status(200).json({
@@ -1652,7 +1652,7 @@ async function handleYieldCurves(req, res, params) {
       fallback: data.fallback || false,
       data_quality: {
         status: data.fallback ? 'FALLBACK_DATA' : 'PRODUCTION_DATA',
-        note: data.fallback ? '⚠️ Données simulées - API indisponible' : '✅ Données réelles de Yahoo Finance'
+        note: data.fallback ? ' Donnees simulees - API indisponible' : ' Donnees reelles de Yahoo Finance'
       },
       timestamp: new Date().toISOString()
     });
@@ -1669,7 +1669,7 @@ async function handleYieldCurves(req, res, params) {
 
 async function fetchYieldCurvesYahoo() {
   try {
-    // Récupérer les taux du Trésor américain depuis Yahoo Finance
+    // Recuperer les taux du Tresor americain depuis Yahoo Finance
     const treasurySymbols = [
       { symbol: '^TNX', name: '10-Year Treasury', term: '10y' },
       { symbol: '^FVX', name: '5-Year Treasury', term: '5y' },
@@ -1679,7 +1679,7 @@ async function fetchYieldCurvesYahoo() {
     
     const rates = {};
     
-    // Récupérer chaque taux individuellement
+    // Recuperer chaque taux individuellement
     for (const treasury of treasurySymbols) {
       try {
         const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${treasury.symbol}?interval=1d&range=1d`);
@@ -1692,7 +1692,7 @@ async function fetchYieldCurvesYahoo() {
         }
       } catch (error) {
         console.error(`Erreur pour ${treasury.symbol}:`, error);
-        // Utiliser des valeurs par défaut réalistes
+        // Utiliser des valeurs par defaut realistes
         rates[treasury.term] = treasury.term === '3m' ? 5.28 : 
                                treasury.term === '5y' ? 3.78 : 
                                treasury.term === '10y' ? 4.21 : 4.77;
@@ -1740,13 +1740,13 @@ async function fetchYieldCurvesYahoo() {
           '5y-30y': (us30y - 1.1) - (us5y - 0.4)
         },
         source: {
-          name: 'Banque du Canada (estimé)',
+          name: 'Banque du Canada (estime)',
           url: 'https://www.bankofcanada.ca/rates/interest-rates/canadian-bonds/'
         }
       },
       us_ca_differential: {
         '10y': (us10y - (us10y - 0.7)) * 100,
-        note: 'Différentiel 10Y US-CA (points de base)'
+        note: 'Differentiel 10Y US-CA (points de base)'
       },
       updated_at: new Date().toISOString(),
       fallback: false
@@ -1801,7 +1801,7 @@ function getFallbackYieldCurves() {
     },
     us_ca_differential: {
       '10y': 0.72,
-      note: 'Différentiel 10Y US-CA (points de base)'
+      note: 'Differentiel 10Y US-CA (points de base)'
     },
     updated_at: now.toISOString(),
     fallback: true
@@ -1809,7 +1809,7 @@ function getFallbackYieldCurves() {
 }
 
 // ============================================================================
-// FOREX DETAILED - Devises détaillées vs USD + vs CAD
+// FOREX DETAILED - Devises detaillees vs USD + vs CAD
 // ============================================================================
 async function handleForexDetailed(req, res, params) {
   try {
@@ -1852,7 +1852,7 @@ async function fetchForexYahoo() {
       const usdchf = forexData.find(f => f.symbol === 'USDCHF=X')?.price || 0.882;
       const audusd = forexData.find(f => f.symbol === 'AUDUSD=X')?.price || 0.652;
       
-      // Calculer les variations (simulées pour l'instant)
+      // Calculer les variations (simulees pour l'instant)
       const variations = {
         'EUR/USD': (Math.random() * 0.4 - 0.2).toFixed(2),
         'GBP/USD': (Math.random() * 0.3 - 0.15).toFixed(2),
@@ -1890,7 +1890,7 @@ async function fetchForexYahoo() {
       };
     }
     
-    throw new Error('Données forex non disponibles');
+    throw new Error('Donnees forex non disponibles');
   } catch (error) {
     console.error('Erreur fetchForexYahoo:', error);
     return getFallbackForex();
@@ -1975,31 +1975,31 @@ async function fetchVolatilityYahoo() {
         vix: {
           level: vixLevel,
           change_5d: (Math.random() * 2 - 1).toFixed(2),
-          interpretation: vixLevel < 16 ? 'Complaisance' : vixLevel > 20 ? 'Nervosité' : 'Neutre',
+          interpretation: vixLevel < 16 ? 'Complaisance' : vixLevel > 20 ? 'Nervosite' : 'Neutre',
           source: {
             name: 'CBOE VIX via Yahoo Finance',
             url: 'https://www.cboe.com/tradable_products/vix/'
           }
         },
         move: {
-          level: 100 + (vixLevel * 0.4), // Estimation basée sur VIX
+          level: 100 + (vixLevel * 0.4), // Estimation basee sur VIX
           change_5d: (Math.random() * 3 - 1.5).toFixed(2),
           interpretation: vixLevel < 16 ? 'Calme obligataire' : vixLevel > 20 ? 'Tension taux' : 'Neutre',
           source: {
-            name: 'ICE MOVE Index (estimé)',
+            name: 'ICE MOVE Index (estime)',
             url: 'https://www.theice.com/marketdata/reports/79'
           }
         },
         sentiment: {
           overall: vixLevel < 16 ? 'risk-on' : vixLevel > 20 ? 'risk-off' : 'neutre',
-          note: 'VIX < 16 = complaisance | VIX > 20 = nervosité'
+          note: 'VIX < 16 = complaisance | VIX > 20 = nervosite'
         },
         updated_at: new Date().toISOString(),
         fallback: false
       };
     }
     
-    throw new Error('Données VIX non disponibles');
+    throw new Error('Donnees VIX non disponibles');
   } catch (error) {
     console.error('Erreur fetchVolatilityYahoo:', error);
     return getFallbackVolatility();
@@ -2015,7 +2015,7 @@ function getFallbackVolatility() {
     vix: {
       level: vixBase + (Math.random() * 2 - 1),
       change_5d: (Math.random() * 2 - 1).toFixed(2),
-      interpretation: vixBase < 16 ? 'Complaisance' : vixBase > 20 ? 'Nervosité' : 'Neutre',
+      interpretation: vixBase < 16 ? 'Complaisance' : vixBase > 20 ? 'Nervosite' : 'Neutre',
       source: {
         name: 'CBOE VIX',
         url: 'https://www.cboe.com/tradable_products/vix/'
@@ -2032,7 +2032,7 @@ function getFallbackVolatility() {
     },
     sentiment: {
       overall: vixBase < 16 ? 'risk-on' : vixBase > 20 ? 'risk-off' : 'neutre',
-      note: 'VIX < 16 = complaisance | VIX > 20 = nervosité'
+      note: 'VIX < 16 = complaisance | VIX > 20 = nervosite'
     },
     updated_at: now.toISOString(),
     fallback: true
@@ -2088,7 +2088,7 @@ async function fetchCommoditiesYahoo() {
           symbol: 'CL=F',
           unit: 'USD/barrel',
           url: 'https://www.investing.com/commodities/crude-oil',
-          context: 'Offre mondiale stable, demande Chine en légère baisse'
+          context: 'Offre mondiale stable, demande Chine en legere baisse'
         },
         gold: {
           price: gold,
@@ -2096,7 +2096,7 @@ async function fetchCommoditiesYahoo() {
           symbol: 'GC=F',
           unit: 'USD/oz',
           url: 'https://www.investing.com/commodities/gold',
-          context: 'Demande refuge persistante, corrélation inverse USD'
+          context: 'Demande refuge persistante, correlation inverse USD'
         },
         copper: {
           price: copper,
@@ -2104,7 +2104,7 @@ async function fetchCommoditiesYahoo() {
           symbol: 'HG=F',
           unit: 'USD/lb',
           url: 'https://www.investing.com/commodities/copper',
-          context: 'Baromètre économique mondial, sensible à la Chine'
+          context: 'Barometre economique mondial, sensible a la Chine'
         },
         silver: {
           price: silver,
@@ -2118,7 +2118,7 @@ async function fetchCommoditiesYahoo() {
       };
     }
     
-    throw new Error('Données commodities non disponibles');
+    throw new Error('Donnees commodities non disponibles');
   } catch (error) {
     console.error('Erreur fetchCommoditiesYahoo:', error);
     return getFallbackCommodities();
@@ -2134,7 +2134,7 @@ function getFallbackCommodities() {
       symbol: 'CL=F',
       unit: 'USD/barrel',
       url: 'https://www.investing.com/commodities/crude-oil',
-      context: 'Offre mondiale stable, demande Chine en légère baisse'
+      context: 'Offre mondiale stable, demande Chine en legere baisse'
     },
     gold: {
       price: 2332 + (Math.random() * 20 - 10),
@@ -2142,7 +2142,7 @@ function getFallbackCommodities() {
       symbol: 'GC=F',
       unit: 'USD/oz',
       url: 'https://www.investing.com/commodities/gold',
-      context: 'Demande refuge persistante, corrélation inverse USD'
+      context: 'Demande refuge persistante, correlation inverse USD'
     },
     copper: {
       price: 8.45 + (Math.random() * 0.4 - 0.2),
@@ -2150,7 +2150,7 @@ function getFallbackCommodities() {
       symbol: 'HG=F',
       unit: 'USD/lb',
       url: 'https://www.investing.com/commodities/copper',
-      context: 'Baromètre économique mondial, sensible à la Chine'
+      context: 'Barometre economique mondial, sensible a la Chine'
     },
     silver: {
       price: 24.85 + (Math.random() * 2 - 1),
@@ -2172,7 +2172,7 @@ async function handleTickersNews(req, res, params) {
     const { tickers, watchlistTickers } = params;
     
     if (!tickers || !Array.isArray(tickers)) {
-      return res.status(400).json({ error: 'Paramètre "tickers" requis (array)' });
+      return res.status(400).json({ error: 'Parametre "tickers" requis (array)' });
     }
     
     // Collecter nouvelles pour tickers principaux (top 5 globales)
@@ -2212,7 +2212,7 @@ async function handleTickersNews(req, res, params) {
 async function fetchNewsForTickers(tickers, limitPerTicker) {
   try {
     // Utiliser APIs existantes ou Yahoo Finance
-    // Pour l'instant, fallback avec données simulées réalistes
+    // Pour l'instant, fallback avec donnees simulees realistes
     return getFallbackTickersNews(tickers, limitPerTicker);
   } catch (error) {
     return getFallbackTickersNews(tickers, limitPerTicker);
@@ -2222,20 +2222,20 @@ async function fetchNewsForTickers(tickers, limitPerTicker) {
 function getFallbackTickersNews(tickers = [], limit = 5) {
   const now = new Date();
   const newsTemplates = [
-    { type: 'earnings', title: 'dépasse les attentes du marché', impact: 'positif' },
-    { type: 'guidance', title: 'révise ses prévisions à la hausse', impact: 'positif' },
-    { type: 'downgrade', title: 'déclassé par les analystes', impact: 'négatif' },
-    { type: 'upgrade', title: 'surclassé à l\'achat', impact: 'positif' },
-    { type: 'acquisition', title: 'annonce une acquisition stratégique', impact: 'positif' },
-    { type: 'regulatory', title: 'fait face à un examen réglementaire', impact: 'négatif' },
-    { type: 'innovation', title: 'dévoile un nouveau produit', impact: 'positif' },
+    { type: 'earnings', title: 'depasse les attentes du marche', impact: 'positif' },
+    { type: 'guidance', title: 'revise ses previsions a la hausse', impact: 'positif' },
+    { type: 'downgrade', title: 'declasse par les analystes', impact: 'negatif' },
+    { type: 'upgrade', title: 'surclasse a l\'achat', impact: 'positif' },
+    { type: 'acquisition', title: 'annonce une acquisition strategique', impact: 'positif' },
+    { type: 'regulatory', title: 'fait face a un examen reglementaire', impact: 'negatif' },
+    { type: 'innovation', title: 'devoile un nouveau produit', impact: 'positif' },
     { type: 'partnership', title: 'annonce un partenariat majeur', impact: 'positif' }
   ];
   
   const sources = ['Bloomberg', 'Reuters', 'CNBC', 'Financial Times', 'The Globe and Mail', 'Wall Street Journal'];
   
   const news = [];
-  const selectedTickers = tickers.slice(0, 10); // Limiter à 10 tickers pour simulation
+  const selectedTickers = tickers.slice(0, 10); // Limiter a 10 tickers pour simulation
   
   for (let i = 0; i < Math.min(limit, selectedTickers.length); i++) {
     const ticker = selectedTickers[i];
@@ -2246,7 +2246,7 @@ function getFallbackTickersNews(tickers = [], limit = 5) {
     news.push({
       ticker,
       title: `${ticker} ${template.title}`,
-      summary: `${ticker} a publié des résultats qui ont surpris les analystes. Les investisseurs institutionnels ajustent leurs positions.`,
+      summary: `${ticker} a publie des resultats qui ont surpris les analystes. Les investisseurs institutionnels ajustent leurs positions.`,
       source,
       time: `Il y a ${hoursAgo}h`,
       timestamp: new Date(now - hoursAgo * 3600000).toISOString(),
@@ -2266,16 +2266,16 @@ function getFallbackTickersNews(tickers = [], limit = 5) {
 // Construire le prompt selon la section
 function buildSectionPrompt(query, section) {
   const basePrompts = {
-    news: `Tu es Emma, assistante virtuelle experte en analyse financière. Fournis un résumé détaillé des actualités financières récentes basé sur cette requête: "${query}". Inclus des chiffres précis, des sources et une analyse contextuelle.`,
-    analysis: `Tu es Emma, assistante virtuelle experte en analyse financière. Fournis une analyse technique et fondamentale approfondie basée sur cette requête: "${query}". Inclus des niveaux de support/résistance, des indicateurs et des recommandations.`,
-    writing: `Tu es Emma, assistante virtuelle experte en analyse financière. Rédige un briefing financier professionnel basé sur cette requête: "${query}". Utilise un style expert, factuel et actionnable avec des recommandations tactiques.`,
-    research: `Tu es Emma, assistante virtuelle experte en analyse financière. Effectue une recherche approfondie basée sur cette requête: "${query}". Fournis une analyse détaillée avec des sources et des perspectives.`
+    news: `Tu es Emma, assistante virtuelle experte en analyse financiere. Fournis un resume detaille des actualites financieres recentes base sur cette requete: "${query}". Inclus des chiffres precis, des sources et une analyse contextuelle.`,
+    analysis: `Tu es Emma, assistante virtuelle experte en analyse financiere. Fournis une analyse technique et fondamentale approfondie basee sur cette requete: "${query}". Inclus des niveaux de support/resistance, des indicateurs et des recommandations.`,
+    writing: `Tu es Emma, assistante virtuelle experte en analyse financiere. Redige un briefing financier professionnel base sur cette requete: "${query}". Utilise un style expert, factuel et actionnable avec des recommandations tactiques.`,
+    research: `Tu es Emma, assistante virtuelle experte en analyse financiere. Effectue une recherche approfondie basee sur cette requete: "${query}". Fournis une analyse detaillee avec des sources et des perspectives.`
   };
   
-  return basePrompts[section] || `Tu es Emma, assistante virtuelle experte en analyse financière. Analyse cette requête: "${query}" et fournis une réponse détaillée et professionnelle.`;
+  return basePrompts[section] || `Tu es Emma, assistante virtuelle experte en analyse financiere. Analyse cette requete: "${query}" et fournis une reponse detaillee et professionnelle.`;
 }
 
-// Fonction getFallbackContent SUPPRIMÉE - Plus de contenu demo
+// Fonction getFallbackContent SUPPRIMEE - Plus de contenu demo
 
 // Extraire les sources du contenu
 function extractSources(content) {

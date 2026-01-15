@@ -31,7 +31,7 @@ export const ScheduleManager: React.FC<TabProps> = (props) => {
             }
         } catch (error) {
             console.error('Erreur chargement horaires:', error);
-            alert('❌ Erreur lors du chargement: ' + error.message);
+            alert(' Erreur lors du chargement: ' + error.message);
         } finally {
             setLoading(false);
         }
@@ -52,13 +52,13 @@ export const ScheduleManager: React.FC<TabProps> = (props) => {
             });
             const result = await response.json();
             if (result.success) {
-                alert('✅ Configuration sauvegardée avec succès !\n\n⚠️ Note: Vous devez mettre à jour le workflow n8n manuellement avec les nouvelles expressions cron.');
+                alert(' Configuration sauvegardee avec succes !\n\n Note: Vous devez mettre a jour le workflow n8n manuellement avec les nouvelles expressions cron.');
             } else {
-                alert('❌ Erreur: ' + result.error);
+                alert(' Erreur: ' + result.error);
             }
         } catch (error) {
             console.error('Erreur sauvegarde horaires:', error);
-            alert('❌ Erreur lors de la sauvegarde: ' + error.message);
+            alert(' Erreur lors de la sauvegarde: ' + error.message);
         } finally {
             setSaving(false);
         }
@@ -70,9 +70,9 @@ export const ScheduleManager: React.FC<TabProps> = (props) => {
     }, []);
 
     const briefingTypes = [
-        { id: 'morning', label: '🌅 Matin', icon: '🌅', description: 'Briefing matinal - Marchés, actualités et focus sur nos tickers' },
-        { id: 'midday', label: '☀️ Midi', icon: '☀️', description: 'Briefing de mi-journée - Performance matinale et perspectives' },
-        { id: 'evening', label: '🌙 Soir', icon: '🌙', description: 'Briefing de clôture - Bilan de journée et perspectives pour demain' }
+        { id: 'morning', label: ' Matin', icon: '', description: 'Briefing matinal - Marches, actualites et focus sur nos tickers' },
+        { id: 'midday', label: ' Midi', icon: '', description: 'Briefing de mi-journee - Performance matinale et perspectives' },
+        { id: 'evening', label: ' Soir', icon: '', description: 'Briefing de cloture - Bilan de journee et perspectives pour demain' }
     ];
 
     return (
@@ -117,7 +117,7 @@ export const ScheduleManager: React.FC<TabProps> = (props) => {
                                     <span className={`font-medium transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        {schedule[type.id]?.enabled ? 'Activé' : 'Désactivé'}
+                                        {schedule[type.id]?.enabled ? 'Active' : 'Desactive'}
                                     </span>
                                 </label>
                             </div>
@@ -198,13 +198,13 @@ export const ScheduleManager: React.FC<TabProps> = (props) => {
                                     : 'bg-purple-600 hover:bg-purple-700 text-white'
                             }`}
                         >
-                            {saving ? '⏳ Sauvegarde...' : '💾 Sauvegarder'}
+                            {saving ? ' Sauvegarde...' : ' Sauvegarder'}
                         </button>
                         <button
                             onClick={loadSchedule}
                             className="px-6 py-2 rounded-lg font-medium bg-gray-600 hover:bg-gray-700 text-white transition-colors duration-300"
                         >
-                            🔄 Recharger
+                             Recharger
                         </button>
                     </div>
 
@@ -212,7 +212,7 @@ export const ScheduleManager: React.FC<TabProps> = (props) => {
                     <div className={`mt-4 p-3 rounded-lg text-sm transition-colors duration-300 ${
                         isDarkMode ? 'bg-blue-900/20 text-blue-300' : 'bg-blue-50 text-blue-800'
                     }`}>
-                        💡 <strong>Note:</strong> Les modifications sont sauvegardées dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">config/briefing-schedule.json</code>. Pour appliquer les changements dans n8n, vous devez mettre à jour manuellement le nœud "Schedule Trigger" avec les nouvelles expressions cron générées.
+                         <strong>Note:</strong> Les modifications sont sauvegardees dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">config/briefing-schedule.json</code>. Pour appliquer les changements dans n8n, vous devez mettre a jour manuellement le nud "Schedule Trigger" avec les nouvelles expressions cron generees.
                     </div>
                 </>
             )}

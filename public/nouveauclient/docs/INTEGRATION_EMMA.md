@@ -1,18 +1,18 @@
-# 🤖 AJOUT EMMA IA AUX PAGES EXISTANTES
+#  AJOUT EMMA IA AUX PAGES EXISTANTES
 
-## ⚡ INTÉGRATION EN 30 SECONDES
+##  INTEGRATION EN 30 SECONDES
 
-### Étape 1️⃣ : Copier Emma Files
+### Etape 1 : Copier Emma Files
 
 ```
-Télécharger dans public/:
-✅ emma-ai.html
-✅ emma-ai.js
+Telecharger dans public/:
+ emma-ai.html
+ emma-ai.js
 ```
 
-### Étape 2️⃣ : Ajouter Iframe dans index.html
+### Etape 2 : Ajouter Iframe dans index.html
 
-À la **fin du fichier index.html** (avant `</body>`), ajouter:
+A la **fin du fichier index.html** (avant `</body>`), ajouter:
 
 ```html
     <!-- Emma IA Chatbot -->
@@ -31,9 +31,9 @@ Télécharger dans public/:
 </html>
 ```
 
-### Étape 3️⃣ : Ajouter Iframe dans app.html
+### Etape 3 : Ajouter Iframe dans app.html
 
-À la **fin du fichier app.html** (avant `</body>`), ajouter:
+A la **fin du fichier app.html** (avant `</body>`), ajouter:
 
 ```html
     <!-- Emma IA Chatbot -->
@@ -52,9 +52,9 @@ Télécharger dans public/:
 </html>
 ```
 
-### Étape 4️⃣ : Ajouter Iframe dans admin.html
+### Etape 4 : Ajouter Iframe dans admin.html
 
-À la **fin du fichier admin.html** (avant `</body>`), ajouter:
+A la **fin du fichier admin.html** (avant `</body>`), ajouter:
 
 ```html
     <!-- Emma IA Chatbot -->
@@ -75,21 +75,21 @@ Télécharger dans public/:
 
 ---
 
-## ✅ C'EST TOUT!
+##  C'EST TOUT!
 
 **Emma est maintenant disponible dans:**
-- ✅ Page login (index.html)
-- ✅ Page formulaire (app.html)
-- ✅ Page admin (admin.html)
+-  Page login (index.html)
+-  Page formulaire (app.html)
+-  Page admin (admin.html)
 
-**Visible:** Button 💬 en bas à droite, toutes les pages!
+**Visible:** Button  en bas a droite, toutes les pages!
 
 ---
 
-## 🧪 TEST RAPIDE
+##  TEST RAPIDE
 
 1. Lancez l'app
-2. Cherchez button 💬 en bas à droite
+2. Cherchez button  en bas a droite
 3. Cliquez pour ouvrir Emma
 4. Posez une question, ex:
    - "C'est quoi Emma?"
@@ -98,28 +98,28 @@ Télécharger dans public/:
 
 ---
 
-## 🔧 SI VOUS VOULEZ PLUS
+##  SI VOUS VOULEZ PLUS
 
 ### Personnaliser Accueil Emma
-Éditez dans **emma-ai.js**:
+Editez dans **emma-ai.js**:
 
 ```javascript
 showWelcomeMessage() {
-    const welcomeMsg = `Votre message personnalisé ici...`;
+    const welcomeMsg = `Votre message personnalise ici...`;
     this.addMessage(welcomeMsg, 'emma');
 }
 ```
 
 ### Ajouter Nouvelles Questions
-Éditez **emma-ai.js**, dans `generateResponse()`:
+Editez **emma-ai.js**, dans `generateResponse()`:
 
 ```javascript
-'votre-keyword': `**Titre** 🎯
-Votre réponse avec **bold** et conseil pragmatique!`
+'votre-keyword': `**Titre** 
+Votre reponse avec **bold** et conseil pragmatique!`
 ```
 
 ### Changer Couleur Emma
-Éditez **emma-ai.html**, section CSS `:root`:
+Editez **emma-ai.html**, section CSS `:root`:
 
 ```css
 --primary: #VOTRE_COULEUR;  /* Changez ici */
@@ -127,33 +127,33 @@ Votre réponse avec **bold** et conseil pragmatique!`
 
 ---
 
-## ✨ EMMA EST PRÊT!
+##  EMMA EST PRET!
 
-**3 fichiers à connaître:**
+**3 fichiers a connaitre:**
 1. **emma-ai.html** - Interface chat + styles
-2. **emma-ai.js** - Logique & réponses
+2. **emma-ai.js** - Logique & reponses
 3. **EMMA_GUIDE.md** - Guide complet
 
-**Zéro dépendance externe, fonctionne offline!**
+**Zero dependance externe, fonctionne offline!**
 
 ---
 
-## 📍 PLACEMENT UTILISATEUR
+##  PLACEMENT UTILISATEUR
 
 ### Adjointe voit:
 ```
-Page Login → Button 💬
-   ↓
-Remplir Formulaire → Button 💬 (aide sur champs)
-   ↓
-Export → Button 💬 (aide export)
+Page Login -> Button 
+   v
+Remplir Formulaire -> Button  (aide sur champs)
+   v
+Export -> Button  (aide export)
 ```
 
 ### Admin voit:
 ```
-Dashboard → Button 💬
-Admin Panel → Button 💬 (aide paramètres)
-Gestion Users → Button 💬
+Dashboard -> Button 
+Admin Panel -> Button  (aide parametres)
+Gestion Users -> Button 
 Etc...
 ```
 
@@ -161,4 +161,4 @@ Etc...
 
 ---
 
-💬 **Let's go! Emma vous attend!** 🚀
+ **Let's go! Emma vous attend!** 

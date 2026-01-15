@@ -12,14 +12,14 @@ export const ExpandableComponent: React.FC<ExpandableComponentProps> = ({
     children,
     title = '',
     className = '',
-    icon = '🔍',
+    icon = '',
     isDarkMode = false
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
 
-    // Gérer la touche ESC pour fermer
+    // Gerer la touche ESC pour fermer
     useEffect(() => {
         if (!isExpanded) return;
 
@@ -33,7 +33,7 @@ export const ExpandableComponent: React.FC<ExpandableComponentProps> = ({
         return () => document.removeEventListener('keydown', handleEscape);
     }, [isExpanded]);
 
-    // Gérer le scroll du body quand la modal est ouverte
+    // Gerer le scroll du body quand la modal est ouverte
     useEffect(() => {
         if (isExpanded) {
             document.body.style.overflow = 'hidden';
@@ -56,7 +56,7 @@ export const ExpandableComponent: React.FC<ExpandableComponentProps> = ({
                             ? 'bg-gray-800/90 hover:bg-gray-700 text-white border border-gray-600 shadow-lg'
                             : 'bg-white/90 hover:bg-gray-100 text-gray-700 border border-gray-300 shadow-lg'
                     }`}
-                    title="Agrandir dans une fenêtre"
+                    title="Agrandir dans une fenetre"
                 >
                     <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />

@@ -27,7 +27,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
     }
     timeoutRef.current = setTimeout(() => {
       setIsVisible(true);
-      // Utiliser requestAnimationFrame pour mettre à jour la position de manière optimale
+      // Utiliser requestAnimationFrame pour mettre a jour la position de maniere optimale
       requestAnimationFrame(() => {
         updatePosition();
       });
@@ -71,7 +71,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
         break;
     }
 
-    // Ajuster si le tooltip sort de l'écran
+    // Ajuster si le tooltip sort de l'ecran
     const margin = 8;
     if (left < margin) left = margin;
     if (left + tooltipRect.width > window.innerWidth - margin) {
@@ -90,12 +90,12 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   useEffect(() => {
     if (isVisible) {
-      // Utiliser requestAnimationFrame pour la mise à jour initiale
+      // Utiliser requestAnimationFrame pour la mise a jour initiale
       requestAnimationFrame(() => {
         updatePosition();
       });
       
-      // Debounce les événements scroll et resize pour éviter trop de calculs
+      // Debounce les evenements scroll et resize pour eviter trop de calculs
       let rafId: number | null = null;
       const debouncedUpdate = () => {
         if (rafId !== null) {

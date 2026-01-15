@@ -1,13 +1,13 @@
 /**
- * Détection automatique des métriques avec prix cibles aberrants (outliers)
- * Décoche automatiquement les métriques dont le prix cible est trop différent des autres
+ * Detection automatique des metriques avec prix cibles aberrants (outliers)
+ * Decoche automatiquement les metriques dont le prix cible est trop different des autres
  */
 
 import { AnnualData, Assumptions } from '../types';
 import { projectFutureValue } from './calculations';
 
 /**
- * Calcule les prix cibles pour chaque métrique
+ * Calcule les prix cibles pour chaque metrique
  */
 function calculateTargetPrices(
   data: AnnualData[],
@@ -56,7 +56,7 @@ function calculateTargetPrices(
     div: futureValues.div > 0 && safeTargetYield > 0 ? futureValues.div / (safeTargetYield / 100) : 0
   };
 
-  // Validation : limites raisonnables (10% à 50x du prix actuel)
+  // Validation : limites raisonnables (10% a 50x du prix actuel)
   const maxReasonableTarget = currentPrice * 50;
   const minReasonableTarget = currentPrice * 0.1;
 
@@ -69,7 +69,7 @@ function calculateTargetPrices(
 }
 
 /**
- * Calcule la médiane d'un tableau de nombres
+ * Calcule la mediane d'un tableau de nombres
  */
 function calculateMedian(values: number[]): number {
   if (values.length === 0) return 0;
@@ -81,7 +81,7 @@ function calculateMedian(values: number[]): number {
 }
 
 /**
- * Calcule l'écart-type d'un tableau de nombres
+ * Calcule l'ecart-type d'un tableau de nombres
  */
 function calculateStandardDeviation(values: number[]): number {
   if (values.length === 0) return 0;
@@ -92,15 +92,15 @@ function calculateStandardDeviation(values: number[]): number {
 }
 
 /**
- * Détecte les métriques avec prix cibles aberrants et retourne les exclusions recommandées
+ * Detecte les metriques avec prix cibles aberrants et retourne les exclusions recommandees
  * 
- * Méthode : Utilise l'écart-type pour détecter les outliers
- * - Calcule la moyenne et l'écart-type des prix cibles valides
- * - Une métrique est considérée comme outlier si son prix cible est à plus de 2 écarts-types de la moyenne
+ * Methode : Utilise l'ecart-type pour detecter les outliers
+ * - Calcule la moyenne et l'ecart-type des prix cibles valides
+ * - Une metrique est consideree comme outlier si son prix cible est a plus de 2 ecarts-types de la moyenne
  * 
- * @param data - Données historiques
+ * @param data - Donnees historiques
  * @param assumptions - Assumptions actuelles
- * @returns Objet avec les exclusions recommandées (excludeEPS, excludeCF, excludeBV, excludeDIV)
+ * @returns Objet avec les exclusions recommandees (excludeEPS, excludeCF, excludeBV, excludeDIV)
  */
 export function detectOutlierMetrics(
   data: AnnualData[],
@@ -112,7 +112,7 @@ export function detectOutlierMetrics(
   excludeDIV: boolean;
   detectedOutliers: string[];
 } {
-  // Calculer les prix cibles pour chaque métrique
+  // Calculer les prix cibles pour chaque metrique
   const targets = calculateTargetPrices(data, assumptions);
 
   // Filtrer les prix cibles valides (non-nuls et non exclus actuellement)
@@ -131,7 +131,7 @@ export function detectOutlierMetrics(
     validTargets.push({ metric: 'DIV', price: targets.div });
   }
 
-  // Si moins de 2 métriques valides, ne rien exclure automatiquement
+  // Si moins de 2 metriques valides, ne rien exclure automatiquement
   if (validTargets.length < 2) {
     return {
       excludeEPS: assumptions.excludeEPS || false,
@@ -145,13 +145,13 @@ export function detectOutlierMetrics(
   // Extraire les prix
   const prices = validTargets.map(t => t.price);
 
-  // Calculer la médiane (plus robuste que la moyenne pour détecter les outliers)
+  // Calculer la mediane (plus robuste que la moyenne pour detecter les outliers)
   const median = calculateMedian(prices);
   
-  // Calculer l'écart-type
+  // Calculer l'ecart-type
   const stdDev = calculateStandardDeviation(prices);
 
-  // Si l'écart-type est très petit (tous les prix sont similaires), ne rien exclure
+  // Si l'ecart-type est tres petit (tous les prix sont similaires), ne rien exclure
   if (stdDev < median * 0.1) {
     return {
       excludeEPS: assumptions.excludeEPS || false,
@@ -162,16 +162,16 @@ export function detectOutlierMetrics(
     };
   }
 
-  // Détecter les outliers avec deux méthodes combinées:
-  // 1. Prix à plus de 1.5 écarts-types de la médiane (statistique)
-  // 2. Prix à plus de 50% d'écart de la médiane (pourcentage)
+  // Detecter les outliers avec deux methodes combinees:
+  // 1. Prix a plus de 1.5 ecarts-types de la mediane (statistique)
+  // 2. Prix a plus de 50% d'ecart de la mediane (pourcentage)
   const stdDevThreshold = 1.5 * stdDev;
-  const percentThreshold = median * 0.5; // 50% de la médiane
+  const percentThreshold = median * 0.5; // 50% de la mediane
   const threshold = Math.min(stdDevThreshold, percentThreshold); // Utiliser le plus strict
   const detectedOutliers: string[] = [];
 
-  // Vérifier chaque métrique - exclure si au-delà du seuil OU si le retour est implausible
-  // Critère utilisateur: Retour > 300% ou < -75% sur 5 ans est considéré comme une erreur de données
+  // Verifier chaque metrique - exclure si au-dela du seuil OU si le retour est implausible
+  // Critere utilisateur: Retour > 300% ou < -75% sur 5 ans est considere comme une erreur de donnees
   const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
   const isImplausible = (targetPrice: number) => {
     if (currentPrice <= 0) return false;

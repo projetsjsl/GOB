@@ -8436,7 +8436,7 @@ const sanitizeAssumptionsSync = (assumptions) => {
     currentPrice: assumptions.currentPrice && assumptions.currentPrice > 0 && isFinite(assumptions.currentPrice) ? round2(assumptions.currentPrice, 2) : safeDefaults.currentPrice,
     currentDividend: assumptions.currentDividend && assumptions.currentDividend >= 0 && isFinite(assumptions.currentDividend) ? round2(assumptions.currentDividend, 4) : safeDefaults.currentDividend,
     baseYear: assumptions.baseYear && assumptions.baseYear >= 2015 && assumptions.baseYear <= (/* @__PURE__ */ new Date()).getFullYear() + 1 ? assumptions.baseYear : safeDefaults.baseYear,
-    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0) dans les profils squelettes
+    //  CRITIQUE : Preserver undefined pour eviter les valeurs inventees (0) dans les profils squelettes
     growthRateEPS: assumptions.growthRateEPS !== void 0 ? (() => {
       const clamped = clamp(assumptions.growthRateEPS, settings.growth_min, settings.growth_max, safeDefaults.growthRateEPS);
       return clamped !== void 0 ? round2(clamped, settings.growth_precision) : void 0;
@@ -8457,7 +8457,7 @@ const sanitizeAssumptionsSync = (assumptions) => {
       const clamped = clamp(assumptions.growthRateDiv, settings.growth_min, settings.growth_max, safeDefaults.growthRateDiv);
       return clamped !== void 0 ? round2(clamped, settings.growth_precision) : void 0;
     })() : void 0,
-    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0)
+    //  CRITIQUE : Preserver undefined pour eviter les valeurs inventees (0)
     targetPE: assumptions.targetPE !== void 0 ? (() => {
       const clamped = clamp(assumptions.targetPE, settings.target_pe_min, settings.target_pe_max, safeDefaults.targetPE);
       return clamped !== void 0 ? round2(clamped, settings.ratio_precision) : void 0;
@@ -8607,7 +8607,7 @@ const isMutualFund = (symbol, companyName) => {
   }
   if (nameUpper.includes("MUTUAL FUND") || nameUpper.includes("FUND TRUST") || nameUpper.includes("INVESTMENT FUND") || nameUpper.includes("INDEX FUND") || /* nameUpper.includes('ETF') || */
   // ETF sont OK, on les garde souvent
-  nameUpper.includes("FUND") && nameUpper.includes("SERIES") || nameUpper.includes("VANGUARD FUNDS") || // Plus spécifique
+  nameUpper.includes("FUND") && nameUpper.includes("SERIES") || nameUpper.includes("VANGUARD FUNDS") || // Plus specifique
   nameUpper.includes("FIDELITY FUNDS")) {
     return true;
   }
@@ -8648,7 +8648,7 @@ const calculateRecommendation = (data, assumptions) => {
 };
 const autoFillAssumptionsFromFMPData = (data, currentPrice, existingAssumptions, currentDividendFromAPI) => {
   if (!data || data.length === 0) {
-    console.warn("⚠️ autoFillAssumptionsFromFMPData: Aucune donnée fournie pour les calculs");
+    console.warn(" autoFillAssumptionsFromFMPData: Aucune donnee fournie pour les calculs");
     return existingAssumptions || {};
   }
   const validHistory = data.filter((d) => d.priceHigh > 0 && d.priceLow > 0);
@@ -8741,31 +8741,31 @@ const autoFillAssumptionsFromFMPData = (data, currentPrice, existingAssumptions,
         }, 0) / yearsWithDividend.length;
         if (avgYield2 > 0.1 && avgYield2 < 20) {
           finalCurrentDividend = avgYield2 / 100 * currentPrice;
-          console.log(`ℹ️ Dividende estimé à partir du yield moyen historique (${avgYield2.toFixed(2)}%): ${finalCurrentDividend.toFixed(4)}`);
+          console.log(`i Dividende estime a partir du yield moyen historique (${avgYield2.toFixed(2)}%): ${finalCurrentDividend.toFixed(4)}`);
         }
       }
     }
   }
   const rawAssumptions = {
     currentPrice: round2(currentPrice, 2),
-    // ✅ Toujours mettre à jour le prix actuel
+    //  Toujours mettre a jour le prix actuel
     currentDividend: preserveIfExists(
       round2(finalCurrentDividend, 4),
       existingAssumptions == null ? void 0 : existingAssumptions.currentDividend,
       true
-      // ✅ FIX: Traiter comme un taux - ne pas préserver si existant est 0
+      //  FIX: Traiter comme un taux - ne pas preserver si existant est 0
     ),
     baseYear: preserveIfExists(
       lastValidData.year,
       existingAssumptions == null ? void 0 : existingAssumptions.baseYear,
       false
     ),
-    // ✅ Taux de croissance: PRÉSERVER les valeurs existantes (orange) si définies
+    //  Taux de croissance: PRESERVER les valeurs existantes (orange) si definies
     growthRateEPS: preserveIfExists(
       round2(Math.min(Math.max(growthEPS, -20), 20), 2),
       existingAssumptions == null ? void 0 : existingAssumptions.growthRateEPS,
       true
-      // ✅ Flag pour indiquer que c'est un taux de croissance
+      //  Flag pour indiquer que c'est un taux de croissance
     ),
     growthRateSales: preserveIfExists(
       round2(Math.min(Math.max(growthCF, -20), 20), 2),
@@ -8787,7 +8787,7 @@ const autoFillAssumptionsFromFMPData = (data, currentPrice, existingAssumptions,
       existingAssumptions == null ? void 0 : existingAssumptions.growthRateDiv,
       true
     ),
-    // ✅ Ratios cibles: PRÉSERVER les valeurs existantes (orange) si définies
+    //  Ratios cibles: PRESERVER les valeurs existantes (orange) si definies
     targetPE: preserveIfExists(
       round2(Math.max(5, Math.min(avgPE, 50)), 1),
       existingAssumptions == null ? void 0 : existingAssumptions.targetPE,
@@ -8808,7 +8808,7 @@ const autoFillAssumptionsFromFMPData = (data, currentPrice, existingAssumptions,
       existingAssumptions == null ? void 0 : existingAssumptions.targetYield,
       false
     ),
-    // Préserver les autres valeurs existantes si fournies
+    // Preserver les autres valeurs existantes si fournies
     requiredReturn: existingAssumptions == null ? void 0 : existingAssumptions.requiredReturn,
     dividendPayoutRatio: existingAssumptions == null ? void 0 : existingAssumptions.dividendPayoutRatio,
     excludeEPS: existingAssumptions == null ? void 0 : existingAssumptions.excludeEPS,
@@ -8855,7 +8855,7 @@ const Header = ({
   onFetchData,
   onRestoreData,
   showSyncButton = true,
-  // Par défaut, afficher le bouton
+  // Par defaut, afficher le bouton
   onOpenSettings,
   onOpenReports,
   activeSymbol
@@ -8908,7 +8908,7 @@ const Header = ({
 
 Source: FMP API
 
-Chargé via: ${info.logo || "Non disponible"}`,
+Charge via: ${info.logo || "Non disponible"}`,
             onError: (e) => {
               e.currentTarget.style.display = "none";
               e.currentTarget.onerror = null;
@@ -8920,10 +8920,10 @@ Chargé via: ${info.logo || "Non disponible"}`,
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-100 p-1.5 sm:p-2 rounded text-blue-700 font-bold text-base sm:text-xl min-w-[50px] sm:min-w-[60px] text-center select-none cursor-help", title: `Symbole: ${info.preferredSymbol || info.symbol}
 
-Symbole boursier utilisé pour identifier l'entreprise.
+Symbole boursier utilise pour identifier l'entreprise.
 
-Symbole préféré: ${info.preferredSymbol || "N/A"}
-Symbole réel: ${info.actualSymbol || info.symbol}
+Symbole prefere: ${info.preferredSymbol || "N/A"}
+Symbole reel: ${info.actualSymbol || info.symbol}
 Symbole original: ${info.symbol}`, children: info.preferredSymbol || info.symbol }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
@@ -8931,16 +8931,16 @@ Symbole original: ${info.symbol}`, children: info.preferredSymbol || info.symbol
               className: `absolute -bottom-1.5 -right-1.5 w-4 h-4 rounded-full border-2 border-white ${getRecColor(recommendation)} shadow-sm cursor-help`,
               title: `Signal: ${recommendation}
 
-ACHAT: Prix actuel ≤ Limite d'achat
+ACHAT: Prix actuel <= Limite d'achat
 CONSERVER: Entre limite d'achat et vente
-VENTE: Prix actuel ≥ Limite de vente`
+VENTE: Prix actuel >= Limite de vente`
             }
           ),
           isWatchlist !== null && isWatchlist !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
             {
               className: "absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-sm border border-blue-100 z-10",
-              title: isWatchlist ? "👁️ Watchlist (Non détenu)\n\nCe titre est dans votre watchlist (surveillé mais non détenu).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation." : "⭐ Portefeuille (Détenu)\n\nCe titre est dans votre portefeuille (team ticker, vous le détenez actuellement).\n\n⚠️ L'étoile ⭐ = Portefeuille (détenu), PAS une recommandation.\n• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)",
+              title: isWatchlist ? " Watchlist (Non detenu)\n\nCe titre est dans votre watchlist (surveille mais non detenu).\n\n L'etoile  = Portefeuille (detenu), PAS une recommandation." : " Portefeuille (Detenu)\n\nCe titre est dans votre portefeuille (team ticker, vous le detenez actuellement).\n\n L'etoile  = Portefeuille (detenu), PAS une recommandation.\n- Point colore = Recommandation (ACHAT/CONSERVER/VENTE)",
               children: isWatchlist ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-3.5 h-3.5 text-blue-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-3.5 h-3.5 text-yellow-500 fill-yellow-500", style: { fill: "#eab308" } })
             }
           )
@@ -8955,8 +8955,8 @@ Source: FMP API (company-profile)
 Symbole: ${info.preferredSymbol || info.symbol}
 Secteur: ${info.sector || "N/A"}
 Pays: ${info.country || "N/A"}
-Bourse: ${info.exchange || "N/A"}`, children: info.name === "Chargement..." && !activeSymbol ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600 normal-case", children: "Données non disponibles - Veuillez sélectionner un ticker" }) : info.name === "Chargement..." && activeSymbol ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-blue-600 normal-case", children: [
-            "Chargement des données pour ",
+Bourse: ${info.exchange || "N/A"}`, children: info.name === "Chargement..." && !activeSymbol ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600 normal-case", children: "Donnees non disponibles - Veuillez selectionner un ticker" }) : info.name === "Chargement..." && activeSymbol ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-blue-600 normal-case", children: [
+            "Chargement des donnees pour ",
             activeSymbol,
             "..."
           ] }) : info.name }),
@@ -8964,12 +8964,12 @@ Bourse: ${info.exchange || "N/A"}`, children: info.name === "Chargement..." && !
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 sm:hidden", children: "GOB" }),
             info.exchange && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded cursor-help", title: `Bourse: ${info.exchange}
 
-Bourse où l'action est cotée.
+Bourse ou l'action est cotee.
 
 Source: FMP API (company-profile)`, children: info.exchange }),
             info.currency && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded cursor-help", title: `Devise: ${info.currency}
 
-Devise dans laquelle l'action est cotée.
+Devise dans laquelle l'action est cotee.
 
 Source: FMP API (company-profile)`, children: info.currency }),
             info.country && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded cursor-help", title: `Pays: ${info.country}
@@ -8985,36 +8985,36 @@ Source: FMP API (company-profile)`, children: info.country })
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-600 block text-[10px] sm:text-xs", children: "SECTEUR" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs sm:text-sm truncate block", title: info.sector, children: info.sector })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center cursor-help", title: "Cote de sécurité ValueLine (1-5)\\n1 = Très sûr\\n5 = Risqué\\nSource: ValueLine (3 déc 2025)\\n⚠️ Lecture seule - Modifiable via Supabase uniquement", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-600 block text-[10px] sm:text-xs", children: "CÔTE SÉCURITÉ" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center cursor-help", title: "Cote de securite ValueLine (1-5)\\n1 = Tres sur\\n5 = Risque\\nSource: ValueLine (3 dec 2025)\\n Lecture seule - Modifiable via Supabase uniquement", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-600 block text-[10px] sm:text-xs", children: "COTE SECURITE" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-green-600 text-sm sm:text-base", children: info.securityRank }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[8px] sm:text-[9px] text-gray-500 hidden sm:block mt-0.5", children: "ValueLine 3 déc 2025" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[8px] sm:text-[9px] text-gray-500 hidden sm:block mt-0.5", children: "ValueLine 3 dec 2025" })
         ] }),
         info.beta !== void 0 && info.beta !== null && isFinite(info.beta) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center cursor-help", title: `Beta: ${info.beta.toFixed(2)}
 
-Mesure la volatilité relative au marché:
-• Beta < 1: Moins volatile que le marché
-• Beta = 1: Volatilité égale au marché
-• Beta > 1: Plus volatile que le marché
+Mesure la volatilite relative au marche:
+- Beta < 1: Moins volatile que le marche
+- Beta = 1: Volatilite egale au marche
+- Beta > 1: Plus volatile que le marche
 
 Source: FMP key-metrics`, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-600 block text-[10px] sm:text-xs", children: "BETA" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-blue-600 text-sm sm:text-base", children: info.beta.toFixed(2) })
         ] }),
-        info.earningsPredictability && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center hidden sm:block cursor-help", title: "Earnings Predictability (ValueLine)\\n\\nMesure la prédictibilité des bénéfices de l'entreprise.\\nSource: ValueLine (3 déc 2025)\\n⚠️ Lecture seule - Modifiable via Supabase uniquement", children: [
+        info.earningsPredictability && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center hidden sm:block cursor-help", title: "Earnings Predictability (ValueLine)\\n\\nMesure la predictibilite des benefices de l'entreprise.\\nSource: ValueLine (3 dec 2025)\\n Lecture seule - Modifiable via Supabase uniquement", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-600 block text-[10px] sm:text-xs", children: "EARNINGS PRED." }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-purple-600 text-sm sm:text-base", children: info.earningsPredictability }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[8px] sm:text-[9px] text-gray-500 hidden md:block mt-0.5", children: "ValueLine 3 déc 2025" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[8px] sm:text-[9px] text-gray-500 hidden md:block mt-0.5", children: "ValueLine 3 dec 2025" })
         ] }),
-        info.priceGrowthPersistence && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center hidden md:block cursor-help", title: "Price Growth Persistence (ValueLine)\\n\\nMesure la persistance de la croissance du prix de l'action.\\nSource: ValueLine (3 déc 2025)\\n⚠️ Lecture seule - Modifiable via Supabase uniquement", children: [
+        info.priceGrowthPersistence && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center hidden md:block cursor-help", title: "Price Growth Persistence (ValueLine)\\n\\nMesure la persistance de la croissance du prix de l'action.\\nSource: ValueLine (3 dec 2025)\\n Lecture seule - Modifiable via Supabase uniquement", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-600 block text-xs", children: "PRICE GROWTH PERSISTENCE" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-pink-600", children: info.priceGrowthPersistence }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[9px] text-gray-500 block mt-0.5", children: "ValueLine 3 déc 2025" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[9px] text-gray-500 block mt-0.5", children: "ValueLine 3 dec 2025" })
         ] }),
-        info.priceStability && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center hidden md:block cursor-help", title: "Price Stability (ValueLine)\\n\\nMesure la stabilité du prix de l'action.\\nSource: ValueLine (3 déc 2025)\\n⚠️ Lecture seule - Modifiable via Supabase uniquement", children: [
+        info.priceStability && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-100 px-2 sm:px-3 py-1 rounded text-center hidden md:block cursor-help", title: "Price Stability (ValueLine)\\n\\nMesure la stabilite du prix de l'action.\\nSource: ValueLine (3 dec 2025)\\n Lecture seule - Modifiable via Supabase uniquement", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-600 block text-xs", children: "PRICE STABILITY" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-teal-600", children: info.priceStability }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[9px] text-gray-500 block mt-0.5", children: "ValueLine 3 déc 2025" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[9px] text-gray-500 block mt-0.5", children: "ValueLine 3 dec 2025" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-1.5 sm:gap-2 ml-auto md:ml-0", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -9022,7 +9022,7 @@ Source: FMP key-metrics`, children: [
             {
               onClick: () => window.dispatchEvent(new CustomEvent("open-save-dialog")),
               className: "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md active:scale-95",
-              title: "💾 Sauvegarder une version (Snapshot)\\n\\nCrée un snapshot complet de l'analyse actuelle incluant toutes les données historiques, hypothèses et métriques calculées.\\n\\nLes snapshots sont accessibles dans la sidebar droite (icône horloge).",
+              title: " Sauvegarder une version (Snapshot)\\n\\nCree un snapshot complet de l'analyse actuelle incluant toutes les donnees historiques, hypotheses et metriques calculees.\\n\\nLes snapshots sont accessibles dans la sidebar droite (icone horloge).",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Sauvegarder" })
@@ -9035,7 +9035,7 @@ Source: FMP key-metrics`, children: [
               onClick: handleSyncClick,
               disabled: isLoading,
               className: `flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:shadow-md active:scale-95 border border-emerald-200"}`,
-              title: "🔄 Options de Synchronisation Avancées\\n\\nOuvre le tableau de bord de synchronisation avec toutes les options configurables pour charger/mettre à jour les données depuis FMP.",
+              title: " Options de Synchronisation Avancees\\n\\nOuvre le tableau de bord de synchronisation avec toutes les options configurables pour charger/mettre a jour les donnees depuis FMP.",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: `w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isLoading ? "animate-pulse" : ""}` }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: isLoading ? "Synchronisation..." : "Synchroniser" })
@@ -9048,8 +9048,8 @@ Source: FMP key-metrics`, children: [
               onClick: onRestoreData,
               disabled: isLoading,
               className: `flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print ${isLoading ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-purple-50 text-purple-700 hover:bg-purple-100 hover:shadow-md active:scale-95 border border-purple-200"}`,
-              title: "📥 Restaurer les données\\n\\nOuvre un dialogue pour charger un snapshot précédent ou recalculer depuis FMP.",
-              "aria-label": "Restaurer les données",
+              title: " Restaurer les donnees\\n\\nOuvre un dialogue pour charger un snapshot precedent ou recalculer depuis FMP.",
+              "aria-label": "Restaurer les donnees",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Restaurer" })
@@ -9061,7 +9061,7 @@ Source: FMP key-metrics`, children: [
             {
               onClick: handlePrint,
               className: "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-gray-50 text-gray-700 hover:bg-gray-100 hover:shadow-md active:scale-95 border border-gray-200",
-              title: "🖨️ Imprimer la fiche d'analyse\\n\\nGénère une version imprimable de l'analyse complète (données, graphiques, matrices, notes).",
+              title: " Imprimer la fiche d'analyse\\n\\nGenere une version imprimable de l'analyse complete (donnees, graphiques, matrices, notes).",
               "aria-label": "Imprimer la fiche d'analyse",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
@@ -9074,7 +9074,7 @@ Source: FMP key-metrics`, children: [
             {
               onClick: onOpenReports,
               className: "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:shadow-md active:scale-95 border border-indigo-200",
-              title: "📊 Rapports Visuels et Analyse de Données\\n\\nOuvre le panneau de rapports visuels complets avec visualisation des données, qualité des données et statistiques détaillées.",
+              title: " Rapports Visuels et Analyse de Donnees\\n\\nOuvre le panneau de rapports visuels complets avec visualisation des donnees, qualite des donnees et statistiques detaillees.",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Rapports" })
@@ -9086,10 +9086,10 @@ Source: FMP key-metrics`, children: [
             {
               onClick: onOpenSettings,
               className: "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-semibold transition-all no-print bg-slate-50 text-slate-700 hover:bg-slate-100 hover:shadow-md active:scale-95 border border-slate-200",
-              title: "⚙️ Configuration Complète\\n\\nOuvre le panneau de configuration pour gérer les Guardrails (affichage), Validation (sanitisation) et Ajustements.",
+              title: " Configuration Complete\\n\\nOuvre le panneau de configuration pour gerer les Guardrails (affichage), Validation (sanitisation) et Ajustements.",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Paramètres" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline whitespace-nowrap", children: "Parametres" })
               ]
             }
           )
@@ -9098,7 +9098,7 @@ Source: FMP key-metrics`, children: [
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 bg-slate-50 p-2 sm:p-3 rounded-md border border-slate-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col group relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Prix du marché en temps réel", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Prix du marche en temps reel", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-3 h-3" }),
           " Prix Actuel"
         ] }),
@@ -9112,12 +9112,12 @@ Source: FMP key-metrics`, children: [
             onChange: (e) => handleNumericChange(e, "currentPrice", 0.01),
             className: `border rounded px-2 py-1 text-base sm:text-lg font-bold focus:ring-2 focus:ring-blue-500 outline-none ${assumptions.currentPrice === 0 || assumptions.currentPrice === null || assumptions.currentPrice === void 0 ? "border-red-300 text-red-600 focus:ring-red-500" : "border-gray-300 text-blue-700 invalid:border-red-500 invalid:text-red-600"}`,
             placeholder: assumptions.currentPrice === 0 ? "Prix requis" : "",
-            title: "Prix Actuel\\n\\nPrix du marché en temps réel de l'action.\\nSource: FMP API (quote)\\n\\nVous pouvez modifier manuellement si nécessaire.\\nUtilisé pour:\\n• Calcul du rendement total\\n• Calcul du JPEGY\\n• Calcul du Ratio 3:1\\n• Zones de prix recommandées\\n\\n⚠️ Le prix doit être > 0 pour les calculs"
+            title: "Prix Actuel\\n\\nPrix du marche en temps reel de l'action.\\nSource: FMP API (quote)\\n\\nVous pouvez modifier manuellement si necessaire.\\nUtilise pour:\\n- Calcul du rendement total\\n- Calcul du JPEGY\\n- Calcul du Ratio 3:1\\n- Zones de prix recommandees\\n\\n Le prix doit etre > 0 pour les calculs"
           }
         )
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Dividende annuel versé par action", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Dividende annuel verse par action", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$H, { className: "w-3 h-3" }),
           " Dividende (Act.)"
         ] }),
@@ -9130,7 +9130,7 @@ Source: FMP key-metrics`, children: [
             value: assumptions.currentDividend,
             onChange: (e) => handleNumericChange(e, "currentDividend", 0),
             className: "border border-gray-300 rounded px-2 py-1 text-base sm:text-lg font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none invalid:border-red-500 invalid:text-red-600",
-            title: "Dividende Actuel\\n\\nDividende annuel versé par action.\\nSource: FMP API (key-metrics)\\n\\nUtilisé pour:\\n• Calcul du Yield actuel\\n• Projection des dividendes sur 5 ans\\n• Calcul du rendement total (incluant dividendes)\\n• Calcul du JPEGY"
+            title: "Dividende Actuel\\n\\nDividende annuel verse par action.\\nSource: FMP API (key-metrics)\\n\\nUtilise pour:\\n- Calcul du Yield actuel\\n- Projection des dividendes sur 5 ans\\n- Calcul du rendement total (incluant dividendes)\\n- Calcul du JPEGY"
           }
         )
       ] }),
@@ -9141,21 +9141,21 @@ Source: FMP key-metrics`, children: [
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-base sm:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help", title: `Rendement du dividende: ${assumptions.currentPrice > 0 ? formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100) : "N/A"}
 
-Formule: (Dividende / Prix Actuel) × 100
+Formule: (Dividende / Prix Actuel) x 100
 
-Calculé automatiquement à partir du dividende et du prix actuel.`, children: assumptions.currentPrice > 0 ? formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100) : "N/A" })
+Calcule automatiquement a partir du dividende et du prix actuel.`, children: assumptions.currentPrice > 0 ? formatPercent(assumptions.currentDividend / assumptions.currentPrice * 100) : "N/A" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 cursor-help", title: "Capitalisation boursière (Market Cap)\\n\\nValeur totale de l'entreprise en bourse.\\nFormule: Prix Actuel × Nombre d'actions en circulation\\n\\nSource: FMP API", children: "Capitalisation" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 cursor-help", title: "Capitalisation boursiere (Market Cap)\\n\\nValeur totale de l'entreprise en bourse.\\nFormule: Prix Actuel x Nombre d'actions en circulation\\n\\nSource: FMP API", children: "Capitalisation" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-2 py-1 text-sm sm:text-base md:text-lg font-medium text-gray-700 bg-gray-100 rounded border border-transparent cursor-help truncate", title: `Capitalisation: ${typeof info.marketCap === "string" ? info.marketCap : info.marketCap || "Non disponible"}
 
-Valeur totale de l'entreprise calculée par:
-Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap && typeof info.marketCap === "string" && info.marketCap.trim() !== "" ? info.marketCap : typeof info.marketCap === "number" ? info.marketCap.toLocaleString() : "N/A" })
+Valeur totale de l'entreprise calculee par:
+Prix Actuel x Nombre d'actions en circulation`, children: info.marketCap && typeof info.marketCap === "string" && info.marketCap.trim() !== "" ? info.marketCap : typeof info.marketCap === "number" ? info.marketCap.toLocaleString() : "N/A" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Année de départ pour les projections à 5 ans", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "text-xs font-semibold text-gray-500 uppercase mb-1 flex items-center gap-1 cursor-help", title: "Annee de depart pour les projections a 5 ans", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$C, { className: "w-3 h-3" }),
-          " Année de Base"
+          " Annee de Base"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "select",
@@ -9163,8 +9163,8 @@ Prix Actuel × Nombre d'actions en circulation`, children: info.marketCap && typ
             value: assumptions.baseYear || "",
             onChange: (e) => onUpdateAssumption("baseYear", parseInt(e.target.value)),
             className: "border border-gray-300 rounded px-2 py-1.5 text-sm sm:text-base md:text-lg font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 outline-none bg-white h-[38px]",
-            title: "Année de Base\\n\\nAnnée de référence pour toutes les projections à 5 ans.\\n\\nSélectionnez l'année qui servira de point de départ:\\n• Généralement la dernière année complète\\n• Ou l'année estimée N+1 si disponible\\n\\nToutes les valeurs projetées (EPS, CF, BV, DIV) partiront de cette année.\\n\\nModifier l'année de base recalcule automatiquement toutes les projections.",
-            children: availableYears.length > 0 ? availableYears.map((year) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: year, children: year }, year)) : /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: "Sélectionner une année" })
+            title: "Annee de Base\\n\\nAnnee de reference pour toutes les projections a 5 ans.\\n\\nSelectionnez l'annee qui servira de point de depart:\\n- Generalement la derniere annee complete\\n- Ou l'annee estimee N+1 si disponible\\n\\nToutes les valeurs projetees (EPS, CF, BV, DIV) partiront de cette annee.\\n\\nModifier l'annee de base recalcule automatiquement toutes les projections.",
+            children: availableYears.length > 0 ? availableYears.map((year) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: year, children: year }, year)) : /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: "Selectionner une annee" })
           }
         )
       ] })
@@ -9182,7 +9182,7 @@ const DataColorLegend = () => {
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-blue-600" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm sm:text-base font-semibold text-gray-700", children: "Légende des couleurs des données" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm sm:text-base font-semibold text-gray-700", children: "Legende des couleurs des donnees" })
           ] }),
           isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-5 h-5 text-gray-500" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-5 h-5 text-gray-500" })
         ]
@@ -9191,13 +9191,13 @@ const DataColorLegend = () => {
     isExpanded && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 space-y-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-green-100 border-2 border-green-400 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-700 font-bold text-xs", children: "✓" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-green-100 border-2 border-green-400 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-700 font-bold text-xs", children: "" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-green-800 text-sm mb-1", children: "Fond VERT" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-green-700", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données FMP vérifiées" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Donnees FMP verifiees" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-              `Données récupérées directement depuis l'API FMP, non modifiées. Ces données sont considérées comme "officielles" et vérifiées.`
+              `Donnees recuperees directement depuis l'API FMP, non modifiees. Ces donnees sont considerees comme "officielles" et verifiees.`
             ] })
           ] })
         ] }),
@@ -9206,21 +9206,21 @@ const DataColorLegend = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-blue-800 text-sm mb-1", children: "Fond BLEU" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données FMP ajustées" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Donnees FMP ajustees" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-              "Données provenant de FMP mais mergées avec des valeurs existantes (Supabase ou manuelles). Apparaît quand FMP retourne des valeurs à 0 ou quand des données existantes sont préservées. ",
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Pour avoir uniquement du VERT, synchronisez depuis FMP sans données existantes à préserver." })
+              "Donnees provenant de FMP mais mergees avec des valeurs existantes (Supabase ou manuelles). Apparait quand FMP retourne des valeurs a 0 ou quand des donnees existantes sont preservees. ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Pour avoir uniquement du VERT, synchronisez depuis FMP sans donnees existantes a preserver." })
             ] })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-orange-100 border-2 border-orange-400 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-700 font-bold text-xs", children: "✎" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-orange-100 border-2 border-orange-400 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-700 font-bold text-xs", children: "" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-orange-800 text-sm mb-1", children: "Fond ORANGE" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-orange-700", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données manuelles" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Donnees manuelles" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-              "Valeur modifiée manuellement par l'utilisateur. Les modifications manuelles sont préservées lors de la synchronisation."
+              "Valeur modifiee manuellement par l'utilisateur. Les modifications manuelles sont preservees lors de la synchronisation."
             ] })
           ] })
         ] }),
@@ -9229,26 +9229,26 @@ const DataColorLegend = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-gray-800 text-sm mb-1", children: "Fond GRIS" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-700", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données calculées" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Donnees calculees" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-              "Valeur calculée automatiquement (ratios P/E, P/CF, P/BV, rendements, etc.). Ces données ne proviennent pas directement de FMP."
+              "Valeur calculee automatiquement (ratios P/E, P/CF, P/BV, rendements, etc.). Ces donnees ne proviennent pas directement de FMP."
             ] })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 bg-red-50 border-2 border-red-400 border-dashed rounded-lg", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-red-100 border-2 border-red-500 rounded flex-shrink-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-red-700" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-red-800 text-sm mb-1", children: "Fond ROUGE (Bordure pointillée)" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-red-800 text-sm mb-1", children: "Fond ROUGE (Bordure pointillee)" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-red-700", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Valeurs aberrantes détectées" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Valeurs aberrantes detectees" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-              "Valeur significativement différente de la moyenne historique (> 2 écarts-types). Peut indiquer une erreur de données, un événement exceptionnel, ou des données incomplètes. Vérifiez et corrigez si nécessaire."
+              "Valeur significativement differente de la moyenne historique (> 2 ecarts-types). Peut indiquer une erreur de donnees, un evenement exceptionnel, ou des donnees incompletes. Verifiez et corrigez si necessaire."
             ] })
           ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 p-2 bg-blue-50 border-l-4 border-blue-400 rounded", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-800", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "💡 Note:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: " Note:" }),
         " Cliquez sur une cellule avec fond vert ou bleu pour la modifier. La modification marquera automatiquement la valeur comme manuelle (fond orange)."
       ] }) })
     ] })
@@ -9305,28 +9305,28 @@ const EditableCell = ({ value, onCommit, min: min2 = -Infinity, id, autoFetched 
   };
   const baseClass = "w-full text-right focus:bg-white focus:ring-1 focus:ring-blue-400 rounded px-0.5 sm:px-1 outline-none transition-colors invalid:text-red-500 invalid:bg-red-50 text-xs sm:text-sm relative";
   let sourceClass = "bg-transparent";
-  let tooltipText = "Données manuelles\n\nFond blanc = valeur modifiée manuellement.\n\nLes modifications manuelles sont préservées lors de la synchronisation.";
+  let tooltipText = "Donnees manuelles\n\nFond blanc = valeur modifiee manuellement.\n\nLes modifications manuelles sont preservees lors de la synchronisation.";
   if (isOutlier) {
     sourceClass = "bg-red-100 text-red-800 font-bold border-2 border-red-400 border-dashed";
-    tooltipText = "⚠️ VALEUR ABERRANTE DÉTECTÉE\n\nCette valeur est significativement différente de la moyenne historique (> 2 écarts-types).\n\nCela peut indiquer:\n• Une erreur de données\n• Un événement exceptionnel (restructuration, acquisition, etc.)\n• Des données incomplètes ou corrompues\n\nVérifiez cette valeur et corrigez-la si nécessaire.";
+    tooltipText = " VALEUR ABERRANTE DETECTEE\n\nCette valeur est significativement differente de la moyenne historique (> 2 ecarts-types).\n\nCela peut indiquer:\n- Une erreur de donnees\n- Un evenement exceptionnel (restructuration, acquisition, etc.)\n- Des donnees incompletes ou corrompues\n\nVerifiez cette valeur et corrigez-la si necessaire.";
   } else if (currentDataSource === "fmp-verified") {
     sourceClass = "bg-green-50 text-green-700 font-medium";
-    tooltipText = `✅ Données FMP vérifiées
+    tooltipText = ` Donnees FMP verifiees
 
-Fond VERT = données récupérées directement depuis l'API FMP, non modifiées.
+Fond VERT = donnees recuperees directement depuis l'API FMP, non modifiees.
 
-Ces données sont les seules considérées comme "officielles" et vérifiées.
+Ces donnees sont les seules considerees comme "officielles" et verifiees.
 
 Cliquez pour modifier manuellement. La modification marquera cette valeur comme manuelle (fond orange).`;
   } else if (currentDataSource === "fmp-adjusted") {
     sourceClass = "bg-blue-50 text-blue-700 font-medium";
-    tooltipText = "🔵 Données FMP ajustées\n\nFond BLEU = données provenant de FMP mais ajustées/mergées avec des valeurs existantes.\n\nCes données ne sont pas 100% vérifiées car elles ont été modifiées lors du merge.\n\nCliquez pour modifier manuellement. La modification marquera cette valeur comme manuelle (fond orange).";
+    tooltipText = " Donnees FMP ajustees\n\nFond BLEU = donnees provenant de FMP mais ajustees/mergees avec des valeurs existantes.\n\nCes donnees ne sont pas 100% verifiees car elles ont ete modifiees lors du merge.\n\nCliquez pour modifier manuellement. La modification marquera cette valeur comme manuelle (fond orange).";
   } else if (currentDataSource === "manual") {
     sourceClass = "bg-orange-50 text-orange-700 font-medium";
-    tooltipText = "🟠 Données manuelles\n\nFond ORANGE = valeur modifiée manuellement.\n\nLes modifications manuelles sont préservées lors de la synchronisation.";
+    tooltipText = " Donnees manuelles\n\nFond ORANGE = valeur modifiee manuellement.\n\nLes modifications manuelles sont preservees lors de la synchronisation.";
   } else if (currentDataSource === "calculated") {
     sourceClass = "bg-gray-50 text-gray-700 font-medium";
-    tooltipText = "⚪ Données calculées\n\nFond GRIS = valeur calculée automatiquement.\n\nCes données ne proviennent pas directement de FMP.";
+    tooltipText = " Donnees calculees\n\nFond GRIS = valeur calculee automatiquement.\n\nCes donnees ne proviennent pas directement de FMP.";
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -9348,7 +9348,7 @@ Cliquez pour modifier manuellement. La modification marquera cette valeur comme 
       ForwardRef$m,
       {
         className: "absolute -top-1 -right-1 w-3 h-3 text-red-600 bg-white rounded-full p-0.5",
-        title: "Valeur aberrante détectée"
+        title: "Valeur aberrante detectee"
       }
     )
   ] });
@@ -9428,12 +9428,12 @@ const HistoricalTable = ({ data, onUpdateRow }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto bg-white rounded-lg shadow border border-gray-200", "data-demo": "historical-table", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "min-w-full text-xs sm:text-sm text-right", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("thead", { className: "bg-slate-100 text-gray-600 font-semibold uppercase text-[10px] sm:text-xs border-b-2 border-slate-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 sm:px-3 py-2 sm:py-3 text-left sticky left-0 bg-slate-100 z-10 cursor-help", title: "Année fiscale\\n\\nAnnée de référence pour les données financières.\\n\\nLes données sont organisées par année fiscale complète.", children: "Année" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-blue-50 text-blue-800 cursor-help", colSpan: 2, title: "Prix de l'action\\n\\n• Prix Haut: Prix maximum observé durant l'année\\n• Prix Bas: Prix minimum observé durant l'année\\n\\nSource: FMP API (historical-price-full)\\n\\nUtilisés pour:\\n• Calcul des ratios P/E, P/CF, P/BV\\n• Calcul du Yield\\n• Détermination du prix plancher historique", children: "Prix" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-green-50 text-green-800 cursor-help", colSpan: 3, title: "Cash Flow par Action (CFA)\\n\\nFlux de trésorerie opérationnel par action.\\n\\nSource: FMP API (cash-flow-statement)\\n\\n• CF/Act: Cash Flow par action (éditable)\\n• P/CF (H): Ratio Prix/Cash Flow au prix haut\\n• P/CF (B): Ratio Prix/Cash Flow au prix bas\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode P/CF)\\n• Évaluation de la génération de cash", children: "Cash Flow" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-yellow-50 text-yellow-800 cursor-help", colSpan: 2, title: "Dividendes par Action\\n\\nSomme des dividendes versés par année fiscale.\\n\\nSource: FMP API (key-metrics + financial-growth)\\n\\n• Div/Act: Dividende par action (éditable)\\n• Rend. %: Rendement en dividendes (Div / Prix Bas)\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode Yield)\\n• Calcul du rendement total (incluant dividendes)", children: "Dividendes" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-purple-50 text-purple-800 cursor-help", colSpan: 3, title: "Valeur Comptable par Action (BV)\\n\\nValeur comptable (actif net) par action.\\n\\nSource: FMP API (balance-sheet-statement)\\n\\n• Val/Act: Book Value par action (éditable)\\n• P/BV (H): Ratio Prix/Valeur Comptable au prix haut\\n• P/BV (B): Ratio Prix/Valeur Comptable au prix bas\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode P/BV)\\n• Évaluation de la valeur intrinsèque", children: "Valeur Comptable (BV)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-red-50 text-red-800 cursor-help", colSpan: 3, title: "Bénéfice par Action (EPS)\\n\\nBénéfice net par action (données annuelles auditées).\\n\\nSource: FMP API (income-statement)\\n\\n• EPS: Earnings per Share (éditable)\\n• P/E (H): Ratio Prix/Bénéfice au prix haut\\n• P/E (B): Ratio Prix/Bénéfice au prix bas\\n\\nUtilisé pour:\\n• Calcul du prix cible (méthode P/E)\\n• Calcul du JPEGY\\n• Évaluation principale", children: "Earnings (EPS)" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 sm:px-3 py-2 sm:py-3 text-left sticky left-0 bg-slate-100 z-10 cursor-help", title: "Annee fiscale\\n\\nAnnee de reference pour les donnees financieres.\\n\\nLes donnees sont organisees par annee fiscale complete.", children: "Annee" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-blue-50 text-blue-800 cursor-help", colSpan: 2, title: "Prix de l'action\\n\\n- Prix Haut: Prix maximum observe durant l'annee\\n- Prix Bas: Prix minimum observe durant l'annee\\n\\nSource: FMP API (historical-price-full)\\n\\nUtilises pour:\\n- Calcul des ratios P/E, P/CF, P/BV\\n- Calcul du Yield\\n- Determination du prix plancher historique", children: "Prix" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-green-50 text-green-800 cursor-help", colSpan: 3, title: "Cash Flow par Action (CFA)\\n\\nFlux de tresorerie operationnel par action.\\n\\nSource: FMP API (cash-flow-statement)\\n\\n- CF/Act: Cash Flow par action (editable)\\n- P/CF (H): Ratio Prix/Cash Flow au prix haut\\n- P/CF (B): Ratio Prix/Cash Flow au prix bas\\n\\nUtilise pour:\\n- Calcul du prix cible (methode P/CF)\\n- Evaluation de la generation de cash", children: "Cash Flow" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-yellow-50 text-yellow-800 cursor-help", colSpan: 2, title: "Dividendes par Action\\n\\nSomme des dividendes verses par annee fiscale.\\n\\nSource: FMP API (key-metrics + financial-growth)\\n\\n- Div/Act: Dividende par action (editable)\\n- Rend. %: Rendement en dividendes (Div / Prix Bas)\\n\\nUtilise pour:\\n- Calcul du prix cible (methode Yield)\\n- Calcul du rendement total (incluant dividendes)", children: "Dividendes" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-purple-50 text-purple-800 cursor-help", colSpan: 3, title: "Valeur Comptable par Action (BV)\\n\\nValeur comptable (actif net) par action.\\n\\nSource: FMP API (balance-sheet-statement)\\n\\n- Val/Act: Book Value par action (editable)\\n- P/BV (H): Ratio Prix/Valeur Comptable au prix haut\\n- P/BV (B): Ratio Prix/Valeur Comptable au prix bas\\n\\nUtilise pour:\\n- Calcul du prix cible (methode P/BV)\\n- Evaluation de la valeur intrinseque", children: "Valeur Comptable (BV)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-1.5 sm:px-2 py-2 sm:py-3 bg-red-50 text-red-800 cursor-help", colSpan: 3, title: "Benefice par Action (EPS)\\n\\nBenefice net par action (donnees annuelles auditees).\\n\\nSource: FMP API (income-statement)\\n\\n- EPS: Earnings per Share (editable)\\n- P/E (H): Ratio Prix/Benefice au prix haut\\n- P/E (B): Ratio Prix/Benefice au prix bas\\n\\nUtilise pour:\\n- Calcul du prix cible (methode P/E)\\n- Calcul du JPEGY\\n- Evaluation principale", children: "Earnings (EPS)" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "text-[9px] sm:text-[10px] text-gray-500", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 sm:px-3 py-1 text-left sticky left-0 bg-slate-100 z-10" }),
@@ -9441,7 +9441,7 @@ const HistoricalTable = ({ data, onUpdateRow }) => {
             "th",
             {
               className: "px-1.5 sm:px-2 py-1 bg-blue-50/50 cursor-pointer hover:bg-blue-100 transition-colors",
-              title: "Prix Haut\\n\\nPrix maximum observé durant l'année.\\nSource: FMP API (historical-price-full)\\n\\nCliquez pour voir les statistiques historiques",
+              title: "Prix Haut\\n\\nPrix maximum observe durant l'annee.\\nSource: FMP API (historical-price-full)\\n\\nCliquez pour voir les statistiques historiques",
               onClick: () => handleHeaderClick("priceHigh", "Prix Haut"),
               children: "Haut"
             }
@@ -9450,7 +9450,7 @@ const HistoricalTable = ({ data, onUpdateRow }) => {
             "th",
             {
               className: "px-1.5 sm:px-2 py-1 bg-blue-50/50 cursor-pointer hover:bg-blue-100 transition-colors",
-              title: "Prix Bas\\n\\nPrix minimum observé durant l'année.\\nSource: FMP API (historical-price-full)\\n\\nCliquez pour voir les statistiques historiques",
+              title: "Prix Bas\\n\\nPrix minimum observe durant l'annee.\\nSource: FMP API (historical-price-full)\\n\\nCliquez pour voir les statistiques historiques",
               onClick: () => handleHeaderClick("priceLow", "Prix Bas"),
               children: "Bas"
             }
@@ -9459,45 +9459,45 @@ const HistoricalTable = ({ data, onUpdateRow }) => {
             "th",
             {
               className: "px-2 py-1 bg-green-50/50 cursor-pointer hover:bg-green-100 transition-colors",
-              title: "Cash Flow par Action (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).\\n\\nCliquez sur l'en-tête pour voir les statistiques historiques",
+              title: "Cash Flow par Action (editable)\\n\\nCliquez pour modifier. Fond vert = donnees auto-fetchees (FMP).\\n\\nCliquez sur l'en-tete pour voir les statistiques historiques",
               onClick: () => handleHeaderClick("cashFlowPerShare", "Cash Flow par Action"),
               children: "CF/Act"
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "P/CF au Prix Haut\\n\\nCalculé: Prix Haut / Cash Flow par Action\\n\\nRatio calculé automatiquement.", children: "P/CF (H)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "P/CF au Prix Bas\\n\\nCalculé: Prix Bas / Cash Flow par Action\\n\\nRatio calculé automatiquement.", children: "P/CF (B)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "P/CF au Prix Haut\\n\\nCalcule: Prix Haut / Cash Flow par Action\\n\\nRatio calcule automatiquement.", children: "P/CF (H)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-green-50/50 cursor-help", title: "P/CF au Prix Bas\\n\\nCalcule: Prix Bas / Cash Flow par Action\\n\\nRatio calcule automatiquement.", children: "P/CF (B)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "th",
             {
               className: "px-2 py-1 bg-yellow-50/50 cursor-pointer hover:bg-yellow-100 transition-colors",
-              title: "Dividende par Action (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).\\n\\nCliquez sur l'en-tête pour voir les statistiques historiques",
+              title: "Dividende par Action (editable)\\n\\nCliquez pour modifier. Fond vert = donnees auto-fetchees (FMP).\\n\\nCliquez sur l'en-tete pour voir les statistiques historiques",
               onClick: () => handleHeaderClick("dividendPerShare", "Dividende par Action"),
               children: "Div/Act"
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-yellow-50/50 cursor-help", title: "Rendement en Dividendes (%)\\n\\nCalculé: (Dividende / Prix Bas) × 100\\n\\nRatio calculé automatiquement.", children: "Rend. %" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-yellow-50/50 cursor-help", title: "Rendement en Dividendes (%)\\n\\nCalcule: (Dividende / Prix Bas) x 100\\n\\nRatio calcule automatiquement.", children: "Rend. %" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "th",
             {
               className: "px-2 py-1 bg-purple-50/50 cursor-pointer hover:bg-purple-100 transition-colors",
-              title: "Book Value par Action (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).\\n\\nCliquez sur l'en-tête pour voir les statistiques historiques",
+              title: "Book Value par Action (editable)\\n\\nCliquez pour modifier. Fond vert = donnees auto-fetchees (FMP).\\n\\nCliquez sur l'en-tete pour voir les statistiques historiques",
               onClick: () => handleHeaderClick("bookValuePerShare", "Book Value par Action"),
               children: "Val/Act"
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "P/BV au Prix Haut\\n\\nCalculé: Prix Haut / Book Value par Action\\n\\nRatio calculé automatiquement.", children: "P/BV (H)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "P/BV au Prix Bas\\n\\nCalculé: Prix Bas / Book Value par Action\\n\\nRatio calculé automatiquement.", children: "P/BV (B)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "P/BV au Prix Haut\\n\\nCalcule: Prix Haut / Book Value par Action\\n\\nRatio calcule automatiquement.", children: "P/BV (H)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-purple-50/50 cursor-help", title: "P/BV au Prix Bas\\n\\nCalcule: Prix Bas / Book Value par Action\\n\\nRatio calcule automatiquement.", children: "P/BV (B)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "th",
             {
               className: "px-2 py-1 bg-red-50/50 cursor-pointer hover:bg-red-100 transition-colors",
-              title: "Earnings per Share (éditable)\\n\\nCliquez pour modifier. Fond vert = données auto-fetchées (FMP).\\n\\nCliquez sur l'en-tête pour voir les statistiques historiques",
+              title: "Earnings per Share (editable)\\n\\nCliquez pour modifier. Fond vert = donnees auto-fetchees (FMP).\\n\\nCliquez sur l'en-tete pour voir les statistiques historiques",
               onClick: () => handleHeaderClick("earningsPerShare", "Earnings per Share"),
               children: "EPS"
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "P/E au Prix Haut\\n\\nCalculé: Prix Haut / Earnings per Share\\n\\nRatio calculé automatiquement.", children: "P/E (H)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "P/E au Prix Bas\\n\\nCalculé: Prix Bas / Earnings per Share\\n\\nRatio calculé automatiquement.", children: "P/E (B)" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "P/E au Prix Haut\\n\\nCalcule: Prix Haut / Earnings per Share\\n\\nRatio calcule automatiquement.", children: "P/E (H)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-2 py-1 bg-red-50/50 cursor-help", title: "P/E au Prix Bas\\n\\nCalcule: Prix Bas / Earnings per Share\\n\\nRatio calcule automatiquement.", children: "P/E (B)" })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { className: "divide-y divide-gray-100", children: data.map((row, idx) => {
@@ -9517,52 +9517,52 @@ const HistoricalTable = ({ data, onUpdateRow }) => {
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: `${rowClass} ${rowOutlierClass} ${hasOutliers ? "relative" : ""}`, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 sm:px-3 py-1.5 sm:py-2 font-bold text-left text-gray-700 sticky left-0 bg-white border-r z-10 text-xs sm:text-sm ${hasOutliers ? "bg-red-50" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
             row.year,
-            hasOutliers && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3 h-3 text-red-600 flex-shrink-0", title: `${outlierCount} valeur(s) aberrante(s) détectée(s) dans cette année` })
+            hasOutliers && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-3 h-3 text-red-600 flex-shrink-0", title: `${outlierCount} valeur(s) aberrante(s) detectee(s) dans cette annee` })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-1.5 sm:px-2 py-1.5 sm:py-2 bg-blue-50/30 border-r ${checkIfOutlier("priceHigh", row.priceHigh) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceHigh-${idx}`, value: row.priceHigh, onCommit: (v) => onUpdateRow(idx, "priceHigh", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("priceHigh", row.priceHigh) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-blue-50/30 border-r ${checkIfOutlier("priceLow", row.priceLow) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-priceLow-${idx}`, value: row.priceLow, onCommit: (v) => onUpdateRow(idx, "priceLow", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("priceLow", row.priceLow) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-green-50/30 border-r ${checkIfOutlier("cashFlowPerShare", row.cashFlowPerShare) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-cashFlowPerShare-${idx}`, value: row.cashFlowPerShare, onCommit: (v) => onUpdateRow(idx, "cashFlowPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("cashFlowPerShare", row.cashFlowPerShare) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/CF au Prix Haut: ${ratios.pcfHigh.toFixed(1)}x
 
-Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
+Calcule: Prix Haut (${row.priceHigh.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
 
 = ${ratios.pcfHigh.toFixed(1)}x`, children: ratios.pcfHigh.toFixed(1) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `P/CF au Prix Bas: ${ratios.pcfLow.toFixed(1)}x
 
-Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
+Calcule: Prix Bas (${row.priceLow.toFixed(2)}) / Cash Flow (${row.cashFlowPerShare.toFixed(2)})
 
 = ${ratios.pcfLow.toFixed(1)}x`, children: ratios.pcfLow.toFixed(1) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-yellow-50/30 border-r ${checkIfOutlier("dividendPerShare", row.dividendPerShare) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-dividendPerShare-${idx}`, value: row.dividendPerShare, onCommit: (v) => onUpdateRow(idx, "dividendPerShare", v), min: 0, autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("dividendPerShare", row.dividendPerShare) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `Rendement au Prix Bas: ${ratios.yieldHigh.toFixed(2)}%
 
-Calculé: (Dividende (${row.dividendPerShare.toFixed(2)}) / Prix Bas (${row.priceLow.toFixed(2)})) × 100
+Calcule: (Dividende (${row.dividendPerShare.toFixed(2)}) / Prix Bas (${row.priceLow.toFixed(2)})) x 100
 
 = ${ratios.yieldHigh.toFixed(2)}%
 
-Le rendement est calculé au prix bas pour obtenir le rendement maximum.`, children: [
+Le rendement est calcule au prix bas pour obtenir le rendement maximum.`, children: [
             ratios.yieldHigh.toFixed(2),
             "%"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-purple-50/30 border-r ${checkIfOutlier("bookValuePerShare", row.bookValuePerShare) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-bookValuePerShare-${idx}`, value: row.bookValuePerShare, onCommit: (v) => onUpdateRow(idx, "bookValuePerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("bookValuePerShare", row.bookValuePerShare) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/BV au Prix Haut: ${ratios.pbvHigh.toFixed(1)}x
 
-Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
+Calcule: Prix Haut (${row.priceHigh.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
 
 = ${ratios.pbvHigh.toFixed(1)}x`, children: ratios.pbvHigh.toFixed(1) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 border-r cursor-help", title: `P/BV au Prix Bas: ${ratios.pbvLow.toFixed(1)}x
 
-Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
+Calcule: Prix Bas (${row.priceLow.toFixed(2)}) / Book Value (${row.bookValuePerShare.toFixed(2)})
 
 = ${ratios.pbvLow.toFixed(1)}x`, children: ratios.pbvLow.toFixed(1) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `px-2 py-2 bg-red-50/30 border-r font-medium ${checkIfOutlier("earningsPerShare", row.earningsPerShare) ? "bg-red-100 border-red-400 border-2 border-dashed" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(EditableCell, { id: `input-earningsPerShare-${idx}`, value: row.earningsPerShare, onCommit: (v) => onUpdateRow(idx, "earningsPerShare", v), autoFetched: row.autoFetched, dataSource: row.dataSource, isOutlier: checkIfOutlier("earningsPerShare", row.earningsPerShare) }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/E au Prix Haut: ${ratios.peHigh.toFixed(1)}x
 
-Calculé: Prix Haut (${row.priceHigh.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})
+Calcule: Prix Haut (${row.priceHigh.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})
 
 = ${ratios.peHigh.toFixed(1)}x`, children: ratios.peHigh.toFixed(1) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-2 py-2 text-gray-500 cursor-help", title: `P/E au Prix Bas: ${ratios.peLow.toFixed(1)}x
 
-Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})
+Calcule: Prix Bas (${row.priceLow.toFixed(2)}) / EPS (${row.earningsPerShare.toFixed(2)})
 
 = ${ratios.peLow.toFixed(1)}x`, children: ratios.peLow.toFixed(1) })
         ] }, row.year);
@@ -9597,7 +9597,7 @@ Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / EPS (${row.earningsPerShare.to
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-bold text-blue-800", children: stats.mean.toFixed(2) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 p-4 rounded-lg", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-600 mb-1", children: "Médiane" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-600 mb-1", children: "Mediane" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-bold text-green-800", children: stats.median.toFixed(2) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-yellow-50 p-4 rounded-lg", children: [
@@ -9611,7 +9611,7 @@ Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / EPS (${row.earningsPerShare.to
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-4 mb-6", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 p-4 rounded-lg", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-600 mb-1", children: "Écart-type" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-600 mb-1", children: "Ecart-type" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-bold text-gray-800", children: stats.stdDev.toFixed(2) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 p-4 rounded-lg", children: [
@@ -9623,7 +9623,7 @@ Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / EPS (${row.earningsPerShare.to
             /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-700 mb-2", children: "Valeurs Historiques" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-gray-100", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left", children: "Année" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-left", children: "Annee" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "px-3 py-2 text-right", children: "Valeur" })
               ] }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { className: "divide-y", children: validData.map((d) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "hover:bg-gray-50", children: [
@@ -9632,7 +9632,7 @@ Calculé: Prix Bas (${row.priceLow.toFixed(2)}) / EPS (${row.earningsPerShare.to
               ] }, d.year)) })
             ] }) })
           ] })
-        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucune donnée valide disponible pour cette métrique" }) })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucune donnee valide disponible pour cette metrique" }) })
       ] }) });
     })()
   ] });
@@ -16561,7 +16561,7 @@ var calculateWordWidths = function calculateWordWidths2(_ref) {
         width: getStringSize(word, style).width
       };
     });
-    var spaceWidth = breakAll ? 0 : getStringSize(" ", style).width;
+    var spaceWidth = breakAll ? 0 : getStringSize(" ", style).width;
     return {
       wordsWithComputedWidth,
       spaceWidth
@@ -16601,7 +16601,7 @@ var calculateWordsByLines = function calculateWordsByLines2(_ref2, initialWordsW
   if (!shouldLimitLines) {
     return originalResult;
   }
-  var suffix = "…";
+  var suffix = "...";
   var checkOverflow = function checkOverflow2(index2) {
     var tempText = text.slice(0, index2);
     var words = calculateWordWidths({
@@ -17776,9 +17776,9 @@ const formatTypes = {
 function identity$3(x2) {
   return x2;
 }
-var map$1 = Array.prototype.map, prefixes = ["y", "z", "a", "f", "p", "n", "µ", "m", "", "k", "M", "G", "T", "P", "E", "Z", "Y"];
+var map$1 = Array.prototype.map, prefixes = ["y", "z", "a", "f", "p", "n", "", "m", "", "k", "M", "G", "T", "P", "E", "Z", "Y"];
 function formatLocale$1(locale2) {
-  var group = locale2.grouping === void 0 || locale2.thousands === void 0 ? identity$3 : formatGroup(map$1.call(locale2.grouping, Number), locale2.thousands + ""), currencyPrefix = locale2.currency === void 0 ? "" : locale2.currency[0] + "", currencySuffix = locale2.currency === void 0 ? "" : locale2.currency[1] + "", decimal = locale2.decimal === void 0 ? "." : locale2.decimal + "", numerals = locale2.numerals === void 0 ? identity$3 : formatNumerals(map$1.call(locale2.numerals, String)), percent = locale2.percent === void 0 ? "%" : locale2.percent + "", minus = locale2.minus === void 0 ? "−" : locale2.minus + "", nan = locale2.nan === void 0 ? "NaN" : locale2.nan + "";
+  var group = locale2.grouping === void 0 || locale2.thousands === void 0 ? identity$3 : formatGroup(map$1.call(locale2.grouping, Number), locale2.thousands + ""), currencyPrefix = locale2.currency === void 0 ? "" : locale2.currency[0] + "", currencySuffix = locale2.currency === void 0 ? "" : locale2.currency[1] + "", decimal = locale2.decimal === void 0 ? "." : locale2.decimal + "", numerals = locale2.numerals === void 0 ? identity$3 : formatNumerals(map$1.call(locale2.numerals, String)), percent = locale2.percent === void 0 ? "%" : locale2.percent + "", minus = locale2.minus === void 0 ? "-" : locale2.minus + "", nan = locale2.nan === void 0 ? "NaN" : locale2.nan + "";
   function newFormat(specifier) {
     specifier = formatSpecifier(specifier);
     var fill = specifier.fill, align = specifier.align, sign2 = specifier.sign, symbol = specifier.symbol, zero2 = specifier.zero, width = specifier.width, comma = specifier.comma, precision = specifier.precision, trim = specifier.trim, type = specifier.type;
@@ -34767,7 +34767,7 @@ const CustomTooltipPriceRange = ({ active, payload, label }) => {
         formatCurrency(data.low)
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-400 mt-1", children: [
-        "Écart: ",
+        "Ecart: ",
         formatCurrency(data.high - data.low)
       ] })
     ] });
@@ -34883,13 +34883,13 @@ const ValuationCharts = ({
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-2xl font-black uppercase", style: { color: getRecColor(recommendation) }, children: recommendation })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-center text-gray-500 text-xs mt-2 px-6", children: [
-            "Le titre est considéré à l'ACHAT sous ",
+            "Le titre est considere a l'ACHAT sous ",
             buyPrice.toFixed(2),
-            "$, à CONSERVER entre ",
+            "$, a CONSERVER entre ",
             buyPrice.toFixed(2),
             "$ et ",
             sellPrice.toFixed(2),
-            "$, et à la VENTE au-dessus de ",
+            "$, et a la VENTE au-dessus de ",
             sellPrice.toFixed(2),
             "$."
           ] })
@@ -34926,7 +34926,7 @@ const ValuationCharts = ({
         ] }) }) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-4", children: "Évolution Historique des Ratios (P/E vs P/CF)" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-4", children: "Evolution Historique des Ratios (P/E vs P/CF)" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-72", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
           LineChart,
           {
@@ -35038,7 +35038,7 @@ const ValuationCharts = ({
 };
 const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, onToggleWatchlist, onSetTickerType, onLoadVersion, onSyncFromSupabase, isLoadingTickers = false, onBulkSyncAll, onSyncSelected, isBulkSyncing = false, bulkSyncProgress, onOpenAdmin, onOpenDataExplorer, isAdmin = false, onToggleAdmin }) => {
   React.useEffect(() => {
-    console.log(`📋 Sidebar: ${profiles.length} profil(s) reçu(s)`, profiles.map((p) => p.id).slice(0, 10));
+    console.log(` Sidebar: ${profiles.length} profil(s) recu(s)`, profiles.map((p) => p.id).slice(0, 10));
   }, [profiles.length]);
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [sortBy2, setSortBy] = reactExports.useState("lastModified");
@@ -35236,14 +35236,14 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
     }
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-900 text-white flex flex-col h-full border-r border-slate-800 shadow-xl w-full", "data-demo": "sidebar", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 sm:p-4 border-b border-slate-800 bg-slate-950 cursor-help", title: "Finance Pro 3p1\\n\\nApplication d'analyse fondamentale pour la gestion de portefeuille.\\n\\nFonctionnalités:\\n• Analyse de valorisation sur 5 ans\\n• Triangulation de la valeur (4 métriques)\\n• KPI Dashboard multi-tickers\\n• Snapshots et historique\\n• Synchronisation avec FMP API", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 sm:p-4 border-b border-slate-800 bg-slate-950 cursor-help", title: "Finance Pro 3p1\\n\\nApplication d'analyse fondamentale pour la gestion de portefeuille.\\n\\nFonctionnalites:\\n- Analyse de valorisation sur 5 ans\\n- Triangulation de la valeur (4 metriques)\\n- KPI Dashboard multi-tickers\\n- Snapshots et historique\\n- Synchronisation avec FMP API", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-blue-400 font-bold text-base sm:text-lg", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           ForwardRef$A,
           {
             className: `w-5 h-5 sm:w-6 sm:h-6 transition-all ${isAdmin ? "text-yellow-400" : ""} ${onToggleAdmin ? "cursor-pointer hover:scale-110" : ""}`,
             onClick: onToggleAdmin ? handleLogoClick : void 0,
-            title: onToggleAdmin ? isAdmin ? "🔐 Mode admin actif\n\nDouble-cliquez pour désactiver" : "Double-cliquez pour activer le mode admin" : void 0
+            title: onToggleAdmin ? isAdmin ? " Mode admin actif\n\nDouble-cliquez pour desactiver" : "Double-cliquez pour activer le mode admin" : void 0
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "FinancePro" }),
@@ -35299,7 +35299,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
                 }
               },
               className: "w-full bg-slate-800 border border-slate-700 rounded pl-7 sm:pl-8 md:pl-9 pr-2 sm:pr-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-200 focus:ring-1 focus:ring-blue-500 outline-none placeholder-slate-500 transition-all focus:border-blue-500",
-              title: "Rechercher un ticker\\n\\nTapez le symbole ou le nom de l'entreprise pour filtrer la liste.\\nLa recherche est insensible à la casse et cherche dans:\\n• Le symbole du ticker\\n• Le nom de l'entreprise\\n\\n💡 Utilisez les flèches ↑↓ pour naviguer dans les suggestions et Entrée pour sélectionner."
+              title: "Rechercher un ticker\\n\\nTapez le symbole ou le nom de l'entreprise pour filtrer la liste.\\nLa recherche est insensible a la casse et cherche dans:\\n- Le symbole du ticker\\n- Le nom de l'entreprise\\n\\n Utilisez les fleches ^v pour naviguer dans les suggestions et Entree pour selectionner."
             }
           ),
           showSuggestions && suggestions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-full left-0 right-0 mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto", children: suggestions.map((suggestion, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -35332,7 +35332,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
           {
             onClick: onAdd,
             className: "bg-blue-600 hover:bg-blue-500 text-white px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm font-bold transition-colors shadow-lg hover:shadow-blue-500/20 whitespace-nowrap flex-shrink-0",
-            title: "Ajouter un nouveau ticker\\n\\nOuvre une boîte de recherche pour ajouter une nouvelle entreprise à analyser.\\n\\nLe système va:\\n1. Rechercher le ticker via l'API FMP\\n2. Charger les données historiques (10 dernières années)\\n3. Auto-remplir les hypothèses (CAGR, ratios moyens)\\n4. Charger les métriques ValueLine si disponibles\\n\\nLe nouveau ticker sera ajouté à votre portefeuille.",
+            title: "Ajouter un nouveau ticker\\n\\nOuvre une boite de recherche pour ajouter une nouvelle entreprise a analyser.\\n\\nLe systeme va:\\n1. Rechercher le ticker via l'API FMP\\n2. Charger les donnees historiques (10 dernieres annees)\\n3. Auto-remplir les hypotheses (CAGR, ratios moyens)\\n4. Charger les metriques ValueLine si disponibles\\n\\nLe nouveau ticker sera ajoute a votre portefeuille.",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$d, { className: "w-4 h-4 sm:w-5 sm:h-5" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Ajouter" })
@@ -35346,7 +35346,7 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
           onClick: onSyncFromSupabase,
           disabled: isLoadingTickers || isBulkSyncing,
           className: "w-full bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mb-2",
-          title: "Synchroniser depuis Supabase\\n\\nCharge les tickers depuis la base de données Supabase.\\n\\nAjoute les nouveaux tickers présents dans Supabase mais absents de votre LocalStorage.\\n\\n⚠️ Ne modifie pas les tickers existants, seulement ajoute les nouveaux.",
+          title: "Synchroniser depuis Supabase\\n\\nCharge les tickers depuis la base de donnees Supabase.\\n\\nAjoute les nouveaux tickers presents dans Supabase mais absents de votre LocalStorage.\\n\\n Ne modifie pas les tickers existants, seulement ajoute les nouveaux.",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: `w-4 h-4 ${isLoadingTickers ? "animate-pulse" : ""}` }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: isLoadingTickers ? "Synchronisation..." : "Synchroniser Supabase" })
@@ -35365,8 +35365,8 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
                 }
               },
               className: `flex-1 px-2 py-1.5 rounded text-xs font-medium transition-colors ${isSelectionMode ? "bg-blue-700 hover:bg-blue-600 text-white" : "bg-slate-700 hover:bg-slate-600 text-slate-300"}`,
-              title: isSelectionMode ? "Désactiver le mode sélection\n\nCliquez pour quitter le mode sélection et revenir au mode normal." : "Activer le mode sélection\n\nPermet de sélectionner des tickers spécifiques pour synchronisation.\n\nAprès activation:\n• Des checkboxes apparaîtront à côté de chaque ticker\n• Sélectionnez les tickers à synchroniser\n• Cliquez sur 'Sync Sélection' pour synchroniser uniquement ceux sélectionnés",
-              children: isSelectionMode ? "✓ Sélection" : "☐ Sélectionner"
+              title: isSelectionMode ? "Desactiver le mode selection\n\nCliquez pour quitter le mode selection et revenir au mode normal." : "Activer le mode selection\n\nPermet de selectionner des tickers specifiques pour synchronisation.\n\nApres activation:\n- Des checkboxes apparaitront a cote de chaque ticker\n- Selectionnez les tickers a synchroniser\n- Cliquez sur 'Sync Selection' pour synchroniser uniquement ceux selectionnes",
+              children: isSelectionMode ? " Selection" : " Selectionner"
             }
           ),
           isSelectionMode && selectedTickers.size > 0 && onSyncSelected && /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -35379,9 +35379,9 @@ const Sidebar = ({ profiles, currentId, onSelect, onAdd, onDelete, onDuplicate, 
               },
               disabled: isBulkSyncing || isLoadingTickers,
               className: "flex-1 bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 py-1.5 rounded text-xs font-medium transition-colors",
-              title: `Synchroniser ${selectedTickers.size} ticker(s) sélectionné(s)
+              title: `Synchroniser ${selectedTickers.size} ticker(s) selectionne(s)
 
-Synchronise uniquement les tickers que vous avez sélectionnés avec les options de synchronisation avancées.`,
+Synchronise uniquement les tickers que vous avez selectionnes avec les options de synchronisation avancees.`,
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: `w-3 h-3 inline mr-1 ${isBulkSyncing ? "animate-pulse" : ""}` }),
                 "Sync (",
@@ -35397,10 +35397,10 @@ Synchronise uniquement les tickers que vous avez sélectionnés avec les options
             onClick: onBulkSyncAll,
             disabled: isBulkSyncing || isLoadingTickers,
             className: "w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-800 disabled:opacity-50 text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors",
-            title: "🔄 Options de Synchronisation Avancées\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\\n\\n📊 Options principales:\\n• Sauvegarder avant sync\\n• Remplacer données oranges\\n• Forcer remplacement\\n\\n⚙️ Options détaillées:\\n• Synchroniser données historiques\\n• Synchroniser uniquement nouvelles années\\n• Synchroniser uniquement métriques manquantes\\n• Synchroniser assumptions\\n• Préserver exclusions\\n• Recalculer outliers\\n• Mettre à jour prix actuel\\n• Synchroniser métriques ValueLine\\n\\n💡 Chaque option inclut des explications détaillées, exemples concrets et informations sur les outils utilisés.",
+            title: " Options de Synchronisation Avancees\\n\\nCliquez pour ouvrir le tableau de bord de synchronisation avec toutes les options:\\n\\n Options principales:\\n- Sauvegarder avant sync\\n- Remplacer donnees oranges\\n- Forcer remplacement\\n\\n Options detaillees:\\n- Synchroniser donnees historiques\\n- Synchroniser uniquement nouvelles annees\\n- Synchroniser uniquement metriques manquantes\\n- Synchroniser assumptions\\n- Preserver exclusions\\n- Recalculer outliers\\n- Mettre a jour prix actuel\\n- Synchroniser metriques ValueLine\\n\\n Chaque option inclut des explications detaillees, exemples concrets et informations sur les outils utilises.",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$s, { className: `w-4 h-4 ${isBulkSyncing ? "animate-pulse" : ""}` }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1 text-left", style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: isBulkSyncing && bulkSyncProgress ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}` : "⚙️ Options Sync Avancées" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1 text-left", style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: isBulkSyncing && bulkSyncProgress ? `Sync ${bulkSyncProgress.current}/${bulkSyncProgress.total}` : " Options Sync Avancees" })
             ]
           }
         ),
@@ -35408,7 +35408,7 @@ Synchronise uniquement les tickers que vous avez sélectionnés avec les options
           "button",
           {
             onClick: () => {
-              if (confirm("Forcer le rafraîchissement complet ? Cela effacera le cache local.")) {
+              if (confirm("Forcer le rafraichissement complet ? Cela effacera le cache local.")) {
                 window.location.reload();
               }
             },
@@ -35423,7 +35423,7 @@ Synchronise uniquement les tickers que vous avez sélectionnés avec les options
         {
           onClick: onOpenAdmin,
           className: "w-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mt-2 border border-slate-700",
-          title: "Ouvrir le tableau de bord d'administration (Ctrl+Shift+A)\\n\\n• État de la synchronisation\\n• Inspecteur de données brutes\\n• Réparation et diagnostic",
+          title: "Ouvrir le tableau de bord d'administration (Ctrl+Shift+A)\\n\\n- Etat de la synchronisation\\n- Inspecteur de donnees brutes\\n- Reparation et diagnostic",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-4 h-4" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: "Admin Warehouse" })
@@ -35435,7 +35435,7 @@ Synchronise uniquement les tickers que vous avez sélectionnés avec les options
         {
           onClick: onOpenDataExplorer,
           className: "w-full bg-emerald-800 hover:bg-emerald-700 text-emerald-200 hover:text-white px-2 sm:px-3 py-1.5 sm:py-2 rounded flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-colors mt-2 border border-emerald-700",
-          title: "Data Explorer - Supabase Tables\\n\\n• Visualiser toutes les tables 3P1\\n• Voir les dernières mises à jour\\n• Exporter en Excel/CSV\\n• Synchronisation sélective",
+          title: "Data Explorer - Supabase Tables\\n\\n- Visualiser toutes les tables 3P1\\n- Voir les dernieres mises a jour\\n- Exporter en Excel/CSV\\n- Synchronisation selective",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-4 h-4" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { wordBreak: "normal", overflowWrap: "normal", whiteSpace: "normal" }, children: "Data Explorer" })
@@ -35447,39 +35447,39 @@ Synchronise uniquement les tickers que vous avez sélectionnés avec les options
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs font-semibold text-slate-500 uppercase px-2 mb-2 tracking-wider flex justify-between items-center", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cursor-help", title: `Liste de vos tickers
 
-📊 Statistiques:
-• ⭐ Portefeuille (team tickers): ${tickerStats.portfolio} tickers
-• 👁️ Watchlist (surveillés): ${tickerStats.watchlist} tickers
-• 📋 Normaux (hors team/watchlist): ${tickerStats.normal} tickers
-• Total: ${tickerStats.total} tickers
+ Statistiques:
+-  Portefeuille (team tickers): ${tickerStats.portfolio} tickers
+-  Watchlist (surveilles): ${tickerStats.watchlist} tickers
+-  Normaux (hors team/watchlist): ${tickerStats.normal} tickers
+- Total: ${tickerStats.total} tickers
 
-⚠️ IMPORTANT:
-• ⭐ Étoile = Portefeuille (team tickers DÉTENUS)
-• 👁️ Œil = Watchlist (titres SURVEILLÉS)
-• 📋 = Tickers normaux (hors team/watchlist)
-• Point coloré = Recommandation (ACHAT/CONSERVER/VENTE)
+ IMPORTANT:
+-  Etoile = Portefeuille (team tickers DETENUS)
+-  il = Watchlist (titres SURVEILLES)
+-  = Tickers normaux (hors team/watchlist)
+- Point colore = Recommandation (ACHAT/CONSERVER/VENTE)
 
-Utilisez les filtres ci-dessous pour filtrer par type.`, children: filterBy === "all" ? "Tous les tickers" : filterBy === "portfolio" ? "⭐ Portefeuille" : filterBy === "watchlist" ? "👁️ Watchlist" : "📋 Normaux" }),
+Utilisez les filtres ci-dessous pour filtrer par type.`, children: filterBy === "all" ? "Tous les tickers" : filterBy === "portfolio" ? " Portefeuille" : filterBy === "watchlist" ? " Watchlist" : " Normaux" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `text-[9px] px-1.5 py-0.5 rounded transition-colors ${filterBy === "portfolio" ? "bg-yellow-600 text-white" : "bg-yellow-900/50 text-yellow-400"}`, title: `Portefeuille (team tickers): ${tickerStats.portfolio} tickers`, children: [
-            "⭐ ",
+            " ",
             tickerStats.portfolio
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `text-[9px] px-1.5 py-0.5 rounded transition-colors ${filterBy === "watchlist" ? "bg-blue-600 text-white" : "bg-blue-900/50 text-blue-400"}`, title: `Watchlist: ${tickerStats.watchlist} tickers`, children: [
-            "👁️ ",
+            " ",
             tickerStats.watchlist
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `text-[9px] px-1.5 py-0.5 rounded transition-colors ${filterBy === "normal" ? "bg-slate-600 text-white" : "bg-slate-700/50 text-slate-400"}`, title: `Tickers normaux: ${tickerStats.normal} tickers`, children: [
-            "📋 ",
+            " ",
             tickerStats.normal
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help", title: `Nombre de tickers affichés: ${filteredAndSortedProfiles.length} / ${profiles.length}
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] bg-slate-800 px-1.5 py-0.5 rounded-full text-slate-400 cursor-help", title: `Nombre de tickers affiches: ${filteredAndSortedProfiles.length} / ${profiles.length}
 
-${searchTerm ? `(Filtrés sur "${searchTerm}")` : ""}
+${searchTerm ? `(Filtres sur "${searchTerm}")` : ""}
 ${filterBy !== "all" ? `(Filtre actif: ${filterBy === "portfolio" ? "Portefeuille" : filterBy === "watchlist" ? "Watchlist" : "Normaux"})` : ""}`, children: filteredAndSortedProfiles.length })
         ] })
       ] }),
-      filteredAndSortedProfiles.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-600 text-sm py-8 px-4", children: searchTerm ? "Aucun résultat" : "Commencez par ajouter un ticker" }) : filteredAndSortedProfiles.map((profile) => {
+      filteredAndSortedProfiles.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center text-slate-600 text-sm py-8 px-4", children: searchTerm ? "Aucun resultat" : "Commencez par ajouter un ticker" }) : filteredAndSortedProfiles.map((profile) => {
         var _a2, _b;
         const { recommendation } = calculateRecommendation(profile.data, profile.assumptions);
         const isSelected = selectedTickers.has(profile.id);
@@ -35527,18 +35527,18 @@ ${filterBy !== "all" ? `(Filtre actif: ${filterBy === "portfolio" ? "Portefeuill
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 min-w-0", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)} cursor-help`, title: `📊 Recommandation: ${recommendation}
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `w-2 h-2 rounded-full flex-shrink-0 ${getRecommendationColor(recommendation)} cursor-help`, title: ` Recommandation: ${recommendation}
 
-Basé sur:
-• Prix actuel vs Limite d'achat/vente
-• Calculé automatiquement selon vos hypothèses
+Base sur:
+- Prix actuel vs Limite d'achat/vente
+- Calcule automatiquement selon vos hypotheses
 
-🟢 Vert = ACHAT
-🟡 Jaune = CONSERVER
-🔴 Rouge = VENTE
+ Vert = ACHAT
+ Jaune = CONSERVER
+ Rouge = VENTE
 
-⚠️ Note: Ce point coloré = Recommandation
-⭐ L'étoile jaune = Portefeuille (titres détenus)` }),
+ Note: Ce point colore = Recommandation
+ L'etoile jaune = Portefeuille (titres detenus)` }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "img",
                   {
@@ -35561,19 +35561,19 @@ Source: FMP API (image-stock)`,
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-sm truncate cursor-help", title: `Symbole: ${profile.info.preferredSymbol || profile.id}
 
-Cliquez pour sélectionner ce ticker et voir son analyse complète.`, children: profile.info.preferredSymbol || profile.id }),
+Cliquez pour selectionner ce ticker et voir son analyse complete.`, children: profile.info.preferredSymbol || profile.id }),
                     profile.info.exchange && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] px-1.5 py-0.5 bg-slate-700 text-slate-300 rounded cursor-help", title: `Bourse: ${profile.info.exchange}
 
-Bourse où l'action est cotée.`, children: profile.info.exchange }),
+Bourse ou l'action est cotee.`, children: profile.info.exchange }),
                     profile.info.currency && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] px-1.5 py-0.5 bg-slate-700 text-slate-300 rounded cursor-help", title: `Devise: ${profile.info.currency}
 
-Devise dans laquelle l'action est cotée.`, children: profile.info.currency })
+Devise dans laquelle l'action est cotee.`, children: profile.info.currency })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs truncate opacity-70 cursor-help", title: `${profile.info.name}
 
 Nom complet de l'entreprise.
 
-Cliquez sur la ligne pour voir l'analyse complète.`, children: profile.info.name }),
+Cliquez sur la ligne pour voir l'analyse complete.`, children: profile.info.name }),
                   profile.info.country && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-slate-500 truncate cursor-help", title: `Pays: ${profile.info.country}
 
 Pays d'origine de l'entreprise.`, children: profile.info.country })
@@ -35591,13 +35591,13 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                         menu.innerHTML = `
                             <div class="py-1">
                               <button class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 flex items-center gap-2 ${profile.isWatchlist === false ? "bg-yellow-900/30 text-yellow-400" : "text-slate-300"}" data-type="portfolio">
-                                <span>⭐</span> Portefeuille
+                                <span></span> Portefeuille
                               </button>
                               <button class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 flex items-center gap-2 ${profile.isWatchlist === true ? "bg-blue-900/30 text-blue-400" : "text-slate-300"}" data-type="watchlist">
-                                <span>👁️</span> Watchlist
+                                <span></span> Watchlist
                               </button>
                               <button class="w-full text-left px-3 py-2 text-xs hover:bg-slate-700 flex items-center gap-2 ${profile.isWatchlist === null || profile.isWatchlist === void 0 ? "bg-slate-700 text-slate-300" : "text-slate-300"}" data-type="normal">
-                                <span>📋</span> Normal
+                                <span></span> Normal
                               </button>
                             </div>
                           `;
@@ -35628,9 +35628,9 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                         onToggleWatchlist(profile.id);
                       }
                     },
-                    title: profile.isWatchlist === false ? "⭐ Portefeuille (Détenu)\n\nCliquez pour changer le type:\n• ⭐ Portefeuille (actuel)\n• 👁️ Watchlist\n• 📋 Normal" : profile.isWatchlist === true ? "👁️ Watchlist (Surveillé)\n\nCliquez pour changer le type:\n• ⭐ Portefeuille\n• 👁️ Watchlist (actuel)\n• 📋 Normal" : "📋 Normal\n\nCliquez pour changer le type:\n• ⭐ Portefeuille\n• 👁️ Watchlist\n• 📋 Normal (actuel)",
+                    title: profile.isWatchlist === false ? " Portefeuille (Detenu)\n\nCliquez pour changer le type:\n-  Portefeuille (actuel)\n-  Watchlist\n-  Normal" : profile.isWatchlist === true ? " Watchlist (Surveille)\n\nCliquez pour changer le type:\n-  Portefeuille\n-  Watchlist (actuel)\n-  Normal" : " Normal\n\nCliquez pour changer le type:\n-  Portefeuille\n-  Watchlist\n-  Normal (actuel)",
                     className: `p-1.5 rounded transition-colors ${profile.isWatchlist === false ? "text-yellow-500 hover:text-yellow-400 hover:bg-slate-700" : profile.isWatchlist === true ? "text-blue-400 hover:bg-slate-700" : "text-slate-500 hover:text-slate-400 hover:bg-slate-700"}`,
-                    children: profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-4 h-4 fill-current", style: { fill: "#eab308" } }) : profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: "📋" })
+                    children: profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-4 h-4 fill-current", style: { fill: "#eab308" } }) : profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: "" })
                   }
                 ) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden group-hover:flex items-center gap-1", children: [
@@ -35641,7 +35641,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                         e.stopPropagation();
                         onDuplicate(profile.id);
                       },
-                      title: "Dupliquer ce ticker\\n\\nCrée une copie complète de l'analyse actuelle.\\n\\nUtile pour:\\n• Comparer différents scénarios (optimiste/pessimiste)\\n• Tester différentes hypothèses\\n• Créer des variantes d'analyse\\n\\nLe ticker dupliqué aura le même nom avec un suffixe.",
+                      title: "Dupliquer ce ticker\\n\\nCree une copie complete de l'analyse actuelle.\\n\\nUtile pour:\\n- Comparer differents scenarios (optimiste/pessimiste)\\n- Tester differentes hypotheses\\n- Creer des variantes d'analyse\\n\\nLe ticker duplique aura le meme nom avec un suffixe.",
                       className: "p-1.5 hover:bg-slate-700 hover:text-white rounded",
                       children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$o, { className: "w-3.5 h-3.5" })
                     }
@@ -35653,7 +35653,7 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                         e.stopPropagation();
                         if (confirm(`Supprimer ${profile.id} ?`)) onDelete(profile.id);
                       },
-                      title: "Supprimer ce ticker\\n\\n⚠️ ATTENTION: Cette action est irréversible!\\n\\nSupprime définitivement:\\n• Toutes les données historiques\\n• Toutes les hypothèses\\n• Tous les snapshots associés\\n\\nUne confirmation sera demandée avant suppression.",
+                      title: "Supprimer ce ticker\\n\\n ATTENTION: Cette action est irreversible!\\n\\nSupprime definitivement:\\n- Toutes les donnees historiques\\n- Toutes les hypotheses\\n- Tous les snapshots associes\\n\\nUne confirmation sera demandee avant suppression.",
                       className: "p-1.5 hover:bg-red-900/50 hover:text-red-400 rounded",
                       children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-3.5 h-3.5" })
                     }
@@ -35672,9 +35672,9 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
         {
           onClick: () => setIsFiltersExpanded(!isFiltersExpanded),
           className: "w-full p-2 sm:p-3 md:p-4 flex items-center justify-between hover:bg-slate-800 transition-colors",
-          title: isFiltersExpanded ? "Réduire les filtres pour voir plus de titres" : "Développer les filtres",
+          title: isFiltersExpanded ? "Reduire les filtres pour voir plus de titres" : "Developper les filtres",
           children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs font-semibold text-slate-500 uppercase flex items-center gap-1.5 sm:gap-2 cursor-help", title: "Filtres et Tri\\n\\nFiltrez et triez votre portefeuille selon différents critères.\\n\\nFiltres:\\n• Tous: Affiche tous les tickers\\n• Portefeuille: Uniquement les titres détenus\\n• Watchlist: Uniquement les titres surveillés\\n\\nTri:\\n• Alphabétique: A-Z ou Z-A\\n• Date de modification: Plus récent ou plus ancien\\n• Recommandation: Achat, Conserver, Vente\\n• Secteur: Par secteur d'activité", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xs font-semibold text-slate-500 uppercase flex items-center gap-1.5 sm:gap-2 cursor-help", title: "Filtres et Tri\\n\\nFiltrez et triez votre portefeuille selon differents criteres.\\n\\nFiltres:\\n- Tous: Affiche tous les tickers\\n- Portefeuille: Uniquement les titres detenus\\n- Watchlist: Uniquement les titres surveilles\\n\\nTri:\\n- Alphabetique: A-Z ou Z-A\\n- Date de modification: Plus recent ou plus ancien\\n- Recommandation: Achat, Conserver, Vente\\n- Secteur: Par secteur d'activite", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$k, { className: "w-3 h-3 flex-shrink-0" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: "Filtres et Tri" })
             ] }),
@@ -35691,11 +35691,11 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
               className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors ${filterBy === "all" ? "bg-blue-600 text-white shadow-lg" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
               title: `Afficher tous les tickers
 
-📊 Statistiques:
-• ⭐ Portefeuille: ${tickerStats.portfolio}
-• 👁️ Watchlist: ${tickerStats.watchlist}
-• 📋 Normaux: ${tickerStats.normal}
-• Total: ${tickerStats.total}`,
+ Statistiques:
+-  Portefeuille: ${tickerStats.portfolio}
+-  Watchlist: ${tickerStats.watchlist}
+-  Normaux: ${tickerStats.normal}
+- Total: ${tickerStats.total}`,
               children: [
                 "Tous (",
                 tickerStats.total,
@@ -35708,9 +35708,9 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
             {
               onClick: () => setFilterBy("portfolio"),
               className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "portfolio" ? "bg-yellow-600 text-white shadow-lg" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
-              title: `Afficher uniquement les tickers du portefeuille (titres détenus)
+              title: `Afficher uniquement les tickers du portefeuille (titres detenus)
 
-⭐ ${tickerStats.portfolio} ticker(s) dans le portefeuille`,
+ ${tickerStats.portfolio} ticker(s) dans le portefeuille`,
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-3 h-3" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Portefeuille" }),
@@ -35728,9 +35728,9 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
             {
               onClick: () => setFilterBy("watchlist"),
               className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "watchlist" ? "bg-blue-600 text-white shadow-lg" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
-              title: `Afficher uniquement les tickers de la watchlist (titres surveillés)
+              title: `Afficher uniquement les tickers de la watchlist (titres surveilles)
 
-👁️ ${tickerStats.watchlist} ticker(s) dans la watchlist`,
+ ${tickerStats.watchlist} ticker(s) dans la watchlist`,
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$l, { className: "w-3 h-3" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Watchlist" }),
@@ -35750,9 +35750,9 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
               className: `px-2 py-1.5 rounded text-[10px] sm:text-xs font-medium transition-colors flex items-center justify-center gap-1 ${filterBy === "normal" ? "bg-slate-600 text-white shadow-lg" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`,
               title: `Afficher uniquement les tickers normaux (hors portefeuille/watchlist)
 
-📋 ${tickerStats.normal} ticker(s) normaux`,
+ ${tickerStats.normal} ticker(s) normaux`,
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: "📋" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: "" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Normaux" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "sm:hidden", children: "Norm." }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[9px]", children: [
@@ -35770,20 +35770,20 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
             value: sortBy2,
             onChange: (e) => setSortBy(e.target.value),
             className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer mb-2",
-            title: "Trier les tickers\\n\\nOptions de tri:\\n• Alphabétique (A-Z): Par symbole croissant\\n• Alphabétique (Z-A): Par symbole décroissant\\n• Date modif. (Récent): Plus récemment modifiés en premier\\n• Date modif. (Ancien): Plus anciennement modifiés en premier\\n• Recommandation: Achat → Conserver → Vente\\n• Secteur: Par secteur d'activité",
+            title: "Trier les tickers\\n\\nOptions de tri:\\n- Alphabetique (A-Z): Par symbole croissant\\n- Alphabetique (Z-A): Par symbole decroissant\\n- Date modif. (Recent): Plus recemment modifies en premier\\n- Date modif. (Ancien): Plus anciennement modifies en premier\\n- Recommandation: Achat -> Conserver -> Vente\\n- Secteur: Par secteur d'activite",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified", children: "📅 Date modif. (Récent)" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified-desc", children: "📅 Date modif. (Ancien)" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical", children: "🔤 Alphabétique (A-Z)" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical-desc", children: "🔤 Alphabétique (Z-A)" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "recommendation", children: "📊 Recommandation" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "sector", children: "🏢 Secteur" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified", children: " Date modif. (Recent)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "lastModified-desc", children: " Date modif. (Ancien)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical", children: " Alphabetique (A-Z)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "alphabetical-desc", children: " Alphabetique (Z-A)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "recommendation", children: " Recommandation" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "sector", children: " Secteur" })
             ]
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 mt-3 pt-3 border-t border-slate-700", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] font-semibold text-slate-400 uppercase", children: "Filtres Avancés" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] font-semibold text-slate-400 uppercase", children: "Filtres Avances" }),
             (filterCountry !== "all" || filterExchange !== "all" || filterMarketCap !== "all") && /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "button",
               {
@@ -35793,16 +35793,16 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
                   setFilterMarketCap("all");
                 },
                 className: "text-[9px] text-blue-400 hover:text-blue-300 flex items-center gap-1",
-                title: "Réinitialiser tous les filtres avancés",
+                title: "Reinitialiser tous les filtres avances",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3" }),
-                  "Réinitialiser"
+                  "Reinitialiser"
                 ]
               }
             )
           ] }),
           availableCountries.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "🌍 Pays" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: " Pays" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "select",
               {
@@ -35822,14 +35822,14 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
             )
           ] }),
           availableExchanges.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "📈 Bourse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: " Bourse" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "select",
               {
                 value: filterExchange,
                 onChange: (e) => setFilterExchange(e.target.value),
                 className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
-                title: "Filtrer par bourse où l'action est cotée",
+                title: "Filtrer par bourse ou l'action est cotee",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "all", children: [
                     "Toutes les bourses (",
@@ -35842,14 +35842,14 @@ Pays d'origine de l'entreprise.`, children: profile.info.country })
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: "💰 Capitalisation" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-[9px] text-slate-400 mb-1", children: " Capitalisation" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "select",
               {
                 value: filterMarketCap,
                 onChange: (e) => setFilterMarketCap(e.target.value),
                 className: "w-full bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-[10px] sm:text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer",
-                title: "Filtrer par capitalisation boursière\\n\\n• Micro: < 300M USD\\n• Small: 300M - 2B USD\\n• Mid: 2B - 10B USD\\n• Large: 10B - 200B USD\\n• Mega: > 200B USD",
+                title: "Filtrer par capitalisation boursiere\\n\\n- Micro: < 300M USD\\n- Small: 300M - 2B USD\\n- Mid: 2B - 10B USD\\n- Large: 10B - 200B USD\\n- Mega: > 200B USD",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: "Toutes les capitalisations" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "micro", children: "Micro Cap (< 300M)" }),
@@ -35896,7 +35896,7 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
         is_current: isCurrent,
         auto_fetched: autoFetched,
         sync_metadata: syncMetadata || null
-        // Ajouter les métadonnées de synchronisation
+        // Ajouter les metadonnees de synchronisation
       })
     });
     if (!response.ok) {
@@ -35907,22 +35907,22 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
         const baseDelay = 1e3 * Math.pow(2, retryCount);
         const jitter = Math.floor(Math.random() * 200);
         const delay = baseDelay + jitter;
-        console.warn(`⚠️ Snapshot error ${response.status} for ${ticker2}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+        console.warn(` Snapshot error ${response.status} for ${ticker2}, retry ${retryCount + 1}/${maxRetries} apres ${delay}ms...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
         return saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
       }
       if (response.status === 400) {
-        console.warn(`⚠️ Snapshot validation failed for ${ticker2}: ${errorMessage}`);
+        console.warn(` Snapshot validation failed for ${ticker2}: ${errorMessage}`);
       } else {
-        console.error(`❌ Failed to save snapshot for ${ticker2}: ${errorMessage}`);
+        console.error(` Failed to save snapshot for ${ticker2}: ${errorMessage}`);
       }
       return { success: false, error: errorMessage };
     }
     const snapshot = await response.json();
     if (retryCount > 0) {
-      console.log(`✅ Snapshot saved: ${ticker2} v${snapshot.version} (après ${retryCount} retry)`);
+      console.log(` Snapshot saved: ${ticker2} v${snapshot.version} (apres ${retryCount} retry)`);
     } else {
-      console.log(`✅ Snapshot saved: ${ticker2} v${snapshot.version}`);
+      console.log(` Snapshot saved: ${ticker2} v${snapshot.version}`);
     }
     return { success: true, snapshot };
   } catch (error) {
@@ -35930,11 +35930,11 @@ async function saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent =
       const baseDelay = 1e3 * Math.pow(2, retryCount);
       const jitter = Math.floor(Math.random() * 200);
       const delay = baseDelay + jitter;
-      console.warn(`⚠️ Snapshot network error for ${ticker2}, retry ${retryCount + 1}/${maxRetries} après ${delay}ms...`);
+      console.warn(` Snapshot network error for ${ticker2}, retry ${retryCount + 1}/${maxRetries} apres ${delay}ms...`);
       await new Promise((resolve) => setTimeout(resolve, delay));
       return saveSnapshot(ticker2, data, assumptions, info, notes, isCurrent, autoFetched, retryCount + 1, maxRetries);
     }
-    console.error(`❌ Failed to save snapshot for ${ticker2}:`, error);
+    console.error(` Failed to save snapshot for ${ticker2}:`, error);
     return { success: false, error: error.message || "Unknown error" };
   }
 }
@@ -35953,7 +35953,7 @@ async function listSnapshots(ticker2, limit = 20) {
 }
 async function getAllApprovedTickers() {
   try {
-    console.log("📊 KPI: Fetching all approved tickers (bulk query)...");
+    console.log(" KPI: Fetching all approved tickers (bulk query)...");
     const startTime = Date.now();
     const response = await fetch(`${API_BASE$1}/api/finance-snapshots?approved_only=true&distinct_tickers=true`);
     if (!response.ok) {
@@ -35961,10 +35961,10 @@ async function getAllApprovedTickers() {
     }
     const data = await response.json();
     const approvedTickers = data.tickers || [];
-    console.log(`✅ KPI: ${approvedTickers.length} approved tickers loaded in ${Date.now() - startTime}ms`);
+    console.log(` KPI: ${approvedTickers.length} approved tickers loaded in ${Date.now() - startTime}ms`);
     return { success: true, approvedTickers };
   } catch (error) {
-    console.error("❌ KPI: Failed to get approved tickers:", error);
+    console.error(" KPI: Failed to get approved tickers:", error);
     return { success: false, error: error.message, approvedTickers: [] };
   }
 }
@@ -35989,7 +35989,7 @@ async function deleteSnapshot(snapshotId) {
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    console.log(`✅ Snapshot deleted: ${snapshotId}`);
+    console.log(` Snapshot deleted: ${snapshotId}`);
     return { success: true };
   } catch (error) {
     console.error("Failed to delete snapshot:", error);
@@ -36058,13 +36058,13 @@ const RightSidebar = ({ ticker: ticker2, onLoadVersion, isOpen, onToggle }) => {
   const getActionLabel = (type) => {
     switch (type) {
       case "sync":
-        return "Synchronisé le";
+        return "Synchronise le";
       case "generated":
-        return "Généré le";
+        return "Genere le";
       case "modified":
-        return "Modifié le";
+        return "Modifie le";
       case "approved":
-        return "Approuvé le";
+        return "Approuve le";
     }
   };
   const formatDate = (dateString) => {
@@ -36082,15 +36082,15 @@ const RightSidebar = ({ ticker: ticker2, onLoadVersion, isOpen, onToggle }) => {
     const snapshot = snapshots.find((s2) => s2.id === snapshotId);
     if (!snapshot) return;
     if (snapshot.isCurrent) {
-      if (!confirm(`⚠️ ATTENTION : Vous êtes sur le point de supprimer la VERSION ACTUELLE (v${snapshot.version}).
+      if (!confirm(` ATTENTION : Vous etes sur le point de supprimer la VERSION ACTUELLE (v${snapshot.version}).
 
-Cette action est irréversible. Voulez-vous vraiment continuer ?`)) {
+Cette action est irreversible. Voulez-vous vraiment continuer ?`)) {
         return;
       }
     } else {
       if (!confirm(`Supprimer la version v${snapshot.version} du ${formatDate(snapshot.date)} ?
 
-Cette action est irréversible.`)) {
+Cette action est irreversible.`)) {
         return;
       }
     }
@@ -36115,7 +36115,7 @@ Cette action est irréversible.`)) {
       {
         onClick: onToggle,
         className: `fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-slate-800 text-white p-2 rounded-l-lg shadow-lg hover:bg-slate-700 transition-all ${isOpen ? "translate-x-0" : "translate-x-full"}`,
-        title: isOpen ? "Masquer l'historique des versions\n\nCliquez pour masquer la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardés de cette analyse." : "Afficher l'historique des versions\n\nCliquez pour afficher la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardés de cette analyse.\n\nVous pouvez:\n• Charger une version précédente (mode lecture seule)\n• Comparer différentes versions\n• Supprimer des snapshots",
+        title: isOpen ? "Masquer l'historique des versions\n\nCliquez pour masquer la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardes de cette analyse." : "Afficher l'historique des versions\n\nCliquez pour afficher la sidebar d'historique.\n\nL'historique contient tous les snapshots sauvegardes de cette analyse.\n\nVous pouvez:\n- Charger une version precedente (mode lecture seule)\n- Comparer differentes versions\n- Supprimer des snapshots",
         children: isOpen ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$v, { className: "w-5 h-5" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-5 h-5" })
       }
     ),
@@ -36164,7 +36164,7 @@ Cette action est irréversible.`)) {
                         snapshot.version
                       ] }),
                       snapshot.isCurrent && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-green-600 px-2 py-0.5 rounded", children: "Actuel" }),
-                      snapshot.isApproved && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-green-400 cursor-help", title: "Version approuvée\\n\\nCette version a été marquée comme officielle et approuvée.\\n\\nLes versions approuvées sont utilisées comme référence pour:\\n• Comparaison avec les versions futures\\n• Indicateur dans le KPI Dashboard\\n• Historique des décisions importantes" })
+                      snapshot.isApproved && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-green-400 cursor-help", title: "Version approuvee\\n\\nCette version a ete marquee comme officielle et approuvee.\\n\\nLes versions approuvees sont utilisees comme reference pour:\\n- Comparaison avec les versions futures\\n- Indicateur dans le KPI Dashboard\\n- Historique des decisions importantes" })
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-slate-400 mt-1", children: formatDate(snapshot.date) })
                   ] }),
@@ -36174,7 +36174,7 @@ Cette action est irréversible.`)) {
                       onClick: (e) => handleDelete(snapshot.id, e),
                       disabled: deletingId === snapshot.id,
                       className: `ml-2 p-1.5 rounded hover:bg-red-600/20 text-slate-400 hover:text-red-400 transition-colors ${deletingId === snapshot.id ? "opacity-50 cursor-not-allowed" : ""}`,
-                      title: "Supprimer cette version\\n\\n⚠️ ATTENTION: Cette action est irréversible!\\n\\nSupprime définitivement ce snapshot de l'historique.\\n\\nUne confirmation sera demandée avant suppression.",
+                      title: "Supprimer cette version\\n\\n ATTENTION: Cette action est irreversible!\\n\\nSupprime definitivement ce snapshot de l'historique.\\n\\nUne confirmation sera demandee avant suppression.",
                       "aria-label": "Supprimer",
                       children: deletingId === snapshot.id ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" })
                     }
@@ -36202,7 +36202,7 @@ const SensitivityTable = ({ baseEPS, baseGrowth, basePE }) => {
   const growthSteps = [safeBaseGrowth - 2, safeBaseGrowth, safeBaseGrowth + 2].map((v) => v != null && isFinite(v) ? v : 0);
   const peSteps = [safeBasePE - 3, safeBasePE, safeBasePE + 3].map((v) => v != null && isFinite(v) ? v : 0);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200 print-break-inside-avoid", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-3", children: "Matrice de Sensibilité (Prix Cible 5 ans)" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-3", children: "Matrice de Sensibilite (Prix Cible 5 ans)" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 bg-slate-100 border border-slate-200 rounded-tl", children: "P/E vs Croissance" }),
@@ -36230,7 +36230,7 @@ const SensitivityTable = ({ baseEPS, baseGrowth, basePE }) => {
         ] }, `pe-${peIdx}-${safePE}`);
       }) })
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-gray-400 mt-2 text-center italic", children: "Axe vertical : P/E Cible · Axe horizontal : Croissance BPA" })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-gray-400 mt-2 text-center italic", children: "Axe vertical : P/E Cible  Axe horizontal : Croissance BPA" })
   ] });
 };
 const SensitivityTablePCF = ({ baseCF, baseGrowth, basePCF }) => {
@@ -36240,7 +36240,7 @@ const SensitivityTablePCF = ({ baseCF, baseGrowth, basePCF }) => {
   const growthSteps = [safeBaseGrowth - 2, safeBaseGrowth, safeBaseGrowth + 2].map((v) => v != null && isFinite(v) ? v : 0);
   const pcfSteps = [safeBasePCF - 3, safeBasePCF, safeBasePCF + 3].map((v) => v != null && isFinite(v) ? v : 0);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200 print-break-inside-avoid", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-3", children: "Matrice de Sensibilité P/FCF (Prix Cible 5 ans)" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-bold text-gray-500 uppercase mb-3", children: "Matrice de Sensibilite P/FCF (Prix Cible 5 ans)" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 bg-slate-100 border border-slate-200 rounded-tl", children: "P/FCF vs Croissance" }),
@@ -36268,7 +36268,7 @@ const SensitivityTablePCF = ({ baseCF, baseGrowth, basePCF }) => {
         ] }, `pcf-${pcfIdx}-${safePCF}`);
       }) })
     ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-gray-400 mt-2 text-center italic", children: "Axe vertical : P/FCF Cible · Axe horizontal : Croissance CF" })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[10px] text-gray-400 mt-2 text-center italic", children: "Axe vertical : P/FCF Cible  Axe horizontal : Croissance CF" })
   ] });
 };
 const NotesEditor = ({ initialNotes, onSave }) => {
@@ -36349,7 +36349,7 @@ async function loadConfigFromSupabase() {
       // Pas encore dans Supabase
     };
   } catch (error) {
-    console.warn("⚠️ Impossible de charger la configuration depuis Supabase, utilisation des valeurs par défaut");
+    console.warn(" Impossible de charger la configuration depuis Supabase, utilisation des valeurs par defaut");
     return DEFAULT_CONFIG;
   }
 }
@@ -36392,7 +36392,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   React.useEffect(() => {
     if (data && data.length > 0) {
       const lastData = data[data.length - 1];
-      console.log("📊 EvaluationDetails: Données reçues", {
+      console.log(" EvaluationDetails: Donnees recues", {
         dataLength: data.length,
         lastYear: lastData.year,
         lastYearEPS: lastData.earningsPerShare,
@@ -36425,7 +36425,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   const DEBUG_MODE = typeof window !== "undefined" && (((_a2 = window.localStorage) == null ? void 0 : _a2.getItem("3p1-debug")) === "true" || window.location.search.includes("debug=true"));
   if (!data || data.length === 0) {
     if (DEBUG_MODE) {
-      console.warn("⚠️ EvaluationDetails: Aucune donnée disponible", {
+      console.warn(" EvaluationDetails: Aucune donnee disponible", {
         dataLength: (data == null ? void 0 : data.length) || 0,
         assumptions
       });
@@ -36451,7 +36451,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   };
   if (baseValues.eps === 0 && baseValues.cf === 0 && baseValues.bv === 0) {
     if (DEBUG_MODE) {
-      console.warn("⚠️ EvaluationDetails: Toutes les valeurs de base sont à 0", {
+      console.warn(" EvaluationDetails: Toutes les valeurs de base sont a 0", {
         baseYear: assumptions.baseYear,
         baseYearData,
         dataLength: (data == null ? void 0 : data.length) || 0,
@@ -36466,19 +36466,19 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   const projectFutureValueSafe = (current, rate, years) => {
     if (rate === void 0 || rate === null) {
       if (DEBUG_MODE) {
-        console.warn("⚠️ projectFutureValueSafe: rate is undefined/null", { current, rate, years });
+        console.warn(" projectFutureValueSafe: rate is undefined/null", { current, rate, years });
       }
       return void 0;
     }
     if (current <= 0 || !isFinite(current)) {
       if (DEBUG_MODE) {
-        console.warn("⚠️ projectFutureValueSafe: current is invalid", { current, rate, years });
+        console.warn(" projectFutureValueSafe: current is invalid", { current, rate, years });
       }
       return void 0;
     }
     if (!isFinite(rate)) {
       if (DEBUG_MODE) {
-        console.warn("⚠️ projectFutureValueSafe: rate is not finite", { current, rate, years });
+        console.warn(" projectFutureValueSafe: rate is not finite", { current, rate, years });
       }
       return void 0;
     }
@@ -36487,7 +36487,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     const result = current * Math.pow(1 + safeRate / 100, years);
     const finalResult = isFinite(result) && result > 0 ? result : void 0;
     if (finalResult === void 0 && DEBUG_MODE) {
-      console.warn("⚠️ projectFutureValueSafe: result is invalid", { current, rate, years, safeRate, result });
+      console.warn(" projectFutureValueSafe: result is invalid", { current, rate, years, safeRate, result });
     }
     return finalResult;
   };
@@ -36512,7 +36512,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   };
   if (futureValues.eps === void 0 && futureValues.cf === void 0 && futureValues.bv === void 0) {
     if (DEBUG_MODE) {
-      console.warn("⚠️ EvaluationDetails: Toutes les projections sont undefined", {
+      console.warn(" EvaluationDetails: Toutes les projections sont undefined", {
         baseValues,
         safeGrowthEPS,
         safeGrowthCF,
@@ -36539,7 +36539,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
   };
   if (targets.eps === void 0 && targets.cf === void 0 && targets.bv === void 0 && targets.div === void 0) {
     if (DEBUG_MODE) {
-      console.warn("⚠️ EvaluationDetails: Tous les prix cibles sont undefined", {
+      console.warn(" EvaluationDetails: Tous les prix cibles sont undefined", {
         futureValues,
         safeTargetPE,
         safeTargetPCF,
@@ -36695,15 +36695,15 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
       if (values.length === 0) return [];
       const limits = {
         pe: { min: 1, max: 200 },
-        // P/E: 1x à 200x
+        // P/E: 1x a 200x
         pcf: { min: 1, max: 200 },
-        // P/CF: 1x à 200x
+        // P/CF: 1x a 200x
         pbv: { min: 0.1, max: 50 },
-        // P/BV: 0.1x à 50x
+        // P/BV: 0.1x a 50x
         yield: { min: 0, max: 50 },
-        // Yield: 0% à 50%
+        // Yield: 0% a 50%
         growth: { min: -50, max: 100 }
-        // Growth: -50% à +100%
+        // Growth: -50% a +100%
       };
       const limit = limits[type] || config2.outliers;
       return values.filter((v) => isFinite(v) && v >= limit.min && v <= limit.max);
@@ -36837,7 +36837,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
     const sector5YGrowth = sector5YearProjections[config22.growthKey];
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 border-l-4 border-blue-400 p-2 sm:p-3 md:p-4 mt-2 mb-2 rounded-r", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs font-semibold text-blue-800 mb-2 sm:mb-3", children: [
-        "📊 Intervalles de Référence - ",
+        " Intervalles de Reference - ",
         metricConfig[metric].ratioLabel
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 md:gap-4 text-xs", children: [
@@ -36890,21 +36890,21 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 text-[10px] text-gray-500 italic", children: [
-        "Titre Historique: Calculé à partir de vos données historiques. Secteur Typique: Valeurs de référence pour le secteur ",
-        (info == null ? void 0 : info.sector) || "générique",
-        ". 5 Ans: Projections basées sur vos hypothèses actuelles."
+        "Titre Historique: Calcule a partir de vos donnees historiques. Secteur Typique: Valeurs de reference pour le secteur ",
+        (info == null ? void 0 : info.sector) || "generique",
+        ". 5 Ans: Projections basees sur vos hypotheses actuelles."
       ] })
     ] });
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-5 rounded-lg shadow border border-gray-200 print-break-inside-avoid", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base sm:text-lg font-bold text-gray-700 mb-3 sm:mb-4 flex items-center gap-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-5 h-5 text-blue-600" }),
-      "ÉVALUATION PERSONNELLE (Projection 5 Ans)",
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-normal text-gray-500 ml-2", children: "(☑ = Incluse, ☐ = Exclue)" })
+      "EVALUATION PERSONNELLE (Projection 5 Ans)",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-normal text-gray-500 ml-2", children: "( = Incluse,  = Exclue)" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto -mx-3 sm:mx-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs sm:text-sm text-right border-collapse", style: { minWidth: "100%" }, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-slate-100 text-gray-600 uppercase text-xs", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Métrique" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Metrique" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2", children: "Actuel" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2", children: "Croissance %" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 bg-slate-50", children: "5 Ans (Proj)" }),
@@ -36921,7 +36921,7 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
                 checked: !assumptions.excludeEPS,
                 onChange: () => handleToggleExclusion("excludeEPS"),
                 className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600",
-                title: assumptions.excludeEPS ? "Inclure BPA (EPS) dans le calcul\n\n✅ Cliquez pour inclure cette métrique dans le prix cible moyen.\n\nLa métrique sera:\n• Incluse dans le calcul du prix cible moyen\n• Affichée normalement (non grisée)\n• Les champs seront éditables" : "Exclure BPA (EPS) du calcul\n\n❌ Cliquez pour exclure cette métrique du prix cible moyen.\n\nLa métrique sera:\n• Exclue du calcul du prix cible moyen\n• Affichée en gris (opacité 50%)\n• Les champs seront désactivés\n\nUtile si:\n• Le prix cible est aberrant\n• Les données sont incomplètes\n• La métrique n'est pas pertinente pour ce type d'entreprise"
+                title: assumptions.excludeEPS ? "Inclure BPA (EPS) dans le calcul\n\n Cliquez pour inclure cette metrique dans le prix cible moyen.\n\nLa metrique sera:\n- Incluse dans le calcul du prix cible moyen\n- Affichee normalement (non grisee)\n- Les champs seront editables" : "Exclure BPA (EPS) du calcul\n\n Cliquez pour exclure cette metrique du prix cible moyen.\n\nLa metrique sera:\n- Exclue du calcul du prix cible moyen\n- Affichee en gris (opacite 50%)\n- Les champs seront desactives\n\nUtile si:\n- Le prix cible est aberrant\n- Les donnees sont incompletes\n- La metrique n'est pas pertinente pour ce type d'entreprise"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "select-none", children: "BPA (EPS)" }),
@@ -36930,19 +36930,19 @@ const EvaluationDetails = ({ data, assumptions, onUpdateAssumption, info, sector
               {
                 onClick: () => toggleMetric("eps"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
-                title: expandedMetrics.eps ? "Masquer les intervalles de référence historiques\n\nCliquez pour masquer les tableaux de comparaison:\n• Ratios historiques (Titre vs Secteur)\n• Croissance historique (Titre vs Secteur)\n• Projections 5 ans (Titre vs Secteur)" : "Afficher les intervalles de référence historiques\n\nCliquez pour afficher les tableaux de comparaison:\n• Ratios historiques (Titre vs Secteur)\n• Croissance historique (Titre vs Secteur)\n• Projections 5 ans (Titre vs Secteur)\n\nUtile pour valider vos hypothèses par rapport à l'historique et au secteur.",
+                title: expandedMetrics.eps ? "Masquer les intervalles de reference historiques\n\nCliquez pour masquer les tableaux de comparaison:\n- Ratios historiques (Titre vs Secteur)\n- Croissance historique (Titre vs Secteur)\n- Projections 5 ans (Titre vs Secteur)" : "Afficher les intervalles de reference historiques\n\nCliquez pour afficher les tableaux de comparaison:\n- Ratios historiques (Titre vs Secteur)\n- Croissance historique (Titre vs Secteur)\n- Projections 5 ans (Titre vs Secteur)\n\nUtile pour valider vos hypotheses par rapport a l'historique et au secteur.",
                 children: expandedMetrics.eps ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-3 font-semibold ${assumptions.excludeEPS ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`, title: `BPA (EPS) Actuel: ${((_b = baseValues.eps) == null ? void 0 : _b.toFixed(2)) ?? "0.00"} $
 
-Valeur de l'année de base (${assumptions.baseYear}).
-Source: Données historiques FMP (vert = officiel).
+Valeur de l'annee de base (${assumptions.baseYear}).
+Source: Donnees historiques FMP (vert = officiel).
 
-${assumptions.excludeEPS ? "⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul." : "Utilisée comme point de départ pour la projection à 5 ans."}`, children: [
+${assumptions.excludeEPS ? " EXCLUE: Cette metrique produit un prix cible aberrant et a ete exclue du calcul." : "Utilisee comme point de depart pour la projection a 5 ans."}`, children: [
             ((_c = baseValues.eps) == null ? void 0 : _c.toFixed(2)) ?? "0.00",
-            assumptions.excludeEPS && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Métrique exclue (prix cible aberrant)" })
+            assumptions.excludeEPS && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Metrique exclue (prix cible aberrant)" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
@@ -36954,24 +36954,24 @@ ${assumptions.excludeEPS ? "⚠️ EXCLUE: Cette métrique produit un prix cible
               className: `w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeEPS ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`,
               title: `Taux de croissance BPA (EPS)
 
-Taux de croissance annuel composé pour projeter le BPA sur 5 ans.
+Taux de croissance annuel compose pour projeter le BPA sur 5 ans.
 
-Plage recommandée: 0% à 20%
-Limite système: -50% à +50%
+Plage recommandee: 0% a 20%
+Limite systeme: -50% a +50%
 
 Auto-rempli avec le CAGR historique.
 
-Formule projection: BPA × (1 + Taux/100)⁵`
+Formule projection: BPA x (1 + Taux/100)5`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BPA (EPS) Projeté (5 ans): ${((_d = futureValues.eps) == null ? void 0 : _d.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BPA (EPS) Projete (5 ans): ${((_d = futureValues.eps) == null ? void 0 : _d.toFixed(2)) ?? "0.00"} $
 
-Calculé avec:
-BPA Actuel (${((_e = baseValues.eps) == null ? void 0 : _e.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateEPS}%)⁵
+Calcule avec:
+BPA Actuel (${((_e = baseValues.eps) == null ? void 0 : _e.toFixed(2)) ?? "0.00"}) x (1 + ${assumptions.growthRateEPS}%)5
 
 = ${((_f = futureValues.eps) == null ? void 0 : _f.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: ((_g = futureValues.eps) == null ? void 0 : _g.toFixed(2)) ?? "0.00" }),
+Valeur projetee utilisee pour calculer le prix cible.`, children: ((_g = futureValues.eps) == null ? void 0 : _g.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeEPS ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -36980,26 +36980,26 @@ Valeur projetée utilisée pour calculer le prix cible.`, children: ((_g = futur
               onChange: (e) => handleInput(e, "targetPE"),
               disabled: assumptions.excludeEPS,
               className: `w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeEPS ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`,
-              title: `P/E Cible (Ratio Prix/Bénéfice)
+              title: `P/E Cible (Ratio Prix/Benefice)
 
 Ratio P/E attendu dans 5 ans.
 
-Plage recommandée: 1x à 100x
-Limite système: 1x à 100x
+Plage recommandee: 1x a 100x
+Limite systeme: 1x a 100x
 
 Auto-rempli avec la moyenne historique.
 
-Prix Cible = BPA Projeté × P/E Cible`
+Prix Cible = BPA Projete x P/E Cible`
             }
           ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-bold ${assumptions.excludeEPS ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`, title: `Prix Cible BPA (EPS): ${formatCurrency(targets.eps)}
 
-Calculé avec:
-BPA Projeté (${(futureValues.eps || 0).toFixed(2)}) × P/E Cible (${assumptions.targetPE}x)
+Calcule avec:
+BPA Projete (${(futureValues.eps || 0).toFixed(2)}) x P/E Cible (${assumptions.targetPE}x)
 
 = ${formatCurrency(targets.eps)}
 
-${assumptions.excludeEPS ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le prix cible moyen"}`, children: formatCurrency(targets.eps) })
+${assumptions.excludeEPS ? " Exclu du prix cible moyen" : " Inclus dans le prix cible moyen"}`, children: formatCurrency(targets.eps) })
         ] }),
         expandedMetrics.eps && /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 6, className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MetricReferenceRanges, { metric: "eps" }) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: assumptions.excludeCF ? "opacity-50 bg-gray-100" : "", children: [
@@ -37011,7 +37011,7 @@ ${assumptions.excludeEPS ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le
                 checked: !assumptions.excludeCF,
                 onChange: () => handleToggleExclusion("excludeCF"),
                 className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600",
-                title: assumptions.excludeCF ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"
+                title: assumptions.excludeCF ? "Inclure cette metrique dans le calcul" : "Exclure cette metrique du calcul"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "select-none", children: "CFA (Cash Flow)" }),
@@ -37020,19 +37020,19 @@ ${assumptions.excludeEPS ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le
               {
                 onClick: () => toggleMetric("cf"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
-                title: expandedMetrics.cf ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence",
+                title: expandedMetrics.cf ? "Masquer les intervalles de reference" : "Afficher les intervalles de reference",
                 children: expandedMetrics.cf ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-3 font-semibold ${assumptions.excludeCF ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`, title: `CFA (Cash Flow) Actuel: ${((_h = baseValues.cf) == null ? void 0 : _h.toFixed(2)) ?? "0.00"} $
 
-Valeur de l'année de base (${assumptions.baseYear}).
-Source: Données historiques FMP (vert = officiel).
+Valeur de l'annee de base (${assumptions.baseYear}).
+Source: Donnees historiques FMP (vert = officiel).
 
-${assumptions.excludeCF ? "⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul." : "Utilisée comme point de départ pour la projection à 5 ans."}`, children: [
+${assumptions.excludeCF ? " EXCLUE: Cette metrique produit un prix cible aberrant et a ete exclue du calcul." : "Utilisee comme point de depart pour la projection a 5 ans."}`, children: [
             ((_i = baseValues.cf) == null ? void 0 : _i.toFixed(2)) ?? "0.00",
-            assumptions.excludeCF && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Métrique exclue (prix cible aberrant)" })
+            assumptions.excludeCF && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Metrique exclue (prix cible aberrant)" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
@@ -37044,24 +37044,24 @@ ${assumptions.excludeCF ? "⚠️ EXCLUE: Cette métrique produit un prix cible 
               className: `w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeCF ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`,
               title: `Taux de croissance CFA (Cash Flow)
 
-Taux de croissance annuel composé pour projeter le Cash Flow sur 5 ans.
+Taux de croissance annuel compose pour projeter le Cash Flow sur 5 ans.
 
-Plage recommandée: 0% à 20%
-Limite système: -50% à +50%
+Plage recommandee: 0% a 20%
+Limite systeme: -50% a +50%
 
 Auto-rempli avec le CAGR historique.
 
-Formule projection: CF × (1 + Taux/100)⁵`
+Formule projection: CF x (1 + Taux/100)5`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `CFA (Cash Flow) Projeté (5 ans): ${((_j = futureValues.cf) == null ? void 0 : _j.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `CFA (Cash Flow) Projete (5 ans): ${((_j = futureValues.cf) == null ? void 0 : _j.toFixed(2)) ?? "0.00"} $
 
-Calculé avec:
-CF Actuel (${((_k = baseValues.cf) == null ? void 0 : _k.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateCF}%)⁵
+Calcule avec:
+CF Actuel (${((_k = baseValues.cf) == null ? void 0 : _k.toFixed(2)) ?? "0.00"}) x (1 + ${assumptions.growthRateCF}%)5
 
 = ${((_l = futureValues.cf) == null ? void 0 : _l.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: ((_m = futureValues.cf) == null ? void 0 : _m.toFixed(2)) ?? "0.00" }),
+Valeur projetee utilisee pour calculer le prix cible.`, children: ((_m = futureValues.cf) == null ? void 0 : _m.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeCF ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -37074,22 +37074,22 @@ Valeur projetée utilisée pour calculer le prix cible.`, children: ((_m = futur
 
 Ratio P/CF attendu dans 5 ans.
 
-Plage recommandée: 1x à 100x
-Limite système: 1x à 100x
+Plage recommandee: 1x a 100x
+Limite systeme: 1x a 100x
 
 Auto-rempli avec la moyenne historique.
 
-Prix Cible = CF Projeté × P/CF Cible`
+Prix Cible = CF Projete x P/CF Cible`
             }
           ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-bold ${assumptions.excludeCF ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`, title: `Prix Cible CFA (Cash Flow): ${formatCurrency(targets.cf)}
 
-Calculé avec:
-CF Projeté (${(futureValues.cf || 0).toFixed(2)}) × P/CF Cible (${assumptions.targetPCF}x)
+Calcule avec:
+CF Projete (${(futureValues.cf || 0).toFixed(2)}) x P/CF Cible (${assumptions.targetPCF}x)
 
 = ${formatCurrency(targets.cf)}
 
-${assumptions.excludeCF ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le prix cible moyen"}`, children: formatCurrency(targets.cf) })
+${assumptions.excludeCF ? " Exclu du prix cible moyen" : " Inclus dans le prix cible moyen"}`, children: formatCurrency(targets.cf) })
         ] }),
         expandedMetrics.cf && /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 6, className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MetricReferenceRanges, { metric: "cf" }) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: assumptions.excludeBV ? "opacity-50 bg-gray-100" : "", children: [
@@ -37101,7 +37101,7 @@ ${assumptions.excludeCF ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
                 checked: !assumptions.excludeBV,
                 onChange: () => handleToggleExclusion("excludeBV"),
                 className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600",
-                title: assumptions.excludeBV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"
+                title: assumptions.excludeBV ? "Inclure cette metrique dans le calcul" : "Exclure cette metrique du calcul"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "select-none", children: "BV (Book Value)" }),
@@ -37110,19 +37110,19 @@ ${assumptions.excludeCF ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
               {
                 onClick: () => toggleMetric("bv"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
-                title: expandedMetrics.bv ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence",
+                title: expandedMetrics.bv ? "Masquer les intervalles de reference" : "Afficher les intervalles de reference",
                 children: expandedMetrics.bv ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-3 font-semibold ${assumptions.excludeBV ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`, title: `BV (Book Value) Actuel: ${((_n = baseValues.bv) == null ? void 0 : _n.toFixed(2)) ?? "0.00"} $
 
-Valeur de l'année de base (${assumptions.baseYear}).
-Source: Données historiques FMP (vert = officiel).
+Valeur de l'annee de base (${assumptions.baseYear}).
+Source: Donnees historiques FMP (vert = officiel).
 
-${assumptions.excludeBV ? "⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul." : "Utilisée comme point de départ pour la projection à 5 ans."}`, children: [
+${assumptions.excludeBV ? " EXCLUE: Cette metrique produit un prix cible aberrant et a ete exclue du calcul." : "Utilisee comme point de depart pour la projection a 5 ans."}`, children: [
             ((_o = baseValues.bv) == null ? void 0 : _o.toFixed(2)) ?? "0.00",
-            assumptions.excludeBV && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Métrique exclue (prix cible aberrant)" })
+            assumptions.excludeBV && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Metrique exclue (prix cible aberrant)" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
@@ -37134,24 +37134,24 @@ ${assumptions.excludeBV ? "⚠️ EXCLUE: Cette métrique produit un prix cible 
               className: `w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeBV ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`,
               title: `Taux de croissance BV (Book Value)
 
-Taux de croissance annuel composé pour projeter la Book Value sur 5 ans.
+Taux de croissance annuel compose pour projeter la Book Value sur 5 ans.
 
-Plage recommandée: 0% à 20%
-Limite système: -50% à +50%
+Plage recommandee: 0% a 20%
+Limite systeme: -50% a +50%
 
 Auto-rempli avec le CAGR historique.
 
-Formule projection: BV × (1 + Taux/100)⁵`
+Formule projection: BV x (1 + Taux/100)5`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BV (Book Value) Projeté (5 ans): ${((_p = futureValues.bv) == null ? void 0 : _p.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `BV (Book Value) Projete (5 ans): ${((_p = futureValues.bv) == null ? void 0 : _p.toFixed(2)) ?? "0.00"} $
 
-Calculé avec:
-BV Actuel (${((_q = baseValues.bv) == null ? void 0 : _q.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateBV}%)⁵
+Calcule avec:
+BV Actuel (${((_q = baseValues.bv) == null ? void 0 : _q.toFixed(2)) ?? "0.00"}) x (1 + ${assumptions.growthRateBV}%)5
 
 = ${((_r = futureValues.bv) == null ? void 0 : _r.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: ((_s = futureValues.bv) == null ? void 0 : _s.toFixed(2)) ?? "0.00" }),
+Valeur projetee utilisee pour calculer le prix cible.`, children: ((_s = futureValues.bv) == null ? void 0 : _s.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeBV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
             {
@@ -37164,22 +37164,22 @@ Valeur projetée utilisée pour calculer le prix cible.`, children: ((_s = futur
 
 Ratio P/BV attendu dans 5 ans.
 
-Plage recommandée: 0.5x à 50x
-Limite système: 0.5x à 50x
+Plage recommandee: 0.5x a 50x
+Limite systeme: 0.5x a 50x
 
 Auto-rempli avec la moyenne historique.
 
-Prix Cible = BV Projeté × P/BV Cible`
+Prix Cible = BV Projete x P/BV Cible`
             }
           ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-bold ${assumptions.excludeBV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`, title: `Prix Cible BV (Book Value): ${formatCurrency(targets.bv)}
 
-Calculé avec:
-BV Projeté (${(futureValues.bv || 0).toFixed(2)}) × P/BV Cible (${assumptions.targetPBV}x)
+Calcule avec:
+BV Projete (${(futureValues.bv || 0).toFixed(2)}) x P/BV Cible (${assumptions.targetPBV}x)
 
 = ${formatCurrency(targets.bv)}
 
-${assumptions.excludeBV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le prix cible moyen"}`, children: formatCurrency(targets.bv) })
+${assumptions.excludeBV ? " Exclu du prix cible moyen" : " Inclus dans le prix cible moyen"}`, children: formatCurrency(targets.bv) })
         ] }),
         expandedMetrics.bv && /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 6, className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MetricReferenceRanges, { metric: "bv" }) }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: assumptions.excludeDIV ? "opacity-50 bg-gray-100" : "", children: [
@@ -37191,7 +37191,7 @@ ${assumptions.excludeBV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
                 checked: !assumptions.excludeDIV,
                 onChange: () => handleToggleExclusion("excludeDIV"),
                 className: "w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer border-2 border-gray-300 flex-shrink-0 accent-blue-600",
-                title: assumptions.excludeDIV ? "Inclure cette métrique dans le calcul" : "Exclure cette métrique du calcul"
+                title: assumptions.excludeDIV ? "Inclure cette metrique dans le calcul" : "Exclure cette metrique du calcul"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "select-none", children: "DIV (Dividende)" }),
@@ -37200,19 +37200,19 @@ ${assumptions.excludeBV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le 
               {
                 onClick: () => toggleMetric("div"),
                 className: "ml-2 p-1 hover:bg-gray-200 rounded transition-colors",
-                title: expandedMetrics.div ? "Masquer les intervalles de référence" : "Afficher les intervalles de référence",
+                title: expandedMetrics.div ? "Masquer les intervalles de reference" : "Afficher les intervalles de reference",
                 children: expandedMetrics.div ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$u, { className: "w-4 h-4 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$x, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-3 font-semibold ${assumptions.excludeDIV ? "bg-red-200 text-red-800 border-2 border-red-500 border-dashed" : "bg-green-50 text-green-800"} cursor-help relative`, title: `DIV (Dividende) Actuel: ${((_t = baseValues.div) == null ? void 0 : _t.toFixed(2)) ?? "0.00"} $
 
-Valeur de l'année de base (${assumptions.baseYear}).
-Source: Données historiques FMP (vert = officiel).
+Valeur de l'annee de base (${assumptions.baseYear}).
+Source: Donnees historiques FMP (vert = officiel).
 
-${assumptions.excludeDIV ? "⚠️ EXCLUE: Cette métrique produit un prix cible aberrant et a été exclue du calcul." : "Utilisée comme point de départ pour la projection à 5 ans."}`, children: [
+${assumptions.excludeDIV ? " EXCLUE: Cette metrique produit un prix cible aberrant et a ete exclue du calcul." : "Utilisee comme point de depart pour la projection a 5 ans."}`, children: [
             ((_u = baseValues.div) == null ? void 0 : _u.toFixed(2)) ?? "0.00",
-            assumptions.excludeDIV && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Métrique exclue (prix cible aberrant)" })
+            assumptions.excludeDIV && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "absolute top-1 right-1 w-4 h-4 text-red-600", title: "Metrique exclue (prix cible aberrant)" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "input",
@@ -37224,24 +37224,24 @@ ${assumptions.excludeDIV ? "⚠️ EXCLUE: Cette métrique produit un prix cible
               className: `w-16 text-right border-b outline-none focus:border-orange-500 bg-transparent font-medium ${assumptions.excludeDIV ? "border-gray-300 text-gray-400 cursor-not-allowed" : "border-orange-300 text-orange-700"}`,
               title: `Taux de croissance DIV (Dividende)
 
-Taux de croissance annuel composé pour projeter le Dividende sur 5 ans.
+Taux de croissance annuel compose pour projeter le Dividende sur 5 ans.
 
-Plage recommandée: 0% à 20%
-Limite système: -50% à +50%
+Plage recommandee: 0% a 20%
+Limite systeme: -50% a +50%
 
 Auto-rempli avec le CAGR historique.
 
-Formule projection: DIV × (1 + Taux/100)⁵`
+Formule projection: DIV x (1 + Taux/100)5`
             }
           ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `DIV (Dividende) Projeté (5 ans): ${((_v = futureValues.div) == null ? void 0 : _v.toFixed(2)) ?? "0.00"} $
+          /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-medium ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-slate-50 text-gray-800"} cursor-help`, title: `DIV (Dividende) Projete (5 ans): ${((_v = futureValues.div) == null ? void 0 : _v.toFixed(2)) ?? "0.00"} $
 
-Calculé avec:
-DIV Actuel (${((_w = baseValues.div) == null ? void 0 : _w.toFixed(2)) ?? "0.00"}) × (1 + ${assumptions.growthRateDiv}%)⁵
+Calcule avec:
+DIV Actuel (${((_w = baseValues.div) == null ? void 0 : _w.toFixed(2)) ?? "0.00"}) x (1 + ${assumptions.growthRateDiv}%)5
 
 = ${((_x = futureValues.div) == null ? void 0 : _x.toFixed(2)) ?? "0.00"} $
 
-Valeur projetée utilisée pour calculer le prix cible.`, children: ((_y = futureValues.div) == null ? void 0 : _y.toFixed(2)) ?? "0.00" }),
+Valeur projetee utilisee pour calculer le prix cible.`, children: ((_y = futureValues.div) == null ? void 0 : _y.toFixed(2)) ?? "0.00" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 ${assumptions.excludeDIV ? "bg-gray-200" : "bg-orange-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
@@ -37256,54 +37256,54 @@ Valeur projetée utilisée pour calculer le prix cible.`, children: ((_y = futur
 
 Rendement en dividendes attendu dans 5 ans (en %).
 
-Plage recommandée: 0.1% à 20%
-Limite système: 0.1% à 20%
+Plage recommandee: 0.1% a 20%
+Limite systeme: 0.1% a 20%
 
 Auto-rempli avec la moyenne historique.
 
-Prix Cible = DIV Projeté / (Yield Cible / 100)`
+Prix Cible = DIV Projete / (Yield Cible / 100)`
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `text-xs ${assumptions.excludeDIV ? "text-gray-400" : "text-orange-600"}`, children: "%" })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-3 font-bold ${assumptions.excludeDIV ? "bg-gray-200 text-gray-500" : "bg-green-50 text-green-700"} cursor-help`, title: `Prix Cible DIV (Dividende): ${formatCurrency(targets.div)}
 
-Calculé avec:
-DIV Projeté (${(futureValues.div || 0).toFixed(2)}) / (Yield Cible (${assumptions.targetYield}%) / 100)
+Calcule avec:
+DIV Projete (${(futureValues.div || 0).toFixed(2)}) / (Yield Cible (${assumptions.targetYield}%) / 100)
 
 = ${formatCurrency(targets.div)}
 
-${assumptions.excludeDIV ? "❌ Exclu du prix cible moyen" : "✅ Inclus dans le prix cible moyen"}`, children: formatCurrency(targets.div) })
+${assumptions.excludeDIV ? " Exclu du prix cible moyen" : " Inclus dans le prix cible moyen"}`, children: formatCurrency(targets.div) })
         ] }),
         expandedMetrics.div && /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 6, className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MetricReferenceRanges, { metric: "div" }) }) })
       ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 md:gap-6 items-end", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-right w-full sm:w-auto", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 uppercase mb-1 cursor-help", title: "Prix Cible Moyen (5 ans)\\n\\nMoyenne des prix cibles des métriques incluses (non exclues).\\n\\nCalcul:\\n(Prix Cible EPS + Prix Cible CF + Prix Cible BV + Prix Cible DIV) / Nombre de métriques incluses\\n\\n= ${formatCurrency(avgTargetPrice)}\\n\\nBasé sur ${validTargets.length} métrique(s) valide(s).", children: "Prix Cible Moyen (5 ans)" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 uppercase mb-1 cursor-help", title: "Prix Cible Moyen (5 ans)\\n\\nMoyenne des prix cibles des metriques incluses (non exclues).\\n\\nCalcul:\\n(Prix Cible EPS + Prix Cible CF + Prix Cible BV + Prix Cible DIV) / Nombre de metriques incluses\\n\\n= ${formatCurrency(avgTargetPrice)}\\n\\nBase sur ${validTargets.length} metrique(s) valide(s).", children: "Prix Cible Moyen (5 ans)" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 border-b-2 border-gray-800 inline-block px-2 cursor-help break-words", title: `Prix Cible Moyen: ${formatCurrency(avgTargetPrice)}
 
-Calculé à partir de ${validTargets.length} métrique(s):
-${validTargets.map((t, i) => `• Métrique ${i + 1}: ${formatCurrency(t)}`).join("\n")}
+Calcule a partir de ${validTargets.length} metrique(s):
+${validTargets.map((t, i) => `- Metrique ${i + 1}: ${formatCurrency(t)}`).join("\n")}
 
 Moyenne: ${formatCurrency(avgTargetPrice)}
 
-Utilisé pour:
-• Calcul du rendement total
-• Zones de prix recommandées
-• Ratio 3:1`, children: formatCurrency(avgTargetPrice) })
+Utilise pour:
+- Calcul du rendement total
+- Zones de prix recommandees
+- Ratio 3:1`, children: formatCurrency(avgTargetPrice) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 p-2.5 sm:p-3 md:p-4 rounded-lg border border-green-200 text-right w-full", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-green-800 uppercase font-bold mb-1 cursor-help", title: "Rendement Total Potentiel (5 ans)\\n\\nInclut:\\n• Appréciation du prix (Prix Cible - Prix Actuel)\\n• Dividendes cumulés sur 5 ans\\n\\nFormule:\\n((Prix Cible Moyen + Dividendes Totaux - Prix Actuel) / Prix Actuel) × 100\\n\\n= ${totalReturnPercent.toFixed(2)}%\\n\\n⚠️ Basé sur vos hypothèses, pas une garantie de performance.", children: "Rendement Total Potentiel" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-green-800 uppercase font-bold mb-1 cursor-help", title: "Rendement Total Potentiel (5 ans)\\n\\nInclut:\\n- Appreciation du prix (Prix Cible - Prix Actuel)\\n- Dividendes cumules sur 5 ans\\n\\nFormule:\\n((Prix Cible Moyen + Dividendes Totaux - Prix Actuel) / Prix Actuel) x 100\\n\\n= ${totalReturnPercent.toFixed(2)}%\\n\\n Base sur vos hypotheses, pas une garantie de performance.", children: "Rendement Total Potentiel" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-lg sm:text-xl md:text-2xl lg:text-3xl font-black text-green-600 cursor-help break-words", title: `Rendement Total: ${totalReturnPercent.toFixed(2)}%
 
-Détail:
-• Prix Actuel: ${formatCurrency(assumptions.currentPrice)}
-• Prix Cible Moyen: ${formatCurrency(avgTargetPrice)}
-• Appréciation: ${((avgTargetPrice - assumptions.currentPrice) / assumptions.currentPrice * 100).toFixed(2)}%
-• Dividendes (5 ans): ~${((totalReturnPercent - (avgTargetPrice - assumptions.currentPrice) / assumptions.currentPrice * 100) * assumptions.currentPrice / 100).toFixed(2)} $
+Detail:
+- Prix Actuel: ${formatCurrency(assumptions.currentPrice)}
+- Prix Cible Moyen: ${formatCurrency(avgTargetPrice)}
+- Appreciation: ${((avgTargetPrice - assumptions.currentPrice) / assumptions.currentPrice * 100).toFixed(2)}%
+- Dividendes (5 ans): ~${((totalReturnPercent - (avgTargetPrice - assumptions.currentPrice) / assumptions.currentPrice * 100) * assumptions.currentPrice / 100).toFixed(2)} $
 
-Basé sur ${validTargets.length} métrique(s) incluse(s).`, children: [
+Base sur ${validTargets.length} metrique(s) incluse(s).`, children: [
           totalReturnPercent.toFixed(2),
           "%"
         ] }),
@@ -37335,7 +37335,7 @@ const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
           if (false) ;
         }
       } catch (error) {
-        console.error("❌ Erreur chargement données sectorielles:", error);
+        console.error(" Erreur chargement donnees sectorielles:", error);
         setSectorError(error.message);
       } finally {
         setIsLoadingSector(false);
@@ -37415,15 +37415,15 @@ const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
       if (values.length === 0) return [];
       const limits = {
         pe: { min: 1, max: 200 },
-        // P/E: 1x à 200x (au-delà c'est aberrant)
+        // P/E: 1x a 200x (au-dela c'est aberrant)
         pcf: { min: 1, max: 200 },
-        // P/CF: 1x à 200x
+        // P/CF: 1x a 200x
         pbv: { min: 0.1, max: 50 },
-        // P/BV: 0.1x à 50x
+        // P/BV: 0.1x a 50x
         yield: { min: 0, max: 50 },
-        // Yield: 0% à 50%
+        // Yield: 0% a 50%
         growth: { min: -50, max: 100 }
-        // Growth: -50% à +100% (pour les cas extrêmes mais réalistes)
+        // Growth: -50% a +100% (pour les cas extremes mais realistes)
       };
       const limit = limits[type] || { min: -100, max: 1e3 };
       return values.filter((v) => isFinite(v) && v >= limit.min && v <= limit.max);
@@ -37521,11 +37521,11 @@ const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
       matchedSector = sectorDefaults["Technology"];
     } else if (normalizedSector.includes("finance") || normalizedSector.includes("financial")) {
       matchedSector = sectorDefaults["Financials"];
-    } else if (normalizedSector.includes("health") || normalizedSector.includes("santé")) {
+    } else if (normalizedSector.includes("health") || normalizedSector.includes("sante")) {
       matchedSector = sectorDefaults["Healthcare"];
     } else if (normalizedSector.includes("consumer") || normalizedSector.includes("consommation")) {
       matchedSector = sectorDefaults["Consumer"];
-    } else if (normalizedSector.includes("energy") || normalizedSector.includes("énergie")) {
+    } else if (normalizedSector.includes("energy") || normalizedSector.includes("energie")) {
       matchedSector = sectorDefaults["Energy"];
     }
     return matchedSector || {
@@ -37594,16 +37594,16 @@ const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
   };
   if (!titleRanges) {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200 mt-6", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-700 mb-4", children: "Intervalles de Référence" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500", children: "Données insuffisantes pour calculer les intervalles historiques" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-700 mb-4", children: "Intervalles de Reference" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500", children: "Donnees insuffisantes pour calculer les intervalles historiques" })
     ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200 mt-6 print-break-inside-avoid", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-700 mb-4", children: "📊 Intervalles de Référence Historiques" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 mb-4", children: "Utilisez ces intervalles pour guider vos hypothèses (champs orange). Les valeurs du titre sont calculées à partir de vos données historiques. Les valeurs du secteur sont des références typiques." }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-700 mb-4", children: " Intervalles de Reference Historiques" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 mb-4", children: "Utilisez ces intervalles pour guider vos hypotheses (champs orange). Les valeurs du titre sont calculees a partir de vos donnees historiques. Les valeurs du secteur sont des references typiques." }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm border-collapse", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-slate-100 text-gray-600 uppercase text-xs", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left border", children: "Métrique" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left border", children: "Metrique" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 border bg-blue-50", children: "Titre Historique" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 border bg-purple-50", children: "Secteur Typique" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 border bg-green-50", children: "5 Ans Titre" }),
@@ -37671,9 +37671,9 @@ const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 text-xs text-gray-500", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Titre Historique:" }),
-        " Calculé à partir de vos données historiques récupérées par API (",
+        " Calcule a partir de vos donnees historiques recuperees par API (",
         data.length,
-        " années : ",
+        " annees : ",
         ((_a2 = data[0]) == null ? void 0 : _a2.year) || "N/A",
         " - ",
         ((_b = data[data.length - 1]) == null ? void 0 : _b.year) || "N/A",
@@ -37682,27 +37682,27 @@ const HistoricalRangesTable = ({ data, info, sector, assumptions }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Secteur Typique:" }),
         " ",
-        isLoadingSector ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-blue-600", children: "Chargement des données sectorielles depuis l'API..." }) : sectorDataFromAPI ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-green-600", children: [
-          "Données récupérées depuis FMP API (secteur: ",
-          info.sector || sector || "non spécifié",
+        isLoadingSector ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-blue-600", children: "Chargement des donnees sectorielles depuis l'API..." }) : sectorDataFromAPI ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-green-600", children: [
+          "Donnees recuperees depuis FMP API (secteur: ",
+          info.sector || sector || "non specifie",
           ")"
         ] }) : sectorError ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-orange-600", children: [
-          "Valeurs par défaut (erreur API: ",
+          "Valeurs par defaut (erreur API: ",
           sectorError,
           ")"
         ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-          "Valeurs de référence pour le secteur ",
-          info.sector || sector || "non spécifié",
-          " (valeurs par défaut)"
+          "Valeurs de reference pour le secteur ",
+          info.sector || sector || "non specifie",
+          " (valeurs par defaut)"
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "5 Ans Titre:" }),
-        " Projections basées sur vos hypothèses actuelles (champs orange)"
+        " Projections basees sur vos hypotheses actuelles (champs orange)"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "5 Ans Secteur:" }),
-        " Projections typiques pour le secteur basées sur les moyennes sectorielles"
+        " Projections typiques pour le secteur basees sur les moyennes sectorielles"
       ] })
     ] })
   ] });
@@ -37712,7 +37712,7 @@ const DataSourcesInfo = () => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3 mb-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800", children: "📊 Sources des Données et Méthodologie de Calcul" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800", children: " Sources des Donnees et Methodologie de Calcul" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "a",
@@ -37733,7 +37733,7 @@ const DataSourcesInfo = () => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "font-bold text-green-700 mb-2 flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-3 h-3 bg-green-500 rounded-full" }),
-          "Données Officielles (Vert)"
+          "Donnees Officielles (Vert)"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-sm text-gray-700 space-y-1.5", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
@@ -37742,11 +37742,11 @@ const DataSourcesInfo = () => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "BPA (EPS) :" }),
-            " Bénéfice net par action (données annuelles auditées)"
+            " Benefice net par action (donnees annuelles auditees)"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "CFA (Cash Flow) :" }),
-            " Flux de trésorerie opérationnel par action"
+            " Flux de tresorerie operationnel par action"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "BV (Book Value) :" }),
@@ -37754,23 +37754,23 @@ const DataSourcesInfo = () => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "DIV (Dividende) :" }),
-            " Somme des dividendes versés par année fiscale"
+            " Somme des dividendes verses par annee fiscale"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Haut/Bas :" }),
-            " Prix maximum et minimum observés durant l'année"
+            " Prix maximum et minimum observes durant l'annee"
           ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "font-bold text-orange-700 mb-2 flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-3 h-3 bg-orange-500 rounded-full" }),
-          "Projections Basées sur Hypothèses (Orange)"
+          "Projections Basees sur Hypotheses (Orange)"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-sm text-gray-700 space-y-1.5", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Taux de Croissance :" }),
-            " CAGR calculé sur l'historique disponible (plafonné à 0-20%)"
+            " CAGR calcule sur l'historique disponible (plafonne a 0-20%)"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Ratios Cibles :" }),
@@ -37781,43 +37781,43 @@ const DataSourcesInfo = () => {
             " Moyenne historique du rendement en dividendes"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Valeurs Projetées (5 ans) :" }),
-            " Calculées avec la formule : ",
-            /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-gray-100 px-1 rounded", children: "Valeur × (1 + Taux)^5" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Valeurs Projetees (5 ans) :" }),
+            " Calculees avec la formule : ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-gray-100 px-1 rounded", children: "Valeur x (1 + Taux)^5" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Cible :" }),
-            " Valeur projetée × Ratio cible (ex: EPS projeté × P/E cible)"
+            " Valeur projetee x Ratio cible (ex: EPS projete x P/E cible)"
           ] })
         ] })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow-sm mt-4", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-indigo-700 mb-2", children: "🧮 Formules de Calcul" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-indigo-700 mb-2", children: " Formules de Calcul" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "CAGR (Taux de Croissance Annuel Composé) :" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "((Valeur Finale / Valeur Initiale)^(1/Années)) - 1" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "CAGR (Taux de Croissance Annuel Compose) :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "((Valeur Finale / Valeur Initiale)^(1/Annees)) - 1" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Cible (Méthode P/E) :" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "BPA Projeté (An 5) × P/E Cible" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Cible (Methode P/E) :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "BPA Projete (An 5) x P/E Cible" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Cible (Méthode Dividende) :" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "Dividende Projeté (An 5) / (Rendement Cible / 100)" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix Cible (Methode Dividende) :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "Dividende Projete (An 5) / (Rendement Cible / 100)" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Rendement Potentiel Total :" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "((Prix Cible Moyen / Prix Actuel) - 1) × 100" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "block bg-gray-100 p-2 rounded mt-1 text-xs", children: "((Prix Cible Moyen / Prix Actuel) - 1) x 100" })
         ] })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-yellow-800", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "⚠️ Avertissement :" }),
-      " Les projections sont basées sur des hypothèses et l'historique. Elles ne constituent pas une garantie de performance future. Les données en ",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: " Avertissement :" }),
+      " Les projections sont basees sur des hypotheses et l'historique. Elles ne constituent pas une garantie de performance future. Les donnees en ",
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600 font-semibold", children: "orange" }),
-      " sont des estimations calculées automatiquement et doivent être ajustées selon votre analyse personnelle."
+      " sont des estimations calculees automatiquement et doivent etre ajustees selon votre analyse personnelle."
     ] }) })
   ] });
 };
@@ -37899,14 +37899,14 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
   const forwardJpegyColor = getJpegyColor(forwardJpegy);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center cursor-help", title: "JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield)\\n\\nMétrique propriétaire développée par Jean-Sébastien (JSLAI™).\\n\\nFormule: P/E ÷ (Croissance % + Yield %)\\n\\nPlus le ratio est bas, plus l'action est attractive.\\n\\nZones:\\n• 0.0 - 0.5: Très sous-évalué (vert pâle)\\n• 0.5 - 1.5: Sous-évalué à raisonnable (vert foncé)\\n• 1.5 - 1.75: Légèrement surévalué (jaune)\\n• 1.75 - 2.0: Surévalué (orange)\\n• > 2.0: Très surévalué (rouge)", children: "🎯 JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield)" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-4", children: "Ratio = P/E ÷ (Growth % + Yield %). Plus le ratio est bas, plus l'action est attractive." }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center cursor-help", title: "JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield)\\n\\nMetrique proprietaire developpee par Jean-Sebastien (JSLAITM).\\n\\nFormule: P/E / (Croissance % + Yield %)\\n\\nPlus le ratio est bas, plus l'action est attractive.\\n\\nZones:\\n- 0.0 - 0.5: Tres sous-evalue (vert pale)\\n- 0.5 - 1.5: Sous-evalue a raisonnable (vert fonce)\\n- 1.5 - 1.75: Legerement surevalue (jaune)\\n- 1.75 - 2.0: Surevalue (orange)\\n- > 2.0: Tres surevalue (rouge)", children: " JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield)" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-4", children: "Ratio = P/E / (Growth % + Yield %). Plus le ratio est bas, plus l'action est attractive." }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 rounded-lg border border-purple-200", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 mb-1", children: "JPEGY (P/E Actuel)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-3xl font-bold mb-3 flex items-center gap-2 ${jpegy !== null ? jpegyColor.textClass : "text-gray-500"}`, children: jpegy !== null ? jpegy.toFixed(2) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "N/A" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg", title: "JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%", children: "⚠️" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg", title: "JPEGY non calculable: EPS invalide ou (Growth + Yield) <= 0.01%", children: "" })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-8 bg-gray-100 rounded-full overflow-hidden mb-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 flex", children: [
@@ -37938,17 +37938,17 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
             "% = ",
             isFinite(growthPlusYield) ? growthPlusYield.toFixed(2) : "0.00",
             "%"
-          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600", children: "⚠️ JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%" }) }),
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600", children: " JPEGY non calculable: EPS invalide ou (Growth + Yield) <= 0.01%" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[10px] text-gray-400 space-y-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source de calcul:" }),
-              " P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)"
+              " P/E Actuel / (Taux de croissance EPS % + Rendement dividende %)"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Formule:" }),
               " JPEGY = ",
               currentPE > 0 ? currentPE.toFixed(2) : "P/E",
-              " ÷ (",
+              " / (",
               (assumptions.growthRateEPS || 0).toFixed(1),
               "% + ",
               isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : "0.00",
@@ -37957,7 +37957,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fournisseur:" }),
-              " Métrique propriétaire développée par Jean-Sébastien (JSLAI™). Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes."
+              " Metrique proprietaire developpee par Jean-Sebastien (JSLAITM). Le fournisseur etablit cette metrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des benefices et du rendement du dividende, permettant une evaluation plus nuancee de la valorisation d'une action en tenant compte de sa capacite de croissance et de sa distribution de dividendes."
             ] })
           ] }) })
         ] }),
@@ -37965,7 +37965,7 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 mb-1", children: "JPEGY (Forward P/E)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-3xl font-bold mb-3 flex items-center gap-2 ${forwardJpegy !== null ? forwardJpegyColor.textClass : "text-gray-500"}`, children: forwardJpegy !== null ? forwardJpegy.toFixed(2) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "N/A" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg", title: "Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%", children: "⚠️" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-lg", title: "Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) <= 0.01%", children: "" })
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative h-8 bg-gray-100 rounded-full overflow-hidden mb-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 flex", children: [
@@ -37997,17 +37997,17 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
             "% = ",
             isFinite(growthPlusYield) ? growthPlusYield.toFixed(2) : "0.00",
             "%"
-          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600", children: "⚠️ Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%" }) }),
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600", children: " Forward JPEGY non calculable: EPS invalide ou (Growth + Yield) <= 0.01%" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[10px] text-gray-400 space-y-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source de calcul:" }),
-              " Forward P/E ÷ (Taux de croissance EPS % + Rendement dividende %)"
+              " Forward P/E / (Taux de croissance EPS % + Rendement dividende %)"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Formule:" }),
               " Forward JPEGY = ",
               forwardPE > 0 ? forwardPE.toFixed(2) : "Forward P/E",
-              " ÷ (",
+              " / (",
               (assumptions.growthRateEPS || 0).toFixed(1),
               "% + ",
               isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : "0.00",
@@ -38016,21 +38016,21 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fournisseur:" }),
-              " Métrique propriétaire développée par Jean-Sébastien (JSLAI™). Le fournisseur établit cette métrique en utilisant le Forward P/E (basé sur les bénéfices projetés) au lieu du P/E actuel, ajusté par la somme du taux de croissance des bénéfices et du rendement du dividende, offrant une perspective prospective de la valorisation."
+              " Metrique proprietaire developpee par Jean-Sebastien (JSLAITM). Le fournisseur etablit cette metrique en utilisant le Forward P/E (base sur les benefices projetes) au lieu du P/E actuel, ajuste par la somme du taux de croissance des benefices et du rendement du dividende, offrant une perspective prospective de la valorisation."
             ] })
           ] }) })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-3 bg-white rounded-lg border border-gray-200", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-gray-700 mb-2", children: "Légende des zones :" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-gray-700 mb-2", children: "Legende des zones :" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2 text-xs", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-green-200 rounded" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "0.0 - 0.5 (Vert pâle)" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "0.0 - 0.5 (Vert pale)" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-green-600 rounded" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "0.5 - 1.5 (Vert foncé)" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "0.5 - 1.5 (Vert fonce)" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-yellow-400 rounded" }),
@@ -38048,20 +38048,20 @@ const AdditionalMetrics = ({ data, assumptions, info, config: config2 = DEFAULT_
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center cursor-help", title: "Ratios Actuels vs Historiques\\n\\nCompare les ratios actuels avec les moyennes historiques.\\n\\nPermet de voir si l'action est:\\n• Sous-évaluée (ratio actuel < historique)\\n• Surévaluée (ratio actuel > historique)\\n\\nLes ratios verts indiquent une sous-évaluation relative.\\nLes ratios rouges indiquent une surévaluation relative.", children: "📊 Ratios Actuels vs Historiques" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center cursor-help", title: "Ratios Actuels vs Historiques\\n\\nCompare les ratios actuels avec les moyennes historiques.\\n\\nPermet de voir si l'action est:\\n- Sous-evaluee (ratio actuel < historique)\\n- Surevaluee (ratio actuel > historique)\\n\\nLes ratios verts indiquent une sous-evaluation relative.\\nLes ratios rouges indiquent une surevaluation relative.", children: " Ratios Actuels vs Historiques" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-slate-100", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Métrique" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Metrique" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Actuel" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Historique Moyen" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Écart" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Ecart" })
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { className: "divide-y", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 font-semibold cursor-help", title: "P/E (Price-to-Earnings)\\n\\nRatio Prix/Bénéfice actuel.\\nSource: FMP key-metrics", children: "P/E" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 font-semibold cursor-help", title: "P/E (Price-to-Earnings)\\n\\nRatio Prix/Benefice actuel.\\nSource: FMP key-metrics", children: "P/E" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/E Actuel: ${currentPE.toFixed(2)}x
 
-Calculé avec:
+Calcule avec:
 Prix Actuel / BPA Actuel
 
 = ${formatCurrency(assumptions.currentPrice)} / ${baseEPS.toFixed(2)}
@@ -38069,12 +38069,12 @@ Prix Actuel / BPA Actuel
 = ${currentPE.toFixed(2)}x`, children: currentPE.toFixed(2) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/E Historique Moyen: ${avgPE.toFixed(2)}x
 
-Moyenne des ratios P/E historiques calculée à partir des données des 10 dernières années.`, children: avgPE.toFixed(2) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPE < avgPE ? "text-green-600" : "text-red-600"}`, title: `Écart: ${avgPE > 0 ? ((currentPE / avgPE - 1) * 100).toFixed(1) : "0.0"}%
+Moyenne des ratios P/E historiques calculee a partir des donnees des 10 dernieres annees.`, children: avgPE.toFixed(2) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPE < avgPE ? "text-green-600" : "text-red-600"}`, title: `Ecart: ${avgPE > 0 ? ((currentPE / avgPE - 1) * 100).toFixed(1) : "0.0"}%
 
-${currentPE < avgPE ? "✅ Sous-évalué par rapport à la moyenne historique" : "⚠️ Surévalué par rapport à la moyenne historique"}
+${currentPE < avgPE ? " Sous-evalue par rapport a la moyenne historique" : " Surevalue par rapport a la moyenne historique"}
 
-Un P/E inférieur à la moyenne historique peut indiquer une opportunité d'achat.`, children: [
+Un P/E inferieur a la moyenne historique peut indiquer une opportunite d'achat.`, children: [
               avgPE > 0 ? ((currentPE / avgPE - 1) * 100).toFixed(1) : "0.0",
               "%"
             ] })
@@ -38083,14 +38083,14 @@ Un P/E inférieur à la moyenne historique peut indiquer une opportunité d'acha
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 font-semibold cursor-help", title: "P/CF (Price-to-Cash Flow)\\n\\nRatio Prix/Cash Flow actuel.\\nSource: FMP key-metrics", children: "P/CF" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/CF Actuel: ${currentPCF.toFixed(2)}x
 
-Calculé avec:
+Calcule avec:
 Prix Actuel / Cash Flow par Action Actuel`, children: currentPCF.toFixed(2) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/CF Historique Moyen: ${avgPCF.toFixed(2)}x
 
-Moyenne des ratios P/CF historiques calculée à partir des données des 10 dernières années.`, children: avgPCF.toFixed(2) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPCF < avgPCF ? "text-green-600" : "text-red-600"}`, title: `Écart: ${avgPCF > 0 ? ((currentPCF / avgPCF - 1) * 100).toFixed(1) : "0.0"}%
+Moyenne des ratios P/CF historiques calculee a partir des donnees des 10 dernieres annees.`, children: avgPCF.toFixed(2) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPCF < avgPCF ? "text-green-600" : "text-red-600"}`, title: `Ecart: ${avgPCF > 0 ? ((currentPCF / avgPCF - 1) * 100).toFixed(1) : "0.0"}%
 
-${currentPCF < avgPCF ? "✅ Sous-évalué par rapport à la moyenne historique" : "⚠️ Surévalué par rapport à la moyenne historique"}`, children: [
+${currentPCF < avgPCF ? " Sous-evalue par rapport a la moyenne historique" : " Surevalue par rapport a la moyenne historique"}`, children: [
               avgPCF > 0 ? ((currentPCF / avgPCF - 1) * 100).toFixed(1) : "0.0",
               "%"
             ] })
@@ -38099,15 +38099,15 @@ ${currentPCF < avgPCF ? "✅ Sous-évalué par rapport à la moyenne historique"
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 font-semibold cursor-help", title: "P/BV (Price-to-Book Value)\\n\\nRatio Prix/Valeur Comptable actuel.\\nSource: FMP key-metrics", children: "P/BV" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/BV Actuel: ${currentPBV.toFixed(2)}x
 
-Calculé avec:
+Calcule avec:
 Prix Actuel / Book Value par Action Actuel`, children: currentPBV.toFixed(2) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 text-right cursor-help", title: `P/BV Cible: ${(assumptions.targetPBV || 0).toFixed(2)}x
 
-Ratio P/BV cible utilisé pour vos projections à 5 ans.
+Ratio P/BV cible utilise pour vos projections a 5 ans.
 Auto-rempli avec la moyenne historique.`, children: (assumptions.targetPBV || 0).toFixed(2) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPBV < assumptions.targetPBV ? "text-green-600" : "text-red-600"}`, title: `Écart: ${assumptions.targetPBV > 0 ? ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1) : "0.0"}%
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${currentPBV < assumptions.targetPBV ? "text-green-600" : "text-red-600"}`, title: `Ecart: ${assumptions.targetPBV > 0 ? ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1) : "0.0"}%
 
-${currentPBV < assumptions.targetPBV ? "✅ Sous-évalué par rapport au ratio cible" : "⚠️ Surévalué par rapport au ratio cible"}`, children: [
+${currentPBV < assumptions.targetPBV ? " Sous-evalue par rapport au ratio cible" : " Surevalue par rapport au ratio cible"}`, children: [
               assumptions.targetPBV > 0 ? ((currentPBV / assumptions.targetPBV - 1) * 100).toFixed(1) : "0.0",
               "%"
             ] })
@@ -38116,23 +38116,23 @@ ${currentPBV < assumptions.targetPBV ? "✅ Sous-évalué par rapport au ratio c
             /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "p-2 font-semibold cursor-help", title: "Rendement DIV (Dividend Yield)\\n\\nRendement en dividendes actuel.\\nSource: FMP key-metrics", children: "Rendement DIV" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 text-right cursor-help", title: `Yield Actuel: ${isFinite(currentYield) ? currentYield.toFixed(2) : "N/A"}%
 
-Calculé avec:
-(Dividende Actuel / Prix Actuel) × 100`, children: [
+Calcule avec:
+(Dividende Actuel / Prix Actuel) x 100`, children: [
               isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(2) : "N/A",
               "%"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "p-2 text-right cursor-help", title: `Yield Cible: ${(assumptions.targetYield || 0).toFixed(2)}%
 
-Rendement en dividendes cible utilisé pour vos projections à 5 ans.
+Rendement en dividendes cible utilise pour vos projections a 5 ans.
 Auto-rempli avec la moyenne historique.`, children: [
               (assumptions.targetYield || 0).toFixed(2),
               "%"
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${isFinite(currentYield) && currentYield > assumptions.targetYield ? "text-green-600" : "text-red-600"}`, title: `Écart: ${assumptions.targetYield > 0 && isFinite(currentYield) && !isNaN(currentYield) ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : "0.0"}%
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: `p-2 text-right font-semibold cursor-help ${isFinite(currentYield) && currentYield > assumptions.targetYield ? "text-green-600" : "text-red-600"}`, title: `Ecart: ${assumptions.targetYield > 0 && isFinite(currentYield) && !isNaN(currentYield) ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : "0.0"}%
 
-${isFinite(currentYield) && currentYield > assumptions.targetYield ? "✅ Rendement supérieur au rendement cible" : "⚠️ Rendement inférieur au rendement cible"}
+${isFinite(currentYield) && currentYield > assumptions.targetYield ? " Rendement superieur au rendement cible" : " Rendement inferieur au rendement cible"}
 
-Un rendement supérieur au cible peut indiquer une opportunité.`, children: [
+Un rendement superieur au cible peut indiquer une opportunite.`, children: [
               assumptions.targetYield > 0 && isFinite(currentYield) && !isNaN(currentYield) ? ((currentYield / assumptions.targetYield - 1) * 100).toFixed(1) : "0.0",
               "%"
             ] })
@@ -38142,31 +38142,31 @@ Un rendement supérieur au cible peut indiquer une opportunité.`, children: [
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-gray-800 mb-3 cursor-help", title: "Marges de Rentabilité\\n\\nMesurent l'efficacité opérationnelle et la rentabilité de l'entreprise.\\n\\n• Marge Opérationnelle: Efficacité opérationnelle\\n• Marge Nette: Rentabilité globale\\n• Taux Distribution: Proportion des bénéfices distribués\\n\\nSource: FMP income-statement et key-metrics", children: "💰 Marges" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-gray-800 mb-3 cursor-help", title: "Marges de Rentabilite\\n\\nMesurent l'efficacite operationnelle et la rentabilite de l'entreprise.\\n\\n- Marge Operationnelle: Efficacite operationnelle\\n- Marge Nette: Rentabilite globale\\n- Taux Distribution: Proportion des benefices distribues\\n\\nSource: FMP income-statement et key-metrics", children: " Marges" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 text-sm", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Marge Opérationnelle: ${opMargin !== null ? opMargin.toFixed(1) : "N/A"}%
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Marge Operationnelle: ${opMargin !== null ? opMargin.toFixed(1) : "N/A"}%
 
-Formule: (Résultat Opérationnel / Chiffre d'Affaires) × 100
+Formule: (Resultat Operationnel / Chiffre d'Affaires) x 100
 
-Mesure l'efficacité opérationnelle de l'entreprise.
+Mesure l'efficacite operationnelle de l'entreprise.
 Source: FMP income-statement`, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Marge Opérationnelle" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Marge Operationnelle" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: opMargin !== null ? `${opMargin.toFixed(1)}%` : "N/A" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Marge Nette: ${netMargin !== null ? netMargin.toFixed(1) : "N/A"}%
 
-Formule: (Bénéfice Net / Chiffre d'Affaires) × 100
+Formule: (Benefice Net / Chiffre d'Affaires) x 100
 
-Mesure la rentabilité globale de l'entreprise.
+Mesure la rentabilite globale de l'entreprise.
 Source: FMP income-statement`, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Marge Nette" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: netMargin !== null ? `${netMargin.toFixed(1)}%` : "N/A" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Taux de Distribution (Payout Ratio): ${payoutRatio.toFixed(1)}%
 
-Formule: (Dividendes / Bénéfice Net) × 100
+Formule: (Dividendes / Benefice Net) x 100
 
-Mesure la proportion des bénéfices distribuée aux actionnaires.
+Mesure la proportion des benefices distribuee aux actionnaires.
 Source: FMP key-metrics`, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Taux Distribution DIV" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-semibold", children: [
@@ -38177,35 +38177,35 @@ Source: FMP key-metrics`, children: [
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-gray-800 mb-3 cursor-help", title: "Structure Financière\\n\\nMesure la santé financière et l'efficacité d'utilisation des ressources.\\n\\n• Ratio d'Endettement: Niveau de dette\\n• ROE: Rentabilité des capitaux propres\\n• ROA: Efficacité d'utilisation des actifs\\n\\nSource: FMP balance-sheet-statement et key-metrics", children: "🏦 Structure Financière" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-gray-800 mb-3 cursor-help", title: "Structure Financiere\\n\\nMesure la sante financiere et l'efficacite d'utilisation des ressources.\\n\\n- Ratio d'Endettement: Niveau de dette\\n- ROE: Rentabilite des capitaux propres\\n- ROA: Efficacite d'utilisation des actifs\\n\\nSource: FMP balance-sheet-statement et key-metrics", children: " Structure Financiere" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Ratio d'Endettement (Debt-to-Equity): ${debtToEquity !== null ? debtToEquity.toFixed(2) : "N/A"}
 
 Formule: Dette Totale / Capitaux Propres
 
 Mesure le niveau d'endettement de l'entreprise.
-Un ratio élevé indique plus de risque financier.
+Un ratio eleve indique plus de risque financier.
 Source: FMP balance-sheet-statement`, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Ratio d'Endettement" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: debtToEquity !== null ? debtToEquity.toFixed(2) : "N/A" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: info.roe !== null && info.roe !== void 0 ? `ROE (Return on Equity): ${info.roe.toFixed(2)}%
 
-Formule: (Bénéfice Net / Capitaux Propres) × 100
+Formule: (Benefice Net / Capitaux Propres) x 100
 
-Mesure la rentabilité des capitaux propres.
-Un ROE élevé indique une utilisation efficace des capitaux.
-Source: FMP key-metrics` : "ROE (Return on Equity): N/A\n\nDonnées non disponibles pour ce ticker.\nSource: FMP key-metrics", children: [
+Mesure la rentabilite des capitaux propres.
+Un ROE eleve indique une utilisation efficace des capitaux.
+Source: FMP key-metrics` : "ROE (Return on Equity): N/A\n\nDonnees non disponibles pour ce ticker.\nSource: FMP key-metrics", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "ROE" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: info.roe !== null && info.roe !== void 0 ? `${info.roe.toFixed(2)}%` : "N/A" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: info.roa !== null && info.roa !== void 0 ? `ROA (Return on Assets): ${info.roa.toFixed(2)}%
 
-Formule: (Bénéfice Net / Actifs Totaux) × 100
+Formule: (Benefice Net / Actifs Totaux) x 100
 
-Mesure l'efficacité d'utilisation des actifs.
-Un ROA élevé indique une bonne gestion des actifs.
-Source: FMP key-metrics` : "ROA (Return on Assets): N/A\n\nDonnées non disponibles pour ce ticker.\nSource: FMP key-metrics", children: [
+Mesure l'efficacite d'utilisation des actifs.
+Un ROA eleve indique une bonne gestion des actifs.
+Source: FMP key-metrics` : "ROA (Return on Assets): N/A\n\nDonnees non disponibles pour ce ticker.\nSource: FMP key-metrics", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "ROA" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: info.roa !== null && info.roa !== void 0 ? `${info.roa.toFixed(2)}%` : "N/A" })
           ] })
@@ -38213,28 +38213,28 @@ Source: FMP key-metrics` : "ROA (Return on Assets): N/A\n\nDonnées non disponib
         (info.roe === null || info.roe === void 0 || info.roa === null || info.roa === void 0) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 text-xs text-gray-500", children: [
           info.roe === null || info.roe === void 0 ? "ROE: " : "",
           info.roa === null || info.roa === void 0 ? "ROA: " : "",
-          "Source: FMP key-metrics (données non disponibles pour ce ticker)"
+          "Source: FMP key-metrics (donnees non disponibles pour ce ticker)"
         ] })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center", children: "📈 Rendement Espéré (5 ans)" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center", children: " Rendement Espere (5 ans)" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs sm:text-sm text-gray-600 mb-2 cursor-help", title: `Appréciation du Prix
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs sm:text-sm text-gray-600 mb-2 cursor-help", title: `Appreciation du Prix
 
-Rendement annualisé basé uniquement sur l'appréciation du prix (sans dividendes).
+Rendement annualise base uniquement sur l'appreciation du prix (sans dividendes).
 
 Formule:
-((Prix Projeté / Prix Actuel)^(1/5) - 1) × 100
+((Prix Projete / Prix Actuel)^(1/5) - 1) x 100
 
 = ${annualizedReturn.toFixed(1)}% / an
 
-Total sur 5 ans: ${totalReturn.toFixed(1)}%`, children: "Appréciation du Prix" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xl sm:text-2xl md:text-3xl font-bold text-blue-600 cursor-help", title: `Appréciation annualisée: ${annualizedReturn.toFixed(1)}% / an
+Total sur 5 ans: ${totalReturn.toFixed(1)}%`, children: "Appreciation du Prix" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xl sm:text-2xl md:text-3xl font-bold text-blue-600 cursor-help", title: `Appreciation annualisee: ${annualizedReturn.toFixed(1)}% / an
 
-Calculée avec:
-((Prix Projeté (${formatCurrency(projectedPrice5Y)}) / Prix Actuel (${formatCurrency(assumptions.currentPrice)}))^(1/5) - 1) × 100
+Calculee avec:
+((Prix Projete (${formatCurrency(projectedPrice5Y)}) / Prix Actuel (${formatCurrency(assumptions.currentPrice)}))^(1/5) - 1) x 100
 
 = ${annualizedReturn.toFixed(1)}% / an
 
@@ -38244,10 +38244,10 @@ Total sur 5 ans: ${totalReturn.toFixed(1)}%`, children: [
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 mt-1 cursor-help", title: `Total sur 5 ans: ${totalReturn.toFixed(1)}%
 
-Calculé avec:
-((Prix Projeté / Prix Actuel) - 1) × 100
+Calcule avec:
+((Prix Projete / Prix Actuel) - 1) x 100
 
-= ((${formatCurrency(projectedPrice5Y)} / ${formatCurrency(assumptions.currentPrice)}) - 1) × 100
+= ((${formatCurrency(projectedPrice5Y)} / ${formatCurrency(assumptions.currentPrice)}) - 1) x 100
 
 = ${totalReturn.toFixed(1)}%`, children: [
             "Total: ",
@@ -38256,33 +38256,33 @@ Calculé avec:
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs sm:text-sm text-gray-600 mb-2 cursor-help", title: `Rendement Total Espéré
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs sm:text-sm text-gray-600 mb-2 cursor-help", title: `Rendement Total Espere
 
-Rendement annualisé incluant l'appréciation du prix ET les dividendes.
+Rendement annualise incluant l'appreciation du prix ET les dividendes.
 
 Formule:
-Appréciation annualisée + Yield annuel
+Appreciation annualisee + Yield annuel
 
 = ${isFinite(annualizedReturn) ? annualizedReturn.toFixed(1) : "0.0"}% + ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0"}%
 
-= ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : "0.0"}% / an`, children: "Rendement Total Espéré" }),
+= ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : "0.0"}% / an`, children: "Rendement Total Espere" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xl sm:text-2xl md:text-3xl font-bold text-green-600 cursor-help", title: `Rendement Total: ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : "0.0"}% / an
 
-Détail:
-• Appréciation: ${isFinite(annualizedReturn) ? annualizedReturn.toFixed(1) : "0.0"}% / an
-• Dividendes: ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0"}% / an
-• Total: ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : "0.0"}% / an
+Detail:
+- Appreciation: ${isFinite(annualizedReturn) ? annualizedReturn.toFixed(1) : "0.0"}% / an
+- Dividendes: ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0"}% / an
+- Total: ${isFinite(expectedReturn) ? expectedReturn.toFixed(1) : "0.0"}% / an
 
-Inclut les dividendes perçus sur 5 ans.`, children: [
+Inclut les dividendes percus sur 5 ans.`, children: [
             isFinite(expectedReturn) && !isNaN(expectedReturn) ? expectedReturn.toFixed(1) : "0.0",
             "% / an"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 mt-1 cursor-help", title: `Dividendes: ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0"}% / an
 
-Calculé avec:
-(Dividende Actuel / Prix Actuel) × 100
+Calcule avec:
+(Dividende Actuel / Prix Actuel) x 100
 
-= (${(assumptions.currentDividend || 0).toFixed(2)} / ${formatCurrency(assumptions.currentPrice)}) × 100
+= (${(assumptions.currentDividend || 0).toFixed(2)} / ${formatCurrency(assumptions.currentPrice)}) x 100
 
 = ${isFinite(currentYield) && !isNaN(currentYield) ? currentYield.toFixed(1) : "0.0"}% / an`, children: [
             "Incluant dividendes: ",
@@ -38294,32 +38294,32 @@ Calculé avec:
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 pt-4 border-t border-blue-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm space-y-1", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Prix Actuel: ${formatCurrency(assumptions.currentPrice)}
 
-Prix du marché en temps réel.
+Prix du marche en temps reel.
 Source: FMP API (quote)
 
-Utilisé comme référence pour tous les calculs de rendement.`, children: [
+Utilise comme reference pour tous les calculs de rendement.`, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Prix Actuel" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: formatCurrency(assumptions.currentPrice) })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Prix Projeté (5 ans): ${formatCurrency(projectedPrice5Y)}
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Prix Projete (5 ans): ${formatCurrency(projectedPrice5Y)}
 
-Calculé avec:
-EPS Base (${baseEPS.toFixed(2)}) × (1 + ${safeGrowthRateEPS.toFixed(1)}%)⁵ × P/E Cible (${safeTargetPE.toFixed(1)}x)
+Calcule avec:
+EPS Base (${baseEPS.toFixed(2)}) x (1 + ${safeGrowthRateEPS.toFixed(1)}%)5 x P/E Cible (${safeTargetPE.toFixed(1)}x)
 
 = ${formatCurrency(projectedPrice5Y)}
 
-Basé sur vos hypothèses de croissance et de ratio P/E.`, children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Prix Projeté (5 ans)" }),
+Base sur vos hypotheses de croissance et de ratio P/E.`, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Prix Projete (5 ans)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: formatCurrency(projectedPrice5Y) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between cursor-help", title: `Multiple 3 ans: ${multiple3Y.toFixed(2)}x
 
-Facteur de croissance sur 3 ans basé sur le taux de croissance EPS.
+Facteur de croissance sur 3 ans base sur le taux de croissance EPS.
 
 Formule:
-(1 + Taux Croissance EPS / 100)³
+(1 + Taux Croissance EPS / 100)3
 
-= (1 + ${safeGrowthRateEPS.toFixed(1)}% / 100)³
+= (1 + ${safeGrowthRateEPS.toFixed(1)}% / 100)3
 
 = ${multiple3Y.toFixed(2)}x
 
@@ -38333,8 +38333,8 @@ Indique le facteur de multiplication de la valeur sur 3 ans.`, children: [
       ] }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: "📊 Ratio 3:1 (Potentiel vs Risque)" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mb-4", children: "Le ratio 3:1 mesure le potentiel de rendement par rapport au risque de baisse. Un ratio ≥ 3:1 indique que le potentiel de hausse est au moins 3 fois supérieur au risque de baisse." }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: " Ratio 3:1 (Potentiel vs Risque)" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mb-4", children: "Le ratio 3:1 mesure le potentiel de rendement par rapport au risque de baisse. Un ratio >= 3:1 indique que le potentiel de hausse est au moins 3 fois superieur au risque de baisse." }),
       (() => {
         const avgLowPrice2 = calculateAverage(validHistory.map((d) => d.priceLow));
         const floorPrice2 = avgLowPrice2 * 0.9;
@@ -38347,37 +38347,37 @@ Indique le facteur de multiplication de la valeur sur 3 ans.`, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200 cursor-help", title: `Potentiel de Hausse: ${upsidePotential.toFixed(1)}%
 
-Calculé avec:
-((Prix Projeté - Prix Actuel) / Prix Actuel) × 100
+Calcule avec:
+((Prix Projete - Prix Actuel) / Prix Actuel) x 100
 
-= ((${formatCurrency(projectedPrice5YLocal)} - ${formatCurrency(assumptions.currentPrice)}) / ${formatCurrency(assumptions.currentPrice)}) × 100
+= ((${formatCurrency(projectedPrice5YLocal)} - ${formatCurrency(assumptions.currentPrice)}) / ${formatCurrency(assumptions.currentPrice)}) x 100
 
 = ${upsidePotential.toFixed(1)}%
 
-Représente le gain potentiel si le prix atteint le prix projeté.`, children: [
+Represente le gain potentiel si le prix atteint le prix projete.`, children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-green-700 font-semibold mb-1", children: "Potentiel de Hausse" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xl sm:text-2xl font-bold text-green-800", children: [
                 upsidePotential.toFixed(1),
                 "%"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[10px] sm:text-xs text-green-600 mt-1 break-words", children: [
-                "Prix projeté: ",
+                "Prix projete: ",
                 formatCurrency(projectedPrice5YLocal)
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200 cursor-help", title: `Risque de Baisse: ${downsideRisk.toFixed(1)}%
 
-Calculé avec:
-((Prix Actuel - Prix Plancher) / Prix Actuel) × 100
+Calcule avec:
+((Prix Actuel - Prix Plancher) / Prix Actuel) x 100
 
-Prix Plancher = Moyenne Prix Bas Historiques × 0.9
-= ${formatCurrency(avgLowPrice2)} × 0.9 = ${formatCurrency(floorPrice2)}
+Prix Plancher = Moyenne Prix Bas Historiques x 0.9
+= ${formatCurrency(avgLowPrice2)} x 0.9 = ${formatCurrency(floorPrice2)}
 
-Risque = ((${formatCurrency(assumptions.currentPrice)} - ${formatCurrency(floorPrice2)}) / ${formatCurrency(assumptions.currentPrice)}) × 100
+Risque = ((${formatCurrency(assumptions.currentPrice)} - ${formatCurrency(floorPrice2)}) / ${formatCurrency(assumptions.currentPrice)}) x 100
 
 = ${downsideRisk.toFixed(1)}%
 
-Représente le risque de baisse jusqu'au prix plancher historique.`, children: [
+Represente le risque de baisse jusqu'au prix plancher historique.`, children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-red-700 font-semibold mb-1", children: "Risque de Baisse" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xl sm:text-2xl font-bold text-red-800", children: [
                 downsideRisk.toFixed(1),
@@ -38393,31 +38393,31 @@ Représente le risque de baisse jusqu'au prix plancher historique.`, children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-semibold text-gray-700 mb-1", children: "Ratio 3:1" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-600", children: "Formule: Potentiel de Hausse (%) ÷ Risque de Baisse (%)" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-600", children: "Formule: Potentiel de Hausse (%) / Risque de Baisse (%)" })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `text-2xl sm:text-3xl md:text-4xl font-bold cursor-help ${isFavorable ? "text-green-700" : "text-yellow-700"}`, title: `Ratio 3:1: ${ratio31.toFixed(2)}:1
 
 Formule:
-Potentiel de Hausse (%) ÷ Risque de Baisse (%)
+Potentiel de Hausse (%) / Risque de Baisse (%)
 
-= ${upsidePotential.toFixed(1)}% ÷ ${downsideRisk.toFixed(1)}%
+= ${upsidePotential.toFixed(1)}% / ${downsideRisk.toFixed(1)}%
 
 = ${ratio31.toFixed(2)}:1
 
-${isFavorable ? "✅ Favorable (≥ 3:1): Le potentiel est au moins 3x supérieur au risque" : "⚠️ Défavorable (< 3:1): Le risque est élevé par rapport au potentiel"}
+${isFavorable ? " Favorable (>= 3:1): Le potentiel est au moins 3x superieur au risque" : " Defavorable (< 3:1): Le risque est eleve par rapport au potentiel"}
 
-Un ratio ≥ 3:1 indique un bon rapport risque/rendement.`, children: [
+Un ratio >= 3:1 indique un bon rapport risque/rendement.`, children: [
                 ratio31.toFixed(2),
                 ":1"
               ] })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `mt-2 text-sm font-semibold ${isFavorable ? "text-green-800" : "text-yellow-800"}`, children: isFavorable ? "✅ Ratio favorable (≥ 3:1) - Potentiel 3x supérieur au risque" : "⚠️ Ratio défavorable (< 3:1) - Risque élevé par rapport au potentiel" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `mt-2 text-sm font-semibold ${isFavorable ? "text-green-800" : "text-yellow-800"}`, children: isFavorable ? " Ratio favorable (>= 3:1) - Potentiel 3x superieur au risque" : " Ratio defavorable (< 3:1) - Risque eleve par rapport au potentiel" })
           ] })
         ] });
       })()
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-5 rounded-lg shadow border border-gray-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: "🎯 Zones de Prix Recommandées" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: " Zones de Prix Recommandees" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 bg-green-50 rounded-lg border-l-4 border-green-500", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
@@ -38425,48 +38425,48 @@ Un ratio ≥ 3:1 indique un bon rapport risque/rendement.`, children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-bold text-green-800", children: "Zone d'Achat" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600", children: "Prix attractif pour accumuler" })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-lg sm:text-xl md:text-2xl font-bold text-green-600 cursor-help break-words", title: `Zone d'Achat: ≤ ${formatCurrency(buyLimit)}
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-lg sm:text-xl md:text-2xl font-bold text-green-600 cursor-help break-words", title: `Zone d'Achat: <= ${formatCurrency(buyLimit)}
 
 Calcul:
-Prix Plancher + (Prix Cible 5 ans - Prix Plancher) × 33%
+Prix Plancher + (Prix Cible 5 ans - Prix Plancher) x 33%
 
-= ${formatCurrency(floorPrice)} + (${formatCurrency(projectedPrice5Y)} - ${formatCurrency(floorPrice)}) × 33%
+= ${formatCurrency(floorPrice)} + (${formatCurrency(projectedPrice5Y)} - ${formatCurrency(floorPrice)}) x 33%
 
 = ${formatCurrency(buyLimit)}
 
-Si le prix actuel est ≤ ${formatCurrency(buyLimit)}, la recommandation est ACHAT.`, children: [
-              "≤ ",
+Si le prix actuel est <= ${formatCurrency(buyLimit)}, la recommandation est ACHAT.`, children: [
+              "<= ",
               formatCurrency(buyLimit)
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-green-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-600 space-y-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Hypothèses utilisées :" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Hypotheses utilisees :" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              "• Prix plancher (floor) = ",
+              "- Prix plancher (floor) = ",
               formatCurrency(avgLowPrice),
-              " (moy. prix bas hist.) × 0.9 = ",
+              " (moy. prix bas hist.) x 0.9 = ",
               formatCurrency(floorPrice)
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              "• Prix cible 5 ans = ",
+              "- Prix cible 5 ans = ",
               formatCurrency(baseEPS),
-              " (EPS année de base ",
+              " (EPS annee de base ",
               assumptions.baseYear,
-              ") × (1 + ",
+              ") x (1 + ",
               safeGrowthRateEPS.toFixed(1),
-              "%)⁵ × ",
+              "%)5 x ",
               safeTargetPE.toFixed(1),
               "x (P/E cible) = ",
               formatCurrency(projectedPrice5Y)
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              "• Limite d'achat = ",
+              "- Limite d'achat = ",
               formatCurrency(floorPrice),
               " + (",
               formatCurrency(projectedPrice5Y),
               " - ",
               formatCurrency(floorPrice),
-              ") × 33% = ",
+              ") x 33% = ",
               formatCurrency(buyLimit)
             ] })
           ] }) })
@@ -38482,33 +38482,33 @@ Si le prix actuel est ≤ ${formatCurrency(buyLimit)}, la recommandation est ACH
 Si le prix actuel est entre ces deux limites, la recommandation est CONSERVER.
 
 Limite d'achat: ${formatCurrency(buyLimit)}
-Limite de vente: ${formatCurrency(sellLimit)} (Prix Cible 5 ans × 95%)`, children: [
+Limite de vente: ${formatCurrency(sellLimit)} (Prix Cible 5 ans x 95%)`, children: [
               formatCurrency(buyLimit),
               " - ",
               formatCurrency(sellLimit)
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-yellow-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-600 space-y-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Hypothèses utilisées :" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Hypotheses utilisees :" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              "• Limite d'achat = ",
+              "- Limite d'achat = ",
               formatCurrency(buyLimit),
               " (voir Zone d'Achat)"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              "• Limite de vente = ",
+              "- Limite de vente = ",
               formatCurrency(projectedPrice5Y),
-              " (prix cible 5 ans) × 95% = ",
+              " (prix cible 5 ans) x 95% = ",
               formatCurrency(sellLimit)
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              "• Prix cible basé sur : EPS ",
+              "- Prix cible base sur : EPS ",
               formatCurrency(baseEPS),
-              " (année ",
+              " (annee ",
               assumptions.baseYear,
-              ") × (1 + ",
+              ") x (1 + ",
               safeGrowthRateEPS.toFixed(1),
-              "%)⁵ × P/E ",
+              "%)5 x P/E ",
               safeTargetPE.toFixed(1),
               "x"
             ] })
@@ -38518,44 +38518,44 @@ Limite de vente: ${formatCurrency(sellLimit)} (Prix Cible 5 ans × 95%)`, childr
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-bold text-red-800", children: "Zone de Vente" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600", children: "Prendre profits / Réduire" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600", children: "Prendre profits / Reduire" })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-lg sm:text-xl md:text-2xl font-bold text-red-600 cursor-help break-words", title: `Zone de Vente: ≥ ${formatCurrency(sellLimit)}
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-lg sm:text-xl md:text-2xl font-bold text-red-600 cursor-help break-words", title: `Zone de Vente: >= ${formatCurrency(sellLimit)}
 
 Calcul:
-Prix Cible 5 ans × 95%
+Prix Cible 5 ans x 95%
 
-= ${formatCurrency(projectedPrice5Y)} × 95%
+= ${formatCurrency(projectedPrice5Y)} x 95%
 
 = ${formatCurrency(sellLimit)}
 
-Si le prix actuel est ≥ ${formatCurrency(sellLimit)}, la recommandation est VENTE (prendre profits).`, children: [
-              "≥ ",
+Si le prix actuel est >= ${formatCurrency(sellLimit)}, la recommandation est VENTE (prendre profits).`, children: [
+              ">= ",
               formatCurrency(sellLimit)
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-red-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-600 space-y-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Hypothèses utilisées :" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Hypotheses utilisees :" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              "• Prix cible 5 ans = ",
+              "- Prix cible 5 ans = ",
               formatCurrency(baseEPS),
-              " (EPS année de base ",
+              " (EPS annee de base ",
               assumptions.baseYear,
-              ") × (1 + ",
+              ") x (1 + ",
               safeGrowthRateEPS.toFixed(1),
-              "%)⁵ × ",
+              "%)5 x ",
               safeTargetPE.toFixed(1),
               "x (P/E cible) = ",
               formatCurrency(projectedPrice5Y)
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              "• Limite de vente = ",
+              "- Limite de vente = ",
               formatCurrency(projectedPrice5Y),
-              " × 95% = ",
+              " x 95% = ",
               formatCurrency(sellLimit)
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              "• Basé sur projection 5 ans avec croissance EPS ",
+              "- Base sur projection 5 ans avec croissance EPS ",
               safeGrowthRateEPS.toFixed(1),
               "% et P/E cible ",
               safeTargetPE.toFixed(1),
@@ -38569,15 +38569,15 @@ Si le prix actuel est ≥ ${formatCurrency(sellLimit)}, la recommandation est VE
         " ",
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "cursor-help", title: `Prix Actuel: ${formatCurrency(assumptions.currentPrice)}
 
-Comparé aux zones:
-• Zone d'Achat: ≤ ${formatCurrency(buyLimit)}
-• Zone de Conservation: ${formatCurrency(buyLimit)} - ${formatCurrency(sellLimit)}
-• Zone de Vente: ≥ ${formatCurrency(sellLimit)}
+Compare aux zones:
+- Zone d'Achat: <= ${formatCurrency(buyLimit)}
+- Zone de Conservation: ${formatCurrency(buyLimit)} - ${formatCurrency(sellLimit)}
+- Zone de Vente: >= ${formatCurrency(sellLimit)}
 
-Recommandation basée sur la position actuelle par rapport à ces zones.`, children: formatCurrency(assumptions.currentPrice) }),
+Recommandation basee sur la position actuelle par rapport a ces zones.`, children: formatCurrency(assumptions.currentPrice) }),
         assumptions.currentPrice <= buyLimit && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 px-2 py-1 bg-green-100 text-green-800 rounded font-semibold cursor-help", title: `Recommandation: ACHAT
 
-Le prix actuel (${formatCurrency(assumptions.currentPrice)}) est dans la zone d'achat (≤ ${formatCurrency(buyLimit)}).
+Le prix actuel (${formatCurrency(assumptions.currentPrice)}) est dans la zone d'achat (<= ${formatCurrency(buyLimit)}).
 
 C'est un prix attractif pour accumuler des positions.`, children: "ACHAT" }),
         assumptions.currentPrice > buyLimit && assumptions.currentPrice < sellLimit && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-semibold cursor-help", title: `Recommandation: CONSERVER
@@ -38587,9 +38587,9 @@ Le prix actuel (${formatCurrency(assumptions.currentPrice)}) est dans la zone de
 Maintenez votre position actuelle.`, children: "CONSERVER" }),
         assumptions.currentPrice >= sellLimit && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 px-2 py-1 bg-red-100 text-red-800 rounded font-semibold cursor-help", title: `Recommandation: VENDRE
 
-Le prix actuel (${formatCurrency(assumptions.currentPrice)}) est dans la zone de vente (≥ ${formatCurrency(sellLimit)}).
+Le prix actuel (${formatCurrency(assumptions.currentPrice)}) est dans la zone de vente (>= ${formatCurrency(sellLimit)}).
 
-Considérez prendre des profits ou réduire votre position.`, children: "VENDRE" })
+Considerez prendre des profits ou reduire votre position.`, children: "VENDRE" })
       ] }) })
     ] })
   ] });
@@ -38601,9 +38601,9 @@ const InfoTab = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$i, { className: "w-6 h-6 text-yellow-500" }),
-            "Guide d'Utilisation & Méthodologie"
+            "Guide d'Utilisation & Methodologie"
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 leading-relaxed", children: "Cette application est un outil d'aide à la décision pour l'investissement fondamental. Elle permet de construire des scénarios de valorisation personnalisés pour chaque société, en projetant les fondamentaux (Bénéfices, Cash Flow, Dividendes) sur un horizon de 5 ans." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 leading-relaxed", children: "Cette application est un outil d'aide a la decision pour l'investissement fondamental. Elle permet de construire des scenarios de valorisation personnalises pour chaque societe, en projetant les fondamentaux (Benefices, Cash Flow, Dividendes) sur un horizon de 5 ans." })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "a",
@@ -38622,35 +38622,35 @@ const InfoTab = () => {
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 border-l-4 border-blue-500 p-4 rounded", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-blue-800", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "📘 Guide Complet Disponible :" }),
-          " Un guide détaillé avec toutes les formules, méthodologies, sources de données et un exemple step-by-step complet (analyse d'Apple - AAPL) est disponible. Cliquez sur le bouton ci-dessus pour l'ouvrir dans GitHub."
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: " Guide Complet Disponible :" }),
+          " Un guide detaille avec toutes les formules, methodologies, sources de donnees et un exemple step-by-step complet (analyse d'Apple - AAPL) est disponible. Cliquez sur le bouton ci-dessus pour l'ouvrir dans GitHub."
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-blue-700 mt-2", children: "Le guide inclut : Sources des données FMP et ValueLine, formules de calcul détaillées, méthodologie JPEGY et Ratio 3:1, guide step-by-step avec exemple AAPL, bonnes pratiques et FAQ." })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-blue-700 mt-2", children: "Le guide inclut : Sources des donnees FMP et ValueLine, formules de calcul detaillees, methodologie JPEGY et Ratio 3:1, guide step-by-step avec exemple AAPL, bonnes pratiques et FAQ." })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$5, { className: "w-6 h-6 text-blue-500" }),
-        "1. Saisie des Données Historiques"
+        "1. Saisie des Donnees Historiques"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 text-gray-600 text-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-          "L'analyse commence par la fiabilité des données. Le tableau historique est ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "entièrement éditable" }),
-          ". Il sert de base pour comprendre la tendance passée de l'entreprise."
+          "L'analyse commence par la fiabilite des donnees. Le tableau historique est ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "entierement editable" }),
+          ". Il sert de base pour comprendre la tendance passee de l'entreprise."
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc pl-5 space-y-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Ajustement manuel :" }),
-            " Vous pouvez corriger ou compléter les données (Prix, EPS, Cash Flow...) si les données automatiques sont incomplètes."
+            " Vous pouvez corriger ou completer les donnees (Prix, EPS, Cash Flow...) si les donnees automatiques sont incompletes."
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Cohérence :" }),
-            " Les ratios (P/E, Yield, P/BV) sont recalculés instantanément pour vous permettre de juger de leur cohérence historique."
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Coherence :" }),
+            " Les ratios (P/E, Yield, P/BV) sont recalcules instantanement pour vous permettre de juger de leur coherence historique."
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Année de Base :" }),
-            " Sélectionnez l'année de référence (souvent l'année en cours ou l'estimé N+1) dans l'en-tête pour ancrer vos projections."
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Annee de Base :" }),
+            " Selectionnez l'annee de reference (souvent l'annee en cours ou l'estime N+1) dans l'en-tete pour ancrer vos projections."
           ] })
         ] })
       ] })
@@ -38658,42 +38658,42 @@ const InfoTab = () => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-6 h-6 text-indigo-500" }),
-        "2. Interprétation Visuelle"
+        "2. Interpretation Visuelle"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3 text-gray-600 text-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Jauge de Valorisation :" }),
-          " Elle situe le prix actuel par rapport à votre propre zone d'achat calculée."
+          " Elle situe le prix actuel par rapport a votre propre zone d'achat calculee."
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc pl-5 space-y-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             "La zone ",
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-600 font-bold", children: "ACHAT" }),
-            " est définie dynamiquement (par défaut sous le prix plancher + 40% de l'écart vers la cible)."
+            " est definie dynamiquement (par defaut sous le prix plancher + 40% de l'ecart vers la cible)."
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "La recommandation (Achat/Conserver/Vente) s'adapte automatiquement selon vos hypothèses de prix cible." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "La recommandation (Achat/Conserver/Vente) s'adapte automatiquement selon vos hypotheses de prix cible." })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Graphique des Ratios :" }),
-          " Vérifiez si vos multiples cibles (Target P/E, Target P/CF) sont réalistes par rapport à l'histoire de l'action (moyenne des 5-10 dernières années)."
+          " Verifiez si vos multiples cibles (Target P/E, Target P/CF) sont realistes par rapport a l'histoire de l'action (moyenne des 5-10 dernieres annees)."
         ] })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border-l-4 border-blue-600", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$D, { className: "w-6 h-6 text-blue-600" }),
-        "3. Méthodologie de Projection (Rendement Total)"
+        "3. Methodologie de Projection (Rendement Total)"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4 text-gray-600 text-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-          "Le cœur de l'analyse réside dans la ",
+          "Le cur de l'analyse reside dans la ",
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: '"Triangulation de la Valeur"' }),
-          ". Plutôt que de se fier à un seul ratio, nous calculons une valeur cible moyenne basée sur 4 piliers fondamentaux."
+          ". Plutot que de se fier a un seul ratio, nous calculons une valeur cible moyenne basee sur 4 piliers fondamentaux."
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6 mt-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-50 p-4 rounded border border-slate-200", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-slate-800 mb-2", children: "A. Vos Hypothèses (Inputs)" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs mb-2 italic", children: "Pour chaque métrique, définissez un taux de croissance annuel et un ratio de valorisation cible à 5 ans." }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-slate-800 mb-2", children: "A. Vos Hypotheses (Inputs)" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs mb-2 italic", children: "Pour chaque metrique, definissez un taux de croissance annuel et un ratio de valorisation cible a 5 ans." }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "space-y-2 text-xs", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "BPA (Earnings) :" }),
@@ -38701,7 +38701,7 @@ const InfoTab = () => {
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Cash Flow :" }),
-                " Génération de cash & P/CF attendu."
+                " Generation de cash & P/CF attendu."
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Book Value :" }),
@@ -38714,10 +38714,10 @@ const InfoTab = () => {
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-50 p-4 rounded border border-slate-200", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-slate-800 mb-2", children: "B. Résultat : Rendement Total" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mb-2 text-xs", children: `Le pourcentage affiché en vert ("Rendement Total Potentiel") est spécifique aux données de l'entreprise analysée.` }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white p-2 rounded border border-gray-200 font-mono text-xs mb-2", children: "Rendement = ((PrixCibleMoyen + DivCumulés) - PrixActuel) / PrixActuel" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs", children: "Ce chiffre combine l'appréciation potentielle du capital (gain en prix) ET le retour sur investissement via les dividendes perçus sur la période." })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-slate-800 mb-2", children: "B. Resultat : Rendement Total" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mb-2 text-xs", children: `Le pourcentage affiche en vert ("Rendement Total Potentiel") est specifique aux donnees de l'entreprise analysee.` }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white p-2 rounded border border-gray-200 font-mono text-xs mb-2", children: "Rendement = ((PrixCibleMoyen + DivCumules) - PrixActuel) / PrixActuel" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs", children: "Ce chiffre combine l'appreciation potentielle du capital (gain en prix) ET le retour sur investissement via les dividendes percus sur la periode." })
           ] })
         ] })
       ] })
@@ -38725,20 +38725,20 @@ const InfoTab = () => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-6 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-xl font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$K, { className: "w-6 h-6 text-green-500" }),
-        "4. Fonctionnalités Pratiques"
+        "4. Fonctionnalites Pratiques"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc pl-5 space-y-2 text-gray-600 text-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Gestion Multi-Dossiers :" }),
-          ' Créez, dupliquez ou supprimez des fiches via le menu latéral pour comparer différents scénarios (ex: "AAPL Optimiste" vs "AAPL Pessimiste").'
+          ' Creez, dupliquez ou supprimez des fiches via le menu lateral pour comparer differents scenarios (ex: "AAPL Optimiste" vs "AAPL Pessimiste").'
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Sauvegarde :" }),
-          " Vos analyses sont sauvegardées automatiquement dans votre navigateur."
+          " Vos analyses sont sauvegardees automatiquement dans votre navigateur."
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Sync API :" }),
-          " Utilisez le bouton de synchronisation pour récupérer les derniers états financiers disponibles (nécessite une clé API FMP/Finnhub optionnelle)."
+          " Utilisez le bouton de synchronisation pour recuperer les derniers etats financiers disponibles (necessite une cle API FMP/Finnhub optionnelle)."
         ] })
       ] })
     ] })
@@ -38833,7 +38833,7 @@ const TickerSearch = ({ onSelect, onClose }) => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-h-96 overflow-y-auto", children: [
       results.length === 0 && query.length > 0 && !isLoading && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center text-gray-500", children: [
-        'Aucun résultat trouvé pour "',
+        'Aucun resultat trouve pour "',
         query,
         '"'
       ] }),
@@ -38865,12 +38865,12 @@ const TickerSearch = ({ onSelect, onClose }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 py-2 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex items-center justify-between", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("kbd", { className: "px-2 py-1 bg-white border border-gray-300 rounded text-xs", children: "↑↓" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("kbd", { className: "px-2 py-1 bg-white border border-gray-300 rounded text-xs", children: "^v" }),
           " Naviguer"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("kbd", { className: "px-2 py-1 bg-white border border-gray-300 rounded text-xs", children: "Enter" }),
-          " Sélectionner"
+          " Selectionner"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("kbd", { className: "px-2 py-1 bg-white border border-gray-300 rounded text-xs", children: "Esc" }),
@@ -38879,7 +38879,7 @@ const TickerSearch = ({ onSelect, onClose }) => {
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         results.length,
-        " résultat",
+        " resultat",
         results.length !== 1 ? "s" : ""
       ] })
     ] })
@@ -38917,11 +38917,11 @@ const ConfirmSyncDialog = ({
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6", children: hasManualData ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-800 font-medium", children: "⚠️ Vous avez modifié des données manuellement" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-800 font-medium", children: " Vous avez modifie des donnees manuellement" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-yellow-700 mt-2", children: [
-          "Charger les données de l'API va ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "écraser vos modifications" }),
-          ". Toutes les cellules seront remplacées par les données FMP/Finnhub."
+          "Charger les donnees de l'API va ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "ecraser vos modifications" }),
+          ". Toutes les cellules seront remplacees par les donnees FMP/Finnhub."
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 p-4 bg-gray-50 rounded-md border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors", children: [
@@ -38935,11 +38935,11 @@ const ConfirmSyncDialog = ({
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💾 Sauvegarder la version actuelle avant sync" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Recommandé: Crée un snapshot de vos modifications avant de charger les nouvelles données. Vous pourrez restaurer cette version plus tard." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Sauvegarder la version actuelle avant sync" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Recommande: Cree un snapshot de vos modifications avant de charger les nouvelles donnees. Vous pourrez restaurer cette version plus tard." })
         ] })
       ] })
-    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 border border-blue-200 rounded-md p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-800", children: "ℹ️ Aucune modification manuelle détectée. Les données actuelles seront remplacées par les données de l'API." }) }) }),
+    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 border border-blue-200 rounded-md p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-800", children: "i Aucune modification manuelle detectee. Les donnees actuelles seront remplacees par les donnees de l'API." }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-lg", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
@@ -38962,7 +38962,7 @@ const ConfirmSyncDialog = ({
         {
           onClick: () => onConfirm(saveBeforeSync),
           className: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors shadow-sm",
-          children: hasManualData && saveBeforeSync ? "💾 Sauvegarder & Sync" : "Synchroniser"
+          children: hasManualData && saveBeforeSync ? " Sauvegarder & Sync" : "Synchroniser"
         }
       )
     ] })
@@ -39070,14 +39070,14 @@ const localStorageAdapter = {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (e) {
       if ((e == null ? void 0 : e.name) === "QuotaExceededError" || ((_a2 = e == null ? void 0 : e.message) == null ? void 0 : _a2.includes("quota"))) {
-        console.warn(`⚠️ LocalStorage quota exceeded for ${key}, attempting cleanup...`);
+        console.warn(` LocalStorage quota exceeded for ${key}, attempting cleanup...`);
         try {
           const keys2 = Object.keys(localStorage);
           const oldCacheKeys = keys2.filter((k2) => k2.startsWith("cache_") || k2.includes("_cache"));
           oldCacheKeys.forEach((k2) => localStorage.removeItem(k2));
           localStorage.setItem(key, JSON.stringify(value));
         } catch (retryError) {
-          console.error("❌ Failed to save even after cleanup, data too large for localStorage", retryError);
+          console.error(" Failed to save even after cleanup, data too large for localStorage", retryError);
           throw e;
         }
       } else {
@@ -39100,111 +39100,111 @@ const OPTION_METADATA = {
   saveBeforeSync: {
     timePerTickerMs: 200,
     timeDescription: "~200ms par ticker (sauvegarde snapshot)",
-    utility: "recommandé",
-    utilityDescription: "Permet de restaurer l'état précédent en cas d'erreur"
+    utility: "recommande",
+    utilityDescription: "Permet de restaurer l'etat precedent en cas d'erreur"
   },
   replaceOrangeData: {
     timePerTickerMs: 0,
-    // Pas de temps supplémentaire, juste un flag
-    timeDescription: "Aucun temps supplémentaire",
+    // Pas de temps supplementaire, juste un flag
+    timeDescription: "Aucun temps supplementaire",
     utility: "optionnel",
-    utilityDescription: "Utile si vous voulez remplacer vos hypothèses manuelles par des calculs automatiques"
+    utilityDescription: "Utile si vous voulez remplacer vos hypotheses manuelles par des calculs automatiques"
   },
   syncAllTickers: {
     timePerTickerMs: 0,
     // Pas de temps par ticker, c'est juste le scope
-    timeDescription: "Détermine le nombre de tickers à synchroniser",
+    timeDescription: "Determine le nombre de tickers a synchroniser",
     utility: "essentiel",
-    utilityDescription: "Définit si on synchronise un ticker ou tous les tickers"
+    utilityDescription: "Definit si on synchronise un ticker ou tous les tickers"
   },
   syncData: {
     timePerTickerMs: 1500,
     // Appel API FMP + traitement
     timeDescription: "~1.5s par ticker (appel API FMP + traitement)",
     utility: "essentiel",
-    utilityDescription: "Récupère les données financières historiques (EPS, CF, BV, DIV, prix) - Option la plus importante"
+    utilityDescription: "Recupere les donnees financieres historiques (EPS, CF, BV, DIV, prix) - Option la plus importante"
   },
   syncAssumptions: {
     timePerTickerMs: 100,
     // Calculs CAGR et moyennes
     timeDescription: "~100ms par ticker (calculs CAGR et moyennes)",
     utility: "essentiel",
-    utilityDescription: "Calcule automatiquement les taux de croissance et ratios cibles basés sur l'historique"
+    utilityDescription: "Calcule automatiquement les taux de croissance et ratios cibles bases sur l'historique"
   },
   syncInfo: {
     timePerTickerMs: 50,
-    // Mise à jour des infos de base
-    timeDescription: "~50ms par ticker (mise à jour infos)",
-    utility: "recommandé",
-    utilityDescription: "Met à jour le nom, secteur, description de l'entreprise"
+    // Mise a jour des infos de base
+    timeDescription: "~50ms par ticker (mise a jour infos)",
+    utility: "recommande",
+    utilityDescription: "Met a jour le nom, secteur, description de l'entreprise"
   },
   forceReplace: {
     timePerTickerMs: 0,
-    // Pas de temps supplémentaire, juste un flag
-    timeDescription: "Aucun temps supplémentaire",
-    utility: "avancé",
-    utilityDescription: "Force le remplacement même des données manuelles (utilisé avec précaution)"
+    // Pas de temps supplementaire, juste un flag
+    timeDescription: "Aucun temps supplementaire",
+    utility: "avance",
+    utilityDescription: "Force le remplacement meme des donnees manuelles (utilise avec precaution)"
   },
   syncOnlyNewYears: {
     timePerTickerMs: -200,
-    // Économise du temps en évitant les mises à jour
-    timeDescription: "Économise ~200ms par ticker (évite mises à jour années existantes)",
-    utility: "recommandé",
-    utilityDescription: "Plus rapide et préserve vos modifications manuelles sur les années existantes"
+    // Economise du temps en evitant les mises a jour
+    timeDescription: "Economise ~200ms par ticker (evite mises a jour annees existantes)",
+    utility: "recommande",
+    utilityDescription: "Plus rapide et preserve vos modifications manuelles sur les annees existantes"
   },
   syncOnlyMissingMetrics: {
     timePerTickerMs: -100,
-    // Économise du temps en évitant les remplacements
-    timeDescription: "Économise ~100ms par ticker (évite remplacements valeurs existantes)",
-    utility: "recommandé",
-    utilityDescription: "Complète progressivement les données sans écraser ce qui existe"
+    // Economise du temps en evitant les remplacements
+    timeDescription: "Economise ~100ms par ticker (evite remplacements valeurs existantes)",
+    utility: "recommande",
+    utilityDescription: "Complete progressivement les donnees sans ecraser ce qui existe"
   },
   preserveExclusions: {
     timePerTickerMs: 0,
-    // Pas de temps supplémentaire
-    timeDescription: "Aucun temps supplémentaire",
-    utility: "recommandé",
-    utilityDescription: "Préserve vos choix d'exclusion de métriques aberrantes"
+    // Pas de temps supplementaire
+    timeDescription: "Aucun temps supplementaire",
+    utility: "recommande",
+    utilityDescription: "Preserve vos choix d'exclusion de metriques aberrantes"
   },
   recalculateOutliers: {
     timePerTickerMs: 150,
-    // Détection d'outliers
-    timeDescription: "~150ms par ticker (détection outliers)",
-    utility: "recommandé",
-    utilityDescription: "Détecte et exclut automatiquement les métriques aberrantes (améliore la qualité des données)"
+    // Detection d'outliers
+    timeDescription: "~150ms par ticker (detection outliers)",
+    utility: "recommande",
+    utilityDescription: "Detecte et exclut automatiquement les metriques aberrantes (ameliore la qualite des donnees)"
   },
   updateCurrentPrice: {
     timePerTickerMs: 50,
-    // Récupération prix actuel
-    timeDescription: "~50ms par ticker (récupération prix)",
-    utility: "recommandé",
-    utilityDescription: "Met à jour le prix actuel de l'action pour les calculs de valorisation"
+    // Recuperation prix actuel
+    timeDescription: "~50ms par ticker (recuperation prix)",
+    utility: "recommande",
+    utilityDescription: "Met a jour le prix actuel de l'action pour les calculs de valorisation"
   },
   syncValueLineMetrics: {
     timePerTickerMs: 0,
-    // Utilise le cache, pas de temps supplémentaire
-    timeDescription: "Aucun temps supplémentaire (utilise cache)",
+    // Utilise le cache, pas de temps supplementaire
+    timeDescription: "Aucun temps supplementaire (utilise cache)",
     utility: "optionnel",
-    utilityDescription: "Synchronise les métriques ValueLine depuis Supabase (securityRank, earningsPredictability, etc.)"
+    utilityDescription: "Synchronise les metriques ValueLine depuis Supabase (securityRank, earningsPredictability, etc.)"
   }
 };
 const DEFAULT_PRESETS = [
   {
     id: "preset-complete",
-    name: "🔄 Synchronisation Complète",
+    name: " Synchronisation Complete",
     isPreset: true,
-    description: "Synchronisation complète avec toutes les fonctionnalités activées. Idéal pour une mise à jour exhaustive de tous les tickers.",
+    description: "Synchronisation complete avec toutes les fonctionnalites activees. Ideal pour une mise a jour exhaustive de tous les tickers.",
     details: [
-      "💾 Sauvegarde snapshot avant sync (permettre restauration)",
-      "📊 Récupération données historiques FMP (30 ans : EPS, CF, BV, DIV, prix)",
-      "📈 Calcul automatique assumptions (taux croissance, ratios cibles)",
-      "ℹ️ Mise à jour infos entreprise (nom, secteur, logo, beta)",
-      "🛡️ Préservation exclusions métriques aberrantes",
-      "🔍 Recalcul détection outliers (amélioration qualité données)",
-      "💰 Mise à jour prix actuel",
-      "⭐ Synchronisation métriques ValueLine (Security Rank, Earnings Predictability)",
-      "⚠️ Ne remplace PAS les données oranges (assumptions manuelles préservées)",
-      "⏱️ Temps estimé : ~2.5s par ticker"
+      " Sauvegarde snapshot avant sync (permettre restauration)",
+      " Recuperation donnees historiques FMP (30 ans : EPS, CF, BV, DIV, prix)",
+      " Calcul automatique assumptions (taux croissance, ratios cibles)",
+      "i Mise a jour infos entreprise (nom, secteur, logo, beta)",
+      " Preservation exclusions metriques aberrantes",
+      " Recalcul detection outliers (amelioration qualite donnees)",
+      " Mise a jour prix actuel",
+      " Synchronisation metriques ValueLine (Security Rank, Earnings Predictability)",
+      " Ne remplace PAS les donnees oranges (assumptions manuelles preservees)",
+      " Temps estime : ~2.5s par ticker"
     ],
     options: {
       saveBeforeSync: true,
@@ -39224,22 +39224,22 @@ const DEFAULT_PRESETS = [
   },
   {
     id: "preset-fast",
-    name: "⚡ Synchronisation Rapide",
+    name: " Synchronisation Rapide",
     isPreset: true,
-    description: "Synchronisation optimisée pour la vitesse. Économise du temps en évitant les opérations non essentielles.",
+    description: "Synchronisation optimisee pour la vitesse. Economise du temps en evitant les operations non essentielles.",
     details: [
-      "❌ Pas de sauvegarde snapshot (gain ~200ms/ticker)",
-      "📊 Récupération données historiques FMP (essentiel)",
-      "📈 Calcul automatique assumptions (essentiel)",
-      "❌ Pas de mise à jour infos entreprise (gain ~50ms/ticker)",
-      "✅ Ajoute uniquement nouvelles années (évite merges complexes, gain ~200ms/ticker)",
-      "✅ Ajoute uniquement métriques manquantes (évite remplacements, gain ~100ms/ticker)",
-      "🛡️ Préservation exclusions métriques aberrantes",
-      "❌ Pas de recalcul outliers (gain ~150ms/ticker)",
-      "💰 Mise à jour prix actuel",
-      "❌ Pas de sync ValueLine (gain temps)",
-      "⚠️ Ne remplace PAS les données oranges",
-      "⏱️ Temps estimé : ~1.5s par ticker (40% plus rapide)"
+      " Pas de sauvegarde snapshot (gain ~200ms/ticker)",
+      " Recuperation donnees historiques FMP (essentiel)",
+      " Calcul automatique assumptions (essentiel)",
+      " Pas de mise a jour infos entreprise (gain ~50ms/ticker)",
+      " Ajoute uniquement nouvelles annees (evite merges complexes, gain ~200ms/ticker)",
+      " Ajoute uniquement metriques manquantes (evite remplacements, gain ~100ms/ticker)",
+      " Preservation exclusions metriques aberrantes",
+      " Pas de recalcul outliers (gain ~150ms/ticker)",
+      " Mise a jour prix actuel",
+      " Pas de sync ValueLine (gain temps)",
+      " Ne remplace PAS les donnees oranges",
+      " Temps estime : ~1.5s par ticker (40% plus rapide)"
     ],
     options: {
       saveBeforeSync: false,
@@ -39259,22 +39259,22 @@ const DEFAULT_PRESETS = [
   },
   {
     id: "preset-safe",
-    name: "🛡️ Synchronisation Sécurisée",
+    name: " Synchronisation Securisee",
     isPreset: true,
-    description: "Synchronisation sécurisée avec sauvegarde et préservation maximale des données existantes. Recommandé pour les mises à jour régulières.",
+    description: "Synchronisation securisee avec sauvegarde et preservation maximale des donnees existantes. Recommande pour les mises a jour regulieres.",
     details: [
-      "💾 Sauvegarde snapshot avant sync (sécurité)",
-      "📊 Récupération données historiques FMP",
-      "📈 Calcul automatique assumptions",
-      "ℹ️ Mise à jour infos entreprise",
-      "✅ Ajoute uniquement nouvelles années (préserve modifications manuelles années existantes)",
-      "✅ Ajoute uniquement métriques manquantes (ne remplace pas valeurs existantes)",
-      "🛡️ Préservation exclusions métriques aberrantes",
-      "🔍 Recalcul détection outliers",
-      "💰 Mise à jour prix actuel",
-      "⭐ Synchronisation métriques ValueLine",
-      "⚠️ Ne remplace PAS les données oranges",
-      "⏱️ Temps estimé : ~2.2s par ticker"
+      " Sauvegarde snapshot avant sync (securite)",
+      " Recuperation donnees historiques FMP",
+      " Calcul automatique assumptions",
+      "i Mise a jour infos entreprise",
+      " Ajoute uniquement nouvelles annees (preserve modifications manuelles annees existantes)",
+      " Ajoute uniquement metriques manquantes (ne remplace pas valeurs existantes)",
+      " Preservation exclusions metriques aberrantes",
+      " Recalcul detection outliers",
+      " Mise a jour prix actuel",
+      " Synchronisation metriques ValueLine",
+      " Ne remplace PAS les donnees oranges",
+      " Temps estime : ~2.2s par ticker"
     ],
     options: {
       saveBeforeSync: true,
@@ -39294,23 +39294,23 @@ const DEFAULT_PRESETS = [
   },
   {
     id: "preset-replace-all",
-    name: "🔄 Remplacer Tout (Avancé)",
+    name: " Remplacer Tout (Avance)",
     isPreset: true,
-    description: "⚠️ ATTENTION : Remplace TOUTES les données, y compris les modifications manuelles. Utiliser avec précaution.",
+    description: " ATTENTION : Remplace TOUTES les donnees, y compris les modifications manuelles. Utiliser avec precaution.",
     details: [
-      "💾 Sauvegarde snapshot avant sync (sécurité)",
-      "📊 Récupération données historiques FMP",
-      "📈 Calcul automatique assumptions",
-      "ℹ️ Mise à jour infos entreprise",
-      "🔄 Remplace TOUTES les données (même années existantes)",
-      "🔄 Remplace TOUTES les métriques (même valeurs existantes)",
-      "🔄 Remplace données oranges (assumptions manuelles remplacées par calculs automatiques)",
-      "❌ Ne préserve PAS les exclusions (toutes métriques réévaluées)",
-      "🔍 Recalcul détection outliers",
-      "💰 Mise à jour prix actuel",
-      "⭐ Synchronisation métriques ValueLine",
-      "⚠️ DESTRUCTIF : Perd toutes modifications manuelles",
-      "⏱️ Temps estimé : ~2.5s par ticker"
+      " Sauvegarde snapshot avant sync (securite)",
+      " Recuperation donnees historiques FMP",
+      " Calcul automatique assumptions",
+      "i Mise a jour infos entreprise",
+      " Remplace TOUTES les donnees (meme annees existantes)",
+      " Remplace TOUTES les metriques (meme valeurs existantes)",
+      " Remplace donnees oranges (assumptions manuelles remplacees par calculs automatiques)",
+      " Ne preserve PAS les exclusions (toutes metriques reevaluees)",
+      " Recalcul detection outliers",
+      " Mise a jour prix actuel",
+      " Synchronisation metriques ValueLine",
+      " DESTRUCTIF : Perd toutes modifications manuelles",
+      " Temps estime : ~2.5s par ticker"
     ],
     options: {
       saveBeforeSync: true,
@@ -39330,20 +39330,20 @@ const DEFAULT_PRESETS = [
   },
   {
     id: "preset-info-only",
-    name: "ℹ️ Infos Uniquement",
+    name: "i Infos Uniquement",
     isPreset: true,
-    description: "Met à jour uniquement les informations de base (nom, secteur, logo, beta, prix). Aucune modification des données historiques.",
+    description: "Met a jour uniquement les informations de base (nom, secteur, logo, beta, prix). Aucune modification des donnees historiques.",
     details: [
-      "❌ Pas de sauvegarde snapshot",
-      "❌ Pas de récupération données historiques FMP",
-      "❌ Pas de calcul assumptions",
-      "ℹ️ Mise à jour infos entreprise uniquement (nom, secteur, logo, beta)",
-      "💰 Mise à jour prix actuel",
-      "⭐ Synchronisation métriques ValueLine",
-      "🛡️ Préservation exclusions métriques aberrantes",
-      "✅ Aucune modification données historiques",
-      "✅ Aucune modification assumptions",
-      "⏱️ Temps estimé : ~100ms par ticker (très rapide)"
+      " Pas de sauvegarde snapshot",
+      " Pas de recuperation donnees historiques FMP",
+      " Pas de calcul assumptions",
+      "i Mise a jour infos entreprise uniquement (nom, secteur, logo, beta)",
+      " Mise a jour prix actuel",
+      " Synchronisation metriques ValueLine",
+      " Preservation exclusions metriques aberrantes",
+      " Aucune modification donnees historiques",
+      " Aucune modification assumptions",
+      " Temps estime : ~100ms par ticker (tres rapide)"
     ],
     options: {
       saveBeforeSync: false,
@@ -39392,13 +39392,13 @@ const AdvancedSyncDialog = ({
   onConfirm,
   isSyncing = false,
   totalTickers = 1010
-  // Par défaut, estimation pour 1010 tickers
+  // Par defaut, estimation pour 1010 tickers
 }) => {
   const [options, setOptions] = reactExports.useState({
     saveBeforeSync: true,
     replaceOrangeData: false,
     syncAllTickers: !ticker2,
-    // Si pas de ticker spécifique, sync tous par défaut
+    // Si pas de ticker specifique, sync tous par defaut
     syncData: true,
     syncAssumptions: true,
     syncInfo: true,
@@ -39471,7 +39471,7 @@ const AdvancedSyncDialog = ({
     }
   };
   const deleteCustomProfile = async (profileId) => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce profil ?")) {
+    if (!confirm("Etes-vous sur de vouloir supprimer ce profil ?")) {
       return;
     }
     const updated = customProfiles.filter((p) => p.id !== profileId);
@@ -39510,16 +39510,16 @@ const AdvancedSyncDialog = ({
       totalMs,
       totalSeconds: Math.round(totalMs / 1e3),
       totalMinutes: Math.round(totalMs / 6e4 * 10) / 10,
-      // Arrondi à 1 décimale
+      // Arrondi a 1 decimale
       perTickerMs: Math.round(totalMs / tickerCount)
     };
   }, [options, ticker2, totalTickers]);
   const getUtilityBadge = (utility) => {
     const badges = {
       essentiel: { color: "bg-red-100 text-red-800 border-red-300", label: "Essentiel" },
-      recommandé: { color: "bg-blue-100 text-blue-800 border-blue-300", label: "Recommandé" },
+      recommande: { color: "bg-blue-100 text-blue-800 border-blue-300", label: "Recommande" },
       optionnel: { color: "bg-gray-100 text-gray-800 border-gray-300", label: "Optionnel" },
-      avancé: { color: "bg-purple-100 text-purple-800 border-purple-300", label: "Avancé" }
+      avance: { color: "bg-purple-100 text-purple-800 border-purple-300", label: "Avance" }
     };
     const badge = badges[utility] || badges.optionnel;
     return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `px-2 py-0.5 rounded-full text-xs font-medium border ${badge.color}`, children: badge.label });
@@ -39531,7 +39531,7 @@ const AdvancedSyncDialog = ({
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-8 h-8 text-blue-600" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900", children: "Options de Synchronisation Avancées" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900", children: "Options de Synchronisation Avancees" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 mt-1", children: isBulkSync ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             "Synchronisation de ",
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "tous les tickers" }),
@@ -39545,7 +39545,7 @@ const AdvancedSyncDialog = ({
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 flex items-center gap-2 text-xs", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4 text-blue-600" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-600", children: [
-              "Temps estimé: ",
+              "Temps estime: ",
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { className: "text-gray-900", children: estimatedTime.totalMinutes >= 1 ? `${estimatedTime.totalMinutes} min` : `${estimatedTime.totalSeconds} sec` }),
               isBulkSync && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-500 ml-1", children: [
                 "(~",
@@ -39597,10 +39597,10 @@ const AdvancedSyncDialog = ({
               children: [
                 DEFAULT_PRESETS.map((profile) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: profile.id, children: profile.name }, profile.id)),
                 customProfiles.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { disabled: true, children: "──────────" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { disabled: true, children: "" }),
                   customProfiles.map((profile) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: profile.id, children: profile.name }, profile.id))
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "custom", children: "✏️ Personnalisé" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "custom", children: " Personnalise" })
               ]
             }
           ),
@@ -39609,25 +39609,25 @@ const AdvancedSyncDialog = ({
             {
               onClick: () => deleteCustomProfile(selectedProfileId),
               className: "px-2 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors",
-              title: "Supprimer ce profil personnalisé",
+              title: "Supprimer ce profil personnalise",
               children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4" })
             }
           )
         ] }),
-        selectedProfileId === "custom" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-xs text-purple-700 italic", children: "✏️ Mode personnalisé : Modifiez les options ci-dessous manuellement" }),
+        selectedProfileId === "custom" && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2 text-xs text-purple-700 italic", children: " Mode personnalise : Modifiez les options ci-dessous manuellement" }),
         selectedProfileId !== "custom" && !selectedProfileId.startsWith("custom-") && (() => {
           const selectedPreset = DEFAULT_PRESETS.find((p) => p.id === selectedProfileId);
           if (!selectedPreset) return null;
           return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-4 bg-white border-2 border-purple-300 rounded-lg shadow-sm", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("h5", { className: "text-sm font-bold text-purple-900 mb-3 flex items-center gap-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-purple-600" }),
-              "📋 Ce que ce profil implique :"
+              " Ce que ce profil implique :"
             ] }),
             selectedPreset.description && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-800 mb-4 font-medium bg-purple-50 p-3 rounded border border-purple-100", children: selectedPreset.description }),
             selectedPreset.details && selectedPreset.details.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-bold text-gray-800 mb-3 uppercase tracking-wide", children: "Détails ventilés :" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-bold text-gray-800 mb-3 uppercase tracking-wide", children: "Details ventiles :" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-gray-50 p-3 rounded border border-gray-200 max-h-[300px] overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "space-y-2", children: selectedPreset.details.map((detail, index2) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "text-xs text-gray-700 flex items-start gap-2 leading-relaxed", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-purple-600 font-bold mt-0.5 flex-shrink-0", children: "•" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-purple-600 font-bold mt-0.5 flex-shrink-0", children: "-" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "flex-1", children: detail })
               ] }, index2)) }) })
             ] })
@@ -39645,7 +39645,7 @@ const AdvancedSyncDialog = ({
                 type: "text",
                 value: newProfileName,
                 onChange: (e) => setNewProfileName(e.target.value),
-                placeholder: "Ex: Ma configuration personnalisée",
+                placeholder: "Ex: Ma configuration personnalisee",
                 className: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500",
                 autoFocus: true,
                 onKeyPress: (e) => {
@@ -39683,42 +39683,42 @@ const AdvancedSyncDialog = ({
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-blue-900 mb-2", children: "🔄 Processus de Synchronisation" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-blue-900 mb-2", children: " Processus de Synchronisation" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-blue-800 space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Séquence d'exécution :" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Sequence d'execution :" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { className: "list-decimal list-inside ml-2 space-y-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Sauvegarde" }),
-                " : Création d'un snapshot (si activé)"
+                " : Creation d'un snapshot (si active)"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Récupération FMP" }),
-                " : Appel API FMP Premium pour données historiques (30 ans)"
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recuperation FMP" }),
+                " : Appel API FMP Premium pour donnees historiques (30 ans)"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Merge intelligent" }),
-                " : Fusion des nouvelles données avec les existantes"
+                " : Fusion des nouvelles donnees avec les existantes"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Calcul assumptions" }),
                 " : Recalcul des taux de croissance et ratios cibles"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Détection outliers" }),
-                " : Identification des métriques aberrantes"
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Detection outliers" }),
+                " : Identification des metriques aberrantes"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Mise à jour Supabase" }),
-                " : Synchronisation des métriques ValueLine (si activé)"
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Mise a jour Supabase" }),
+                " : Synchronisation des metriques ValueLine (si active)"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Sauvegarde finale" }),
-                " : Création d'un snapshot post-sync"
+                " : Creation d'un snapshot post-sync"
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outils utilisés :" }),
-              " FMP API Premium, Supabase, Algorithmes de détection d'outliers, Calculs CAGR"
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outils utilises :" }),
+              " FMP API Premium, Supabase, Algorithmes de detection d'outliers, Calculs CAGR"
             ] })
           ] })
         ] })
@@ -39726,8 +39726,8 @@ const AdvancedSyncDialog = ({
       hasManualData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border border-yellow-200 rounded-md p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-800 font-medium", children: "⚠️ Données manuelles détectées" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-700 mt-1", children: "Vous avez modifié des données manuellement (cases oranges). Choisissez si vous souhaitez les préserver ou les remplacer." })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-800 font-medium", children: " Donnees manuelles detectees" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-700 mt-1", children: "Vous avez modifie des donnees manuellement (cases oranges). Choisissez si vous souhaitez les preserver ou les remplacer." })
         ] })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
@@ -39748,16 +39748,16 @@ const AdvancedSyncDialog = ({
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💾 Sauvegarder la version actuelle avant synchronisation" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Sauvegarder la version actuelle avant synchronisation" }),
               getUtilityBadge(OPTION_METADATA.saveBeforeSync.utility),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
                 OPTION_METADATA.saveBeforeSync.timeDescription
               ] })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Crée un snapshot de sauvegarde avant de synchroniser. Recommandé pour pouvoir restaurer en cas de problème." }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Cree un snapshot de sauvegarde avant de synchroniser. Recommande pour pouvoir restaurer en cas de probleme." }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-              "💡 ",
+              " ",
               OPTION_METADATA.saveBeforeSync.utilityDescription
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -39770,11 +39770,11 @@ const AdvancedSyncDialog = ({
                 children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                    " Un snapshot complet est créé dans Supabase avec toutes les données actuelles (historiques, assumptions, infos)."
+                    " Un snapshot complet est cree dans Supabase avec toutes les donnees actuelles (historiques, assumptions, infos)."
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }),
-                    " Si vous avez modifié manuellement le taux de croissance EPS à 12% et que la sync le recalcule à 8.5%, vous pourrez restaurer la version avec 12%."
+                    " Si vous avez modifie manuellement le taux de croissance EPS a 12% et que la sync le recalcule a 8.5%, vous pourrez restaurer la version avec 12%."
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
@@ -39782,7 +39782,7 @@ const AdvancedSyncDialog = ({
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommandation :" }),
-                    " Toujours activer cette option, surtout avant de remplacer les données oranges."
+                    " Toujours activer cette option, surtout avant de remplacer les donnees oranges."
                   ] })
                 ] })
               }
@@ -39802,7 +39802,7 @@ const AdvancedSyncDialog = ({
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-orange-900", children: "🟠 Remplacer les données oranges (assumptions manuelles)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-orange-900", children: " Remplacer les donnees oranges (assumptions manuelles)" }),
               getUtilityBadge(OPTION_METADATA.replaceOrangeData.utility),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
@@ -39811,37 +39811,37 @@ const AdvancedSyncDialog = ({
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-orange-700 mt-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Attention:" }),
-              " Si coché, toutes les valeurs manuelles (taux de croissance, ratios cibles) seront recalculées et remplacées par les valeurs calculées depuis FMP. Cette action est irréversible."
+              " Si coche, toutes les valeurs manuelles (taux de croissance, ratios cibles) seront recalculees et remplacees par les valeurs calculees depuis FMP. Cette action est irreversible."
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-              "💡 ",
+              " ",
               OPTION_METADATA.replaceOrangeData.utilityDescription
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               HelpSection,
               {
                 id: "replaceOrangeData",
-                title: "Remplacement des données oranges",
+                title: "Remplacement des donnees oranges",
                 showHelp,
                 setShowHelp,
                 children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                    " Les assumptions modifiées manuellement (affichées en orange) seront recalculées depuis les données FMP historiques."
+                    " Les assumptions modifiees manuellement (affichees en orange) seront recalculees depuis les donnees FMP historiques."
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-                      "Vous aviez modifié ",
+                      "Vous aviez modifie ",
                       /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "growthRateEPS" }),
-                      " à 10% manuellement"
+                      " a 10% manuellement"
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "FMP calcule un CAGR de 8.5% sur 5 ans" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : 10% → 8.5% (remplacé)" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : 10% → 10% (préservé)" })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : 10% -> 8.5% (remplace)" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : 10% -> 10% (preserve)" })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Champs affectés :" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Champs affectes :" }),
                     " growthRateEPS, growthRateCF, growthRateBV, growthRateDiv, targetPE, targetPCF, targetPBV, targetYield"
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
@@ -39853,7 +39853,7 @@ const AdvancedSyncDialog = ({
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommandation :" }),
-                    " Utiliser uniquement si vous voulez réinitialiser toutes vos hypothèses manuelles avec les valeurs calculées."
+                    " Utiliser uniquement si vous voulez reinitialiser toutes vos hypotheses manuelles avec les valeurs calculees."
                   ] })
                 ] })
               }
@@ -39873,7 +39873,7 @@ const AdvancedSyncDialog = ({
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-red-900", children: "⚠️ Forcer le remplacement de TOUTES les données manuelles" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-red-900", children: " Forcer le remplacement de TOUTES les donnees manuelles" }),
               getUtilityBadge(OPTION_METADATA.forceReplace.utility),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
@@ -39882,36 +39882,36 @@ const AdvancedSyncDialog = ({
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-red-700 mt-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Danger:" }),
-              " Remplace également les données historiques manuelles (pas seulement les assumptions). Utilisez avec précaution."
+              " Remplace egalement les donnees historiques manuelles (pas seulement les assumptions). Utilisez avec precaution."
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-              "💡 ",
+              " ",
               OPTION_METADATA.forceReplace.utilityDescription
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               HelpSection,
               {
                 id: "forceReplace",
-                title: "Remplacement forcé de toutes les données",
+                title: "Remplacement force de toutes les donnees",
                 showHelp,
                 setShowHelp,
                 children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                    " Ignore complètement le flag ",
+                    " Ignore completement le flag ",
                     /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "autoFetched: false" }),
-                    " et remplace TOUTES les données, même celles modifiées manuellement dans le tableau historique."
+                    " et remplace TOUTES les donnees, meme celles modifiees manuellement dans le tableau historique."
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vous aviez modifié manuellement l'EPS de 2020 de 2.50$ à 2.75$" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vous aviez modifie manuellement l'EPS de 2020 de 2.50$ a 2.75$" }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "FMP retourne 2.50$ pour 2020" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : 2.75$ → 2.50$ (remplacé, même si manuel)" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : 2.75$ → 2.75$ (préservé car manuel)" })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : 2.75$ -> 2.50$ (remplace, meme si manuel)" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : 2.75$ -> 2.75$ (preserve car manuel)" })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Champs affectés :" }),
-                    " Toutes les données historiques (EPS, CF, BV, Dividendes, Prix High/Low) pour toutes les années"
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Champs affectes :" }),
+                    " Toutes les donnees historiques (EPS, CF, BV, Dividendes, Prix High/Low) pour toutes les annees"
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
@@ -39919,8 +39919,8 @@ const AdvancedSyncDialog = ({
                     /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "forceReplace = true" })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "⚠️ Attention :" }),
-                    " Cette option est destructive et ne peut pas être annulée facilement. Assurez-vous d'avoir activé la sauvegarde avant sync."
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: " Attention :" }),
+                    " Cette option est destructive et ne peut pas etre annulee facilement. Assurez-vous d'avoir active la sauvegarde avant sync."
                   ] })
                 ] })
               }
@@ -39930,7 +39930,7 @@ const AdvancedSyncDialog = ({
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-gray-200 pt-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-gray-600" }),
-            "Options Détaillées de Synchronisation"
+            "Options Detaillees de Synchronisation"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-blue-50 rounded-md border border-blue-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 cursor-pointer", children: [
@@ -39945,29 +39945,29 @@ const AdvancedSyncDialog = ({
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "📊 Synchroniser les données historiques" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "États financiers, prix historiques, métriques (30 ans d'historique)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Synchroniser les donnees historiques" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Etats financiers, prix historiques, metriques (30 ans d'historique)" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
                     id: "syncData",
-                    title: "Synchronisation des données historiques",
+                    title: "Synchronisation des donnees historiques",
                     showHelp,
                     setShowHelp,
                     children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                        " Récupère les données financières historiques depuis FMP API (30 ans d'historique) et les fusionne avec les données existantes."
+                        " Recupere les donnees financieres historiques depuis FMP API (30 ans d'historique) et les fusionne avec les donnees existantes."
                       ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données synchronisées :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Donnees synchronisees :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "EPS (Earnings Per Share)" }),
-                          " : Bénéfices par action par année"
+                          " : Benefices par action par annee"
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "CF (Cash Flow Per Share)" }),
-                          " : Flux de trésorerie par action"
+                          " : Flux de tresorerie par action"
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "BV (Book Value Per Share)" }),
@@ -39979,12 +39979,12 @@ const AdvancedSyncDialog = ({
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Prix High/Low" }),
-                          " : Prix maximum et minimum par année"
+                          " : Prix maximum et minimum par annee"
                         ] })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }),
-                        " Si vous avez des données jusqu'en 2020 et que FMP a des données jusqu'en 2024, les années 2021-2024 seront ajoutées automatiquement."
+                        " Si vous avez des donnees jusqu'en 2020 et que FMP a des donnees jusqu'en 2024, les annees 2021-2024 seront ajoutees automatiquement."
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
@@ -39996,8 +39996,8 @@ const AdvancedSyncDialog = ({
                         /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "/api/v3/balance-sheet-statement" })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Séquence :" }),
-                        " Appel API → Parse JSON → Merge avec données existantes → Tri par année"
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Sequence :" }),
+                        " Appel API -> Parse JSON -> Merge avec donnees existantes -> Tri par annee"
                       ] })
                     ] })
                   }
@@ -40017,44 +40017,44 @@ const AdvancedSyncDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🆕 Synchroniser uniquement les nouvelles années" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Synchroniser uniquement les nouvelles annees" }),
                   getUtilityBadge(OPTION_METADATA.syncOnlyNewYears.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-green-600", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncOnlyNewYears.timeDescription
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "N'ajoute que les années manquantes, ne modifie pas les années existantes" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "N'ajoute que les annees manquantes, ne modifie pas les annees existantes" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-                  "💡 ",
+                  " ",
                   OPTION_METADATA.syncOnlyNewYears.utilityDescription
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
                     id: "syncOnlyNewYears",
-                    title: "Synchronisation uniquement des nouvelles années",
+                    title: "Synchronisation uniquement des nouvelles annees",
                     showHelp,
                     setShowHelp,
                     children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                        " Compare les années existantes avec les années disponibles dans FMP et n'ajoute que les années manquantes. Les années existantes ne sont pas modifiées, même si les données FMP sont différentes."
+                        " Compare les annees existantes avec les annees disponibles dans FMP et n'ajoute que les annees manquantes. Les annees existantes ne sont pas modifiees, meme si les donnees FMP sont differentes."
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vous avez des données pour 2015-2020" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "FMP a des données pour 2010-2024" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vous avez des donnees pour 2015-2020" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "FMP a des donnees pour 2010-2024" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : Ajoute uniquement 2010-2014 et 2021-2024" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : Met à jour toutes les années 2015-2020 aussi" })
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : Met a jour toutes les annees 2015-2020 aussi" })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Avantage :" }),
-                        " Plus rapide, préserve toutes vos modifications manuelles sur les années existantes"
+                        " Plus rapide, preserve toutes vos modifications manuelles sur les annees existantes"
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
-                        " Algorithme de comparaison d'années avec ",
+                        " Algorithme de comparaison d'annees avec ",
                         /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "mergedData.some(row => row.year === newRow.year)" })
                       ] })
                     ] })
@@ -40075,40 +40075,40 @@ const AdvancedSyncDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🔍 Synchroniser uniquement les métriques manquantes" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Synchroniser uniquement les metriques manquantes" }),
                   getUtilityBadge(OPTION_METADATA.syncOnlyMissingMetrics.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-green-600", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncOnlyMissingMetrics.timeDescription
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Ne remplit que les champs vides (0 ou null), préserve les valeurs existantes" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Ne remplit que les champs vides (0 ou null), preserve les valeurs existantes" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-                  "💡 ",
+                  " ",
                   OPTION_METADATA.syncOnlyMissingMetrics.utilityDescription
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
                     id: "syncOnlyMissingMetrics",
-                    title: "Synchronisation uniquement des métriques manquantes",
+                    title: "Synchronisation uniquement des metriques manquantes",
                     showHelp,
                     setShowHelp,
                     children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                        " Pour chaque année, ne remplit que les champs qui sont actuellement vides (0, null, ou undefined). Les champs avec des valeurs existantes sont préservés."
+                        " Pour chaque annee, ne remplit que les champs qui sont actuellement vides (0, null, ou undefined). Les champs avec des valeurs existantes sont preserves."
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Année 2020 : EPS = 2.50$ (existant), CF = 0 (manquant)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Annee 2020 : EPS = 2.50$ (existant), CF = 0 (manquant)" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "FMP retourne : EPS = 2.50$, CF = 3.20$" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : EPS reste 2.50$, CF devient 3.20$" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : EPS devient 2.50$, CF devient 3.20$ (même si identique)" })
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : EPS devient 2.50$, CF devient 3.20$ (meme si identique)" })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Avantage :" }),
-                        " Permet de compléter progressivement les données sans écraser ce qui existe déjà"
+                        " Permet de completer progressivement les donnees sans ecraser ce qui existe deja"
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
@@ -40133,16 +40133,16 @@ const AdvancedSyncDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🎯 Synchroniser les assumptions (hypothèses)" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Synchroniser les assumptions (hypotheses)" }),
                   getUtilityBadge(OPTION_METADATA.syncAssumptions.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncAssumptions.timeDescription
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Taux de croissance, ratios cibles, année de base, dividende actuel" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Taux de croissance, ratios cibles, annee de base, dividende actuel" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-                  "💡 ",
+                  " ",
                   OPTION_METADATA.syncAssumptions.utilityDescription
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -40155,9 +40155,9 @@ const AdvancedSyncDialog = ({
                     children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                        " Recalcule les hypothèses de valorisation basées sur les données historiques FMP."
+                        " Recalcule les hypotheses de valorisation basees sur les donnees historiques FMP."
                       ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Assumptions calculées :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Assumptions calculees :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Taux de croissance (CAGR 5 ans) :" }),
@@ -40168,8 +40168,8 @@ const AdvancedSyncDialog = ({
                           " targetPE, targetPCF, targetPBV, targetYield"
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Année de base :" }),
-                          " Dernière année avec EPS valide"
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Annee de base :" }),
+                          " Derniere annee avec EPS valide"
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Dividende actuel :" }),
@@ -40178,9 +40178,9 @@ const AdvancedSyncDialog = ({
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Données FMP : EPS 2019=2.00$, EPS 2024=2.80$" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Donnees FMP : EPS 2019=2.00$, EPS 2024=2.80$" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Calcul CAGR : ((2.80/2.00)^(1/5) - 1) * 100 = 6.96%" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Résultat : growthRateEPS = 6.96%" })
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Resultat : growthRateEPS = 6.96%" })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
@@ -40191,7 +40191,7 @@ const AdvancedSyncDialog = ({
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Formule CAGR :" }),
                         " ",
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "((ValeurFinale/ValeurInitiale)^(1/Années) - 1) * 100" })
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "((ValeurFinale/ValeurInitiale)^(1/Annees) - 1) * 100" })
                       ] })
                     ] })
                   }
@@ -40211,44 +40211,44 @@ const AdvancedSyncDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "🚫 Préserver les exclusions de métriques" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Preserver les exclusions de metriques" }),
                   getUtilityBadge(OPTION_METADATA.preserveExclusions.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
                     OPTION_METADATA.preserveExclusions.timeDescription
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Maintient les checkboxes d'exclusion (EPS, CF, BV, DIV) même après recalcul" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Maintient les checkboxes d'exclusion (EPS, CF, BV, DIV) meme apres recalcul" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-                  "💡 ",
+                  " ",
                   OPTION_METADATA.preserveExclusions.utilityDescription
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
                     id: "preserveExclusions",
-                    title: "Préservation des exclusions de métriques",
+                    title: "Preservation des exclusions de metriques",
                     showHelp,
                     setShowHelp,
                     children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                        " Les flags d'exclusion (excludeEPS, excludeCF, excludeBV, excludeDIV) sont préservés même si la détection d'outliers les recalculerait différemment."
+                        " Les flags d'exclusion (excludeEPS, excludeCF, excludeBV, excludeDIV) sont preserves meme si la detection d'outliers les recalculerait differemment."
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vous avez exclu EPS manuellement (excludeEPS = true)" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "La détection d'outliers recalcule et trouve que EPS n'est plus aberrant" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : excludeEPS reste true (préservé)" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : excludeEPS devient false (recalculé)" })
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "La detection d'outliers recalcule et trouve que EPS n'est plus aberrant" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : excludeEPS reste true (preserve)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : excludeEPS devient false (recalcule)" })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Avantage :" }),
-                        " Vous gardez le contrôle sur quelles métriques utiliser pour la valorisation"
+                        " Vous gardez le controle sur quelles metriques utiliser pour la valorisation"
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
-                        " Préservation des flags ",
+                        " Preservation des flags ",
                         /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "excludeEPS" }),
                         ", ",
                         /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "excludeCF" }),
@@ -40273,43 +40273,43 @@ const AdvancedSyncDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "📊 Recalculer la détection d'outliers" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Recalculer la detection d'outliers" }),
                   getUtilityBadge(OPTION_METADATA.recalculateOutliers.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
                     OPTION_METADATA.recalculateOutliers.timeDescription
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Identifie automatiquement les métriques qui produisent des prix cibles aberrants" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Identifie automatiquement les metriques qui produisent des prix cibles aberrants" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-                  "💡 ",
+                  " ",
                   OPTION_METADATA.recalculateOutliers.utilityDescription
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
                     id: "recalculateOutliers",
-                    title: "Recalcul de la détection d'outliers",
+                    title: "Recalcul de la detection d'outliers",
                     showHelp,
                     setShowHelp,
                     children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                        " Analyse chaque métrique (EPS, CF, BV, DIV) et calcule le prix cible. Si le prix cible est aberrant (négatif, ",
+                        " Analyse chaque metrique (EPS, CF, BV, DIV) et calcule le prix cible. Si le prix cible est aberrant (negatif, ",
                         ">",
-                        " 10x le prix actuel, etc.), la métrique est automatiquement exclue."
+                        " 10x le prix actuel, etc.), la metrique est automatiquement exclue."
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix actuel : 100$" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Calcul prix cible EPS : -50$ (aberrant, EPS négatif ou croissance impossible)" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Résultat : excludeEPS = true (métrique exclue automatiquement)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Calcul prix cible EPS : -50$ (aberrant, EPS negatif ou croissance impossible)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Resultat : excludeEPS = true (metrique exclue automatiquement)" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Calcul prix cible CF : 150$ (normal)" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Résultat : excludeCF = false (métrique utilisée)" })
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Resultat : excludeCF = false (metrique utilisee)" })
                       ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Critères d'aberration :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Criteres d'aberration :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix cible négatif" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix cible negatif" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           "Prix cible ",
                           ">",
@@ -40320,7 +40320,7 @@ const AdvancedSyncDialog = ({
                           "<",
                           " 0.1x le prix actuel"
                         ] }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Données insuffisantes pour calculer" })
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Donnees insuffisantes pour calculer" })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
@@ -40346,29 +40346,29 @@ const AdvancedSyncDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "💰 Mettre à jour le prix actuel" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Mettre a jour le prix actuel" }),
                   getUtilityBadge(OPTION_METADATA.updateCurrentPrice.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
                     OPTION_METADATA.updateCurrentPrice.timeDescription
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Met à jour le prix actuel depuis FMP (toujours activé par défaut)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Met a jour le prix actuel depuis FMP (toujours active par defaut)" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-                  "💡 ",
+                  " ",
                   OPTION_METADATA.updateCurrentPrice.utilityDescription
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
                     id: "updateCurrentPrice",
-                    title: "Mise à jour du prix actuel",
+                    title: "Mise a jour du prix actuel",
                     showHelp,
                     setShowHelp,
                     children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                        " Récupère le prix actuel depuis FMP API et met à jour l'assumption ",
+                        " Recupere le prix actuel depuis FMP API et met a jour l'assumption ",
                         /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-white px-1 rounded", children: "currentPrice" }),
                         "."
                       ] }),
@@ -40376,8 +40376,8 @@ const AdvancedSyncDialog = ({
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix actuel dans l'app : 150.00$" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix FMP : 152.50$" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : 150.00$ → 152.50$ (mis à jour)" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : 150.00$ → 150.00$ (préservé)" })
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Avec cette option : 150.00$ -> 152.50$ (mis a jour)" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sans cette option : 150.00$ -> 150.00$ (preserve)" })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Outil :" }),
@@ -40388,7 +40388,7 @@ const AdvancedSyncDialog = ({
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommandation :" }),
-                        " Toujours activer pour avoir les prix à jour"
+                        " Toujours activer pour avoir les prix a jour"
                       ] })
                     ] })
                   }
@@ -40408,16 +40408,16 @@ const AdvancedSyncDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "ℹ️ Synchroniser les informations de profil" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "i Synchroniser les informations de profil" }),
                   getUtilityBadge(OPTION_METADATA.syncInfo.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncInfo.timeDescription
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Nom de l'entreprise, secteur, logo, beta, capitalisation boursière" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Nom de l'entreprise, secteur, logo, beta, capitalisation boursiere" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-                  "💡 ",
+                  " ",
                   OPTION_METADATA.syncInfo.utilityDescription
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -40430,9 +40430,9 @@ const AdvancedSyncDialog = ({
                     children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                        " Met à jour les informations générales de l'entreprise depuis FMP API."
+                        " Met a jour les informations generales de l'entreprise depuis FMP API."
                       ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Informations synchronisées :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Informations synchronisees :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Nom de l'entreprise" }),
@@ -40440,7 +40440,7 @@ const AdvancedSyncDialog = ({
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Secteur" }),
-                          ` : Secteur d'activité (ex: "Technology")`
+                          ` : Secteur d'activite (ex: "Technology")`
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Logo" }),
@@ -40448,7 +40448,7 @@ const AdvancedSyncDialog = ({
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Beta" }),
-                          " : Coefficient bêta (volatilité relative au marché)"
+                          " : Coefficient beta (volatilite relative au marche)"
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Capitalisation" }),
@@ -40466,7 +40466,7 @@ const AdvancedSyncDialog = ({
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Note :" }),
-                        " Les métriques ValueLine (Security Rank, Earnings Predictability) sont préservées et rechargées depuis Supabase séparément."
+                        " Les metriques ValueLine (Security Rank, Earnings Predictability) sont preservees et rechargees depuis Supabase separement."
                       ] })
                     ] })
                   }
@@ -40486,39 +40486,39 @@ const AdvancedSyncDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: "⭐ Synchroniser les métriques ValueLine depuis Supabase" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium text-gray-900", children: " Synchroniser les metriques ValueLine depuis Supabase" }),
                   getUtilityBadge(OPTION_METADATA.syncValueLineMetrics.utility),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1 text-xs text-gray-500", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-3 h-3" }),
                     OPTION_METADATA.syncValueLineMetrics.timeDescription
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Recharge Security Rank, Earnings Predictability, etc. depuis la base de données" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-1", children: "Recharge Security Rank, Earnings Predictability, etc. depuis la base de donnees" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-700 mt-1 italic", children: [
-                  "💡 ",
+                  " ",
                   OPTION_METADATA.syncValueLineMetrics.utilityDescription
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpSection,
                   {
                     id: "syncValueLineMetrics",
-                    title: "Synchronisation des métriques ValueLine",
+                    title: "Synchronisation des metriques ValueLine",
                     showHelp,
                     setShowHelp,
                     children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Comportement :" }),
-                        " Recharge les métriques ValueLine depuis Supabase pour garantir la cohérence multi-utilisateurs. Ces métriques ne sont pas disponibles dans FMP."
+                        " Recharge les metriques ValueLine depuis Supabase pour garantir la coherence multi-utilisateurs. Ces metriques ne sont pas disponibles dans FMP."
                       ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Métriques ValueLine :" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Metriques ValueLine :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Security Rank" }),
-                          " : Classement de sécurité (1-5, 1 = meilleur)"
+                          " : Classement de securite (1-5, 1 = meilleur)"
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Earnings Predictability" }),
-                          " : Prédictibilité des bénéfices (A-E, A = meilleur)"
+                          " : Predictibilite des benefices (A-E, A = meilleur)"
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Price Growth Persistence" }),
@@ -40526,14 +40526,14 @@ const AdvancedSyncDialog = ({
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Price Stability" }),
-                          " : Stabilité du prix"
+                          " : Stabilite du prix"
                         ] })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple concret :" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Valeur locale : Security Rank = "2"' }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Valeur Supabase : Security Rank = "1" (mise à jour par un autre utilisateur)' }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Avec cette option : Security Rank devient "1" (synchronisé)' }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Valeur Supabase : Security Rank = "1" (mise a jour par un autre utilisateur)' }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Avec cette option : Security Rank devient "1" (synchronise)' }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Sans cette option : Security Rank reste "2" (local)' })
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
@@ -40548,7 +40548,7 @@ const AdvancedSyncDialog = ({
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Recommandation :" }),
-                        " Toujours activer pour avoir les dernières métriques ValueLine partagées"
+                        " Toujours activer pour avoir les dernieres metriques ValueLine partagees"
                       ] })
                     ] })
                   }
@@ -40566,21 +40566,21 @@ const AdvancedSyncDialog = ({
               HelpSection,
               {
                 id: "bulkSync",
-                title: "Synchronisation en masse - Détails techniques",
+                title: "Synchronisation en masse - Details techniques",
                 showHelp,
                 setShowHelp,
                 children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Processus :" }) }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { className: "list-decimal list-inside ml-2 space-y-1", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Traitement par batch de 5 tickers en parallèle" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Délai de 500ms entre chaque batch" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Traitement par batch de 5 tickers en parallele" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Delai de 500ms entre chaque batch" }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Timeout de 30 secondes par ticker" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sauvegarde snapshot avant chaque sync (si activé)" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sauvegarde snapshot avant chaque sync (si active)" }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Appel FMP API pour chaque ticker" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Merge intelligent des données" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Merge intelligent des donnees" }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Recalcul des assumptions" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Détection d'outliers" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sauvegarde snapshot après sync" })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Detection d'outliers" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sauvegarde snapshot apres sync" })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Exemple de timing :" }) }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-2 space-y-1", children: [
@@ -40589,7 +40589,7 @@ const AdvancedSyncDialog = ({
                     /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "100 tickers : ~20-30 minutes" })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Contrôles disponibles :" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Controles disponibles :" }),
                     " Pause, Resume, Stop pendant la synchronisation"
                   ] })
                 ] })
@@ -40710,19 +40710,19 @@ const SyncReportDialog = ({
       "Statut",
       "Temps (ms)",
       "Prix Actuel",
-      "Années de Données",
-      "Points de Données",
-      "Outliers Détectés",
+      "Annees de Donnees",
+      "Points de Donnees",
+      "Outliers Detectes",
       "Outliers Exclus",
-      "Cases Orange Recalculées",
-      "Données EPS à Zéro",
-      "Données CF à Zéro",
-      "Données BV à Zéro",
-      "Données DIV à Zéro",
-      "Données N/A",
-      "Snapshot Sauvegardé",
-      "Assumptions Mises à Jour",
-      "Info Mise à Jour",
+      "Cases Orange Recalculees",
+      "Donnees EPS a Zero",
+      "Donnees CF a Zero",
+      "Donnees BV a Zero",
+      "Donnees DIV a Zero",
+      "Donnees N/A",
+      "Snapshot Sauvegarde",
+      "Assumptions Mises a Jour",
+      "Info Mise a Jour",
       "ValueLine Synced",
       "Erreur"
     ];
@@ -40730,7 +40730,7 @@ const SyncReportDialog = ({
       var _a2, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v;
       return [
         result.ticker,
-        result.success ? "Succès" : "Erreur",
+        result.success ? "Succes" : "Erreur",
         result.timeMs.toString(),
         result.currentPrice > 0 ? `$${result.currentPrice.toFixed(2)}` : "N/A",
         ((_b = (_a2 = result.dataRetrieved) == null ? void 0 : _a2.years) == null ? void 0 : _b.toString()) || "0",
@@ -40839,7 +40839,7 @@ const SyncReportDialog = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-gray-900", children: reportData.totalTickers })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 p-4 rounded-lg border border-green-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-green-600", children: "Succès" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-green-600", children: "Succes" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-green-700", children: reportData.successCount }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-green-600 mt-1", children: [
             successRate,
@@ -40851,13 +40851,13 @@ const SyncReportDialog = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-red-700", children: reportData.errorCount })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-yellow-50 p-4 rounded-lg border border-yellow-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-yellow-600", children: "Ignorés" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-yellow-600", children: "Ignores" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-yellow-700", children: reportData.skippedCount })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg border border-gray-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: "Durée Totale" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: "Duree Totale" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xl font-bold text-gray-900", children: [
             Math.floor(duration / 1e3),
             "s"
@@ -40878,18 +40878,18 @@ const SyncReportDialog = ({
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg border border-gray-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: "Points de Données" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: "Points de Donnees" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-bold text-gray-900", children: reportData.globalStats.totalDataPoints.toLocaleString() })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg border border-gray-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: "Outliers Détectés" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: "Outliers Detectes" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-bold text-gray-900", children: reportData.globalStats.totalOutliersDetected })
         ] })
       ] }),
       reportData.options && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-gray-600" }),
-          "Options de Synchronisation Utilisées"
+          "Options de Synchronisation Utilisees"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3", children: Object.entries(reportData.options).map(([key, value]) => {
           if (!value || key === "syncAllTickers") return null;
@@ -40898,9 +40898,9 @@ const SyncReportDialog = ({
           const getUtilityColor = (utility) => {
             const colors = {
               essentiel: "bg-red-100 text-red-800 border-red-300",
-              recommandé: "bg-blue-100 text-blue-800 border-blue-300",
+              recommande: "bg-blue-100 text-blue-800 border-blue-300",
               optionnel: "bg-gray-100 text-gray-800 border-gray-300",
-              avancé: "bg-purple-100 text-purple-800 border-purple-300"
+              avance: "bg-purple-100 text-purple-800 border-purple-300"
             };
             return colors[utility] || colors.optionnel;
           };
@@ -40926,7 +40926,7 @@ const SyncReportDialog = ({
               data: filteredResults.sort((a2, b) => b.timeMs - a2.timeMs).slice(0, 10).map((r2) => ({
                 ticker: r2.ticker,
                 temps: r2.timeMs,
-                statut: r2.success ? "Succès" : "Erreur"
+                statut: r2.success ? "Succes" : "Erreur"
               })),
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3" }),
@@ -40939,15 +40939,15 @@ const SyncReportDialog = ({
           ) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg border border-gray-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-700 mb-4", children: "Répartition des Résultats" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-700 mb-4", children: "Repartition des Resultats" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: 250, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(PieChart, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Pie,
               {
                 data: [
-                  { name: "Succès", value: reportData.successCount, color: "#10b981" },
+                  { name: "Succes", value: reportData.successCount, color: "#10b981" },
                   { name: "Erreurs", value: reportData.errorCount, color: "#ef4444" },
-                  { name: "Ignorés", value: reportData.skippedCount, color: "#f59e0b" }
+                  { name: "Ignores", value: reportData.skippedCount, color: "#f59e0b" }
                 ],
                 cx: "50%",
                 cy: "50%",
@@ -40957,9 +40957,9 @@ const SyncReportDialog = ({
                 fill: "#8884d8",
                 dataKey: "value",
                 children: [
-                  { name: "Succès", value: reportData.successCount, color: "#10b981" },
+                  { name: "Succes", value: reportData.successCount, color: "#10b981" },
                   { name: "Erreurs", value: reportData.errorCount, color: "#ef4444" },
-                  { name: "Ignorés", value: reportData.skippedCount, color: "#f59e0b" }
+                  { name: "Ignores", value: reportData.skippedCount, color: "#f59e0b" }
                 ].map((entry, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(Cell, { fill: entry.color }, `cell-${index2}`))
               }
             ),
@@ -40980,9 +40980,9 @@ const SyncReportDialog = ({
             className: "border border-gray-300 rounded-md px-3 py-1 text-sm",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: "Tous" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "success", children: "Succès" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "success", children: "Succes" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "error", children: "Erreurs" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "skipped", children: "Ignorés" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "skipped", children: "Ignores" })
             ]
           }
         )
@@ -41005,7 +41005,7 @@ const SyncReportDialog = ({
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "ml-auto text-sm text-gray-500", children: [
         filteredResults.length,
-        " ticker(s) affiché(s)"
+        " ticker(s) affiche(s)"
       ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-y-auto p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: filteredResults.map((result) => /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -41029,7 +41029,7 @@ const SyncReportDialog = ({
           className: "px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors text-sm font-medium flex items-center gap-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }),
-            "Réessayer les Échecs (",
+            "Reessayer les Echecs (",
             reportData.errorCount,
             ")"
           ]
@@ -41062,7 +41062,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
             result.success ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-6 h-6 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$n, { className: "w-6 h-6 text-red-600" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-bold text-lg", children: result.ticker }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: result.success ? "Synchronisé avec succès" : result.error || "Erreur" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500", children: result.success ? "Synchronise avec succes" : result.error || "Erreur" })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4", children: [
@@ -41074,11 +41074,11 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              hasOutliers && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-yellow-600", title: "Outliers détectés" }),
-              hasZeroData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-blue-600", title: "Données à zéro" }),
-              hasNaData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-gray-600", title: "Données N/A" })
+              hasOutliers && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-yellow-600", title: "Outliers detectes" }),
+              hasZeroData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-blue-600", title: "Donnees a zero" }),
+              hasNaData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-gray-600", title: "Donnees N/A" })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-400", children: isExpanded ? "▼" : "▶" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-400", children: isExpanded ? "" : "" })
           ] })
         ] })
       }
@@ -41093,31 +41093,31 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 mb-1", children: "Années de Données" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 mb-1", children: "Annees de Donnees" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-bold text-gray-900", children: result.dataRetrieved.years })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 mb-1", children: "Points de Données" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 mb-1", children: "Points de Donnees" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-bold text-gray-900", children: result.dataRetrieved.dataPoints })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 mb-1", children: "Sources" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-700", children: [
-            result.dataRetrieved.hasProfile && "✅ Profile ",
-            result.dataRetrieved.hasKeyMetrics && "✅ Metrics ",
-            result.dataRetrieved.hasQuotes && "✅ Quotes ",
-            result.dataRetrieved.hasFinancials && "✅ Financials"
+            result.dataRetrieved.hasProfile && " Profile ",
+            result.dataRetrieved.hasKeyMetrics && " Metrics ",
+            result.dataRetrieved.hasQuotes && " Quotes ",
+            result.dataRetrieved.hasFinancials && " Financials"
           ] })
         ] })
       ] }),
       hasOutliers && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-yellow-50 border border-yellow-200 rounded-lg p-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5 text-yellow-600" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-yellow-900", children: "Métriques Aberrantes Détectées" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-yellow-900", children: "Metriques Aberrantes Detectees" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: result.outliers.detected.map((metric) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: metric }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-yellow-700", children: result.outliers.excluded[metric] ? "❌ Exclue" : "⚠️ Détectée" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-yellow-700", children: result.outliers.excluded[metric] ? " Exclue" : " Detectee" }),
           result.outliers.reasons[metric] && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-yellow-600 ml-2", children: [
             "(",
             result.outliers.reasons[metric],
@@ -41129,7 +41129,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-orange-400 rounded" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-orange-900", children: "Cases Orange (Assumptions)" }),
-          result.orangeData.wasReplaced && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded", children: "Recalculées" })
+          result.orangeData.wasReplaced && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded", children: "Recalculees" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-3 text-sm", children: [
           result.orangeData.growthRateEPS !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -41193,14 +41193,14 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
       hasZeroData && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-blue-600" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-blue-900", children: "Données à Zéro" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-blue-900", children: "Donnees a Zero" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 text-sm", children: [
           result.zeroData.earningsPerShare > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
               "EPS: ",
               result.zeroData.earningsPerShare,
-              " années"
+              " annees"
             ] }),
             result.zeroData.reasons.earningsPerShare && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-blue-700 ml-2", children: [
               "(",
@@ -41212,7 +41212,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
               "CF: ",
               result.zeroData.cashFlowPerShare,
-              " années"
+              " annees"
             ] }),
             result.zeroData.reasons.cashFlowPerShare && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-blue-700 ml-2", children: [
               "(",
@@ -41224,7 +41224,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
               "BV: ",
               result.zeroData.bookValuePerShare,
-              " années"
+              " annees"
             ] }),
             result.zeroData.reasons.bookValuePerShare && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-blue-700 ml-2", children: [
               "(",
@@ -41236,7 +41236,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
               "DIV: ",
               result.zeroData.dividendPerShare,
-              " années"
+              " annees"
             ] }),
             result.zeroData.reasons.dividendPerShare && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-blue-700 ml-2", children: [
               "(",
@@ -41249,7 +41249,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
       hasNaData && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 border border-gray-200 rounded-lg p-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-gray-600" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Données N/A" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Donnees N/A" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1 text-sm", children: result.naData.fields.map((field) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: field }),
@@ -41264,19 +41264,19 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-2 text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
             result.other.snapshotSaved ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Snapshot sauvegardé" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Snapshot sauvegarde" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
             result.other.assumptionsUpdated ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Assumptions mises à jour" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Assumptions mises a jour" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
             result.other.infoUpdated ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Info mise à jour" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Info mise a jour" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
             result.other.valueLineMetricsSynced ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-4 h-4 text-green-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-gray-400" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Métriques ValueLine" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Metriques ValueLine" })
           ] })
         ] })
       ] }),
@@ -41295,7 +41295,7 @@ const TickerResultCard = ({ result, isExpanded, onToggle, onRetry }) => {
             className: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium flex items-center gap-2",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }),
-              "Réessayer"
+              "Reessayer"
             ]
           }
         )
@@ -41335,11 +41335,11 @@ const HistoricalVersionBanner = ({
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-4 h-4" }),
             "Version historique (v",
             snapshotVersion,
-            ") - Déverrouillée"
+            ") - Deverrouillee"
           ] }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-yellow-700 mt-0.5", children: [
             formatDate(snapshotDate),
-            !isLocked && " • Les modifications seront sauvegardées sur cette ancienne version"
+            !isLocked && " - Les modifications seront sauvegardees sur cette ancienne version"
           ] })
         ] })
       ] }),
@@ -41352,7 +41352,7 @@ const HistoricalVersionBanner = ({
               className: "px-3 py-1.5 text-sm font-medium text-yellow-800 bg-white border border-yellow-300 rounded-md hover:bg-yellow-50 transition-colors flex items-center gap-1.5",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-4 h-4" }),
-                "Déverrouiller"
+                "Deverrouiller"
               ]
             }
           ),
@@ -41361,7 +41361,7 @@ const HistoricalVersionBanner = ({
             {
               onClick: onSaveAsNew,
               className: "px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors",
-              children: "💾 Sauvegarder comme nouvelle"
+              children: " Sauvegarder comme nouvelle"
             }
           )
         ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -41369,7 +41369,7 @@ const HistoricalVersionBanner = ({
           {
             onClick: onSaveAsNew,
             className: "px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors",
-            children: "💾 Sauvegarder (ancienne version)"
+            children: " Sauvegarder (ancienne version)"
           }
         ) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -41379,16 +41379,16 @@ const HistoricalVersionBanner = ({
             className: "px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-1.5",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-4 h-4" }),
-              "Revenir à la version actuelle"
+              "Revenir a la version actuelle"
             ]
           }
         )
       ] })
     ] }),
     !isLocked && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 p-2 bg-yellow-100 border border-yellow-200 rounded text-xs text-yellow-800", children: [
-      "⚠️ Attention: Vous modifiez une version datée du ",
+      " Attention: Vous modifiez une version datee du ",
       formatDate(snapshotDate),
-      ". Les changements seront enregistrés sur cette ancienne version, pas la version actuelle."
+      ". Les changements seront enregistres sur cette ancienne version, pas la version actuelle."
     ] })
   ] }) });
 };
@@ -41552,7 +41552,7 @@ const SyncLockOverlay = ({
                 {
                   onClick: onAbort,
                   className: "p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors",
-                  title: "Arrêter la synchronisation",
+                  title: "Arreter la synchronisation",
                   children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-6 h-6" })
                 }
               )
@@ -41591,7 +41591,7 @@ const SyncLockOverlay = ({
                 {
                   className: "bg-green-500 rounded-full transition-all duration-300",
                   style: { width: `${successCount / total * 100}%` },
-                  title: `${successCount} réussies`
+                  title: `${successCount} reussies`
                 }
               ),
               errorCount > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -41607,7 +41607,7 @@ const SyncLockOverlay = ({
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 rounded-lg p-3 border border-green-200", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-5 h-5 text-green-600" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-semibold text-green-700", children: "Réussies" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-semibold text-green-700", children: "Reussies" })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-green-900", children: successCount })
               ] }),
@@ -41623,12 +41623,12 @@ const SyncLockOverlay = ({
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-gray-600", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-4 h-4" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Temps écoulé:" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Temps ecoule:" })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: formatTime(elapsedTime) })
               ] }),
               estimatedTimeRemaining > 0 && remaining > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-gray-600", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Temps estimé restant:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Temps estime restant:" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: formatTime(Math.ceil(estimatedTimeRemaining)) })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-gray-600", children: [
@@ -41636,7 +41636,7 @@ const SyncLockOverlay = ({
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: remaining })
               ] })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-yellow-800 text-center", children: "⚠️ L'interface est verrouillée pendant la synchronisation. Veuillez ne pas naviguer ni modifier les données." }) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-yellow-800 text-center", children: " L'interface est verrouillee pendant la synchronisation. Veuillez ne pas naviguer ni modifier les donnees." }) })
           ]
         }
       )
@@ -41654,11 +41654,11 @@ const LandingPage = ({ onGetStarted }) => {
         ] })
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight", style: { wordBreak: "normal", overflowWrap: "normal" }, children: [
-        "Analyse Financière",
+        "Analyse Financiere",
         /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Propulsée par l'IA" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Propulsee par l'IA" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Prenez des décisions d'investissement éclairées avec notre plateforme professionnelle d'analyse de valorisation" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Prenez des decisions d'investissement eclairees avec notre plateforme professionnelle d'analyse de valorisation" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
@@ -41673,7 +41673,7 @@ const LandingPage = ({ onGetStarted }) => {
       )
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-3xl md:text-4xl font-bold text-white text-center mb-12", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Comment ça fonctionne" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-3xl md:text-4xl font-bold text-white text-center mb-12", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Comment ca fonctionne" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid md:grid-cols-3 gap-8", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-4 -left-4 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg", children: "1" }),
@@ -41682,19 +41682,19 @@ const LandingPage = ({ onGetStarted }) => {
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-4 -left-4 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg", children: "2" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-white mb-3 mt-2", children: "Analysez les données" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-slate-400", children: "Explorez les métriques financières, ratios et tendances historiques" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-white mb-3 mt-2", children: "Analysez les donnees" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-slate-400", children: "Explorez les metriques financieres, ratios et tendances historiques" })
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-slate-700", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-4 -left-4 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg", children: "3" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-white mb-3 mt-2", children: "Prenez vos décisions" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-slate-400", children: "Utilisez les valorisations calculées pour guider vos investissements" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-white mb-3 mt-2", children: "Prenez vos decisions" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-slate-400", children: "Utilisez les valorisations calculees pour guider vos investissements" })
         ] }) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-3xl md:text-4xl font-bold text-white mb-4", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Prêt à commencer votre analyse?" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl text-blue-100 mb-8 max-w-2xl mx-auto", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Accédez instantanément à notre plateforme d'analyse professionnelle" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-3xl md:text-4xl font-bold text-white mb-4", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Pret a commencer votre analyse?" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl text-blue-100 mb-8 max-w-2xl mx-auto", style: { wordBreak: "normal", overflowWrap: "normal" }, children: "Accedez instantanement a notre plateforme d'analyse professionnelle" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
@@ -41709,9 +41709,9 @@ const LandingPage = ({ onGetStarted }) => {
       )
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-slate-800", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-center text-slate-500 text-sm", children: [
-      "© 2025 ",
+      " 2025 ",
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent", children: "JLab 3p1" }),
-      " - Plateforme d'analyse financière professionnelle"
+      " - Plateforme d'analyse financiere professionnelle"
     ] }) })
   ] });
 };
@@ -41751,7 +41751,7 @@ class ErrorBoundary extends reactExports.Component {
           {
             onClick: this.handleRetry,
             className: "px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors",
-            children: "Réessayer"
+            children: "Reessayer"
           }
         ),
         false
@@ -41766,26 +41766,26 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
   const overlayRef = reactExports.useRef(null);
   const stepConfig = {
     1: {
-      title: "Étape 1: Sélectionner un ticker",
-      description: "Commencez par choisir un titre dans la barre latérale gauche. Vous pouvez rechercher par symbole (ex: AAPL) ou par nom d'entreprise.",
+      title: "Etape 1: Selectionner un ticker",
+      description: "Commencez par choisir un titre dans la barre laterale gauche. Vous pouvez rechercher par symbole (ex: AAPL) ou par nom d'entreprise.",
       highlightSelector: '[data-demo="sidebar"]',
       elementDescription: "La sidebar contient tous vos tickers. Utilisez la barre de recherche pour trouver rapidement un titre.",
       icon: ForwardRef$f,
       color: "blue"
     },
     2: {
-      title: "Étape 2: Explorer les données historiques",
-      description: "Une fois un ticker sélectionné, vous verrez ses données financières historiques dans le tableau principal. Les couleurs indiquent la source des données (vert = FMP vérifié, bleu = FMP ajusté, orange = manuel, gris = calculé).",
+      title: "Etape 2: Explorer les donnees historiques",
+      description: "Une fois un ticker selectionne, vous verrez ses donnees financieres historiques dans le tableau principal. Les couleurs indiquent la source des donnees (vert = FMP verifie, bleu = FMP ajuste, orange = manuel, gris = calcule).",
       highlightSelector: '[data-demo="historical-table"]',
-      elementDescription: "Le tableau affiche les données annuelles: prix, bénéfices, dividendes, etc. Cliquez sur une cellule pour la modifier. Consultez la légende des couleurs au-dessus du tableau.",
+      elementDescription: "Le tableau affiche les donnees annuelles: prix, benefices, dividendes, etc. Cliquez sur une cellule pour la modifier. Consultez la legende des couleurs au-dessus du tableau.",
       icon: ForwardRef$5,
       color: "green"
     },
     3: {
-      title: "Étape 3: Utiliser les fonctionnalités avancées",
-      description: "Explorez les graphiques de valorisation, les métriques additionnelles, et synchronisez les données depuis l'API pour obtenir les informations les plus récentes.",
+      title: "Etape 3: Utiliser les fonctionnalites avancees",
+      description: "Explorez les graphiques de valorisation, les metriques additionnelles, et synchronisez les donnees depuis l'API pour obtenir les informations les plus recentes.",
       highlightSelector: '[data-demo="features"]',
-      elementDescription: "Les onglets en haut permettent d'accéder aux graphiques, métriques, et autres analyses. Le bouton de synchronisation met à jour les données depuis l'API.",
+      elementDescription: "Les onglets en haut permettent d'acceder aux graphiques, metriques, et autres analyses. Le bouton de synchronisation met a jour les donnees depuis l'API.",
       icon: ForwardRef$c,
       color: "purple"
     }
@@ -41915,7 +41915,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-semibold text-gray-500", children: [
-                    "Étape ",
+                    "Etape ",
                     currentStep,
                     " sur 3"
                   ] }),
@@ -41963,7 +41963,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
                   borderColor: currentStep === 1 ? "#3b82f6" : currentStep === 2 ? "#10b981" : "#a855f7"
                 },
                 children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-700", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "💡 Astuce:" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: " Astuce:" }),
                   " ",
                   currentConfig.elementDescription
                 ] })
@@ -41979,7 +41979,7 @@ const InteractiveDemo = ({ onClose, onSelectTicker, onLoadDefaultTicker }) => {
                 className: `flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${currentStep === 1 ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$w, { className: "w-5 h-5" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Précédent" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Precedent" })
                 ]
               }
             ),
@@ -42076,7 +42076,7 @@ const SupabaseLoadingProgress = ({
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-5 h-5 text-blue-600 animate-spin" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-800", children: isLoading ? "Chargement Supabase" : "Chargement terminé" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-800", children: isLoading ? "Chargement Supabase" : "Chargement termine" })
       ] }),
       !isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-5 h-5 text-green-600" })
     ] }),
@@ -42103,18 +42103,18 @@ const SupabaseLoadingProgress = ({
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1 text-xs text-gray-600", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "⏱️ Temps écoulé:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: " Temps ecoule:" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-800", children: formatTime(elapsedTime) })
       ] }),
       isLoading && estimatedTimeRemaining !== null && estimatedTimeRemaining > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "⏳ Temps restant (est.):" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: " Temps restant (est.):" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-800", children: formatTime(estimatedTimeRemaining) })
       ] }),
       message && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 italic", children: message }) })
     ] }),
     isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500", children: [
       current === 0 && "Initialisation...",
-      current > 0 && current < total && `Chargement des données pour ${current} ticker(s)...`,
+      current > 0 && current < total && `Chargement des donnees pour ${current} ticker(s)...`,
       current === total && "Finalisation..."
     ] }) })
   ] });
@@ -42234,7 +42234,7 @@ function detectOutlierMetrics(data, assumptions) {
 }
 const fetchCompanyData = async (symbol) => {
   if (!symbol || symbol.trim() === "") {
-    console.warn("⚠️ fetchCompanyData called with empty symbol");
+    console.warn(" fetchCompanyData called with empty symbol");
     return {
       data: [],
       info: { symbol: "", name: "Invalid Symbol" },
@@ -42251,7 +42251,7 @@ const fetchCompanyData = async (symbol) => {
         const errorData = await response.json().catch(() => ({}));
         const triedSymbols = errorData.tried || [cleanSymbol];
         throw new Error(
-          `Symbole '${cleanSymbol}' introuvable. Variantes essayées: ${triedSymbols.join(", ")}. Vérifiez que le symbole est correct ou essayez un format différent.`
+          `Symbole '${cleanSymbol}' introuvable. Variantes essayees: ${triedSymbols.join(", ")}. Verifiez que le symbole est correct ou essayez un format different.`
         );
       }
       throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
@@ -42268,7 +42268,7 @@ const fetchCompanyData = async (symbol) => {
         const latest = sortedData[0];
         if (latest.priceHigh > 0 && latest.priceLow > 0) {
           finalCurrentPrice = (latest.priceHigh + latest.priceLow) / 2;
-          console.log(`⚠️ currentPrice was 0, used latest annual average: ${finalCurrentPrice}`);
+          console.log(` currentPrice was 0, used latest annual average: ${finalCurrentPrice}`);
         }
       }
     }
@@ -42278,7 +42278,7 @@ const fetchCompanyData = async (symbol) => {
       currentPrice: finalCurrentPrice,
       // Use validated/fallback price
       currentDividend: result.currentDividend || 0,
-      // ✅ NOUVEAU: Dividende actuel depuis l'API
+      //  NOUVEAU: Dividende actuel depuis l'API
       financials: result.financials,
       analysisData: result.analysisData
     };
@@ -42310,8 +42310,8 @@ const RestoreDataDialog = ({
         children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-5 h-5" })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-gray-900 mb-2", children: "Restaurer les données" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-6", children: "Choisissez comment restaurer les données de ce ticker :" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-gray-900 mb-2", children: "Restaurer les donnees" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-6", children: "Choisissez comment restaurer les donnees de ce ticker :" }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
@@ -42325,10 +42325,10 @@ const RestoreDataDialog = ({
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-blue-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$t, { className: "w-6 h-6 text-blue-600" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 mb-1", children: "Depuis la dernière sauvegarde" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-2", children: "Restaure les données et métriques de la dernière version sauvegardée (snapshot)." }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 mb-1", children: "Depuis la derniere sauvegarde" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-2", children: "Restaure les donnees et metriques de la derniere version sauvegardee (snapshot)." }),
               latestSnapshotDate && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500", children: [
-                "Dernière sauvegarde : ",
+                "Derniere sauvegarde : ",
                 new Date(latestSnapshotDate).toLocaleString("fr-CA")
               ] })
             ] })
@@ -42348,8 +42348,8 @@ const RestoreDataDialog = ({
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-green-100 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-6 h-6 text-green-600" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 mb-1", children: "Recalculer depuis FMP" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-2", children: "Récupère les données FMP et recalcule automatiquement toutes les métriques (comme lors d'un nouvel ajout de ticker)." }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500", children: "Les métriques seront recalculées selon les bonnes pratiques (CAGR, ratios moyens, etc.)" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mb-2", children: "Recupere les donnees FMP et recalcule automatiquement toutes les metriques (comme lors d'un nouvel ajout de ticker)." }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500", children: "Les metriques seront recalculees selon les bonnes pratiques (CAGR, ratios moyens, etc.)" })
             ] })
           ] })
         }
@@ -42420,7 +42420,7 @@ async function saveValidationSettings(settings) {
       throw new Error(errorData.error || `HTTP ${response.status}`);
     }
     const savedSettings = await response.json();
-    console.log(`✅ Validation settings saved: ${savedSettings.settings_key}`);
+    console.log(` Validation settings saved: ${savedSettings.settings_key}`);
     return { success: true, settings: savedSettings };
   } catch (error) {
     console.error("Failed to save validation settings:", error);
@@ -42455,7 +42455,7 @@ function getDefaultValidationSettings() {
     validate_price_range: true,
     price_min_threshold: 0.01,
     price_max_threshold: 1e5,
-    description: "Paramètres par défaut",
+    description: "Parametres par defaut",
     is_active: true
   };
 }
@@ -42533,7 +42533,7 @@ const UnifiedSettingsPanel = ({
     }
   };
   const handleReset = () => {
-    if (confirm("Réinitialiser toutes les configurations aux valeurs par défaut ?")) {
+    if (confirm("Reinitialiser toutes les configurations aux valeurs par defaut ?")) {
       setGuardrailConfig(DEFAULT_CONFIG);
       setValidationSettings(getDefaultValidationSettings());
       setHasChanges(true);
@@ -42545,7 +42545,7 @@ const UnifiedSettingsPanel = ({
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 min-w-0", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-600 p-2 rounded-lg shadow-lg flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$r, { className: "w-5 h-5 text-white" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 truncate", children: "Configuration Complète 3p1" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 truncate", children: "Configuration Complete 3p1" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 mt-0.5 truncate", children: "Guardrails, Validation, Ajustements" })
         ] })
       ] }),
@@ -42556,7 +42556,7 @@ const UnifiedSettingsPanel = ({
         ] }),
         saveStatus === "saved" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-green-600 text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-5 h-5" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Sauvegardé" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Sauvegarde" })
         ] }),
         saveStatus === "error" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-red-600 text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5" }),
@@ -42574,9 +42574,9 @@ const UnifiedSettingsPanel = ({
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex border-b border-gray-200 overflow-x-auto bg-gray-50 px-4 flex-shrink-0", children: [
-      { id: "overview", label: "📊 Vue d'ensemble", icon: "📊" },
-      { id: "guardrails", label: "🛡️ Guardrails", icon: "🛡️" },
-      { id: "validation", label: "✅ Validation & Cohérence", icon: "✅" }
+      { id: "overview", label: " Vue d'ensemble", icon: "" },
+      { id: "guardrails", label: " Guardrails", icon: "" },
+      { id: "validation", label: " Validation & Coherence", icon: "" }
     ].map((tab) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "button",
       {
@@ -42620,7 +42620,7 @@ const UnifiedSettingsPanel = ({
           className: "flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors bg-white border border-gray-300 rounded-lg hover:bg-red-50",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }),
-            "Réinitialiser tout"
+            "Reinitialiser tout"
           ]
         }
       ),
@@ -42649,66 +42649,66 @@ const UnifiedSettingsPanel = ({
 const OverviewTab = ({ guardrailConfig, validationSettings }) => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 border border-blue-200 rounded-lg p-6", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-lg text-blue-900 mb-3", children: "📋 Configuration Actuelle" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-lg text-blue-900 mb-3", children: " Configuration Actuelle" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "font-semibold text-blue-800 mb-2", children: "🛡️ Guardrails (LocalStorage)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "font-semibold text-blue-800 mb-2", children: " Guardrails (LocalStorage)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-blue-700 space-y-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-              "• Croissance: ",
+              "- Croissance: ",
               guardrailConfig.growth.min,
-              "% à ",
+              "% a ",
               guardrailConfig.growth.max,
               "%"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-              "• P/E: ",
+              "- P/E: ",
               guardrailConfig.ratios.pe.min,
-              "x à ",
+              "x a ",
               guardrailConfig.ratios.pe.max,
               "x"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-              "• P/CF: ",
+              "- P/CF: ",
               guardrailConfig.ratios.pcf.min,
-              "x à ",
+              "x a ",
               guardrailConfig.ratios.pcf.max,
               "x"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-              "• Multiplicateur max: ",
+              "- Multiplicateur max: ",
               guardrailConfig.projections.maxReasonableTargetMultiplier,
               "x"
             ] })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "font-semibold text-green-800 mb-2", children: "✅ Validation (Supabase)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "font-semibold text-green-800 mb-2", children: " Validation (Supabase)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-green-700 space-y-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-              "• Croissance: ",
+              "- Croissance: ",
               validationSettings.growth_min,
-              "% à ",
+              "% a ",
               validationSettings.growth_max,
               "%"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-              "• P/E: ",
+              "- P/E: ",
               validationSettings.target_pe_min,
-              "x à ",
+              "x a ",
               validationSettings.target_pe_max,
               "x"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-              "• P/CF: ",
+              "- P/CF: ",
               validationSettings.target_pcf_min,
-              "x à ",
+              "x a ",
               validationSettings.target_pcf_max,
               "x"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-              "• Sanitisation auto: ",
-              validationSettings.auto_sanitize_on_save ? "✅" : "❌"
+              "- Sanitisation auto: ",
+              validationSettings.auto_sanitize_on_save ? "" : ""
             ] })
           ] })
         ] })
@@ -42717,18 +42717,18 @@ const OverviewTab = ({ guardrailConfig, validationSettings }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border border-yellow-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-yellow-800", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "💡 Note importante" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: " Note importante" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
           "Les ",
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Guardrails" }),
-          " sont stockés dans localStorage (navigateur) et contrôlent les limites d'affichage."
+          " sont stockes dans localStorage (navigateur) et controlent les limites d'affichage."
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-2", children: [
           "Les ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Paramètres de Validation" }),
-          " sont stockés dans Supabase et contrôlent la sanitisation automatique des données."
+          /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Parametres de Validation" }),
+          " sont stockes dans Supabase et controlent la sanitisation automatique des donnees."
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2", children: "Les deux sont nécessaires pour une protection complète contre les valeurs aberrantes." })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-2", children: "Les deux sont necessaires pour une protection complete contre les valeurs aberrantes." })
       ] })
     ] }) })
   ] });
@@ -42760,7 +42760,7 @@ const GuardrailsTab = ({ config: config2, onUpdate }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-blue-800", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "Guardrails - Limites d'Affichage" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Ces limites contrôlent ce qui est affiché dans l'interface et les calculs de projections." })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Ces limites controlent ce qui est affiche dans l'interface et les calculs de projections." })
       ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: [
@@ -42863,7 +42863,7 @@ const ValidationTab = ({ settings, onUpdate }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-green-800", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "Validation & Sanitisation Automatique" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Ces paramètres sont sauvegardés dans Supabase et contrôlent la sanitisation automatique des données lors du chargement, de la sauvegarde et de la synchronisation." })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Ces parametres sont sauvegardes dans Supabase et controlent la sanitisation automatique des donnees lors du chargement, de la sauvegarde et de la synchronisation." })
       ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -42988,42 +42988,42 @@ const ValidationTab = ({ settings, onUpdate }) => {
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white border border-gray-200 rounded-lg p-5", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-gray-800 mb-4", children: "Précisions (décimales)" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-gray-800 mb-4", children: "Precisions (decimales)" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           NumberInput,
           {
-            label: "Précision Croissance",
+            label: "Precision Croissance",
             value: settings.growth_precision,
             onChange: (v) => updateSetting("growth_precision", Math.max(0, Math.min(4, Math.round(v)))),
             min: 0,
             max: 4,
             step: 1,
-            help: "Nombre de décimales pour les taux de croissance"
+            help: "Nombre de decimales pour les taux de croissance"
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           NumberInput,
           {
-            label: "Précision Ratios",
+            label: "Precision Ratios",
             value: settings.ratio_precision,
             onChange: (v) => updateSetting("ratio_precision", Math.max(0, Math.min(4, Math.round(v)))),
             min: 0,
             max: 4,
             step: 1,
-            help: "Nombre de décimales pour les ratios (P/E, P/CF, etc.)"
+            help: "Nombre de decimales pour les ratios (P/E, P/CF, etc.)"
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           NumberInput,
           {
-            label: "Précision Yield",
+            label: "Precision Yield",
             value: settings.yield_precision,
             onChange: (v) => updateSetting("yield_precision", Math.max(0, Math.min(4, Math.round(v)))),
             min: 0,
             max: 4,
             step: 1,
-            help: "Nombre de décimales pour le rendement"
+            help: "Nombre de decimales pour le rendement"
           }
         )
       ] })
@@ -43039,7 +43039,7 @@ const ValidationTab = ({ settings, onUpdate }) => {
             onChange: (v) => updateSetting("price_min_threshold", Math.max(0.01, v)),
             min: 0.01,
             step: 0.01,
-            help: "Prix minimum accepté pour une action"
+            help: "Prix minimum accepte pour une action"
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -43050,7 +43050,7 @@ const ValidationTab = ({ settings, onUpdate }) => {
             onChange: (v) => updateSetting("price_max_threshold", Math.max(settings.price_min_threshold, v)),
             min: settings.price_min_threshold,
             step: 1,
-            help: "Prix maximum accepté pour une action"
+            help: "Prix maximum accepte pour une action"
           }
         )
       ] })
@@ -43086,12 +43086,12 @@ const ValidationTab = ({ settings, onUpdate }) => {
       )
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-gray-800", children: "Cohérence FMP/Supabase" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-gray-800", children: "Coherence FMP/Supabase" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         ToggleSwitch,
         {
-          label: "Forcer la cohérence FMP/Supabase",
-          description: "Rejette les données qui ne correspondent pas entre FMP et Supabase",
+          label: "Forcer la coherence FMP/Supabase",
+          description: "Rejette les donnees qui ne correspondent pas entre FMP et Supabase",
           enabled: settings.enforce_fmp_supabase_consistency,
           onChange: (enabled) => updateSetting("enforce_fmp_supabase_consistency", enabled)
         }
@@ -43099,8 +43099,8 @@ const ValidationTab = ({ settings, onUpdate }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         ToggleSwitch,
         {
-          label: "Rejeter les données placeholder",
-          description: "Rejette les valeurs placeholder (0, -1, etc.) qui indiquent des données manquantes",
+          label: "Rejeter les donnees placeholder",
+          description: "Rejette les valeurs placeholder (0, -1, etc.) qui indiquent des donnees manquantes",
           enabled: settings.reject_placeholder_data,
           onChange: (enabled) => updateSetting("reject_placeholder_data", enabled)
         }
@@ -43278,7 +43278,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
       const isOutlier = deviation > threshold2 || assumptions.currentPrice > 0 && Math.abs((target.price - assumptions.currentPrice) / assumptions.currentPrice) > 3;
       let reason = "";
       if (deviation > threshold2) {
-        reason = `Écart de ${formatPercent(deviationPercent)} par rapport à la médiane (${formatCurrency(median)})`;
+        reason = `Ecart de ${formatPercent(deviationPercent)} par rapport a la mediane (${formatCurrency(median)})`;
       }
       if (assumptions.currentPrice > 0) {
         const returnPct = (target.price - assumptions.currentPrice) / assumptions.currentPrice * 100;
@@ -43321,7 +43321,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
               value,
               average: mean,
               deviation,
-              reason: `Écart de ${formatPercent(deviation / mean * 100)} par rapport à la moyenne`
+              reason: `Ecart de ${formatPercent(deviation / mean * 100)} par rapport a la moyenne`
             });
           }
         }
@@ -43354,15 +43354,15 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 rounded-lg shadow-lg", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-bold flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$j, { className: "w-6 h-6" }),
-        "Rapport de Qualité des Données - ",
+        "Rapport de Qualite des Donnees - ",
         ticker2
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-blue-100 text-sm mt-1", children: "Analyse complète des données aberrantes, exclusions et qualité des données historiques" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-blue-100 text-sm mt-1", children: "Analyse complete des donnees aberrantes, exclusions et qualite des donnees historiques" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(BarChart, { className: "w-5 h-5 text-blue-600" }),
-        "Prix Cibles par Métrique"
+        "Prix Cibles par Metrique"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-80", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(BarChart, { data: targetPriceData, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3" }),
@@ -43375,28 +43375,28 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 flex gap-4 text-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-green-500 rounded" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Métrique incluse" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Metrique incluse" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-red-500 rounded" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Métrique exclue (aberrante)" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Metrique exclue (aberrante)" })
         ] })
       ] })
     ] }),
     outlierAnalysis.outliers.filter((o) => o.isExcluded).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-red-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-red-800 mb-4 flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5" }),
-        "Métriques Aberrantes Détectées (",
+        "Metriques Aberrantes Detectees (",
         outlierAnalysis.outliers.filter((o) => o.isExcluded).length,
         ")"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-red-50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Métrique" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Metrique" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Prix Cible" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Médiane" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Écart" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Écart %" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Mediane" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Ecart" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Ecart %" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Raison" })
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { className: "divide-y", children: outlierAnalysis.outliers.filter((o) => o.isExcluded).map((outlier, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "hover:bg-red-50", children: [
@@ -43412,7 +43412,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
     outlierAnalysis.outliers.filter((o) => !o.isExcluded).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-green-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-green-800 mb-4 flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-5 h-5" }),
-        "Métriques Valides (",
+        "Metriques Valides (",
         outlierAnalysis.outliers.filter((o) => !o.isExcluded).length,
         ")"
       ] }),
@@ -43420,7 +43420,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-green-600 font-semibold mb-1", children: outlier.metric }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-bold text-green-800", children: formatCurrency(outlier.targetPrice) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 mt-1", children: [
-          "Écart: ",
+          "Ecart: ",
           formatPercent(outlier.deviationPercent)
         ] })
       ] }, idx)) })
@@ -43428,7 +43428,7 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(LineChart, { className: "w-5 h-5 text-blue-600" }),
-        "Évolution des Données Historiques"
+        "Evolution des Donnees Historiques"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-80", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(LineChart, { data: historicalDataChart, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3" }),
@@ -43448,17 +43448,17 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
     historicalOutliers.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-orange-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-orange-800 mb-4 flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-5 h-5" }),
-        "Valeurs Aberrantes dans les Données Historiques (",
+        "Valeurs Aberrantes dans les Donnees Historiques (",
         historicalOutliers.length,
         ")"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-orange-50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Année" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Métrique" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Annee" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Metrique" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Valeur" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Moyenne" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Écart" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-right", children: "Ecart" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left", children: "Raison" })
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { className: "divide-y", children: historicalOutliers.map((outlier, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "hover:bg-orange-50", children: [
@@ -43473,15 +43473,15 @@ const DataQualityReport = ({ data, assumptions, ticker: ticker2 }) => {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 p-4 rounded-lg border border-blue-200", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-blue-600 font-semibold mb-1", children: "Médiane des Prix Cibles" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-blue-600 font-semibold mb-1", children: "Mediane des Prix Cibles" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-blue-800", children: formatCurrency(outlierAnalysis.median) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-purple-50 p-4 rounded-lg border border-purple-200", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-purple-600 font-semibold mb-1", children: "Écart-Type" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-purple-600 font-semibold mb-1", children: "Ecart-Type" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-purple-800", children: formatCurrency(outlierAnalysis.stdDev) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 p-4 rounded-lg border border-green-200", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-green-600 font-semibold mb-1", children: "Métriques Valides" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-green-600 font-semibold mb-1", children: "Metriques Valides" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-2xl font-bold text-green-800", children: [
           outlierAnalysis.outliers.filter((o) => !o.isExcluded).length,
           " / ",
@@ -43504,18 +43504,18 @@ const SanitizationReport = ({
         const changePercent = original !== 0 ? change / original * 100 : 0;
         let reason = "";
         if (category === "growth") {
-          if (original < -20) reason = "Croissance négative trop extrême (< -20%)";
-          else if (original > 20) reason = "Croissance trop élevée (> 20%)";
+          if (original < -20) reason = "Croissance negative trop extreme (< -20%)";
+          else if (original > 20) reason = "Croissance trop elevee (> 20%)";
           else reason = "Valeur hors limites de validation";
         } else if (category === "ratio") {
-          if (original < 0) reason = "Ratio négatif invalide";
-          else if (original > 100) reason = "Ratio trop élevé (> 100x)";
+          if (original < 0) reason = "Ratio negatif invalide";
+          else if (original > 100) reason = "Ratio trop eleve (> 100x)";
           else reason = "Valeur hors limites de validation";
         } else if (category === "price") {
-          if (original <= 0) reason = "Prix invalide (≤ 0)";
-          else reason = "Valeur corrigée par validation";
+          if (original <= 0) reason = "Prix invalide (<= 0)";
+          else reason = "Valeur corrigee par validation";
         } else {
-          reason = "Valeur sanitisée selon les paramètres de validation";
+          reason = "Valeur sanitisee selon les parametres de validation";
         }
         changesList.push({
           field,
@@ -43572,17 +43572,17 @@ const SanitizationReport = ({
         "Rapport de Sanitisation - ",
         ticker2
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-purple-100 text-sm mt-1", children: "Visualisation des corrections automatiques appliquées aux hypothèses" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-purple-100 text-sm mt-1", children: "Visualisation des corrections automatiques appliquees aux hypotheses" })
     ] }),
     changes.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 p-6 rounded-lg border border-green-200 text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-12 h-12 text-green-600 mx-auto mb-2" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-green-800 mb-2", children: "Aucune correction nécessaire" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-green-600", children: "Toutes les hypothèses sont dans les limites de validation acceptables." })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-green-800 mb-2", children: "Aucune correction necessaire" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-green-600", children: "Toutes les hypotheses sont dans les limites de validation acceptables." })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(BarChart, { className: "w-5 h-5 text-purple-600" }),
-          "Comparaison Avant/Après Sanitisation"
+          "Comparaison Avant/Apres Sanitisation"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-96", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(BarChart, { data: chartData, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3" }),
@@ -43591,22 +43591,22 @@ const SanitizationReport = ({
           /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, {}),
           /* @__PURE__ */ jsxRuntimeExports.jsx(Legend, {}),
           /* @__PURE__ */ jsxRuntimeExports.jsx(Bar, { dataKey: "original", fill: "#ef4444", name: "Valeur Originale", radius: [4, 4, 0, 0] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Bar, { dataKey: "sanitized", fill: "#10b981", name: "Valeur Sanitisée", radius: [4, 4, 0, 0] })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Bar, { dataKey: "sanitized", fill: "#10b981", name: "Valeur Sanitisee", radius: [4, 4, 0, 0] })
         ] }) }) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-800 mb-4 flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-5 h-5" }),
-          "Détails des Corrections (",
+          "Details des Corrections (",
           changes.length,
           ")"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-gray-50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-left", children: "Paramètre" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-left", children: "Parametre" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-right", children: "Valeur Originale" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-center", children: "→" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-right", children: "Valeur Sanitisée" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-center", children: "->" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-right", children: "Valeur Sanitisee" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-right", children: "Changement" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-right", children: "Changement %" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-3 text-left", children: "Raison" })
@@ -43673,7 +43673,7 @@ const FullDataVisualization = ({
       const ratios = calculateRowRatios(row);
       return {
         year: row.year,
-        // Données financières
+        // Donnees financieres
         EPS: row.earningsPerShare,
         CF: row.cashFlowPerShare,
         BV: row.bookValuePerShare,
@@ -43693,7 +43693,7 @@ const FullDataVisualization = ({
         PBV_Low: ratios.pbvLow,
         PBV_Avg: (ratios.pbvHigh + ratios.pbvLow) / 2,
         Yield: ratios.yield,
-        // Croissance (calculée)
+        // Croissance (calculee)
         EPS_Growth: row.year > ((_a2 = data[0]) == null ? void 0 : _a2.year) ? (row.earningsPerShare - (((_b = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _b.earningsPerShare) || 0)) / Math.max(((_c = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _c.earningsPerShare) || 1, 0.01) * 100 : 0,
         CF_Growth: row.year > ((_d = data[0]) == null ? void 0 : _d.year) ? (row.cashFlowPerShare - (((_e = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _e.cashFlowPerShare) || 0)) / Math.max(((_f = data.find((d) => d.year === row.year - 1)) == null ? void 0 : _f.cashFlowPerShare) || 1, 0.01) * 100 : 0,
         // Flags
@@ -43724,13 +43724,13 @@ const FullDataVisualization = ({
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-lg shadow-lg", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-xl font-bold flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-6 h-6" }),
-        "Visualisation Complète des Données - ",
+        "Visualisation Complete des Donnees - ",
         info.symbol
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-indigo-100 text-sm mt-1", children: "Analyse visuelle complète de toutes les données historiques, ratios et métriques" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-indigo-100 text-sm mt-1", children: "Analyse visuelle complete de toutes les donnees historiques, ratios et metriques" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: "Données Financières Principales" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: "Donnees Financieres Principales" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-96", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ComposedChart, { data: visualizationData, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(XAxis, { dataKey: "year" }),
@@ -43753,7 +43753,7 @@ const FullDataVisualization = ({
       ] }) }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: "Évolution des Prix (High/Low/Avg)" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: "Evolution des Prix (High/Low/Avg)" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-80", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ComposedChart, { data: visualizationData, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(XAxis, { dataKey: "year" }),
@@ -43838,14 +43838,14 @@ const FullDataVisualization = ({
       ] }) }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: "Corrélation Ratios vs Prix" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-800 mb-4", children: "Correlation Ratios vs Prix" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-80", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ScatterChart, { data: visualizationData, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(XAxis, { dataKey: "PE_Avg", name: "P/E" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(YAxis, { dataKey: "PriceAvg", name: "Prix" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { cursor: { strokeDasharray: "3 3" } }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(Legend, {}),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Scatter, { name: "Données", dataKey: "PriceAvg", fill: "#3b82f6", children: visualizationData.map((entry, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(Cell, { fill: entry.isEstimate ? "#f59e0b" : "#3b82f6" }, `cell-${index2}`)) })
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Scatter, { name: "Donnees", dataKey: "PriceAvg", fill: "#3b82f6", children: visualizationData.map((entry, index2) => /* @__PURE__ */ jsxRuntimeExports.jsx(Cell, { fill: entry.isEstimate ? "#f59e0b" : "#3b82f6" }, `cell-${index2}`)) })
       ] }) }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
@@ -43865,7 +43865,7 @@ const FullDataVisualization = ({
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatCurrency(stats.eps.max) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Écart-type:" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Ecart-type:" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatCurrency(stats.eps.stdDev) })
           ] })
         ] })
@@ -43886,7 +43886,7 @@ const FullDataVisualization = ({
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatCurrency(stats.cf.max) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Écart-type:" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Ecart-type:" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatCurrency(stats.cf.stdDev) })
           ] })
         ] })
@@ -43907,7 +43907,7 @@ const FullDataVisualization = ({
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatCurrency(stats.bv.max) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Écart-type:" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Ecart-type:" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: formatCurrency(stats.bv.stdDev) })
           ] })
         ] })
@@ -43932,7 +43932,7 @@ const ReportsPanel = ({
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "text-2xl font-bold flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$p, { className: "w-6 h-6" }),
-          "Rapports Visuels et Analyse de Données"
+          "Rapports Visuels et Analyse de Donnees"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-indigo-100 text-sm mt-1", children: [
           info.symbol,
@@ -43956,7 +43956,7 @@ const ReportsPanel = ({
         {
           onClick: () => setActiveTab("overview"),
           className: `px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "overview" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-gray-500 hover:text-gray-700"}`,
-          children: "📊 Vue d'ensemble"
+          children: " Vue d'ensemble"
         }
       ),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -43966,7 +43966,7 @@ const ReportsPanel = ({
           className: `px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "quality" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-gray-500 hover:text-gray-700"}`,
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-4 h-4 inline mr-1" }),
-            "Qualité des Données"
+            "Qualite des Donnees"
           ]
         }
       ),
@@ -43988,7 +43988,7 @@ const ReportsPanel = ({
           className: `px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "full" ? "border-indigo-600 text-indigo-600 bg-white" : "border-transparent text-gray-500 hover:text-gray-700"}`,
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-4 h-4 inline mr-1" }),
-            "Visualisation Complète"
+            "Visualisation Complete"
           ]
         }
       )
@@ -43997,17 +43997,17 @@ const ReportsPanel = ({
       activeTab === "overview" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 p-4 rounded-lg border border-blue-200", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold text-blue-800 mb-2", children: "Données Historiques" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold text-blue-800 mb-2", children: "Donnees Historiques" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-blue-600", children: data.length }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-blue-600", children: "années de données" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-blue-600", children: "annees de donnees" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 p-4 rounded-lg border border-green-200", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold text-green-800 mb-2", children: "Métriques Valides" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold text-green-800 mb-2", children: "Metriques Valides" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-2xl font-bold text-green-600", children: [
               [assumptions.excludeEPS, assumptions.excludeCF, assumptions.excludeBV, assumptions.excludeDIV].filter((excluded) => !excluded).length,
               " / 4"
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-green-600", children: "métriques incluses" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-green-600", children: "metriques incluses" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-purple-50 p-4 rounded-lg border border-purple-200", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold text-purple-800 mb-2", children: "Corrections" }),
@@ -44015,7 +44015,7 @@ const ReportsPanel = ({
               const k2 = key;
               return typeof assumptions[k2] === "number" && assumptions[k2] !== sanitizedAssumptions[k2];
             }).length }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-purple-600", children: "valeurs corrigées" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-purple-600", children: "valeurs corrigees" })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
@@ -44028,8 +44028,8 @@ const ReportsPanel = ({
                 className: "p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-left transition-colors",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$m, { className: "w-8 h-8 text-blue-600 mb-2" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-blue-800 mb-1", children: "Qualité des Données" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-600", children: "Visualise les données aberrantes, les exclusions et la qualité des données historiques" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-blue-800 mb-1", children: "Qualite des Donnees" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-600", children: "Visualise les donnees aberrantes, les exclusions et la qualite des donnees historiques" })
                 ]
               }
             ),
@@ -44041,7 +44041,7 @@ const ReportsPanel = ({
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$z, { className: "w-8 h-8 text-green-600 mb-2" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-green-800 mb-1", children: "Rapport de Sanitisation" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-green-600", children: "Affiche toutes les corrections automatiques appliquées aux hypothèses" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-green-600", children: "Affiche toutes les corrections automatiques appliquees aux hypotheses" })
                 ]
               }
             ),
@@ -44052,8 +44052,8 @@ const ReportsPanel = ({
                 className: "p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 text-left transition-colors",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$A, { className: "w-8 h-8 text-purple-600 mb-2" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-purple-800 mb-1", children: "Visualisation Complète" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-purple-600", children: "Graphiques complets de toutes les données historiques, ratios et métriques" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-purple-800 mb-1", children: "Visualisation Complete" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-purple-600", children: "Graphiques complets de toutes les donnees historiques, ratios et metriques" })
                 ]
               }
             )
@@ -44153,14 +44153,14 @@ const loadAllTickersFromSupabase = async () => {
             uniqueTeamTickers.add(t.ticker.toUpperCase());
           }
         });
-        console.log(`✅ ${tickers.length} tickers chargés depuis /api/admin/tickers (dont ${uniqueTeamTickers.size} team tickers uniques)`);
+        console.log(` ${tickers.length} tickers charges depuis /api/admin/tickers (dont ${uniqueTeamTickers.size} team tickers uniques)`);
         return {
           success: true,
           tickers
         };
       }
     }
-    console.warn("⚠️ API admin/tickers échouée, tentative avec /api/team-tickers");
+    console.warn(" API admin/tickers echouee, tentative avec /api/team-tickers");
     response = await fetch("/api/team-tickers?limit=1000");
     if (response.ok) {
       result = await response.json();
@@ -44169,14 +44169,14 @@ const loadAllTickersFromSupabase = async () => {
           const source = ticker2.source || ticker2.category || (Array.isArray(ticker2.categories) && ticker2.categories.includes("team") ? "team" : "manual");
           return { ...ticker2, source };
         });
-        console.log(`✅ ${tickers.length} tickers chargés depuis /api/team-tickers (fallback)`);
+        console.log(` ${tickers.length} tickers charges depuis /api/team-tickers (fallback)`);
         return {
           success: true,
           tickers
         };
       }
     }
-    console.warn("⚠️ API team-tickers échouée, tentative avec /api/tickers-config");
+    console.warn(" API team-tickers echouee, tentative avec /api/tickers-config");
     response = await fetch("/api/tickers-config");
     if (response.ok) {
       result = await response.json();
@@ -44203,7 +44203,7 @@ const loadAllTickersFromSupabase = async () => {
           });
         }
         if (allTickers.length > 0) {
-          console.log(`✅ ${allTickers.length} tickers chargés depuis /api/tickers-config (fallback)`);
+          console.log(` ${allTickers.length} tickers charges depuis /api/tickers-config (fallback)`);
           return {
             success: true,
             tickers: allTickers
@@ -44212,7 +44212,7 @@ const loadAllTickersFromSupabase = async () => {
       }
     }
     if (isLocalhost) {
-      console.log("🔄 Localhost détecté - Tentative chargement direct depuis Supabase...");
+      console.log(" Localhost detecte - Tentative chargement direct depuis Supabase...");
       try {
         const { getSupabaseClient: getSupabaseClient2 } = await __vitePreload(async () => {
           const { getSupabaseClient: getSupabaseClient3 } = await Promise.resolve().then(() => supabase$1);
@@ -44234,7 +44234,7 @@ const loadAllTickersFromSupabase = async () => {
               price_stability: t.price_stability,
               beta: t.beta
             }));
-            console.log(`✅ ${normalizedTickers.length} tickers chargés directement depuis Supabase (localhost)`);
+            console.log(` ${normalizedTickers.length} tickers charges directement depuis Supabase (localhost)`);
             return {
               success: true,
               tickers: normalizedTickers
@@ -44242,12 +44242,12 @@ const loadAllTickersFromSupabase = async () => {
           }
         }
       } catch (supabaseDirectError) {
-        console.warn("⚠️ Erreur chargement direct Supabase:", supabaseDirectError);
+        console.warn(" Erreur chargement direct Supabase:", supabaseDirectError);
       }
     }
     throw new Error("Aucune API disponible pour charger les tickers");
   } catch (error) {
-    console.error("❌ Erreur chargement tickers Supabase:", error);
+    console.error(" Erreur chargement tickers Supabase:", error);
     return {
       success: false,
       tickers: [],
@@ -44279,7 +44279,7 @@ async function fetchMarketDataBatch(tickers) {
     const response = await fetch(`/api/marketdata/batch?symbols=${encodeURIComponent(tickersStr)}&endpoints=quote`);
     if (!response.ok) {
       if (response.status === 404) {
-        console.warn("⚠️ Endpoint market-data-batch non disponible - Retour vide");
+        console.warn(" Endpoint market-data-batch non disponible - Retour vide");
         return {
           success: true,
           data: [],
@@ -44332,7 +44332,7 @@ async function fetchMarketDataBatch(tickers) {
     }
     return result;
   } catch (error) {
-    console.error("❌ Erreur fetchMarketDataBatch:", error);
+    console.error(" Erreur fetchMarketDataBatch:", error);
     return {
       success: false,
       data: [],
@@ -44389,7 +44389,7 @@ async function loadCurrentSnapshotFromSupabase(ticker2) {
       auto_fetched: currentSnapshot.auto_fetched
     };
   } catch (error) {
-    console.error(`❌ Erreur chargement snapshot Supabase pour ${ticker2}:`, error);
+    console.error(` Erreur chargement snapshot Supabase pour ${ticker2}:`, error);
     return null;
   }
 }
@@ -44399,12 +44399,12 @@ const CACHE_TTL_MS = 5 * 60 * 1e3;
 async function loadAllCurrentSnapshotsFromSupabase() {
   const now = Date.now();
   if (allSnapshotsCache && now - allSnapshotsCacheTimestamp < CACHE_TTL_MS) {
-    console.log(`📦 Using cached snapshots (${allSnapshotsCache.size} tickers, age: ${Math.round((now - allSnapshotsCacheTimestamp) / 1e3)}s)`);
+    console.log(` Using cached snapshots (${allSnapshotsCache.size} tickers, age: ${Math.round((now - allSnapshotsCacheTimestamp) / 1e3)}s)`);
     return allSnapshotsCache;
   }
   const isLocalhost = typeof window !== "undefined" && (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
   try {
-    console.log("🚀 Loading ALL current snapshots from Supabase...");
+    console.log(" Loading ALL current snapshots from Supabase...");
     const startTime = Date.now();
     let snapshots = [];
     try {
@@ -44421,9 +44421,9 @@ async function loadAllCurrentSnapshotsFromSupabase() {
         throw new Error(`API error: ${response.status}`);
       }
     } catch (apiError) {
-      console.warn("⚠️ API route failed:", apiError);
+      console.warn(" API route failed:", apiError);
       if (isLocalhost) {
-        console.log("🔄 Localhost détecté - Chargement direct snapshots depuis Supabase...");
+        console.log(" Localhost detecte - Chargement direct snapshots depuis Supabase...");
         const { getSupabaseClient: getSupabaseClient2 } = await __vitePreload(async () => {
           const { getSupabaseClient: getSupabaseClient3 } = await Promise.resolve().then(() => supabase$1);
           return { getSupabaseClient: getSupabaseClient3 };
@@ -44433,9 +44433,9 @@ async function loadAllCurrentSnapshotsFromSupabase() {
           const { data, error } = await supabase2.from("finance_pro_snapshots").select("ticker, annual_data, assumptions, company_info, snapshot_date, is_current, auto_fetched").eq("is_current", true).limit(1500);
           if (!error && data) {
             snapshots = data;
-            console.log(`✅ ${snapshots.length} snapshots chargés directement depuis Supabase (localhost)`);
+            console.log(` ${snapshots.length} snapshots charges directement depuis Supabase (localhost)`);
           } else {
-            console.error("❌ Erreur Supabase direct:", error);
+            console.error(" Erreur Supabase direct:", error);
           }
         }
       }
@@ -44456,12 +44456,12 @@ async function loadAllCurrentSnapshotsFromSupabase() {
       });
     }
     const loadTime = Date.now() - startTime;
-    console.log(`✅ Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms`);
+    console.log(` Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms`);
     allSnapshotsCache = snapshotMap;
     allSnapshotsCacheTimestamp = now;
     return snapshotMap;
   } catch (error) {
-    console.error("❌ Error loading all snapshots from Supabase:", error);
+    console.error(" Error loading all snapshots from Supabase:", error);
     return /* @__PURE__ */ new Map();
   }
 }
@@ -44476,7 +44476,7 @@ async function loadProfileFromSupabase(ticker2, fallbackToFMP = true) {
       ...snapshot.assumptions,
       currentPrice: currentPrice > 0 ? currentPrice : ((_b = snapshot.assumptions) == null ? void 0 : _b.currentPrice) || 0
     });
-    console.log(`✅ ${upperTicker}: Chargé depuis Supabase (snapshot du ${snapshot.snapshot_date})`);
+    console.log(` ${upperTicker}: Charge depuis Supabase (snapshot du ${snapshot.snapshot_date})`);
     return {
       data: snapshot.annual_data,
       info: snapshot.company_info,
@@ -44486,7 +44486,7 @@ async function loadProfileFromSupabase(ticker2, fallbackToFMP = true) {
     };
   }
   if (fallbackToFMP) {
-    console.log(`⚠️ ${upperTicker}: Pas de snapshot Supabase, fallback sur FMP`);
+    console.log(` ${upperTicker}: Pas de snapshot Supabase, fallback sur FMP`);
     const { fetchCompanyData: fetchCompanyData2 } = await __vitePreload(async () => {
       const { fetchCompanyData: fetchCompanyData3 } = await Promise.resolve().then(() => financeApi);
       return { fetchCompanyData: fetchCompanyData3 };
@@ -44498,7 +44498,7 @@ async function loadProfileFromSupabase(ticker2, fallbackToFMP = true) {
         source: "fmp"
       };
     } catch (error) {
-      console.error(`❌ ${upperTicker}: Erreur FMP fallback:`, error);
+      console.error(` ${upperTicker}: Erreur FMP fallback:`, error);
       return {
         data: [],
         info: {},
@@ -44526,7 +44526,7 @@ async function loadProfilesBatchFromSupabase(tickers) {
       }
     }
   } catch (e) {
-    console.warn("⚠️ fetchMarketDataBatch failed, using snapshot prices:", e);
+    console.warn(" fetchMarketDataBatch failed, using snapshot prices:", e);
   }
   tickers.forEach((ticker2) => {
     var _a2;
@@ -46630,7 +46630,7 @@ function requireCjs() {
 }
 class WebSocketFactory {
   /**
-   * Static-only utility – prevent instantiation.
+   * Static-only utility - prevent instantiation.
    */
   constructor() {
   }
@@ -57214,7 +57214,7 @@ function requireMain() {
       return majorVersion <= 18;
     }
     if (shouldShowDeprecationWarning()) {
-      console.warn(`⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217`);
+      console.warn(`  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217`);
     }
   })(main);
   return main;
@@ -57278,7 +57278,7 @@ function getSupabaseConfig() {
   if (!key && typeof document !== "undefined") {
     const envScript = document.querySelector('script[src*="env-config"]');
     if (envScript) {
-      console.log("📋 env-config.js script found in DOM");
+      console.log(" env-config.js script found in DOM");
     }
   }
   return { url, key };
@@ -57291,7 +57291,7 @@ function getSupabaseClient() {
   const key = config2.key || SUPABASE_ANON_KEY;
   const url = config2.url || SUPABASE_URL;
   if (!key) {
-    console.warn("⚠️ Supabase anon key not configured. Real-time sync disabled.");
+    console.warn(" Supabase anon key not configured. Real-time sync disabled.");
     console.warn("   Make sure env-config.js is loaded before this script.");
     console.warn("   Current window.SUPABASE_ANON_KEY:", typeof window !== "undefined" ? window.SUPABASE_ANON_KEY : "N/A");
     console.warn("   Current window.ENV_CONFIG:", typeof window !== "undefined" ? window.ENV_CONFIG : "N/A");
@@ -57305,10 +57305,10 @@ function getSupabaseClient() {
         }
       }
     });
-    console.log("✅ Supabase client initialized for 3p1");
+    console.log(" Supabase client initialized for 3p1");
     return supabaseInstance;
   } catch (error) {
-    console.error("❌ Failed to initialize Supabase client:", error);
+    console.error(" Failed to initialize Supabase client:", error);
     return null;
   }
 }
@@ -57329,7 +57329,7 @@ function useRealtimeSync(tableName, onDataChange, options) {
       return;
     }
     const channelName = `realtime-${tableName}-${Date.now()}`;
-    console.log(`📡 Subscribing to ${tableName} changes...`);
+    console.log(` Subscribing to ${tableName} changes...`);
     let isMounted = true;
     const channel = supabase.channel(channelName).on(
       "postgres_changes",
@@ -57341,7 +57341,7 @@ function useRealtimeSync(tableName, onDataChange, options) {
       },
       (payload) => {
         if (!isMounted) return;
-        console.log(`📡 [${tableName}] ${payload.eventType}:`, payload);
+        console.log(` [${tableName}] ${payload.eventType}:`, payload);
         onDataChangeRef.current({
           eventType: payload.eventType,
           new: payload.new,
@@ -57351,25 +57351,25 @@ function useRealtimeSync(tableName, onDataChange, options) {
     ).subscribe((status) => {
       if (isMounted) {
         if (status === "SUBSCRIBED") {
-          console.log(`📡 [${tableName}] Subscription status: ${status}`);
+          console.log(` [${tableName}] Subscription status: ${status}`);
         } else if (status === "CHANNEL_ERROR") {
           if (typeof window !== "undefined" && (localStorage.getItem("3p1-debug") === "true" || window.location.search.includes("debug=true"))) {
-            console.warn(`⚠️ [${tableName}] Subscription error (non-bloquant, fallback périodique actif)`);
+            console.warn(` [${tableName}] Subscription error (non-bloquant, fallback periodique actif)`);
           }
         } else {
           if (typeof window !== "undefined" && (localStorage.getItem("3p1-debug") === "true" || window.location.search.includes("debug=true"))) {
-            console.log(`📡 [${tableName}] Subscription status: ${status}`);
+            console.log(` [${tableName}] Subscription status: ${status}`);
           }
         }
       }
     });
     return () => {
       isMounted = false;
-      console.log(`🔌 Unsubscribing from ${tableName}`);
+      console.log(` Unsubscribing from ${tableName}`);
       try {
         supabase.removeChannel(channel);
       } catch (error) {
-        console.warn(`⚠️ Error removing channel ${channelName}:`, error);
+        console.warn(` Error removing channel ${channelName}:`, error);
       }
     };
   }, [tableName, options == null ? void 0 : options.schema, options == null ? void 0 : options.filter, options == null ? void 0 : options.enabled]);
@@ -57377,10 +57377,10 @@ function useRealtimeSync(tableName, onDataChange, options) {
 const STORAGE_KEY$1 = "finance_pro_profiles";
 async function cleanupProfilesNotInSupabase() {
   try {
-    console.log("🧹 Nettoyage des profils obsolètes...");
+    console.log(" Nettoyage des profils obsoletes...");
     const supabaseResult = await loadAllTickersFromSupabase();
     if (!supabaseResult.success || !supabaseResult.tickers) {
-      console.error("❌ Impossible de charger les tickers depuis Supabase");
+      console.error(" Impossible de charger les tickers depuis Supabase");
       return {
         removed: 0,
         kept: 0,
@@ -57390,10 +57390,10 @@ async function cleanupProfilesNotInSupabase() {
     const activeTickers = new Set(
       supabaseResult.tickers.map((t) => t.ticker.toUpperCase())
     );
-    console.log(`📊 ${activeTickers.size} tickers actifs dans Supabase`);
+    console.log(` ${activeTickers.size} tickers actifs dans Supabase`);
     const saved = await storage.getItem(STORAGE_KEY$1);
     if (!saved) {
-      console.log("✅ Aucun profil en localStorage");
+      console.log(" Aucun profil en localStorage");
       return { removed: 0, kept: 0, errors: [] };
     }
     let profiles = {};
@@ -57402,11 +57402,11 @@ async function cleanupProfilesNotInSupabase() {
     } else if (typeof saved === "object") {
       profiles = saved;
     } else {
-      console.log("✅ Format de profil non reconnu, pas de nettoyage nécessaire");
+      console.log(" Format de profil non reconnu, pas de nettoyage necessaire");
       return { removed: 0, kept: 0, errors: [] };
     }
     const profileKeys = Object.keys(profiles);
-    console.log(`📋 ${profileKeys.length} profils en localStorage`);
+    console.log(` ${profileKeys.length} profils en localStorage`);
     const toRemove = [];
     const toKeep = {};
     profileKeys.forEach((key) => {
@@ -57417,22 +57417,22 @@ async function cleanupProfilesNotInSupabase() {
         toRemove.push(key);
       }
     });
-    console.log(`🗑️  ${toRemove.length} profils à supprimer`);
-    console.log(`✅ ${Object.keys(toKeep).length} profils à garder`);
+    console.log(`  ${toRemove.length} profils a supprimer`);
+    console.log(` ${Object.keys(toKeep).length} profils a garder`);
     if (toRemove.length > 0) {
       const cacheEntry = {
         data: toKeep,
         timestamp: Date.now()
       };
       await storage.setItem(STORAGE_KEY$1, cacheEntry);
-      console.log(`✅ Nettoyage terminé: ${toRemove.length} profils supprimés`);
+      console.log(` Nettoyage termine: ${toRemove.length} profils supprimes`);
       if (toRemove.length <= 20) {
-        console.log(`   Profils supprimés: ${toRemove.join(", ")}`);
+        console.log(`   Profils supprimes: ${toRemove.join(", ")}`);
       } else {
-        console.log(`   Profils supprimés: ${toRemove.slice(0, 20).join(", ")} ... et ${toRemove.length - 20} autres`);
+        console.log(`   Profils supprimes: ${toRemove.slice(0, 20).join(", ")} ... et ${toRemove.length - 20} autres`);
       }
     } else {
-      console.log("✅ Aucun profil obsolète trouvé");
+      console.log(" Aucun profil obsolete trouve");
     }
     return {
       removed: toRemove.length,
@@ -57441,7 +57441,7 @@ async function cleanupProfilesNotInSupabase() {
       removedTickers: toRemove
     };
   } catch (error) {
-    console.error("❌ Erreur lors du nettoyage:", error);
+    console.error(" Erreur lors du nettoyage:", error);
     return {
       removed: 0,
       kept: 0,
@@ -57453,11 +57453,11 @@ async function autoCleanupProfiles() {
   try {
     const result = await cleanupProfilesNotInSupabase();
     if (result.removed > 0) {
-      console.log(`🧹 Nettoyage automatique: ${result.removed} profils obsolètes supprimés`);
+      console.log(` Nettoyage automatique: ${result.removed} profils obsoletes supprimes`);
     }
     return result;
   } catch (error) {
-    console.error("❌ Erreur lors du nettoyage automatique:", error);
+    console.error(" Erreur lors du nettoyage automatique:", error);
     return { removed: 0, kept: 0, errors: [error.message] };
   }
 }
@@ -57517,10 +57517,10 @@ const saveToSupabase = async (data) => {
     }, true ? [] : void 0, import.meta.url);
     const result = await saveProfilesBatchToSupabase(data);
     if (result.failed > 0) {
-      console.warn(`⚠️ ${result.failed} profils n'ont pas pu être sauvegardés dans Supabase:`, result.errors.slice(0, 5));
+      console.warn(` ${result.failed} profils n'ont pas pu etre sauvegardes dans Supabase:`, result.errors.slice(0, 5));
     }
     if (result.success > 0) {
-      console.log(`✅ ${result.success} profils sauvegardés dans Supabase`);
+      console.log(` ${result.success} profils sauvegardes dans Supabase`);
     }
   } catch (e) {
     console.warn("Failed to save to Supabase:", e);
@@ -57546,11 +57546,11 @@ const saveProfiles = async (data, saveToSupabaseFirst = true) => {
 function App() {
   var _a2, _b, _c;
   reactExports.useEffect(() => {
-    console.log("🚀 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels activés");
-    console.log("✅ Modifications disponibles:");
+    console.log(" 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels actives");
+    console.log(" Modifications disponibles:");
     console.log('   - Section "Filtres et Tri" en bas de sidebar');
-    console.log("   - Bouton 📊 Rapports dans Header");
-    console.log("   - Bouton ⚙️ Settings fonctionnel");
+    console.log("   - Bouton  Rapports dans Header");
+    console.log("   - Bouton  Settings fonctionnel");
   }, []);
   const [showLanding, setShowLanding] = reactExports.useState(() => {
     const hasSeenLanding = localStorage.getItem("3p1-has-seen-landing");
@@ -57592,7 +57592,7 @@ function App() {
     loadConfig().then((config2) => {
       setGuardrailConfig(config2);
       invalidateValidationSettingsCache();
-      showNotification("Paramètres de validation mis à jour", "success");
+      showNotification("Parametres de validation mis a jour", "success");
     }).catch(console.error);
   };
   reactExports.useEffect(() => {
@@ -57609,7 +57609,7 @@ function App() {
   const loadTickersFromSupabaseRef = reactExports.useRef(null);
   useRealtimeSync("tickers", (payload) => {
     var _a3, _b2, _c2, _d, _e;
-    console.log("📡 [3p1] Realtime ticker change:", payload.eventType, ((_a3 = payload.new) == null ? void 0 : _a3.ticker) || ((_b2 = payload.old) == null ? void 0 : _b2.ticker));
+    console.log(" [3p1] Realtime ticker change:", payload.eventType, ((_a3 = payload.new) == null ? void 0 : _a3.ticker) || ((_b2 = payload.old) == null ? void 0 : _b2.ticker));
     if (realtimeTimeoutRef.current) {
       clearTimeout(realtimeTimeoutRef.current);
       realtimeTimeoutRef.current = null;
@@ -57617,7 +57617,7 @@ function App() {
     if (payload.eventType === "INSERT" && payload.new) {
       const symbol = (_c2 = payload.new.ticker) == null ? void 0 : _c2.toUpperCase();
       if (symbol) {
-        showNotification(`📡 Nouveau ticker ajouté par un autre utilisateur: ${symbol}`, "info");
+        showNotification(` Nouveau ticker ajoute par un autre utilisateur: ${symbol}`, "info");
         storage.removeItem(STORAGE_KEY).catch(console.warn);
         hasLoadedTickersRef.current = false;
         supabaseTickersCacheRef.current = null;
@@ -57631,7 +57631,7 @@ function App() {
     } else if (payload.eventType === "DELETE" && payload.old) {
       const symbol = (_d = payload.old.ticker) == null ? void 0 : _d.toUpperCase();
       if (symbol) {
-        showNotification(`📡 Ticker supprimé par un autre utilisateur: ${symbol}`, "warning");
+        showNotification(` Ticker supprime par un autre utilisateur: ${symbol}`, "warning");
         storage.removeItem(STORAGE_KEY).catch(console.warn);
         setLibrary((prev) => {
           const updated = { ...prev };
@@ -57650,7 +57650,7 @@ function App() {
     } else if (payload.eventType === "UPDATE" && payload.new) {
       const symbol = (_e = payload.new.ticker) == null ? void 0 : _e.toUpperCase();
       if (symbol) {
-        showNotification(`📡 Ticker mis à jour: ${symbol}`, "info");
+        showNotification(` Ticker mis a jour: ${symbol}`, "info");
         storage.removeItem(STORAGE_KEY).catch(console.warn);
         setLibrary((prev) => {
           if (!prev[symbol]) return prev;
@@ -57698,12 +57698,12 @@ function App() {
       if (urlRole === "admin" || urlAdmin === "true") {
         setIsAdmin(true);
         localStorage.setItem("3p1-admin", "true");
-        console.log("🔐 Admin access granted via URL parameter");
+        console.log(" Admin access granted via URL parameter");
         return;
       }
       if (localStorage.getItem("3p1-admin") === "true") {
         setIsAdmin(true);
-        console.log("🔐 Admin access granted via localStorage");
+        console.log(" Admin access granted via localStorage");
         return;
       }
       const userJson = sessionStorage.getItem("gob-user");
@@ -57711,7 +57711,7 @@ function App() {
         const user = JSON.parse(userJson);
         if (user.role === "admin" || user.is_admin === true || user.username === "admin" || user.id === "admin") {
           setIsAdmin(true);
-          console.log("🔐 Admin access granted via sessionStorage");
+          console.log(" Admin access granted via sessionStorage");
         }
       }
     } catch (e) {
@@ -57723,18 +57723,18 @@ function App() {
     setIsAdmin(newAdminState);
     if (newAdminState) {
       localStorage.setItem("3p1-admin", "true");
-      console.log("🔐 Mode admin activé (double-clic sur logo)");
-      showNotification("🔐 Mode admin activé", "success");
+      console.log(" Mode admin active (double-clic sur logo)");
+      showNotification(" Mode admin active", "success");
     } else {
       localStorage.removeItem("3p1-admin");
-      console.log("🔓 Mode admin désactivé (double-clic sur logo)");
-      showNotification("🔓 Mode admin désactivé", "info");
+      console.log(" Mode admin desactive (double-clic sur logo)");
+      showNotification(" Mode admin desactive", "info");
     }
   };
   const handleAdminRepair = async (tickerToRepair) => {
     setIsRepairing(tickerToRepair);
     try {
-      console.log(`🔧 Admin: Repairing ${tickerToRepair}...`);
+      console.log(` Admin: Repairing ${tickerToRepair}...`);
       const result = await fetchCompanyData(tickerToRepair);
       if (result.data && result.data.length > 0) {
         const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
@@ -57777,13 +57777,13 @@ function App() {
             }
           };
         });
-        showNotification(`✅ Repaired ${tickerToRepair}`, "success");
+        showNotification(` Repaired ${tickerToRepair}`, "success");
       } else {
-        showNotification(`❌ Failed to fetch data for ${tickerToRepair}`, "error");
+        showNotification(` Failed to fetch data for ${tickerToRepair}`, "error");
       }
     } catch (e) {
       console.error(e);
-      showNotification(`❌ Error repairing ${tickerToRepair}`, "error");
+      showNotification(` Error repairing ${tickerToRepair}`, "error");
     } finally {
       setIsRepairing(null);
     }
@@ -57794,7 +57794,7 @@ function App() {
     const loadFromStorage = async () => {
       var _a3;
       try {
-        console.log("📡 Chargement des profils depuis Supabase...");
+        console.log(" Chargement des profils depuis Supabase...");
         const { loadAllProfilesFromSupabase } = await __vitePreload(async () => {
           const { loadAllProfilesFromSupabase: loadAllProfilesFromSupabase2 } = await import("./profileApi.js");
           return { loadAllProfilesFromSupabase: loadAllProfilesFromSupabase2 };
@@ -57803,10 +57803,10 @@ function App() {
         let parsed = {};
         if (supabaseResult.success && Object.keys(supabaseResult.profiles).length > 0) {
           parsed = supabaseResult.profiles;
-          console.log(`✅ ${Object.keys(parsed).length} profils chargés depuis Supabase`);
+          console.log(` ${Object.keys(parsed).length} profils charges depuis Supabase`);
           await saveToCache(parsed);
         } else {
-          console.log("⚠️ Échec chargement Supabase, fallback sur cache local...");
+          console.log(" Echec chargement Supabase, fallback sur cache local...");
           const saved = await storage.getItem(STORAGE_KEY);
           if (saved) {
             let cacheTimestamp = null;
@@ -57817,10 +57817,10 @@ function App() {
               const now = Date.now();
               const cacheAge = now - cacheTimestamp;
               if (cacheAge > CACHE_MAX_AGE_MS) {
-                console.log(`🔄 Cache obsolète (${Math.round(cacheAge / 1e3 / 60)} min) - Ignoré`);
+                console.log(` Cache obsolete (${Math.round(cacheAge / 1e3 / 60)} min) - Ignore`);
                 parsed = {};
               } else {
-                console.log(`✅ Cache valide (${Math.round(cacheAge / 1e3)}s) - Utilisation cache local`);
+                console.log(` Cache valide (${Math.round(cacheAge / 1e3)}s) - Utilisation cache local`);
               }
             } else if (typeof saved === "string") {
               try {
@@ -57843,7 +57843,7 @@ function App() {
               }
             }
             if (removedMutualFunds.length > 0) {
-              console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement`);
+              console.log(` ${removedMutualFunds.length} fonds mutuel(s) supprime(s) automatiquement`);
               await saveProfiles(cleaned, true);
             }
             if (Object.keys(cleaned).length > 0) {
@@ -57853,14 +57853,14 @@ function App() {
               );
               setActiveId(sortedKeys[0]);
             } else {
-              console.log("📡 Cache vide ou obsolète - Chargement depuis Supabase...");
+              console.log(" Cache vide ou obsolete - Chargement depuis Supabase...");
               setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
               setActiveId(DEFAULT_PROFILE.id);
               hasLoadedTickersRef.current = false;
               supabaseTickersCacheRef.current = null;
             }
           } else {
-            console.log("📡 Aucun cache trouvé - Chargement depuis Supabase...");
+            console.log(" Aucun cache trouve - Chargement depuis Supabase...");
             setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
             setActiveId(DEFAULT_PROFILE.id);
             hasLoadedTickersRef.current = false;
@@ -57869,7 +57869,7 @@ function App() {
         }
       } catch (e) {
         console.warn("Storage access failed", e);
-        console.log("📡 Erreur accès cache - Chargement depuis Supabase...");
+        console.log(" Erreur acces cache - Chargement depuis Supabase...");
         setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
         setActiveId(DEFAULT_PROFILE.id);
         hasLoadedTickersRef.current = false;
@@ -57905,7 +57905,7 @@ function App() {
     };
     const loadTickersFromSupabase = async () => {
       if (isLoadingTickers) {
-        console.log("⏳ Chargement tickers déjà en cours, ignoré");
+        console.log(" Chargement tickers deja en cours, ignore");
         return;
       }
       loadTickersFromSupabaseRef.current = loadTickersFromSupabase;
@@ -57917,53 +57917,53 @@ function App() {
         startTime: Date.now(),
         message: "Chargement de la liste des tickers..."
       });
-      console.log("📡 Début chargement tickers depuis Supabase...");
+      console.log(" Debut chargement tickers depuis Supabase...");
       try {
         const result = await loadAllTickersFromSupabase();
         if (!result.success) {
           const errorMsg = result.error || "Erreur lors du chargement des tickers";
-          console.error("❌ Échec chargement tickers:", errorMsg);
+          console.error(" Echec chargement tickers:", errorMsg);
           setTickersLoadError(errorMsg);
           setIsLoadingTickers(false);
           hasLoadedTickersRef.current = false;
           showNotification(
-            `❌ Impossible de charger les tickers: ${errorMsg}
+            ` Impossible de charger les tickers: ${errorMsg}
 
-Vérifiez votre connexion et réessayez.`,
+Verifiez votre connexion et reessayez.`,
             "error"
           );
           return;
         }
         if (!result.tickers || result.tickers.length === 0) {
-          console.warn("⚠️ Aucun ticker retourné par l'API");
-          setTickersLoadError("Aucun ticker trouvé dans la base de données");
+          console.warn(" Aucun ticker retourne par l'API");
+          setTickersLoadError("Aucun ticker trouve dans la base de donnees");
           setIsLoadingTickers(false);
           hasLoadedTickersRef.current = false;
           showNotification(
-            "⚠️ Aucun ticker trouvé dans la base de données.\n\nVérifiez que des tickers sont actifs dans Supabase.",
+            " Aucun ticker trouve dans la base de donnees.\n\nVerifiez que des tickers sont actifs dans Supabase.",
             "warning"
           );
           return;
         }
-        console.log(`✅ ${result.tickers.length} tickers chargés depuis Supabase`);
+        console.log(` ${result.tickers.length} tickers charges depuis Supabase`);
         try {
           const cleanupResult = await autoCleanupProfiles();
           if (cleanupResult.removed > 0) {
-            console.log(`🧹 Nettoyage automatique: ${cleanupResult.removed} profils obsolètes supprimés de localStorage`);
+            console.log(` Nettoyage automatique: ${cleanupResult.removed} profils obsoletes supprimes de localStorage`);
             const cleaned = await storage.getItem(STORAGE_KEY);
             if (cleaned && typeof cleaned === "object" && "data" in cleaned) {
               setLibrary(cleaned.data || {});
             }
           }
         } catch (cleanupError) {
-          console.warn("⚠️ Erreur lors du nettoyage automatique:", cleanupError);
+          console.warn(" Erreur lors du nettoyage automatique:", cleanupError);
         }
         const validTickers = result.tickers.filter((t) => t.ticker && !isMutualFund(t.ticker, t.company_name));
         setSupabaseProgress({
           current: 0,
           total: validTickers.length,
           startTime: Date.now(),
-          message: `Chargement des données pour ${validTickers.length} ticker(s)...`
+          message: `Chargement des donnees pour ${validTickers.length} ticker(s)...`
         });
         hasLoadedTickersRef.current = true;
         supabaseTickersCacheRef.current = {
@@ -57982,13 +57982,13 @@ Vérifiez votre connexion et réessayez.`,
             if (existingSymbols.has(symbol)) {
               const existingProfile = prev[symbol];
               if (existingProfile._isSkeleton || !existingProfile.data || existingProfile.data.length === 0) {
-                console.log(`🔄 Reloading skeleton/empty profile: ${symbol}`);
+                console.log(` Reloading skeleton/empty profile: ${symbol}`);
                 return true;
               }
               return false;
             }
             if (isMutualFund(symbol, t.company_name)) {
-              console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - exclu du chargement automatique`);
+              console.warn(` ${symbol}: Fonds mutuel detecte - exclu du chargement automatique`);
               return false;
             }
             return true;
@@ -57998,12 +57998,12 @@ Vérifiez votre connexion et réessayez.`,
             const symbol = t.ticker.toUpperCase();
             return (t.source === "team" || t.source === "both") && existingSymbols.has(symbol);
           });
-          console.log(`📊 Team tickers: ${teamTickersInNew.length} nouveaux à créer, ${teamTickersAlreadyInLibrary.length} déjà dans library`);
+          console.log(` Team tickers: ${teamTickersInNew.length} nouveaux a creer, ${teamTickersAlreadyInLibrary.length} deja dans library`);
           if (teamTickersInNew.length > 0) {
-            console.log(`   ➕ Nouveaux:`, teamTickersInNew.map((t) => t.ticker).join(", "));
+            console.log(`    Nouveaux:`, teamTickersInNew.map((t) => t.ticker).join(", "));
           }
           if (teamTickersAlreadyInLibrary.length > 0) {
-            console.log(`   🔄 Déjà dans library (seront mis à jour):`, teamTickersAlreadyInLibrary.map((t) => t.ticker).join(", "));
+            console.log(`    Deja dans library (seront mis a jour):`, teamTickersAlreadyInLibrary.map((t) => t.ticker).join(", "));
           }
           const updated = { ...prev };
           let newTickersCount = 0;
@@ -58028,14 +58028,14 @@ Vérifiez votre connexion et réessayez.`,
               const needsUpdate = updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates;
               const isTeamTicker2 = supabaseTicker.source === "team" || supabaseTicker.source === "both";
               if (isTeamTicker2 && needsUpdate) {
-                console.log(`   🔄 Mise à jour team ticker existant: ${tickerSymbol} (isWatchlist: ${updated[tickerSymbol].isWatchlist} → ${shouldBeWatchlist})`);
+                console.log(`    Mise a jour team ticker existant: ${tickerSymbol} (isWatchlist: ${updated[tickerSymbol].isWatchlist} -> ${shouldBeWatchlist})`);
               }
               if (needsUpdate) {
                 updated[tickerSymbol] = {
                   ...updated[tickerSymbol],
                   isWatchlist: shouldBeWatchlist,
-                  // ✅ FORCER mise à jour depuis Supabase
-                  // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
+                  //  FORCER mise a jour depuis Supabase
+                  //  MULTI-UTILISATEUR : Supabase est la source de verite pour les metriques ValueLine
                   // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                   info: {
                     ...updated[tickerSymbol].info,
@@ -58069,16 +58069,16 @@ Vérifiez votre connexion et réessayez.`,
               id: tickerSymbol,
               lastModified: Date.now(),
               data: [],
-              // Données vides pour l'instant
+              // Donnees vides pour l'instant
               assumptions: {
-                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
+                //  Seulement les champs requis, pas de valeurs inventees (0)
                 currentPrice: 0,
-                // Sera mis à jour lors du chargement FMP
+                // Sera mis a jour lors du chargement FMP
                 currentDividend: 0,
                 baseYear: (/* @__PURE__ */ new Date()).getFullYear(),
                 requiredReturn: 10,
-                // Valeur par défaut raisonnable
-                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                // Valeur par defaut raisonnable
+                //  Tous les autres champs sont undefined (pas 0) pour eviter les valeurs inventees
                 growthRateEPS: void 0,
                 growthRateSales: void 0,
                 growthRateCF: void 0,
@@ -58112,16 +58112,16 @@ Vérifiez votre connexion et réessayez.`,
               // Flag pour indiquer que c'est un profil incomplet
             };
             if (isTeamTicker) {
-              console.log(`   ⭐ Création profil squelette team ticker: ${tickerSymbol} (source: ${supabaseTicker.source}, isWatchlist: ${isWatchlist2})`);
+              console.log(`    Creation profil squelette team ticker: ${tickerSymbol} (source: ${supabaseTicker.source}, isWatchlist: ${isWatchlist2})`);
             }
             newTickersCount++;
           });
           saveProfiles(updated, false).catch((e) => console.warn("Failed to save profiles:", e));
           if (newTickersCount > 0) {
-            console.log(`✅ ${newTickersCount} nouveaux profils squelettes créés depuis Supabase`);
-            console.log(`📊 Library après migration: ${Object.keys(updated).length} profils (dont ${Object.keys(updated).filter((k2) => k2 !== DEFAULT_PROFILE.id).length} réels)`);
+            console.log(` ${newTickersCount} nouveaux profils squelettes crees depuis Supabase`);
+            console.log(` Library apres migration: ${Object.keys(updated).length} profils (dont ${Object.keys(updated).filter((k2) => k2 !== DEFAULT_PROFILE.id).length} reels)`);
           } else {
-            console.log(`ℹ️ Aucun nouveau ticker - ${Object.keys(updated).length} profils déjà dans library`);
+            console.log(`i Aucun nouveau ticker - ${Object.keys(updated).length} profils deja dans library`);
           }
           const portfolioCount = Object.values(updated).filter((p) => p.isWatchlist === false).length;
           const watchlistCount = Object.values(updated).filter((p) => p.isWatchlist === true).length;
@@ -58139,17 +58139,17 @@ Vérifiez votre connexion et réessayez.`,
             return !updated[symbol] || updated[symbol].isWatchlist !== false;
           });
           if (migrationCount > 0) {
-            console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+            console.log(` Migration: ${migrationCount} profil(s) mis a jour avec isWatchlist depuis Supabase`);
           }
           if (teamTickersInSupabaseAfter.length !== teamTickersInLibraryAfter.length) {
-            console.warn(`⚠️ ${teamTickersInSupabaseAfter.length} team tickers dans Supabase, mais seulement ${teamTickersInLibraryAfter.length} avec ⭐ dans library`);
+            console.warn(` ${teamTickersInSupabaseAfter.length} team tickers dans Supabase, mais seulement ${teamTickersInLibraryAfter.length} avec  dans library`);
             if (missingTeamTickersAfter.length > 0) {
-              console.warn(`   📋 ${missingTeamTickersAfter.length} team ticker(s) manquant(s) ou incorrect(s):`, missingTeamTickersAfter.map((t) => `${t.ticker} (source: ${t.source})`).join(", "));
+              console.warn(`    ${missingTeamTickersAfter.length} team ticker(s) manquant(s) ou incorrect(s):`, missingTeamTickersAfter.map((t) => `${t.ticker} (source: ${t.source})`).join(", "));
             }
           } else {
-            console.log(`✅ Tous les ${teamTickersInSupabaseAfter.length} team tickers ont ⭐ (isWatchlist=false)`);
+            console.log(` Tous les ${teamTickersInSupabaseAfter.length} team tickers ont  (isWatchlist=false)`);
           }
-          console.log(`📊 Après migration - Portefeuille (⭐): ${portfolioCount}, Watchlist (👁️): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
+          console.log(` Apres migration - Portefeuille (): ${portfolioCount}, Watchlist (): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
           const teamTickersInSupabase = result.tickers.filter((t) => {
             const mapped = mapSourceToIsWatchlist(t.source);
             return mapped === false;
@@ -58167,16 +58167,16 @@ Vérifiez votre connexion et réessayez.`,
             return updated[symbol] && updated[symbol].isWatchlist !== false;
           });
           if (teamTickersInSupabase.length !== teamTickersInLibrary.length) {
-            console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
+            console.warn(` ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
             if (missingTickers.length > 0) {
-              console.warn(`   📋 ${missingTickers.length} ticker(s) non chargé(s) depuis FMP:`, missingTickers.map((t) => t.ticker).join(", "));
+              console.warn(`    ${missingTickers.length} ticker(s) non charge(s) depuis FMP:`, missingTickers.map((t) => t.ticker).join(", "));
             }
             if (incorrectTickers.length > 0) {
-              console.warn(`   ❌ ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map((t) => t.ticker).join(", "));
+              console.warn(`    ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map((t) => t.ticker).join(", "));
             }
-            console.log(`   ✅ ${teamTickersInLibrary.length} ticker(s) correctement configuré(s) dans localStorage`);
+            console.log(`    ${teamTickersInLibrary.length} ticker(s) correctement configure(s) dans localStorage`);
           } else {
-            console.log(`✅ Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
+            console.log(` Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
           }
           return updated;
         });
@@ -58188,13 +58188,13 @@ Vérifiez votre connexion et réessayez.`,
               return p._isSkeleton === true;
             }).map(([symbol]) => symbol);
             if (skeletonTickers.length > 0) {
-              console.log(`🔄 Trouvé ${skeletonTickers.length} squelettes à charger après migration`);
+              console.log(` Trouve ${skeletonTickers.length} squelettes a charger apres migration`);
               const tickersToLoad = result.tickers.filter((t) => {
                 const symbol = t.ticker.toUpperCase();
                 return skeletonTickers.includes(symbol) && !isMutualFund(symbol, t.company_name);
               });
               if (tickersToLoad.length > 0) {
-                console.log(`🚀 Démarrage du chargement pour ${tickersToLoad.length} squelettes`);
+                console.log(` Demarrage du chargement pour ${tickersToLoad.length} squelettes`);
                 const loadSkeletonsInBackground = async () => {
                   const batchSize = 10;
                   const delayBetweenBatches = 1e3;
@@ -58202,7 +58202,7 @@ Vérifiez votre connexion et réessayez.`,
                     const batch = tickersToLoad.slice(i, i + batchSize);
                     const batchNum = Math.floor(i / batchSize) + 1;
                     const totalBatches = Math.ceil(tickersToLoad.length / batchSize);
-                    console.log(`📥 Chargement squelettes batch ${batchNum}/${totalBatches}...`);
+                    console.log(` Chargement squelettes batch ${batchNum}/${totalBatches}...`);
                     const tickerSymbols = batch.map((t) => t.ticker.toUpperCase());
                     const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
                     for (const supabaseTicker of batch) {
@@ -58243,7 +58243,7 @@ Vérifiez votre connexion et réessayez.`,
                             });
                           }
                         } catch (e) {
-                          console.warn(`❌ FMP fetch failed for ${symbol}:`, e);
+                          console.warn(` FMP fetch failed for ${symbol}:`, e);
                         }
                       }
                     }
@@ -58251,7 +58251,7 @@ Vérifiez votre connexion et réessayez.`,
                       await new Promise((resolve) => setTimeout(resolve, delayBetweenBatches));
                     }
                   }
-                  console.log(`✅ Chargement squelettes terminé`);
+                  console.log(` Chargement squelettes termine`);
                 };
                 loadSkeletonsInBackground().catch((e) => console.error("Erreur chargement squelettes:", e));
               }
@@ -58263,13 +58263,13 @@ Vérifiez votre connexion et réessayez.`,
           const validTickers2 = newTickers.filter((t) => {
             const symbol = t.ticker.toUpperCase();
             if (isMutualFund(symbol, t.company_name)) {
-              console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé (exclu automatiquement)`);
+              console.warn(` ${symbol}: Fonds mutuel detecte - profil NON cree (exclu automatiquement)`);
               return false;
             }
             return true;
           });
           if (validTickers2.length === 0) {
-            console.log("✅ Aucun ticker valide après filtrage des fonds mutuels");
+            console.log(" Aucun ticker valide apres filtrage des fonds mutuels");
             setIsLoadingTickers(false);
             return;
           }
@@ -58281,14 +58281,14 @@ Vérifiez votre connexion et réessayez.`,
               id: symbol,
               lastModified: Date.now(),
               data: [],
-              // Données vides pour l'instant
+              // Donnees vides pour l'instant
               assumptions: {
-                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
+                //  Seulement les champs requis, pas de valeurs inventees (0)
                 currentPrice: 0,
                 currentDividend: 0,
                 baseYear: (/* @__PURE__ */ new Date()).getFullYear(),
                 requiredReturn: 10,
-                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                //  Tous les autres champs sont undefined (pas 0) pour eviter les valeurs inventees
                 growthRateEPS: void 0,
                 growthRateSales: void 0,
                 growthRateCF: void 0,
@@ -58324,16 +58324,16 @@ Vérifiez votre connexion et réessayez.`,
           });
           setLibrary((prev) => {
             const updated = { ...prev, ...skeletonProfiles };
-            console.log(`📊 ${Object.keys(skeletonProfiles).length} profils squelettes ajoutés à library (total: ${Object.keys(updated).length})`);
+            console.log(` ${Object.keys(skeletonProfiles).length} profils squelettes ajoutes a library (total: ${Object.keys(updated).length})`);
             saveProfiles(updated, false).catch((e) => console.warn("Failed to save profiles:", e));
             return updated;
           });
           setIsLoadingTickers(false);
-          console.log(`✅ ${validTickers2.length} profils squelettes créés - affichage immédiat`);
+          console.log(` ${validTickers2.length} profils squelettes crees - affichage immediat`);
           const loadFMPDataInBackground = async () => {
             const batchSize = 50;
             const delayBetweenBatches = 200;
-            console.log(`🚀 Démarrage du chargement optimisé pour ${validTickers2.length} tickers (Batch: ${batchSize})`);
+            console.log(` Demarrage du chargement optimise pour ${validTickers2.length} tickers (Batch: ${batchSize})`);
             let processedCount = 0;
             for (let i = 0; i < validTickers2.length; i += batchSize) {
               const batch = validTickers2.slice(i, i + batchSize);
@@ -58343,7 +58343,7 @@ Vérifiez votre connexion et réessayez.`,
               const tickerSymbols = batch.map((t) => t.ticker.toUpperCase());
               const batchNumber = Math.floor(i / batchSize) + 1;
               const totalBatches = Math.ceil(validTickers2.length / batchSize);
-              console.log(`📥 Chargement batch ${batchNumber}/${totalBatches}: ${tickerSymbols.length} tickers...`);
+              console.log(` Chargement batch ${batchNumber}/${totalBatches}: ${tickerSymbols.length} tickers...`);
               setSupabaseProgress((prev) => ({
                 ...prev,
                 message: `Chargement batch ${batchNumber}/${totalBatches}...`
@@ -58355,7 +58355,7 @@ Vérifiez votre connexion et réessayez.`,
                   const symbol = supabaseTicker.ticker.toUpperCase();
                   if (!symbol || symbol.trim() === "") return;
                   const markAsInvalid = (reason) => {
-                    console.warn(`❌ ${symbol}: ${reason} - Marking as invalid/loaded`);
+                    console.warn(` ${symbol}: ${reason} - Marking as invalid/loaded`);
                     setLibrary((prev) => {
                       var _a3, _b2;
                       return {
@@ -58393,7 +58393,7 @@ Vérifiez votre connexion et réessayez.`,
                       source: "supabase"
                     };
                     if (!result2.data || result2.data.length === 0) {
-                      markAsInvalid("Données vides après chargement");
+                      markAsInvalid("Donnees vides apres chargement");
                       return;
                     }
                     if (!result2.currentPrice || result2.currentPrice <= 0) {
@@ -58404,7 +58404,7 @@ Vérifiez votre connexion et réessayez.`,
                       (d) => d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
                     );
                     if (!hasValidData) {
-                      markAsInvalid("Aucune année avec données suffisantes (EPS/CF/BV > 0)");
+                      markAsInvalid("Aucune annee avec donnees suffisantes (EPS/CF/BV > 0)");
                       return;
                     }
                     const isWatchlist2 = mapSourceToIsWatchlist(supabaseTicker.source);
@@ -58421,12 +58421,12 @@ Vérifiez votre connexion et réessayez.`,
                         result2.currentPrice,
                         INITIAL_ASSUMPTIONS,
                         result2.currentDividend
-                        // ✅ NOUVEAU: Dividende actuel depuis l'API
+                        //  NOUVEAU: Dividende actuel depuis l'API
                       );
                     }
                     const outlierDetection = detectOutlierMetrics(result2.data, baseAssumptions);
                     if (outlierDetection.detectedOutliers.length > 0) {
-                      console.log(`⚠️ ${symbol}: Métriques aberrantes auto-exclues: ${outlierDetection.detectedOutliers.join(", ")}`);
+                      console.log(` ${symbol}: Metriques aberrantes auto-exclues: ${outlierDetection.detectedOutliers.join(", ")}`);
                     }
                     const finalAssumptions = {
                       ...baseAssumptions,
@@ -58470,7 +58470,7 @@ Vérifiez votre connexion et réessayez.`,
                       saveProfiles(updated, false).catch((e) => console.warn("Failed to save profiles:", e));
                       return updated;
                     });
-                    console.log(`✅ ${symbol}: Profil mis à jour depuis ${result2.source === "supabase" ? "Supabase" : "FMP"}`);
+                    console.log(` ${symbol}: Profil mis a jour depuis ${result2.source === "supabase" ? "Supabase" : "FMP"}`);
                     processedCount++;
                     setSupabaseProgress((prev) => ({
                       ...prev,
@@ -58478,7 +58478,7 @@ Vérifiez votre connexion et réessayez.`,
                       message: `Chargement ${processedCount}/${prev.total} ticker(s)...`
                     }));
                   } catch (error) {
-                    console.error(`❌ ${symbol}: Erreur chargement données:`, error);
+                    console.error(` ${symbol}: Erreur chargement donnees:`, error);
                     processedCount++;
                     setSupabaseProgress((prev) => ({
                       ...prev,
@@ -58491,7 +58491,7 @@ Vérifiez votre connexion et réessayez.`,
             setSupabaseProgress((prev) => ({
               ...prev,
               current: prev.total,
-              message: "Chargement terminé"
+              message: "Chargement termine"
             }));
             setTimeout(() => {
               setSupabaseProgress({
@@ -58503,7 +58503,7 @@ Vérifiez votre connexion et réessayez.`,
             }, 2e3);
           };
           setTimeout(() => {
-            console.log("⏰ Démarrage du chargement de données après délai...");
+            console.log(" Demarrage du chargement de donnees apres delai...");
             loadFMPDataInBackground();
           }, 500);
         } else {
@@ -58516,7 +58516,7 @@ Vérifiez votre connexion et réessayez.`,
           });
         }
       } catch (error) {
-        console.error("❌ Erreur lors du chargement des tickers:", error);
+        console.error(" Erreur lors du chargement des tickers:", error);
         setTickersLoadError(error.message || "Erreur inconnue");
         hasLoadedTickersRef.current = false;
         setSupabaseProgress({
@@ -58533,7 +58533,7 @@ Vérifiez votre connexion et réessayez.`,
     loadTickersFromSupabase();
     const syncIntervalId = setInterval(() => {
       if (!isLoadingTickers && hasLoadedTickersRef.current) {
-        console.log("🔄 Synchronisation périodique avec Supabase pour cohérence multi-utilisateurs...");
+        console.log(" Synchronisation periodique avec Supabase pour coherence multi-utilisateurs...");
         hasLoadedTickersRef.current = false;
         supabaseTickersCacheRef.current = null;
         loadTickersFromSupabase();
@@ -58590,7 +58590,7 @@ Vérifiez votre connexion et réessayez.`,
       })();
     }
     if (activeId2 && profile2 && (profile2._isSkeleton || !profile2.data || profile2.data.length === 0)) {
-      console.log(`🚀 Chargement PRIORITAIRE pour le profil actif: ${activeId2}`);
+      console.log(` Chargement PRIORITAIRE pour le profil actif: ${activeId2}`);
       const timeoutId = setTimeout(() => {
         const currentProfile = library[activeId2];
         if (currentProfile && (currentProfile._isSkeleton || !currentProfile.data || currentProfile.data.length === 0)) {
@@ -58708,7 +58708,7 @@ Vérifiez votre connexion et réessayez.`,
         const hasValidInfo = info && info.symbol && info.name;
         const hasValidAssumptions = assumptions && typeof assumptions === "object";
         if (hasValidData && hasValidInfo && hasValidAssumptions) {
-          console.log("💾 Saving current version before sync...");
+          console.log(" Saving current version before sync...");
           const saveResult = await saveSnapshot(
             activeId2,
             data,
@@ -58724,7 +58724,7 @@ Vérifiez votre connexion et réessayez.`,
             console.warn("Backup save warning:", saveResult.error);
           }
         } else {
-          console.log("⚠️ Skipping backup save: Incomplete data state", { hasValidData, hasValidInfo, hasValidAssumptions });
+          console.log(" Skipping backup save: Incomplete data state", { hasValidData, hasValidInfo, hasValidAssumptions });
         }
       }
       const result = await fetchCompanyData(activeId2);
@@ -58741,7 +58741,7 @@ Vérifiez votre connexion et réessayez.`,
                 ...newRow,
                 autoFetched: true,
                 dataSource: "fmp-verified"
-                // ✅ Nouvelle année directement de FMP = vérifiée
+                //  Nouvelle annee directement de FMP = verifiee
               });
             }
           });
@@ -58756,7 +58756,7 @@ Vérifiez votre connexion et réessayez.`,
                 ...newRow,
                 autoFetched: true,
                 dataSource: "fmp-verified"
-                // ✅ Force replace = données FMP vérifiées
+                //  Force replace = donnees FMP verifiees
               };
             }
             if (syncOptions == null ? void 0 : syncOptions.syncOnlyMissingMetrics) {
@@ -58815,7 +58815,7 @@ Vérifiez votre connexion et réessayez.`,
               priceLow: newRowTyped.priceLow > 0 ? newRowTyped.priceLow : existingRow.priceLow,
               autoFetched: true,
               dataSource: finalDataSource
-              // ✅ Préserve 'fmp-verified' si les données n'ont pas été modifiées
+              //  Preserve 'fmp-verified' si les donnees n'ont pas ete modifiees
             };
           });
           result.data.forEach((newRow) => {
@@ -58825,13 +58825,13 @@ Vérifiez votre connexion et réessayez.`,
                 ...newRow,
                 autoFetched: true,
                 dataSource: "fmp-verified"
-                // ✅ Nouvelle année directement de FMP = vérifiée
+                //  Nouvelle annee directement de FMP = verifiee
               });
             }
           });
         }
         mergedData.sort((a2, b) => a2.year - b.year);
-        console.log("✅ performSync: Données mergées prêtes", {
+        console.log(" performSync: Donnees mergees pretes", {
           mergedDataLength: mergedData.length,
           mergedDataYears: mergedData.map((d) => d.year),
           lastYearEPS: (_a3 = mergedData[mergedData.length - 1]) == null ? void 0 : _a3.earningsPerShare,
@@ -58846,7 +58846,7 @@ Vérifiez votre connexion et réessayez.`,
         });
         setData(mergedData);
       } else {
-        console.warn("⚠️ performSync: Aucune donnée dans result.data", {
+        console.warn(" performSync: Aucune donnee dans result.data", {
           resultDataLength: result.data.length,
           currentDataLength: data.length
         });
@@ -58873,12 +58873,12 @@ Vérifiez votre connexion et réessayez.`,
             }
           }
         } catch (error) {
-          console.warn("⚠️ Impossible de recharger les métriques ValueLine depuis Supabase lors de la sync FMP:", error);
+          console.warn(" Impossible de recharger les metriques ValueLine depuis Supabase lors de la sync FMP:", error);
         }
         const updatedInfo = {
           ...result.info,
           ...preservedValueLineMetrics
-          // Préserver les métriques ValueLine
+          // Preserver les metriques ValueLine
         };
         const completeInfo = {
           symbol: updatedInfo.symbol || activeId2,
@@ -58909,14 +58909,14 @@ Vérifiez votre connexion et réessayez.`,
       const existingAssumptionsForCalc = (syncOptions == null ? void 0 : syncOptions.replaceOrangeData) ? void 0 : assumptions;
       const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
         mergedDataForCalc,
-        // Utiliser les données mergées au lieu de result.data
+        // Utiliser les donnees mergees au lieu de result.data
         result.currentPrice,
         existingAssumptionsForCalc,
-        // Préserver les valeurs existantes seulement si replaceOrangeData est false
+        // Preserver les valeurs existantes seulement si replaceOrangeData est false
         result.currentDividend
-        // ✅ NOUVEAU: Dividende actuel depuis l'API
+        //  NOUVEAU: Dividende actuel depuis l'API
       );
-      console.log("✅ Auto-filled assumptions in performSync (AVANT setAssumptions):", {
+      console.log(" Auto-filled assumptions in performSync (AVANT setAssumptions):", {
         growthEPS: autoFilledAssumptions.growthRateEPS,
         growthCF: autoFilledAssumptions.growthRateCF,
         growthBV: autoFilledAssumptions.growthRateBV,
@@ -58943,14 +58943,14 @@ Vérifiez votre connexion et réessayez.`,
         const updated = {
           ...prev,
           ...autoFilledAssumptions,
-          // Mettre à jour avec les nouvelles valeurs calculées
-          // Préserver les exclusions si l'option est activée
+          // Mettre a jour avec les nouvelles valeurs calculees
+          // Preserver les exclusions si l'option est activee
           excludeEPS: (syncOptions == null ? void 0 : syncOptions.preserveExclusions) !== false ? prev.excludeEPS || outlierDetection2.excludeEPS : outlierDetection2.excludeEPS,
           excludeCF: (syncOptions == null ? void 0 : syncOptions.preserveExclusions) !== false ? prev.excludeCF || outlierDetection2.excludeCF : outlierDetection2.excludeCF,
           excludeBV: (syncOptions == null ? void 0 : syncOptions.preserveExclusions) !== false ? prev.excludeBV || outlierDetection2.excludeBV : outlierDetection2.excludeBV,
           excludeDIV: (syncOptions == null ? void 0 : syncOptions.preserveExclusions) !== false ? prev.excludeDIV || outlierDetection2.excludeDIV : outlierDetection2.excludeDIV
         };
-        console.log("✅ setAssumptions: Assumptions mises à jour", {
+        console.log(" setAssumptions: Assumptions mises a jour", {
           prevGrowthEPS: prev.growthRateEPS,
           newGrowthEPS: updated.growthRateEPS,
           prevTargetPE: prev.targetPE,
@@ -58963,13 +58963,13 @@ Vérifiez votre connexion et réessayez.`,
       const finalAssumptions = {
         ...assumptions,
         ...autoFilledAssumptions
-        // Les valeurs auto-remplies prennent priorité
+        // Les valeurs auto-remplies prennent priorite
       };
       const outlierDetection = detectOutlierMetrics(finalData, finalAssumptions);
       if (outlierDetection.detectedOutliers.length > 0) {
-        console.log(`⚠️ Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(", ")}`);
+        console.log(` Metriques avec prix cibles aberrants detectees: ${outlierDetection.detectedOutliers.join(", ")}`);
         showNotification(
-          `Métriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(", ")}`,
+          `Metriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(", ")}`,
           "warning"
         );
       }
@@ -58981,7 +58981,7 @@ Vérifiez votre connexion et réessayez.`,
         excludeDIV: outlierDetection.excludeDIV
       };
       setAssumptions(assumptionsWithOutlierExclusions);
-      console.log("💾 Auto-saving snapshot after API sync...");
+      console.log(" Auto-saving snapshot after API sync...");
       const syncStartTime = Date.now();
       const syncMetadata = {
         timestamp: (/* @__PURE__ */ new Date()).toISOString(),
@@ -59030,7 +59030,7 @@ Vérifiez votre connexion et réessayez.`,
         activeId2,
         finalData,
         assumptionsWithOutlierExclusions,
-        // setAssumptions a déjà sanitisé, saveSnapshot sanitisera aussi
+        // setAssumptions a deja sanitise, saveSnapshot sanitisera aussi
         info,
         `API sync - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
         true,
@@ -59042,9 +59042,9 @@ Vérifiez votre connexion et réessayez.`,
         2,
         // maxRetries
         syncMetadata
-        // Métadonnées de synchronisation
+        // Metadonnees de synchronisation
       );
-      showNotification(`Données synchronisées avec succès pour ${activeId2}`, "success");
+      showNotification(`Donnees synchronisees avec succes pour ${activeId2}`, "success");
     } catch (e) {
       const error = e;
       let errorMessage = error.message;
@@ -59052,29 +59052,29 @@ Vérifiez votre connexion et réessayez.`,
         errorMessage = `Symbole '${activeId2}' introuvable dans FMP.
 
 Causes possibles:
-• Le symbole n'existe pas ou est mal orthographié
-• Le symbole nécessite un format différent (ex: BRK-B au lieu de BRK.B)
-• La clé API FMP n'est pas configurée ou invalide
-• Le ticker n'est pas disponible dans FMP (essayez un autre fournisseur)
+- Le symbole n'existe pas ou est mal orthographie
+- Le symbole necessite un format different (ex: BRK-B au lieu de BRK.B)
+- La cle API FMP n'est pas configuree ou invalide
+- Le ticker n'est pas disponible dans FMP (essayez un autre fournisseur)
 
-Vérifiez les logs de la console pour plus de détails.`;
+Verifiez les logs de la console pour plus de details.`;
       } else if (errorMessage.includes("API key") || errorMessage.includes("Invalid API")) {
-        errorMessage = `Erreur de clé API FMP.
+        errorMessage = `Erreur de cle API FMP.
 
-La clé API FMP semble invalide ou non configurée.
-Vérifiez FMP_API_KEY dans les variables d'environnement Vercel.`;
+La cle API FMP semble invalide ou non configuree.
+Verifiez FMP_API_KEY dans les variables d'environnement Vercel.`;
       } else if (errorMessage.includes("empty") || errorMessage.includes("vide")) {
-        errorMessage = `Aucune donnée retournée pour '${activeId2}'.
+        errorMessage = `Aucune donnee retournee pour '${activeId2}'.
 
-FMP a retourné un tableau vide. Cela peut signifier:
-• Le ticker existe mais n'a pas de données historiques disponibles
-• Le ticker nécessite un abonnement FMP premium
-• Le symbole doit être formaté différemment
+FMP a retourne un tableau vide. Cela peut signifier:
+- Le ticker existe mais n'a pas de donnees historiques disponibles
+- Le ticker necessite un abonnement FMP premium
+- Le symbole doit etre formate differemment
 
-Vérifiez les logs de la console pour plus de détails.`;
+Verifiez les logs de la console pour plus de details.`;
       }
-      console.error("❌ Erreur synchronisation:", error);
-      showNotification(`Erreur lors de la récupération des données : ${errorMessage}`, "error");
+      console.error(" Erreur synchronisation:", error);
+      showNotification(`Erreur lors de la recuperation des donnees : ${errorMessage}`, "error");
     } finally {
       setIsLoading(false);
       setCurrentSyncingTicker(void 0);
@@ -59082,7 +59082,7 @@ Vérifiez les logs de la console pour plus de détails.`;
   };
   const handleUpdateRow = (index2, field, value) => {
     if (isReadOnly) {
-      showNotification("Cette version est en lecture seule. Déverrouillez-la pour la modifier.", "warning");
+      showNotification("Cette version est en lecture seule. Deverrouillez-la pour la modifier.", "warning");
       return;
     }
     setPastData((prev) => [...prev, data]);
@@ -59098,7 +59098,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     const valueLineFields = ["securityRank", "earningsPredictability", "priceGrowthPersistence", "priceStability"];
     if (valueLineFields.includes(key)) {
       showNotification(
-        "⚠️ Les métriques ValueLine ne peuvent pas être modifiées localement.\nElles sont synchronisées depuis Supabase pour tous les utilisateurs.\nPour modifier ces valeurs, utilisez l'interface d'administration Supabase.",
+        " Les metriques ValueLine ne peuvent pas etre modifiees localement.\nElles sont synchronisees depuis Supabase pour tous les utilisateurs.\nPour modifier ces valeurs, utilisez l'interface d'administration Supabase.",
         "warning"
       );
       return;
@@ -59109,15 +59109,15 @@ Vérifiez les logs de la console pour plus de détails.`;
     setIsSearchOpen(true);
   };
   const handleLoadSnapshot = async (snapshotId) => {
-    console.log(`🔄 Attempting to load snapshot: ${snapshotId}`);
+    console.log(` Attempting to load snapshot: ${snapshotId}`);
     const result = await loadSnapshot(snapshotId);
     if (!result.success) {
-      console.error(`❌ Load failed: ${result.error}`);
+      console.error(` Load failed: ${result.error}`);
       showNotification(`Erreur chargement: ${result.error}`, "error");
       return;
     }
     const snapshot = result.snapshot;
-    console.log("✅ Snapshot loaded:", snapshot);
+    console.log(" Snapshot loaded:", snapshot);
     setCurrentSnapshot({
       id: snapshot.id,
       date: snapshot.snapshot_date,
@@ -59128,7 +59128,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     setData(snapshot.annual_data);
     setAssumptions(snapshot.assumptions);
     setInfo(snapshot.company_info);
-    console.log(`📜 Loaded snapshot v${snapshot.version} from ${snapshot.snapshot_date}`);
+    console.log(` Loaded snapshot v${snapshot.version} from ${snapshot.snapshot_date}`);
   };
   const handleRevertToCurrent = async () => {
     const result = await listSnapshots(activeId2, 100);
@@ -59137,14 +59137,14 @@ Vérifiez les logs de la console pour plus de détails.`;
       if (currentSnap) {
         await handleLoadSnapshot(currentSnap.id);
       } else {
-        showNotification("Aucune version actuelle trouvée", "warning");
+        showNotification("Aucune version actuelle trouvee", "warning");
       }
     }
     setCurrentSnapshot(null);
     setIsReadOnly(false);
   };
   const handleUnlockVersion = () => {
-    if (!confirm("Déverrouiller cette version pour modification?\n\nLes changements seront enregistrés sur cette ancienne version.")) {
+    if (!confirm("Deverrouiller cette version pour modification?\n\nLes changements seront enregistres sur cette ancienne version.")) {
       return;
     }
     setIsReadOnly(false);
@@ -59156,9 +59156,9 @@ Vérifiez les logs de la console pour plus de détails.`;
         const currentSnap = result.snapshots.find((s2) => s2.is_current) || result.snapshots[0];
         if (currentSnap) {
           await handleLoadSnapshot(currentSnap.id);
-          showNotification("Données restaurées depuis la dernière sauvegarde", "success");
+          showNotification("Donnees restaurees depuis la derniere sauvegarde", "success");
         } else {
-          showNotification("Aucune sauvegarde trouvée", "warning");
+          showNotification("Aucune sauvegarde trouvee", "warning");
         }
       } else {
         showNotification("Aucune sauvegarde disponible", "warning");
@@ -59170,10 +59170,10 @@ Vérifiez les logs de la console pour plus de détails.`;
   };
   const handleRecalculateFromFMP = async () => {
     try {
-      showNotification(`Recalcul des données depuis FMP pour ${activeId2}...`, "info");
+      showNotification(`Recalcul des donnees depuis FMP pour ${activeId2}...`, "info");
       const result = await fetchCompanyData(activeId2);
       if (!result.data || result.data.length === 0) {
-        throw new Error(`Aucune donnée FMP retournée pour ${activeId2}`);
+        throw new Error(`Aucune donnee FMP retournee pour ${activeId2}`);
       }
       if (!result.currentPrice || result.currentPrice <= 0) {
         throw new Error(`Prix actuel invalide (${result.currentPrice}) pour ${activeId2}`);
@@ -59183,9 +59183,9 @@ Vérifiez les logs de la console pour plus de détails.`;
       );
       if (!hasValidData) {
         if (isMutualFund(activeId2, result.info.name)) {
-          throw new Error(`${activeId2} est un fonds mutuel et ne peut pas être analysé avec les ratios d'entreprise`);
+          throw new Error(`${activeId2} est un fonds mutuel et ne peut pas etre analyse avec les ratios d'entreprise`);
         }
-        throw new Error(`Aucune donnée financière valide pour ${activeId2}`);
+        throw new Error(`Aucune donnee financiere valide pour ${activeId2}`);
       }
       const existingProfile = library[activeId2];
       const existingData = (existingProfile == null ? void 0 : existingProfile.data) || data;
@@ -59215,12 +59215,12 @@ Vérifiez les logs de la console pour plus de détails.`;
       mergedData.sort((a2, b) => a2.year - b.year);
       const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
         mergedData,
-        // Utiliser les données mergées au lieu de result.data
+        // Utiliser les donnees mergees au lieu de result.data
         result.currentPrice,
         assumptions,
-        // Préserver les exclusions existantes
+        // Preserver les exclusions existantes
         result.currentDividend
-        // ✅ NOUVEAU: Dividende actuel depuis l'API
+        //  NOUVEAU: Dividende actuel depuis l'API
       );
       const tempAssumptions = {
         ...assumptions,
@@ -59228,9 +59228,9 @@ Vérifiez les logs de la console pour plus de détails.`;
       };
       const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
       if (outlierDetection.detectedOutliers.length > 0) {
-        console.log(`⚠️ Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(", ")}`);
+        console.log(` Metriques avec prix cibles aberrants detectees: ${outlierDetection.detectedOutliers.join(", ")}`);
         showNotification(
-          `Métriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(", ")}`,
+          `Metriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(", ")}`,
           "warning"
         );
       }
@@ -59246,7 +59246,7 @@ Vérifiez les logs de la console pour plus de détails.`;
       setInfo((prev) => ({
         ...prev,
         ...result.info,
-        // Préserver les métriques ValueLine
+        // Preserver les metriques ValueLine
         securityRank: prev.securityRank || result.info.securityRank || "N/A",
         earningsPredictability: prev.earningsPredictability || result.info.earningsPredictability,
         priceGrowthPersistence: prev.priceGrowthPersistence || result.info.priceGrowthPersistence,
@@ -59260,7 +59260,7 @@ Vérifiez les logs de la console pour plus de détails.`;
           [activeId2]: {
             ...profile2,
             data: mergedData,
-            // Utiliser les données mergées au lieu de result.data
+            // Utiliser les donnees mergees au lieu de result.data
             assumptions: finalAssumptions,
             // Inclure les exclusions automatiques
             info: {
@@ -59277,11 +59277,11 @@ Vérifiez les logs de la console pour plus de détails.`;
       });
       setCurrentSnapshot(null);
       setIsReadOnly(false);
-      showNotification(`✅ Données recalculées depuis FMP avec succès pour ${activeId2}`, "success");
-      console.log(`✅ ${activeId2}: Données recalculées depuis FMP`);
+      showNotification(` Donnees recalculees depuis FMP avec succes pour ${activeId2}`, "success");
+      console.log(` ${activeId2}: Donnees recalculees depuis FMP`);
     } catch (error) {
-      console.error(`❌ ${activeId2}: Erreur lors du recalcul FMP:`, error);
-      showNotification(`❌ Erreur: ${error.message}`, "error");
+      console.error(` ${activeId2}: Erreur lors du recalcul FMP:`, error);
+      showNotification(` Erreur: ${error.message}`, "error");
     }
   };
   const handleManualSave = async () => {
@@ -59300,7 +59300,7 @@ Vérifiez les logs de la console pour plus de détails.`;
       // Not auto-fetched (user might have edited)
     );
     if (result.success) {
-      showNotification("Version sauvegardée avec succès!", "success");
+      showNotification("Version sauvegardee avec succes!", "success");
       if (result.snapshot) {
         setCurrentSnapshot({
           id: result.snapshot.id,
@@ -59334,7 +59334,7 @@ Vérifiez les logs de la console pour plus de détails.`;
       // Not auto-fetched
     );
     if (result.success) {
-      showNotification("Nouvelle version sauvegardée!", "success");
+      showNotification("Nouvelle version sauvegardee!", "success");
       setCurrentSnapshot(null);
       setIsReadOnly(false);
     } else {
@@ -59359,10 +59359,10 @@ Vérifiez les logs de la console pour plus de détails.`;
       const hasCorruptedDataValue = hasCorruptedData(existingProfile.data || []);
       if (isSkeleton || hasNoData || hasNoPrice || hasCorruptedDataValue) {
         if (hasCorruptedDataValue) {
-          console.warn(`⚠️ ${upperSymbol}: Données corrompues détectées (toutes les valeurs à 0) - Re-synchronisation forcée...`);
-          showNotification(`⚠️ ${upperSymbol}: Données corrompues détectées. Re-synchronisation en cours...`, "warning");
+          console.warn(` ${upperSymbol}: Donnees corrompues detectees (toutes les valeurs a 0) - Re-synchronisation forcee...`);
+          showNotification(` ${upperSymbol}: Donnees corrompues detectees. Re-synchronisation en cours...`, "warning");
         }
-        console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Tentative chargement Supabase puis FMP...`);
+        console.log(` ${upperSymbol}: Profil squelette ou donnees vides detectees - Tentative chargement Supabase puis FMP...`);
         try {
           const { loadProfileFromSupabase: loadProfileFromSupabase2 } = await __vitePreload(async () => {
             const { loadProfileFromSupabase: loadProfileFromSupabase22 } = await Promise.resolve().then(() => supabaseDataLoader);
@@ -59370,7 +59370,7 @@ Vérifiez les logs de la console pour plus de détails.`;
           }, true ? void 0 : void 0, import.meta.url);
           const supabaseProfile = await loadProfileFromSupabase2(upperSymbol, false);
           if (supabaseProfile && supabaseProfile.source === "supabase" && supabaseProfile.data && supabaseProfile.data.length > 0) {
-            console.log(`✅ ${upperSymbol}: Chargé depuis Supabase (snapshot)`);
+            console.log(` ${upperSymbol}: Charge depuis Supabase (snapshot)`);
             const updatedProfile = {
               id: upperSymbol,
               lastModified: Date.now(),
@@ -59393,9 +59393,9 @@ Vérifiez les logs de la console pour plus de détails.`;
             setAssumptions(updatedProfile.assumptions);
             setInfo(updatedProfile.info);
             setNotes(updatedProfile.notes || "");
-            showNotification(`✅ ${upperSymbol} chargé depuis Supabase`, "success");
+            showNotification(` ${upperSymbol} charge depuis Supabase`, "success");
             try {
-              console.log(`🔄 Tentative récupération prix temps réel pour ${upperSymbol}...`);
+              console.log(` Tentative recuperation prix temps reel pour ${upperSymbol}...`);
               const { fetchMarketData: fetchMarketData2 } = await __vitePreload(async () => {
                 const { fetchMarketData: fetchMarketData3 } = await Promise.resolve().then(() => marketDataCache);
                 return { fetchMarketData: fetchMarketData3 };
@@ -59415,19 +59415,19 @@ Vérifiez les logs de la console pour plus de détails.`;
                     lastModified: Date.now()
                   }
                 }));
-                console.log(`✅ Prix mis à jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
+                console.log(` Prix mis a jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
               } else {
-                console.log(`⚠️ Prix de marché non disponible pour ${upperSymbol}`);
+                console.log(` Prix de marche non disponible pour ${upperSymbol}`);
               }
             } catch (priceError) {
-              console.warn(`⚠️ Erreur récupération prix pour ${upperSymbol}:`, priceError);
+              console.warn(` Erreur recuperation prix pour ${upperSymbol}:`, priceError);
             }
             return;
           } else {
-            console.log(`⚠️ ${upperSymbol}: Pas de snapshot Supabase disponible - Fallback FMP...`);
+            console.log(` ${upperSymbol}: Pas de snapshot Supabase disponible - Fallback FMP...`);
           }
         } catch (supabaseError) {
-          console.warn(`⚠️ ${upperSymbol}: Erreur chargement Supabase (non bloquant):`, supabaseError);
+          console.warn(` ${upperSymbol}: Erreur chargement Supabase (non bloquant):`, supabaseError);
         }
       } else {
         try {
@@ -59465,7 +59465,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                   }
                 }));
                 setInfo(updatedInfo);
-                console.log(`✅ Métriques ValueLine mises à jour depuis Supabase pour ${upperSymbol}`);
+                console.log(` Metriques ValueLine mises a jour depuis Supabase pour ${upperSymbol}`);
               } else {
                 setInfo(existingProfile.info);
               }
@@ -59476,13 +59476,13 @@ Vérifiez les logs de la console pour plus de détails.`;
             setInfo(existingProfile.info);
           }
         } catch (error) {
-          console.warn(`⚠️ Impossible de charger les métriques ValueLine depuis Supabase pour ${upperSymbol}:`, error);
+          console.warn(` Impossible de charger les metriques ValueLine depuis Supabase pour ${upperSymbol}:`, error);
           setInfo(existingProfile.info);
         }
         setActiveId(upperSymbol);
         setData(existingProfile.data);
         try {
-          console.log(`🔄 [ELSE BLOCK] Tentative récupération prix temps réel pour ${upperSymbol}...`);
+          console.log(` [ELSE BLOCK] Tentative recuperation prix temps reel pour ${upperSymbol}...`);
           const { fetchMarketData: fetchMarketData2 } = await __vitePreload(async () => {
             const { fetchMarketData: fetchMarketData3 } = await Promise.resolve().then(() => marketDataCache);
             return { fetchMarketData: fetchMarketData3 };
@@ -59502,25 +59502,25 @@ Vérifiez les logs de la console pour plus de détails.`;
                 lastModified: Date.now()
               }
             }));
-            console.log(`✅ Prix mis à jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
+            console.log(` Prix mis a jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
           } else {
             setAssumptions(existingProfile.assumptions);
-            console.log(`⚠️ Prix de marché non disponible pour ${upperSymbol}, utilisation du cache`);
+            console.log(` Prix de marche non disponible pour ${upperSymbol}, utilisation du cache`);
           }
         } catch (priceError) {
-          console.warn(`⚠️ Erreur récupération prix pour ${upperSymbol}:`, priceError);
+          console.warn(` Erreur recuperation prix pour ${upperSymbol}:`, priceError);
           setAssumptions(existingProfile.assumptions);
         }
         setNotes(existingProfile.notes);
-        console.log(`✅ Loaded existing profile for ${upperSymbol}`);
+        console.log(` Loaded existing profile for ${upperSymbol}`);
         return;
       }
     }
     try {
-      showNotification(`Chargement des données pour ${upperSymbol}...`, "info");
+      showNotification(`Chargement des donnees pour ${upperSymbol}...`, "info");
       const result = await fetchCompanyData(upperSymbol);
       if (!result.data || result.data.length === 0) {
-        throw new Error(`Aucune donnée FMP retournée pour ${upperSymbol}`);
+        throw new Error(`Aucune donnee FMP retournee pour ${upperSymbol}`);
       }
       if (!result.currentPrice || result.currentPrice <= 0) {
         throw new Error(`Prix actuel invalide (${result.currentPrice}) pour ${upperSymbol}`);
@@ -59530,9 +59530,9 @@ Vérifiez les logs de la console pour plus de détails.`;
       );
       if (!hasValidData) {
         if (isMutualFund(upperSymbol, result.info.name)) {
-          throw new Error(`${upperSymbol} est un fonds mutuel et ne peut pas être analysé avec les ratios d'entreprise`);
+          throw new Error(`${upperSymbol} est un fonds mutuel et ne peut pas etre analyse avec les ratios d'entreprise`);
         }
-        throw new Error(`Aucune donnée financière valide pour ${upperSymbol}`);
+        throw new Error(`Aucune donnee financiere valide pour ${upperSymbol}`);
       }
       const existingProfile = library[upperSymbol];
       const isUpdatingSkeleton = existingProfile && (existingProfile._isSkeleton === true || !existingProfile.data || existingProfile.data.length === 0);
@@ -59566,7 +59566,7 @@ Vérifiez les logs de la console pour plus de détails.`;
           priceLow: newRowTyped.priceLow > 0 ? newRowTyped.priceLow : existingRow.priceLow,
           autoFetched: true,
           dataSource: finalDataSource
-          // ✅ Préserve 'fmp-verified' si les données n'ont pas été modifiées
+          //  Preserve 'fmp-verified' si les donnees n'ont pas ete modifiees
         };
       });
       result.data.forEach((newRow) => {
@@ -59581,28 +59581,28 @@ Vérifiez les logs de la console pour plus de détails.`;
       mergedData.sort((a2, b) => a2.year - b.year);
       const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
         mergedData,
-        // ✅ Utiliser mergedData au lieu de result.data
+        //  Utiliser mergedData au lieu de result.data
         result.currentPrice,
         (existingProfile == null ? void 0 : existingProfile.assumptions) || INITIAL_ASSUMPTIONS,
         result.currentDividend
-        // ✅ NOUVEAU: Dividende actuel depuis l'API
+        //  NOUVEAU: Dividende actuel depuis l'API
       );
       const existingAssumptions = (existingProfile == null ? void 0 : existingProfile.assumptions) || INITIAL_ASSUMPTIONS;
       const tempAssumptions = {
         ...autoFilledAssumptions,
-        // Nouvelles valeurs calculées (qui préservent déjà les valeurs existantes)
-        // ✅ PRÉSERVER explicitement les valeurs existantes pour être sûr (double protection)
+        // Nouvelles valeurs calculees (qui preservent deja les valeurs existantes)
+        //  PRESERVER explicitement les valeurs existantes pour etre sur (double protection)
         growthRateEPS: existingAssumptions.growthRateEPS !== void 0 && existingAssumptions.growthRateEPS !== 0 ? existingAssumptions.growthRateEPS : autoFilledAssumptions.growthRateEPS,
         growthRateSales: existingAssumptions.growthRateSales !== void 0 && existingAssumptions.growthRateSales !== 0 ? existingAssumptions.growthRateSales : autoFilledAssumptions.growthRateSales,
         growthRateCF: existingAssumptions.growthRateCF !== void 0 && existingAssumptions.growthRateCF !== 0 ? existingAssumptions.growthRateCF : autoFilledAssumptions.growthRateCF,
         growthRateBV: existingAssumptions.growthRateBV !== void 0 && existingAssumptions.growthRateBV !== 0 ? existingAssumptions.growthRateBV : autoFilledAssumptions.growthRateBV,
         growthRateDiv: existingAssumptions.growthRateDiv !== void 0 && existingAssumptions.growthRateDiv !== 0 ? existingAssumptions.growthRateDiv : autoFilledAssumptions.growthRateDiv,
-        // Préserver aussi les ratios cibles si définis
+        // Preserver aussi les ratios cibles si definis
         targetPE: existingAssumptions.targetPE !== void 0 && existingAssumptions.targetPE !== 0 ? existingAssumptions.targetPE : autoFilledAssumptions.targetPE,
         targetPCF: existingAssumptions.targetPCF !== void 0 && existingAssumptions.targetPCF !== 0 ? existingAssumptions.targetPCF : autoFilledAssumptions.targetPCF,
         targetPBV: existingAssumptions.targetPBV !== void 0 && existingAssumptions.targetPBV !== 0 ? existingAssumptions.targetPBV : autoFilledAssumptions.targetPBV,
         targetYield: existingAssumptions.targetYield !== void 0 && existingAssumptions.targetYield !== 0 ? existingAssumptions.targetYield : autoFilledAssumptions.targetYield,
-        // Préserver les autres valeurs existantes
+        // Preserver les autres valeurs existantes
         requiredReturn: existingAssumptions.requiredReturn || autoFilledAssumptions.requiredReturn,
         dividendPayoutRatio: existingAssumptions.dividendPayoutRatio || autoFilledAssumptions.dividendPayoutRatio,
         excludeEPS: existingAssumptions.excludeEPS,
@@ -59612,7 +59612,7 @@ Vérifiez les logs de la console pour plus de détails.`;
       };
       const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
       if (outlierDetection.detectedOutliers.length > 0) {
-        console.log(`⚠️ ${upperSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(", ")}`);
+        console.log(` ${upperSymbol}: Outliers detectes: ${outlierDetection.detectedOutliers.join(", ")}`);
       }
       const finalAssumptions = sanitizeAssumptionsSync({
         ...tempAssumptions,
@@ -59625,9 +59625,9 @@ Vérifiez les logs de la console pour plus de détails.`;
         id: upperSymbol,
         lastModified: Date.now(),
         data: mergedData,
-        // ✅ Utiliser mergedData au lieu de result.data
+        //  Utiliser mergedData au lieu de result.data
         assumptions: finalAssumptions,
-        // ✅ Utiliser finalAssumptions avec guardrails
+        //  Utiliser finalAssumptions avec guardrails
         info: {
           ...(existingProfile == null ? void 0 : existingProfile.info) || {},
           symbol,
@@ -59664,16 +59664,16 @@ Vérifiez les logs de la console pour plus de détails.`;
       setInfo(completeInfo);
       setNotes((existingProfile == null ? void 0 : existingProfile.notes) || "");
       if (isUpdatingSkeleton) {
-        showNotification(`✅ ${upperSymbol} chargé avec succès (profil mis à jour)`, "success");
-        console.log(`✅ ${upperSymbol}: Profil squelette mis à jour avec données FMP valides`);
+        showNotification(` ${upperSymbol} charge avec succes (profil mis a jour)`, "success");
+        console.log(` ${upperSymbol}: Profil squelette mis a jour avec donnees FMP valides`);
       } else {
-        showNotification(`✅ ${upperSymbol} chargé avec succès`, "success");
-        console.log(`✅ ${upperSymbol}: Profil créé avec données FMP valides`);
+        showNotification(` ${upperSymbol} charge avec succes`, "success");
+        console.log(` ${upperSymbol}: Profil cree avec donnees FMP valides`);
       }
     } catch (e) {
       const error = e;
-      console.error(`❌ ${upperSymbol}: Erreur FMP - profil NON créé:`, error);
-      showNotification(`❌ Impossible de charger ${upperSymbol}: ${error.message}`, "error");
+      console.error(` ${upperSymbol}: Erreur FMP - profil NON cree:`, error);
+      showNotification(` Impossible de charger ${upperSymbol}: ${error.message}`, "error");
     }
   };
   const handleDeleteTicker = async (id) => {
@@ -59704,13 +59704,13 @@ Vérifiez les logs de la console pour plus de détails.`;
       });
       const result = await response.json();
       if (result.success) {
-        console.log(`✅ ${id} supprimé de Supabase:`, result.removed_from);
-        showNotification(`✅ ${id} supprimé définitivement`, "success");
+        console.log(` ${id} supprime de Supabase:`, result.removed_from);
+        showNotification(` ${id} supprime definitivement`, "success");
       } else {
-        console.warn(`⚠️ ${id} non trouvé dans Supabase`, result);
+        console.warn(` ${id} non trouve dans Supabase`, result);
       }
     } catch (error) {
-      console.error(`❌ Erreur suppression Supabase pour ${id}:`, error);
+      console.error(` Erreur suppression Supabase pour ${id}:`, error);
     }
   };
   const handleDuplicateTicker = (id) => {
@@ -59718,7 +59718,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     if (newId) {
       const upperId = newId.toUpperCase();
       if (library[upperId]) {
-        showNotification("Ce nom existe déjà.", "warning");
+        showNotification("Ce nom existe deja.", "warning");
         return;
       }
       const source = library[id];
@@ -59769,7 +59769,7 @@ Vérifiez les logs de la console pour plus de détails.`;
     });
   };
   const handleResetData = () => {
-    if (confirm("Voulez-vous remettre à zéro toutes les données historiques de ce profil ?")) {
+    if (confirm("Voulez-vous remettre a zero toutes les donnees historiques de ce profil ?")) {
       setData(INITIAL_DATA.map((d) => ({ ...d, priceHigh: 0, priceLow: 0, earningsPerShare: 0, dividendPerShare: 0, cashFlowPerShare: 0, bookValuePerShare: 0 })));
     }
   };
@@ -59786,7 +59786,7 @@ Vérifiez les logs de la console pour plus de détails.`;
   };
   const handleSyncSelectedTickers = async (tickerIds) => {
     if (tickerIds.length === 0) {
-      showNotification("Aucun ticker sélectionné", "warning");
+      showNotification("Aucun ticker selectionne", "warning");
       return;
     }
     window._pendingSyncTickers = tickerIds;
@@ -59813,16 +59813,16 @@ Vérifiez les logs de la console pour plus de détails.`;
     let supabaseTickersCache = null;
     if (options.syncValueLineMetrics) {
       try {
-        console.log("📡 Chargement initial des tickers Supabase pour métriques ValueLine...");
+        console.log(" Chargement initial des tickers Supabase pour metriques ValueLine...");
         const supabaseResult = await loadAllTickersFromSupabase();
         if (supabaseResult.success) {
           supabaseTickersCache = supabaseResult.tickers;
-          console.log(`✅ ${supabaseTickersCache.length} tickers Supabase chargés et mis en cache pour toute la synchronisation`);
+          console.log(` ${supabaseTickersCache.length} tickers Supabase charges et mis en cache pour toute la synchronisation`);
         } else {
-          console.warn("⚠️ Échec chargement initial tickers Supabase, métriques ValueLine non synchronisées");
+          console.warn(" Echec chargement initial tickers Supabase, metriques ValueLine non synchronisees");
         }
       } catch (error) {
-        console.warn("⚠️ Erreur chargement initial tickers Supabase:", error.message);
+        console.warn(" Erreur chargement initial tickers Supabase:", error.message);
       }
     }
     const { getConfigValue } = await __vitePreload(async () => {
@@ -59838,44 +59838,44 @@ Vérifiez les logs de la console pour plus de détails.`;
       const results = /* @__PURE__ */ new Map();
       try {
         const symbolString = tickerSymbols.join(",");
-        console.log(`🔍 [BATCH] Appel API pour ${tickerSymbols.length} tickers: ${symbolString.substring(0, 50)}...`);
-        console.log(`🔍 [BATCH] includeKeyMetrics: ${includeKeyMetrics}`);
+        console.log(` [BATCH] Appel API pour ${tickerSymbols.length} tickers: ${symbolString.substring(0, 50)}...`);
+        console.log(` [BATCH] includeKeyMetrics: ${includeKeyMetrics}`);
         const url = `/api/fmp-company-data-batch-sync?symbols=${encodeURIComponent(symbolString)}&limit=${BATCH_API_SIZE}&includeKeyMetrics=${includeKeyMetrics}`;
-        console.log(`🔍 [BATCH] URL: ${url.substring(0, 100)}...`);
+        console.log(` [BATCH] URL: ${url.substring(0, 100)}...`);
         const response = await fetch(url);
-        console.log(`🔍 [BATCH] Réponse HTTP: ${response.status} ${response.statusText}`);
+        console.log(` [BATCH] Reponse HTTP: ${response.status} ${response.statusText}`);
         if (!response.ok) {
           const errorText = await response.text();
-          console.error(`❌ [BATCH] Erreur HTTP ${response.status}:`, errorText.substring(0, 200));
+          console.error(` [BATCH] Erreur HTTP ${response.status}:`, errorText.substring(0, 200));
           throw new Error(`Batch API error: ${response.status}`);
         }
         const batchData = await response.json();
-        console.log(`🔍 [BATCH] Données reçues:`, {
+        console.log(` [BATCH] Donnees recues:`, {
           success: batchData.success,
           resultsCount: ((_a3 = batchData.results) == null ? void 0 : _a3.length) || 0,
           stats: batchData.stats
         });
         if (batchData.success && batchData.results) {
-          console.log(`📦 [BATCH] Batch API réponse: ${batchData.results.length} résultats`);
+          console.log(` [BATCH] Batch API reponse: ${batchData.results.length} resultats`);
           batchData.results.forEach((result) => {
             if (result.success && result.data) {
               const dataLength = result.data.data ? result.data.data.length : 0;
               if (dataLength > 0) {
-                console.log(`✅ [BATCH] ${result.symbol}: ${dataLength} années de données, currentDividend: ${result.data.currentDividend || 0}`);
+                console.log(` [BATCH] ${result.symbol}: ${dataLength} annees de donnees, currentDividend: ${result.data.currentDividend || 0}`);
               } else {
-                console.log(`⚠️ [BATCH] ${result.symbol}: Profile trouvé mais ${dataLength} années de données`);
+                console.log(` [BATCH] ${result.symbol}: Profile trouve mais ${dataLength} annees de donnees`);
               }
               results.set(result.symbol.toUpperCase(), result.data);
             } else {
-              console.warn(`❌ [BATCH] ${result.symbol}: Échec ou données manquantes (success: ${result.success}, hasData: ${!!result.data})`);
+              console.warn(` [BATCH] ${result.symbol}: Echec ou donnees manquantes (success: ${result.success}, hasData: ${!!result.data})`);
             }
           });
-          console.log(`📦 [BATCH] Total résultats stockés dans Map: ${results.size}`);
+          console.log(` [BATCH] Total resultats stockes dans Map: ${results.size}`);
         } else {
-          console.error(`❌ [BATCH] Batch API réponse invalide:`, batchData);
+          console.error(` [BATCH] Batch API reponse invalide:`, batchData);
         }
       } catch (error) {
-        console.error(`❌ [BATCH] Erreur batch fetch:`, error.message, error);
+        console.error(` [BATCH] Erreur batch fetch:`, error.message, error);
       }
       return results;
     };
@@ -59883,22 +59883,22 @@ Vérifiez les logs de la console pour plus de détails.`;
       return Promise.race([
         fetchCompanyData(tickerSymbol),
         new Promise(
-          (_, reject) => setTimeout(() => reject(new Error(`Timeout après 30000ms`)), 3e4)
+          (_, reject) => setTimeout(() => reject(new Error(`Timeout apres 30000ms`)), 3e4)
         )
       ]);
     };
     try {
-      console.log(`🚀 Début synchronisation avec options: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / BATCH_API_SIZE)} batches API`);
-      console.log("📋 Options de synchronisation:", options);
+      console.log(` Debut synchronisation avec options: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / BATCH_API_SIZE)} batches API`);
+      console.log(" Options de synchronisation:", options);
       for (let i = 0; i < allTickers.length; i += BATCH_API_SIZE) {
         if (abortSync.current) {
-          console.log("🛑 Synchronisation arrêtée par l'utilisateur.");
+          console.log(" Synchronisation arretee par l'utilisateur.");
           break;
         }
         const elapsedTime = Date.now() - startSyncTime;
         if (elapsedTime > MAX_SYNC_TIME_MS) {
-          console.warn(`⏱️ Timeout global atteint (${MAX_SYNC_TIME_MS / 1e3 / 60} min). Arrêt de la synchronisation.`);
-          console.warn(`📊 Progression: ${i}/${allTickers.length} tickers traités (${Math.round(i / allTickers.length * 100)}%)`);
+          console.warn(` Timeout global atteint (${MAX_SYNC_TIME_MS / 1e3 / 60} min). Arret de la synchronisation.`);
+          console.warn(` Progression: ${i}/${allTickers.length} tickers traites (${Math.round(i / allTickers.length * 100)}%)`);
           break;
         }
         while (isSyncPaused.current) {
@@ -59906,7 +59906,7 @@ Vérifiez les logs de la console pour plus de détails.`;
         }
         const batch = allTickers.slice(i, i + BATCH_API_SIZE).filter((t) => t && t.trim());
         if (batch.length === 0) {
-          console.warn(`⚠️ Batch vide détecté à l'index ${i}, ignoré`);
+          console.warn(` Batch vide detecte a l'index ${i}, ignore`);
           continue;
         }
         if (i > 0) {
@@ -59940,18 +59940,18 @@ Vérifiez les logs de la console pour plus de détails.`;
             if (needsFMP) {
               tickersNeedingFMP.push(tickerSymbol);
             } else {
-              console.log(`✅ ${tickerSymbol}: Skip FMP - données déjà disponibles`);
+              console.log(` ${tickerSymbol}: Skip FMP - donnees deja disponibles`);
             }
           })
         );
         const includeKeyMetrics = options.syncData;
         let batchResults = /* @__PURE__ */ new Map();
         if (tickersNeedingFMP.length > 0) {
-          console.log(`📦 Récupération batch ${i / BATCH_API_SIZE + 1}/${Math.ceil(allTickers.length / BATCH_API_SIZE)}: ${tickersNeedingFMP.length}/${batch.length} tickers nécessitent FMP`);
-          console.log(`🔍 [BATCH] Options: syncData=${options.syncData}, syncAssumptions=${options.syncAssumptions}, syncInfo=${options.syncInfo}, includeKeyMetrics=${includeKeyMetrics}`);
+          console.log(` Recuperation batch ${i / BATCH_API_SIZE + 1}/${Math.ceil(allTickers.length / BATCH_API_SIZE)}: ${tickersNeedingFMP.length}/${batch.length} tickers necessitent FMP`);
+          console.log(` [BATCH] Options: syncData=${options.syncData}, syncAssumptions=${options.syncAssumptions}, syncInfo=${options.syncInfo}, includeKeyMetrics=${includeKeyMetrics}`);
           batchResults = await fetchCompanyDataBatch(tickersNeedingFMP, includeKeyMetrics);
         } else {
-          console.log(`✅ Batch ${i / BATCH_API_SIZE + 1}: Tous les tickers ont déjà leurs données, skip FMP`);
+          console.log(` Batch ${i / BATCH_API_SIZE + 1}: Tous les tickers ont deja leurs donnees, skip FMP`);
         }
         await Promise.allSettled(
           batch.map(async (tickerSymbol) => {
@@ -60004,35 +60004,35 @@ Vérifiez les logs de la console pour plus de détails.`;
                   setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
                   const profile2 = library[tickerSymbol];
                   if (!profile2) {
-                    console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
-                    tickerResult.error = "Profil non trouvé";
+                    console.warn(` ${tickerSymbol}: Profil non trouve`);
+                    tickerResult.error = "Profil non trouve";
                     tickerResult.timeMs = Date.now() - tickerStartTime;
                     tickerResults.push(tickerResult);
                     return;
                   }
                   if (options.saveBeforeSync) {
-                    console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                    console.log(` Sauvegarde snapshot pour ${tickerSymbol}...`);
                     try {
                       const saveResult = await saveSnapshot(
                         tickerSymbol,
                         profile2.data,
                         profile2.assumptions,
                         profile2.info,
-                        `Avant synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                        `Avant synchronisation (${options.replaceOrangeData ? "avec remplacement donnees oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
                         false,
                         false
                       );
                       if (saveResult.success) {
                         tickerResult.other.snapshotSaved = true;
                       } else {
-                        console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
+                        console.warn(` ${tickerSymbol}: Echec sauvegarde snapshot avant sync: ${saveResult.error}`);
                       }
                     } catch (saveError) {
-                      console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
+                      console.warn(` ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
                     }
                   }
                   if (!options.syncData && !options.syncAssumptions && !options.syncInfo) {
-                    console.log(`⏭️ ${tickerSymbol}: Aucune option de sync activée, ignoré`);
+                    console.log(` ${tickerSymbol}: Aucune option de sync activee, ignore`);
                     return;
                   }
                   const { shouldFetchFromFMP: shouldFetchFromFMP2, analyzeSyncNeeds } = await __vitePreload(async () => {
@@ -60053,7 +60053,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                     }
                   );
                   if (!needsFMP) {
-                    console.log(`✅ ${tickerSymbol}: Toutes les données nécessaires déjà disponibles, skip FMP`);
+                    console.log(` ${tickerSymbol}: Toutes les donnees necessaires deja disponibles, skip FMP`);
                     if (options.syncAssumptions && profile2.data.length > 0) {
                       const { autoFillAssumptionsFromFMPData: autoFillAssumptionsFromFMPData2 } = await __vitePreload(async () => {
                         const { autoFillAssumptionsFromFMPData: autoFillAssumptionsFromFMPData22 } = await Promise.resolve().then(() => calculations);
@@ -60078,11 +60078,11 @@ Vérifiez les logs de la console pour plus de détails.`;
                       successCount++;
                       tickerResult.success = true;
                       setSyncStats((prev) => ({ ...prev, successCount: prev.successCount + 1 }));
-                      console.log(`✅ ${tickerSymbol}: Assumptions mises à jour sans appel FMP`);
+                      console.log(` ${tickerSymbol}: Assumptions mises a jour sans appel FMP`);
                     }
                     return;
                   }
-                  console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+                  console.log(` Synchronisation ${tickerSymbol}...`);
                   let result;
                   if (batchResults.has(tickerSymbol)) {
                     const batchResult = batchResults.get(tickerSymbol);
@@ -60091,11 +60091,11 @@ Vérifiez les logs de la console pour plus de détails.`;
                       info: (batchResult == null ? void 0 : batchResult.info) || {},
                       currentPrice: (batchResult == null ? void 0 : batchResult.currentPrice) || 0,
                       currentDividend: (batchResult == null ? void 0 : batchResult.currentDividend) || 0,
-                      // ✅ NOUVEAU: Dividende actuel depuis batch
+                      //  NOUVEAU: Dividende actuel depuis batch
                       financials: (batchResult == null ? void 0 : batchResult.financials) || [],
                       analysisData: (batchResult == null ? void 0 : batchResult.analysisData) || null
                     };
-                    console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${((_a3 = result == null ? void 0 : result.data) == null ? void 0 : _a3.length) || 0}, currentDividend: ${result.currentDividend})`);
+                    console.log(` ${tickerSymbol}: Donnees recuperees du batch (data.length: ${((_a3 = result == null ? void 0 : result.data) == null ? void 0 : _a3.length) || 0}, currentDividend: ${result.currentDividend})`);
                     if (options.syncOnlyNewYears || options.syncOnlyMissingMetrics) {
                       const { filterFMPDataForSync } = await __vitePreload(async () => {
                         const { filterFMPDataForSync: filterFMPDataForSync2 } = await import("./syncOptimization.js");
@@ -60105,10 +60105,10 @@ Vérifiez les logs de la console pour plus de détails.`;
                         syncOnlyNewYears: options.syncOnlyNewYears,
                         syncOnlyMissingMetrics: options.syncOnlyMissingMetrics
                       });
-                      console.log(`🔍 ${tickerSymbol}: Données FMP filtrées - ${result.data.length} années à traiter`);
+                      console.log(` ${tickerSymbol}: Donnees FMP filtrees - ${result.data.length} annees a traiter`);
                     }
                   } else {
-                    console.warn(`⚠️ ${tickerSymbol}: Pas dans les résultats du batch, fallback vers appel individuel`);
+                    console.warn(` ${tickerSymbol}: Pas dans les resultats du batch, fallback vers appel individuel`);
                     try {
                       result = await fetchCompanyDataWithTimeout(tickerSymbol);
                       if (result && result.data && (options.syncOnlyNewYears || options.syncOnlyMissingMetrics)) {
@@ -60120,7 +60120,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                           syncOnlyNewYears: options.syncOnlyNewYears,
                           syncOnlyMissingMetrics: options.syncOnlyMissingMetrics
                         });
-                        console.log(`🔍 ${tickerSymbol}: Données FMP filtrées - ${result.data.length} années à traiter`);
+                        console.log(` ${tickerSymbol}: Donnees FMP filtrees - ${result.data.length} annees a traiter`);
                       }
                     } catch (fetchError) {
                       const isRateLimitError = fetchError.message && (fetchError.message.includes("Rate limit") || fetchError.message.includes("rate limit") || fetchError.message.includes("429"));
@@ -60129,8 +60129,8 @@ Vérifiez les logs de la console pour plus de détails.`;
                         const errorMsg = `${tickerSymbol}: ${fetchError.message}`;
                         errors.push(errorMsg);
                         setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
-                        console.error(`❌ ${errorMsg}`);
-                        console.error(`⚠️ Rate limiting détecté - La synchronisation peut être ralentie ou interrompue.`);
+                        console.error(` ${errorMsg}`);
+                        console.error(` Rate limiting detecte - La synchronisation peut etre ralentie ou interrompue.`);
                         await new Promise((resolve) => setTimeout(resolve, 5e3));
                         return;
                       }
@@ -60138,7 +60138,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                       if (isNotFoundError) {
                         skippedCount++;
                         skippedTickers.push(tickerSymbol);
-                        console.warn(`⏭️ ${tickerSymbol}: Ignoré (introuvable dans FMP). ${fetchError.message}`);
+                        console.warn(` ${tickerSymbol}: Ignore (introuvable dans FMP). ${fetchError.message}`);
                         return;
                       }
                       throw fetchError;
@@ -60147,15 +60147,15 @@ Vérifiez les logs de la console pour plus de détails.`;
                   if (!result || !result.data) {
                     skippedCount++;
                     skippedTickers.push(tickerSymbol);
-                    console.warn(`⏭️ ${tickerSymbol}: Ignoré (résultat invalide)`);
-                    tickerResult.error = "Résultat invalide";
+                    console.warn(` ${tickerSymbol}: Ignore (resultat invalide)`);
+                    tickerResult.error = "Resultat invalide";
                     tickerResult.timeMs = Date.now() - tickerStartTime;
                     tickerResults.push(tickerResult);
                     return;
                   }
                   if (result.data.length === 0) {
                     if (result.info && options.syncInfo) {
-                      console.log(`ℹ️ ${tickerSymbol}: Profile trouvé mais aucune donnée historique. Synchronisation des infos uniquement.`);
+                      console.log(`i ${tickerSymbol}: Profile trouve mais aucune donnee historique. Synchronisation des infos uniquement.`);
                       const updatedProfile = {
                         ...profile2,
                         info: result.info
@@ -60183,15 +60183,15 @@ Vérifiez les logs de la console pour plus de détails.`;
                         hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
                         hasFinancials: false
                       };
-                      tickerResult.error = "Aucune donnée historique disponible (infos synchronisées)";
+                      tickerResult.error = "Aucune donnee historique disponible (infos synchronisees)";
                       tickerResult.timeMs = Date.now() - tickerStartTime;
                       tickerResults.push(tickerResult);
                       return;
                     } else {
                       skippedCount++;
                       skippedTickers.push(tickerSymbol);
-                      console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
-                      tickerResult.error = "Aucune donnée disponible";
+                      console.warn(` ${tickerSymbol}: Ignore (aucune donnee disponible)`);
+                      tickerResult.error = "Aucune donnee disponible";
                       tickerResult.timeMs = Date.now() - tickerStartTime;
                       tickerResults.push(tickerResult);
                       return;
@@ -60217,7 +60217,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                             ...newRow,
                             autoFetched: true,
                             dataSource: "fmp-verified"
-                            // ✅ Nouvelle année directement de FMP = vérifiée
+                            //  Nouvelle annee directement de FMP = verifiee
                           });
                         }
                       });
@@ -60230,7 +60230,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                             ...newRow,
                             autoFetched: true,
                             dataSource: "fmp-verified"
-                            // ✅ Force replace = données FMP vérifiées
+                            //  Force replace = donnees FMP verifiees
                           };
                         }
                         if (options.syncOnlyMissingMetrics) {
@@ -60289,7 +60289,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                           priceLow: typedNewRow.priceLow > 0 ? typedNewRow.priceLow : existingRow.priceLow,
                           autoFetched: true,
                           dataSource: finalDataSource
-                          // ✅ Préserve 'fmp-verified' si les données n'ont pas été modifiées
+                          //  Preserve 'fmp-verified' si les donnees n'ont pas ete modifiees
                         };
                       });
                       result.data.forEach((newRow) => {
@@ -60299,7 +60299,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                             ...newRow,
                             autoFetched: true,
                             dataSource: "fmp-verified"
-                            // ✅ Nouvelle année directement de FMP = vérifiée
+                            //  Nouvelle annee directement de FMP = verifiee
                           });
                         }
                       });
@@ -60315,7 +60315,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                       currentPriceForCalc,
                       existingAssumptionsForCalc,
                       result.currentDividend
-                      // ✅ NOUVEAU: Dividende actuel depuis l'API
+                      //  NOUVEAU: Dividende actuel depuis l'API
                     );
                     const tempAssumptions = {
                       ...profile2.assumptions,
@@ -60331,7 +60331,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                     if (options.recalculateOutliers) {
                       outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
                       if (outlierDetection.detectedOutliers.length > 0) {
-                        console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(", ")}`);
+                        console.log(` ${tickerSymbol}: Metriques avec prix cibles aberrants detectees: ${outlierDetection.detectedOutliers.join(", ")}`);
                         tickerResult.outliers.detected = outlierDetection.detectedOutliers;
                         tickerResult.outliers.excluded = {
                           EPS: outlierDetection.excludeEPS,
@@ -60346,14 +60346,14 @@ Vérifiez les logs de la console pour plus de détails.`;
                         outlierDetection.detectedOutliers.forEach((metric) => {
                           const isExcluded = tickerResult.outliers.excluded[metric];
                           if (isExcluded) {
-                            tickerResult.outliers.reasons[metric] = "Prix cible aberrant détecté (>1.5σ ou retour implausible)";
+                            tickerResult.outliers.reasons[metric] = "Prix cible aberrant detecte (>1.5 ou retour implausible)";
                           }
                         });
                       }
                     }
                     finalAssumptions = {
                       ...tempAssumptions,
-                      // Préserver les exclusions si l'option est activée
+                      // Preserver les exclusions si l'option est activee
                       excludeEPS: options.preserveExclusions ? profile2.assumptions.excludeEPS || outlierDetection.excludeEPS : outlierDetection.excludeEPS,
                       excludeCF: options.preserveExclusions ? profile2.assumptions.excludeCF || outlierDetection.excludeCF : outlierDetection.excludeCF,
                       excludeBV: options.preserveExclusions ? profile2.assumptions.excludeBV || outlierDetection.excludeBV : outlierDetection.excludeBV,
@@ -60394,7 +60394,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                           tickerResult.other.valueLineMetricsSynced = true;
                         }
                       } catch (error) {
-                        console.warn(`⚠️ Impossible de recharger les métriques ValueLine pour ${tickerSymbol}:`, error);
+                        console.warn(` Impossible de recharger les metriques ValueLine pour ${tickerSymbol}:`, error);
                       }
                     }
                   }
@@ -60426,10 +60426,10 @@ Vérifiez les logs de la console pour plus de détails.`;
                     bookValuePerShare: zeroCounts.bookValuePerShare,
                     dividendPerShare: zeroCounts.dividendPerShare,
                     reasons: {
-                      earningsPerShare: zeroCounts.earningsPerShare > 0 ? `${zeroCounts.earningsPerShare} années avec EPS à 0 (pertes ou données manquantes)` : "",
-                      cashFlowPerShare: zeroCounts.cashFlowPerShare > 0 ? `${zeroCounts.cashFlowPerShare} années avec CF à 0 (CF négatif ou données manquantes)` : "",
-                      bookValuePerShare: zeroCounts.bookValuePerShare > 0 ? `${zeroCounts.bookValuePerShare} années avec BV à 0 (BV négatif ou données manquantes)` : "",
-                      dividendPerShare: zeroCounts.dividendPerShare > 0 ? `${zeroCounts.dividendPerShare} années avec DIV à 0 (pas de dividende ou données manquantes)` : ""
+                      earningsPerShare: zeroCounts.earningsPerShare > 0 ? `${zeroCounts.earningsPerShare} annees avec EPS a 0 (pertes ou donnees manquantes)` : "",
+                      cashFlowPerShare: zeroCounts.cashFlowPerShare > 0 ? `${zeroCounts.cashFlowPerShare} annees avec CF a 0 (CF negatif ou donnees manquantes)` : "",
+                      bookValuePerShare: zeroCounts.bookValuePerShare > 0 ? `${zeroCounts.bookValuePerShare} annees avec BV a 0 (BV negatif ou donnees manquantes)` : "",
+                      dividendPerShare: zeroCounts.dividendPerShare > 0 ? `${zeroCounts.dividendPerShare} annees avec DIV a 0 (pas de dividende ou donnees manquantes)` : ""
                     }
                   };
                   const naFields = [];
@@ -60440,11 +60440,11 @@ Vérifiez les logs de la console pour plus de détails.`;
                   }
                   if (mergedData.length === 0) {
                     naFields.push("annualData");
-                    naReasons.annualData = "Aucune donnée historique disponible";
+                    naReasons.annualData = "Aucune donnee historique disponible";
                   }
                   if (!finalAssumptions.growthRateEPS && !finalAssumptions.growthRateCF) {
                     naFields.push("assumptions");
-                    naReasons.assumptions = "Impossible de calculer assumptions (données insuffisantes)";
+                    naReasons.assumptions = "Impossible de calculer assumptions (donnees insuffisantes)";
                   }
                   tickerResult.naData = {
                     fields: naFields,
@@ -60470,7 +60470,7 @@ Vérifiez les logs de la console pour plus de détails.`;
                       mergedData,
                       finalAssumptions,
                       updatedInfo,
-                      `Après synchronisation (${options.replaceOrangeData ? "avec remplacement données oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
+                      `Apres synchronisation (${options.replaceOrangeData ? "avec remplacement donnees oranges" : "standard"}) - ${(/* @__PURE__ */ new Date()).toLocaleString()}`,
                       true,
                       true,
                       0,
@@ -60478,22 +60478,22 @@ Vérifiez les logs de la console pour plus de détails.`;
                       2,
                       // maxRetries
                       syncMetadata
-                      // Métadonnées de synchronisation
+                      // Metadonnees de synchronisation
                     );
                     if (saveResult.success) {
                       tickerResult.other.snapshotSaved = true;
                     } else {
-                      console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
+                      console.warn(` ${tickerSymbol}: Echec sauvegarde snapshot apres sync: ${saveResult.error}`);
                     }
                   } catch (saveError) {
-                    console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
+                    console.warn(` ${tickerSymbol}: Erreur lors de la sauvegarde snapshot apres sync: ${saveError.message}`);
                   }
                   successCount++;
                   tickerResult.success = true;
                   tickerResult.timeMs = Date.now() - tickerStartTime;
                   tickerResults.push(tickerResult);
                   setSyncStats((prev) => ({ ...prev, successCount: prev.successCount + 1 }));
-                  console.log(`✅ ${tickerSymbol}: Synchronisé avec succès`);
+                  console.log(` ${tickerSymbol}: Synchronise avec succes`);
                 } catch (error) {
                   errorCount++;
                   const errorMsg = `${tickerSymbol}: ${error.message || String(error)}`;
@@ -60503,11 +60503,11 @@ Vérifiez les logs de la console pour plus de détails.`;
                   tickerResult.timeMs = Date.now() - tickerStartTime;
                   tickerResults.push(tickerResult);
                   setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
-                  console.error(`❌ ${errorMsg}`);
+                  console.error(` ${errorMsg}`);
                 }
               })(),
               new Promise(
-                (_, reject) => setTimeout(() => reject(new Error(`Timeout après ${TICKER_TIMEOUT_MS / 1e3}s`)), TICKER_TIMEOUT_MS)
+                (_, reject) => setTimeout(() => reject(new Error(`Timeout apres ${TICKER_TIMEOUT_MS / 1e3}s`)), TICKER_TIMEOUT_MS)
               )
             ]).catch((timeoutError) => {
               errorCount++;
@@ -60530,7 +60530,7 @@ Vérifiez les logs de la console pour plus de détails.`;
               setSyncStats((prev) => ({ ...prev, errorCount: prev.errorCount + 1 }));
               const isDebugMode = typeof window !== "undefined" && (localStorage.getItem("3p1-debug") === "true" || window.location.search.includes("debug=true"));
               if (isDebugMode) {
-                console.warn(`⏱️ ${errorMsg}`);
+                console.warn(` ${errorMsg}`);
               }
             });
           })
@@ -60570,32 +60570,32 @@ Vérifiez les logs de la console pour plus de détails.`;
       const totalTickersProcessed = tickerResults.length;
       if (totalTickersProcessed < allTickers.length) {
         const missingCount = allTickers.length - totalTickersProcessed;
-        console.warn(`⚠️ ATTENTION: ${missingCount} ticker(s) non traité(s) sur ${allTickers.length} total`);
+        console.warn(` ATTENTION: ${missingCount} ticker(s) non traite(s) sur ${allTickers.length} total`);
       }
-      let summary = `Synchronisation terminée:
-✅ ${successCount} succès`;
+      let summary = `Synchronisation terminee:
+ ${successCount} succes`;
       if (skippedCount > 0) {
         summary += `
-⏭️ ${skippedCount} ignorés (introuvables dans FMP)`;
+ ${skippedCount} ignores (introuvables dans FMP)`;
       }
       if (errorCount > 0) {
         summary += `
-❌ ${errorCount} erreurs`;
+ ${errorCount} erreurs`;
       }
       summary += `
-📊 Total traité: ${totalTickersProcessed}/${allTickers.length} (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`;
+ Total traite: ${totalTickersProcessed}/${allTickers.length} (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`;
       if (totalTickersProcessed === allTickers.length) {
-        console.log(`✅ 100% des tickers traités (${totalTickersProcessed}/${allTickers.length})`);
+        console.log(` 100% des tickers traites (${totalTickersProcessed}/${allTickers.length})`);
       } else {
-        console.warn(`⚠️ ${totalTickersProcessed}/${allTickers.length} tickers traités (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`);
+        console.warn(` ${totalTickersProcessed}/${allTickers.length} tickers traites (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`);
       }
       if (skippedCount > 0) {
-        console.warn(`⏭️ Tickers ignorés (introuvables dans FMP):
+        console.warn(` Tickers ignores (introuvables dans FMP):
 ${skippedTickers.slice(0, 20).join(", ")}${skippedTickers.length > 20 ? `
 ... et ${skippedTickers.length - 20} autres` : ""}`);
       }
       if (errorCount > 0) {
-        console.warn(`❌ Erreurs:
+        console.warn(` Erreurs:
 ${errors.slice(0, 10).join("\n")}${errors.length > 10 ? `
 ... et ${errors.length - 10} autres` : ""}`);
       }
@@ -60603,15 +60603,15 @@ ${errors.slice(0, 10).join("\n")}${errors.length > 10 ? `
       if (errorCount > 0 || skippedCount > 0) {
         const notificationMessage = skippedCount > 0 && errorCount === 0 ? `${summary}
 
-${skippedTickers.length} ticker(s) ignoré(s) car introuvable(s) dans FMP.` : `${summary}
+${skippedTickers.length} ticker(s) ignore(s) car introuvable(s) dans FMP.` : `${summary}
 
-Voir la console pour les détails.`;
+Voir la console pour les details.`;
         setNotifications((prev) => [...prev, {
           id: notificationId,
           message: notificationMessage,
           type: skippedCount > 0 && errorCount === 0 ? "warning" : "error",
           action: {
-            label: "Voir Rapport Détaillé",
+            label: "Voir Rapport Detaille",
             onClick: () => {
               setSyncReportData(reportData);
               setShowSyncReport(true);
@@ -60619,13 +60619,13 @@ Voir la console pour les détails.`;
           }
         }]);
       } else {
-        console.log(`✅ ${summary}`);
+        console.log(` ${summary}`);
         setNotifications((prev) => [...prev, {
           id: notificationId,
           message: summary,
           type: "success",
           action: {
-            label: "Voir Rapport Détaillé",
+            label: "Voir Rapport Detaille",
             onClick: () => {
               setSyncReportData(reportData);
               setShowSyncReport(true);
@@ -60636,7 +60636,7 @@ Voir la console pour les détails.`;
       setSyncReportData(reportData);
       setShowSyncReport(true);
     } catch (error) {
-      console.error("❌ Erreur lors de la synchronisation en masse:", error);
+      console.error(" Erreur lors de la synchronisation en masse:", error);
       setNotifications((prev) => [...prev, {
         id: `bulk-sync-error-${Date.now()}`,
         message: `Erreur lors de la synchronisation: ${error.message || String(error)}`,
@@ -60650,7 +60650,7 @@ Voir la console pour les détails.`;
   };
   const handleSyncSpecificTickers = async (tickersToSync) => {
     if (tickersToSync.length === 0) {
-      showNotification("Aucun ticker à synchroniser", "warning");
+      showNotification("Aucun ticker a synchroniser", "warning");
       return;
     }
     if (!confirm(`Synchroniser ${tickersToSync.length} ticker(s) avec N/A ?
@@ -60658,8 +60658,8 @@ Voir la console pour les détails.`;
 Tickers: ${tickersToSync.slice(0, 10).join(", ")}${tickersToSync.length > 10 ? `
 ... et ${tickersToSync.length - 10} autres` : ""}
 
-Chaque version sera sauvegardée avant la synchronisation.
-Les données manuelles et hypothèses (orange) seront préservées.`)) {
+Chaque version sera sauvegardee avant la synchronisation.
+Les donnees manuelles et hypotheses (orange) seront preservees.`)) {
       return;
     }
     setIsBulkSyncing(true);
@@ -60675,12 +60675,12 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
       return Promise.race([
         fetchCompanyData(tickerSymbol),
         new Promise(
-          (_, reject) => setTimeout(() => reject(new Error(`Timeout après ${FMP_TIMEOUT_MS}ms`)), FMP_TIMEOUT_MS)
+          (_, reject) => setTimeout(() => reject(new Error(`Timeout apres ${FMP_TIMEOUT_MS}ms`)), FMP_TIMEOUT_MS)
         )
       ]);
     };
     try {
-      console.log(`🚀 Début synchronisation spécifique: ${tickersToSync.length} tickers`);
+      console.log(` Debut synchronisation specifique: ${tickersToSync.length} tickers`);
       for (let i = 0; i < tickersToSync.length; i += batchSize) {
         const batch = tickersToSync.slice(i, i + batchSize);
         if (i > 0) {
@@ -60693,10 +60693,10 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
               setBulkSyncProgress((prev) => ({ ...prev, current: prev.current + 1 }));
               const profile2 = library[tickerSymbol];
               if (!profile2) {
-                console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
+                console.warn(` ${tickerSymbol}: Profil non trouve`);
                 return;
               }
-              console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+              console.log(` Sauvegarde snapshot pour ${tickerSymbol}...`);
               try {
                 const saveResult = await saveSnapshot(
                   tickerSymbol,
@@ -60708,12 +60708,12 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
                   false
                 );
                 if (!saveResult.success) {
-                  console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
+                  console.warn(` ${tickerSymbol}: Echec sauvegarde snapshot avant sync: ${saveResult.error}`);
                 }
               } catch (saveError) {
-                console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
+                console.warn(` ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
               }
-              console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+              console.log(` Synchronisation ${tickerSymbol}...`);
               const result = await fetchCompanyDataWithTimeout(tickerSymbol);
               const newDataByYear = new Map(result.data.map((row) => [row.year, row]));
               const mergedData = profile2.data.map((existingRow) => {
@@ -60749,7 +60749,7 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
                 result.currentPrice,
                 profile2.assumptions,
                 result.currentDividend
-                // ✅ NOUVEAU: Dividende actuel depuis l'API
+                //  NOUVEAU: Dividende actuel depuis l'API
               );
               const tempAssumptions = {
                 ...profile2.assumptions,
@@ -60757,7 +60757,7 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
               };
               const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
               if (outlierDetection.detectedOutliers.length > 0) {
-                console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(", ")}`);
+                console.log(` ${tickerSymbol}: Metriques avec prix cibles aberrants detectees: ${outlierDetection.detectedOutliers.join(", ")}`);
               }
               const finalAssumptions = {
                 ...tempAssumptions,
@@ -60800,43 +60800,43 @@ Les données manuelles et hypothèses (orange) seront préservées.`)) {
                   true
                 );
                 if (!saveResult.success) {
-                  console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
+                  console.warn(` ${tickerSymbol}: Echec sauvegarde snapshot apres sync: ${saveResult.error}`);
                 }
               } catch (saveError) {
-                console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
+                console.warn(` ${tickerSymbol}: Erreur lors de la sauvegarde snapshot apres sync: ${saveError.message}`);
               }
               successCount++;
               setSyncStats({ successCount, errorCount });
-              console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+              console.log(` ${tickerSymbol} synchronise avec succes`);
             } catch (error) {
               errorCount++;
               setSyncStats({ successCount, errorCount });
               const errorMsg = `${tickerSymbol}: ${error.message || "Erreur inconnue"}`;
               errors.push(errorMsg);
-              console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+              console.error(` Erreur sync ${tickerSymbol}:`, error);
             }
           })
         );
       }
-      console.log(`✅ Synchronisation spécifique terminée: ${successCount} succès, ${errorCount} erreurs`);
+      console.log(` Synchronisation specifique terminee: ${successCount} succes, ${errorCount} erreurs`);
     } catch (error) {
-      console.error("❌ Erreur fatale pendant la synchronisation spécifique:", error);
+      console.error(" Erreur fatale pendant la synchronisation specifique:", error);
       errorCount++;
       errors.push(`Erreur fatale: ${error.message || "Erreur inconnue"}`);
     } finally {
       setIsBulkSyncing(false);
       setBulkSyncProgress({ current: 0, total: 0 });
       setCurrentSyncingTicker(void 0);
-      const message = `Synchronisation terminée
+      const message = `Synchronisation terminee
 
-Réussies: ${successCount}
+Reussies: ${successCount}
 Erreurs: ${errorCount}` + (errors.length > 0 ? `
 
 Erreurs:
 ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
 ... et ${errors.length - 5} autres` : ""}` : "");
       showNotification(message, errorCount > 0 ? "warning" : "success");
-      console.log(`✅ ${message}`);
+      console.log(` ${message}`);
     }
   };
   const handleSyncFromSupabase = async () => {
@@ -60882,8 +60882,8 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
               updated[tickerSymbol] = {
                 ...updated[tickerSymbol],
                 isWatchlist: shouldBeWatchlist,
-                // ✅ FORCER mise à jour depuis Supabase
-                // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
+                //  FORCER mise a jour depuis Supabase
+                //  MULTI-UTILISATEUR : Supabase est la source de verite pour les metriques ValueLine
                 // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                 info: {
                   ...updated[tickerSymbol].info,
@@ -60912,9 +60912,9 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         const watchlistCount = Object.values(updated).filter((p) => p.isWatchlist === true).length;
         const normalCount = Object.values(updated).filter((p) => p.isWatchlist === null || p.isWatchlist === void 0).length;
         if (migrationCount > 0) {
-          console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+          console.log(` Migration: ${migrationCount} profil(s) mis a jour avec isWatchlist depuis Supabase`);
         }
-        console.log(`📊 Après migration (handleSyncFromSupabase) - Portefeuille (⭐): ${portfolioCount}, Watchlist (👁️): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
+        console.log(` Apres migration (handleSyncFromSupabase) - Portefeuille (): ${portfolioCount}, Watchlist (): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
         const teamTickersInSupabase = result.tickers.filter((t) => {
           const mapped = mapSourceToIsWatchlist(t.source);
           return mapped === false;
@@ -60932,16 +60932,16 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
           return updated[symbol] && updated[symbol].isWatchlist !== false;
         });
         if (teamTickersInSupabase.length !== teamTickersInLibrary.length) {
-          console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
+          console.warn(` ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
           if (missingTickers.length > 0) {
-            console.warn(`   📋 ${missingTickers.length} ticker(s) non chargé(s) depuis FMP:`, missingTickers.map((t) => t.ticker).join(", "));
+            console.warn(`    ${missingTickers.length} ticker(s) non charge(s) depuis FMP:`, missingTickers.map((t) => t.ticker).join(", "));
           }
           if (incorrectTickers.length > 0) {
-            console.warn(`   ❌ ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map((t) => t.ticker).join(", "));
+            console.warn(`    ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map((t) => t.ticker).join(", "));
           }
-          console.log(`   ✅ ${teamTickersInLibrary.length} ticker(s) correctement configuré(s) dans localStorage`);
+          console.log(`    ${teamTickersInLibrary.length} ticker(s) correctement configure(s) dans localStorage`);
         } else {
-          console.log(`✅ Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
+          console.log(` Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
         }
         return updated;
       });
@@ -60972,13 +60972,13 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
       const newTickers = result.tickers.filter((t) => {
         const symbol = t.ticker.toUpperCase();
         if (isMutualFund(symbol, t.company_name)) {
-          console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - exclu de la synchronisation`);
+          console.warn(` ${symbol}: Fonds mutuel detecte - exclu de la synchronisation`);
           return false;
         }
         if (t.market_cap) {
           const marketCapNum = typeof t.market_cap === "number" ? t.market_cap : parseMarketCapToNumber(String(t.market_cap));
           if (marketCapNum > 0 && marketCapNum < MIN_MARKET_CAP) {
-            console.warn(`⚠️ ${symbol}: Capitalisation boursière trop faible (${t.market_cap} < 2B) - exclu de la synchronisation`);
+            console.warn(` ${symbol}: Capitalisation boursiere trop faible (${t.market_cap} < 2B) - exclu de la synchronisation`);
             return false;
           }
         }
@@ -61067,7 +61067,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                   result2.currentPrice,
                   INITIAL_ASSUMPTIONS,
                   result2.currentDividend
-                  // ✅ NOUVEAU: Dividende actuel depuis l'API
+                  //  NOUVEAU: Dividende actuel depuis l'API
                 );
                 const sanitizedAutoFilled = sanitizeAssumptionsSync(autoFilledAssumptions);
                 const tempAssumptions = {
@@ -61127,30 +61127,30 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
         }
         const totalErrors = errorSummary.notFound.length + errorSummary.noData.length + errorSummary.invalidPrice.length + errorSummary.invalidData.length + errorSummary.lowMarketCap.length + errorSummary.other.length;
         if (totalErrors > 0) {
-          console.group(`📊 Résumé synchronisation: ${successCount} succès, ${totalErrors} erreurs`);
+          console.group(` Resume synchronisation: ${successCount} succes, ${totalErrors} erreurs`);
           if (errorSummary.notFound.length > 0) {
-            console.warn(`⚠️ ${errorSummary.notFound.length} ticker(s) introuvable(s) dans FMP: ${errorSummary.notFound.slice(0, 10).join(", ")}${errorSummary.notFound.length > 10 ? ` (+${errorSummary.notFound.length - 10} autres)` : ""}`);
+            console.warn(` ${errorSummary.notFound.length} ticker(s) introuvable(s) dans FMP: ${errorSummary.notFound.slice(0, 10).join(", ")}${errorSummary.notFound.length > 10 ? ` (+${errorSummary.notFound.length - 10} autres)` : ""}`);
           }
           if (errorSummary.lowMarketCap.length > 0) {
-            console.warn(`⚠️ ${errorSummary.lowMarketCap.length} ticker(s) avec capitalisation < 2B: ${errorSummary.lowMarketCap.slice(0, 10).join(", ")}${errorSummary.lowMarketCap.length > 10 ? ` (+${errorSummary.lowMarketCap.length - 10} autres)` : ""}`);
+            console.warn(` ${errorSummary.lowMarketCap.length} ticker(s) avec capitalisation < 2B: ${errorSummary.lowMarketCap.slice(0, 10).join(", ")}${errorSummary.lowMarketCap.length > 10 ? ` (+${errorSummary.lowMarketCap.length - 10} autres)` : ""}`);
           }
           if (errorSummary.noData.length > 0) {
-            console.warn(`⚠️ ${errorSummary.noData.length} ticker(s) sans données: ${errorSummary.noData.slice(0, 10).join(", ")}${errorSummary.noData.length > 10 ? ` (+${errorSummary.noData.length - 10} autres)` : ""}`);
+            console.warn(` ${errorSummary.noData.length} ticker(s) sans donnees: ${errorSummary.noData.slice(0, 10).join(", ")}${errorSummary.noData.length > 10 ? ` (+${errorSummary.noData.length - 10} autres)` : ""}`);
           }
           if (errorSummary.invalidData.length > 0) {
-            console.warn(`⚠️ ${errorSummary.invalidData.length} ticker(s) avec données invalides: ${errorSummary.invalidData.slice(0, 10).join(", ")}${errorSummary.invalidData.length > 10 ? ` (+${errorSummary.invalidData.length - 10} autres)` : ""}`);
+            console.warn(` ${errorSummary.invalidData.length} ticker(s) avec donnees invalides: ${errorSummary.invalidData.slice(0, 10).join(", ")}${errorSummary.invalidData.length > 10 ? ` (+${errorSummary.invalidData.length - 10} autres)` : ""}`);
           }
           if (errorSummary.other.length > 0) {
-            console.warn(`⚠️ ${errorSummary.other.length} autre(s) erreur(s): ${errorSummary.other.slice(0, 5).map((e) => e.symbol).join(", ")}${errorSummary.other.length > 5 ? ` (+${errorSummary.other.length - 5} autres)` : ""}`);
+            console.warn(` ${errorSummary.other.length} autre(s) erreur(s): ${errorSummary.other.slice(0, 5).map((e) => e.symbol).join(", ")}${errorSummary.other.length > 5 ? ` (+${errorSummary.other.length - 5} autres)` : ""}`);
           }
           console.groupEnd();
         }
       }
-      const message = newTickersCount > 0 ? `${newTickersCount} nouveau(x) ticker(s) ajouté(s)${updatedTickersCount > 0 ? `, ${updatedTickersCount} mis à jour` : ""}` : updatedTickersCount > 0 ? `${updatedTickersCount} ticker(s) mis à jour` : "Synchronisation terminée (aucun changement)";
+      const message = newTickersCount > 0 ? `${newTickersCount} nouveau(x) ticker(s) ajoute(s)${updatedTickersCount > 0 ? `, ${updatedTickersCount} mis a jour` : ""}` : updatedTickersCount > 0 ? `${updatedTickersCount} ticker(s) mis a jour` : "Synchronisation terminee (aucun changement)";
       showNotification(message, "success");
-      console.log(`✅ ${message}`);
+      console.log(` ${message}`);
     } catch (error) {
-      console.error("❌ Erreur lors de la synchronisation:", error);
+      console.error(" Erreur lors de la synchronisation:", error);
       setTickersLoadError(error.message || "Erreur inconnue");
       showNotification(`Erreur: ${error.message || "Impossible de synchroniser avec Supabase"}`, "error");
     } finally {
@@ -61235,7 +61235,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
       const updatedProfile = {
         ...prev[id],
         ...updates,
-        // Ne pas écraser lastModified si fourni dans updates, sinon update
+        // Ne pas ecraser lastModified si fourni dans updates, sinon update
         lastModified: updates.lastModified || Date.now()
       };
       const updatedLibrary = {
@@ -61421,19 +61421,19 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-3 order-2 lg:order-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2 px-1", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-700 flex items-center gap-2", children: [
-                      "Données Historiques",
-                      historicalCAGR_EPS != null && isFinite(historicalCAGR_EPS) && historicalCAGR_EPS > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full", title: "Taux de croissance annuel composé des EPS sur la période affichée", children: [
+                      "Donnees Historiques",
+                      historicalCAGR_EPS != null && isFinite(historicalCAGR_EPS) && historicalCAGR_EPS > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full", title: "Taux de croissance annuel compose des EPS sur la periode affichee", children: [
                         "CAGR EPS: ",
                         historicalCAGR_EPS.toFixed(1),
                         "%"
                       ] })
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↶ Annuler la dernière modification\\n\\nAnnule la dernière modification effectuée sur les données historiques.\\n\\n📊 Fonctionnalités:\\n• Permet de revenir en arrière sur les changements\\n• Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\\n• Historique illimité (tant que vous ne quittez pas la page)\\n\\n⌨️ Raccourci: Ctrl+Z (Cmd+Z sur Mac)", "aria-label": "Annuler la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-4 h-4" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: undo, disabled: pastData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: " Annuler la derniere modification\\n\\nAnnule la derniere modification effectuee sur les donnees historiques.\\n\\n Fonctionnalites:\\n- Permet de revenir en arriere sur les changements\\n- Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\\n- Historique illimite (tant que vous ne quittez pas la page)\\n\\n Raccourci: Ctrl+Z (Cmd+Z sur Mac)", "aria-label": "Annuler la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$J, { className: "w-4 h-4" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: "↷ Rétablir la modification annulée\\n\\nRétablit la dernière modification que vous avez annulée.\\n\\n📊 Fonctionnalités:\\n• Permet de refaire une action annulée\\n• Fonctionne avec toutes les modifications\\n• Disponible uniquement si vous avez annulé une action\\n\\n⌨️ Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)", "aria-label": "Rétablir la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-4 h-4" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: redo, disabled: futureData.length === 0, className: "p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30", title: " Retablir la modification annulee\\n\\nRetablit la derniere modification que vous avez annulee.\\n\\n Fonctionnalites:\\n- Permet de refaire une action annulee\\n- Fonctionne avec toutes les modifications\\n- Disponible uniquement si vous avez annule une action\\n\\n Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)", "aria-label": "Retablir la modification", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$I, { className: "w-4 h-4" }) }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-px bg-gray-200 my-1" }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: "🔄 Réinitialiser les données\\n\\nRéinitialise toutes les données historiques à leurs valeurs d'origine.\\n\\n⚠️ Attention:\\n• Cette action est irréversible\\n• Toutes vos modifications manuelles seront perdues\\n• Les données seront restaurées depuis la dernière synchronisation FMP\\n• Les hypothèses ne sont PAS affectées\\n\\n💡 Utilisation:\\n• Utile si vous avez fait des erreurs de saisie\\n• Permet de repartir de zéro avec les données FMP\\n• Confirmation requise avant exécution", "aria-label": "Réinitialiser toutes les données", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }) })
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: handleResetData, className: "p-1.5 rounded hover:bg-red-50 text-red-600", title: " Reinitialiser les donnees\\n\\nReinitialise toutes les donnees historiques a leurs valeurs d'origine.\\n\\n Attention:\\n- Cette action est irreversible\\n- Toutes vos modifications manuelles seront perdues\\n- Les donnees seront restaurees depuis la derniere synchronisation FMP\\n- Les hypotheses ne sont PAS affectees\\n\\n Utilisation:\\n- Utile si vous avez fait des erreurs de saisie\\n- Permet de repartir de zero avec les donnees FMP\\n- Confirmation requise avant execution", "aria-label": "Reinitialiser toutes les donnees", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$M, { className: "w-4 h-4" }) })
                     ] })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(HistoricalTable, { data, onUpdateRow: handleUpdateRow }),
@@ -61499,18 +61499,18 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-1 space-y-3 sm:space-y-4 md:space-y-6 no-print order-1 lg:order-2", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-br from-slate-800 to-slate-900 text-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 border-b border-slate-600 pb-2", children: "Résumé Exécutif" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 border-b border-slate-600 pb-2", children: "Resume Executif" }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-slate-300 text-sm mb-4 leading-relaxed", children: [
                       "L'analyse de ",
                       info.name,
-                      " suggère une position ",
+                      " suggere une position ",
                       /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { className: "text-white uppercase", children: recommendation }),
                       " au prix actuel de ",
                       formatCurrency(assumptions.currentPrice),
                       "."
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-slate-300 text-sm mb-4 leading-relaxed", children: targetPrice && targetPrice > 0 && assumptions.currentPrice > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                      "Le titre se négocie à ",
+                      "Le titre se negocie a ",
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("strong", { className: "text-white", children: [
                         (() => {
                           const diff = Math.abs(1 - assumptions.currentPrice / targetPrice) * 100;
@@ -61522,7 +61522,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                       " l'objectif de prix EPS de ",
                       formatCurrency(targetPrice),
                       "."
-                    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-400", children: "Données insuffisantes pour calculer la position relative au prix cible EPS." }) }),
+                    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-slate-400", children: "Donnees insuffisantes pour calculer la position relative au prix cible EPS." }) }),
                     info.beta !== void 0 && info.beta !== null && isFinite(info.beta) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-slate-700/50 p-3 rounded mt-6", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-slate-400 uppercase", children: "Beta" }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-2xl font-bold text-blue-400", children: info.beta.toFixed(2) }),
@@ -61536,7 +61536,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2 sm:space-y-3 text-xs sm:text-sm", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "config-company-name", className: "block text-xs text-gray-500 mb-1", children: "Nom Société" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "config-company-name", className: "block text-xs text-gray-500 mb-1", children: "Nom Societe" }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           "input",
                           {
@@ -61576,8 +61576,8 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex text-xs text-gray-500 mb-1 items-center gap-1", children: [
-                          "Financial Strength (ValueLine 3 déc 2025)",
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-blue-600", title: "Synchronisé depuis Supabase - Lecture seule", children: "🔒" })
+                          "Financial Strength (ValueLine 3 dec 2025)",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-blue-600", title: "Synchronise depuis Supabase - Lecture seule", children: "" })
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           "input",
@@ -61587,14 +61587,14 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                             readOnly: true,
                             className: "w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed",
                             placeholder: "A+, A, B+, etc.",
-                            title: "Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
+                            title: "Cette metrique est synchronisee depuis Supabase et ne peut pas etre modifiee localement"
                           }
                         )
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex text-xs text-gray-500 mb-1 items-center gap-1", children: [
-                          "Earnings Predictability (ValueLine 3 déc 2025)",
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-blue-600", title: "Synchronisé depuis Supabase - Lecture seule", children: "🔒" })
+                          "Earnings Predictability (ValueLine 3 dec 2025)",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-blue-600", title: "Synchronise depuis Supabase - Lecture seule", children: "" })
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           "input",
@@ -61604,14 +61604,14 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                             readOnly: true,
                             className: "w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed",
                             placeholder: "100, 95, 90, etc.",
-                            title: "Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
+                            title: "Cette metrique est synchronisee depuis Supabase et ne peut pas etre modifiee localement"
                           }
                         )
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex text-xs text-gray-500 mb-1 items-center gap-1", children: [
-                          "Price Growth Persistence (ValueLine 3 déc 2025)",
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-blue-600", title: "Synchronisé depuis Supabase - Lecture seule", children: "🔒" })
+                          "Price Growth Persistence (ValueLine 3 dec 2025)",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-blue-600", title: "Synchronise depuis Supabase - Lecture seule", children: "" })
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           "input",
@@ -61621,14 +61621,14 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                             readOnly: true,
                             className: "w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed",
                             placeholder: "95, 90, 85, etc.",
-                            title: "Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
+                            title: "Cette metrique est synchronisee depuis Supabase et ne peut pas etre modifiee localement"
                           }
                         )
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex text-xs text-gray-500 mb-1 items-center gap-1", children: [
-                          "Price Stability (ValueLine 3 déc 2025)",
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-blue-600", title: "Synchronisé depuis Supabase - Lecture seule", children: "🔒" })
+                          "Price Stability (ValueLine 3 dec 2025)",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px] text-blue-600", title: "Synchronise depuis Supabase - Lecture seule", children: "" })
                         ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           "input",
@@ -61638,7 +61638,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                             readOnly: true,
                             className: "w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed",
                             placeholder: "100, 95, 90, etc.",
-                            title: "Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
+                            title: "Cette metrique est synchronisee depuis Supabase et ne peut pas etre modifiee localement"
                           }
                         )
                       ] }),
@@ -61653,7 +61653,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                             onChange: (e) => handleUpdateInfo("beta", parseFloat(e.target.value) || 0),
                             className: "w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none",
                             readOnly: true,
-                            title: "Beta récupéré automatiquement via API FMP"
+                            title: "Beta recupere automatiquement via API FMP"
                           }
                         )
                       ] }),
@@ -61733,7 +61733,7 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 const defaultTicker = "ACN";
                 const upperTicker = defaultTicker.toUpperCase();
                 if (!library[upperTicker]) {
-                  console.log(`📝 Création profil squelette pour ${upperTicker}...`);
+                  console.log(` Creation profil squelette pour ${upperTicker}...`);
                   const skeletonProfile = {
                     id: upperTicker,
                     lastModified: Date.now(),
@@ -61761,13 +61761,13 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                 setTimeout(async () => {
                   const currentProfile = library[upperTicker];
                   if (currentProfile && (!currentProfile.data || currentProfile.data.length === 0)) {
-                    console.log(`🔄 ${upperTicker}: Données toujours vides après handleSelectTicker - Forcer chargement FMP...`);
+                    console.log(` ${upperTicker}: Donnees toujours vides apres handleSelectTicker - Forcer chargement FMP...`);
                     try {
                       const { fetchCompanyData: fetchCompanyData2 } = await __vitePreload(async () => {
                         const { fetchCompanyData: fetchCompanyData22 } = await Promise.resolve().then(() => financeApi);
                         return { fetchCompanyData: fetchCompanyData22 };
                       }, true ? void 0 : void 0, import.meta.url);
-                      showNotification(`Chargement des données FMP pour ${upperTicker}...`, "info");
+                      showNotification(`Chargement des donnees FMP pour ${upperTicker}...`, "info");
                       const result = await fetchCompanyData2(upperTicker);
                       if (result.data && result.data.length > 0 && result.currentPrice > 0) {
                         const updatedProfile = {
@@ -61789,12 +61789,12 @@ ${errors.slice(0, 5).join("\n")}${errors.length > 5 ? `
                           setAssumptions(updatedProfile.assumptions);
                           setInfo(updatedProfile.info);
                         }
-                        showNotification(`✅ ${upperTicker} chargé depuis FMP`, "success");
-                        console.log(`✅ ${upperTicker}: Données FMP chargées avec succès`);
+                        showNotification(` ${upperTicker} charge depuis FMP`, "success");
+                        console.log(` ${upperTicker}: Donnees FMP chargees avec succes`);
                       }
                     } catch (error) {
-                      console.error(`❌ ${upperTicker}: Erreur chargement FMP forcé:`, error);
-                      showNotification(`❌ Impossible de charger ${upperTicker} depuis FMP`, "error");
+                      console.error(` ${upperTicker}: Erreur chargement FMP force:`, error);
+                      showNotification(` Impossible de charger ${upperTicker} depuis FMP`, "error");
                     }
                   }
                 }, 1e3);

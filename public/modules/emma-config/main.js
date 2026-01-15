@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // MAIN - Initialisation et coordination de l'application
-// ═══════════════════════════════════════════════════════════════
+// 
 
 import { switchMainTab, clearFilters } from './ui-helpers.js';
 import './emmaia-logic.js'; // Import for side-effects (window exposure)
@@ -19,9 +19,9 @@ import { initModelsManager } from './models-manager.js';
  * Fonction d'initialisation principale
  */
 export async function init() {
-    // ═══════════════════════════════════════════════════════════
+    // 
     // EXPOSE FUNCTIONS TO GLOBAL SCOPE (pour onclick HTML)
-    // ═══════════════════════════════════════════════════════════
+    // 
     window.switchMainTab = switchMainTab;
     window.selectConfig = selectConfig;
     window.getConfig = getConfig;
@@ -45,9 +45,9 @@ export async function init() {
     window.filterByRelatedPrompts = filterByRelatedPrompts;
     window.clearRelationshipFilter = clearRelationshipFilter;
 
-    // ═══════════════════════════════════════════════════════════
+    // 
     // EVENT LISTENERS
-    // ═══════════════════════════════════════════════════════════
+    // 
 
     // Boutons principaux
     document.getElementById('refreshBtn').addEventListener('click', loadConfigs);
@@ -126,7 +126,7 @@ export async function init() {
         renderConfigList();
     });
 
-    // Event listener pour la fréquence (afficher/masquer jours)
+    // Event listener pour la frequence (afficher/masquer jours)
     document.getElementById('deliveryFrequency')?.addEventListener('change', (e) => {
         const freq = e.target.value;
         const showDays = freq === 'daily' || freq === 'weekly';
@@ -141,25 +141,25 @@ export async function init() {
         }
     });
 
-    // ═══════════════════════════════════════════════════════════
+    // 
     // INITIALISATION
-    // ═══════════════════════════════════════════════════════════
+    // 
 
-    console.log('🚀 Initialisation Emma Config...');
+    console.log(' Initialisation Emma Config...');
 
-    // Charger les prompts d'abord (nécessaire pour le dashboard)
+    // Charger les prompts d'abord (necessaire pour le dashboard)
     await loadConfigs();
-    console.log('✅ Prompts chargés');
+    console.log(' Prompts charges');
 
     // Initialiser le chatbot
     initChatAssistant();
 
-    // Charger le dashboard si c'est l'onglet actif par défaut
-    // Utiliser setTimeout pour s'assurer que le DOM est prêt
+    // Charger le dashboard si c'est l'onglet actif par defaut
+    // Utiliser setTimeout pour s'assurer que le DOM est pret
     setTimeout(() => {
         const dashboardTab = document.getElementById('tabDashboard');
         if (dashboardTab && dashboardTab.classList.contains('bg-white')) {
-            console.log('📊 Onglet dashboard actif, chargement...');
+            console.log(' Onglet dashboard actif, chargement...');
             loadDashboard();
         }
     }, 100);
@@ -170,6 +170,6 @@ export async function init() {
     // Initialiser le gestionnaire Email
     emailManager.init();
 
-    // Initialiser le gestionnaire de modèles
+    // Initialiser le gestionnaire de modeles
     initModelsManager();
 }

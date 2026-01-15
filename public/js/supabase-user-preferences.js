@@ -1,5 +1,5 @@
 /**
- * Service centralisé pour gérer les préférences utilisateur dans Supabase
+ * Service centralise pour gerer les preferences utilisateur dans Supabase
  * Version navigateur (compatible avec Babel/UMD)
  * 
  * Usage:
@@ -10,7 +10,7 @@
 (function() {
     'use strict';
 
-    // Applications supportées
+    // Applications supportees
     const USER_PREFERENCES_APPS = {
         DASHBOARD: 'dashboard',
         CURVEWATCH: 'curvewatch',
@@ -22,10 +22,10 @@
     };
 
     /**
-     * Obtient le client Supabase (côté client)
+     * Obtient le client Supabase (cote client)
      */
     function getSupabaseClient() {
-        // Côté client (window.supabase)
+        // Cote client (window.supabase)
         if (typeof window !== 'undefined' && window.supabase) {
             return window.supabase;
         }
@@ -49,7 +49,7 @@
     }
 
     /**
-     * Charge les préférences utilisateur depuis Supabase
+     * Charge les preferences utilisateur depuis Supabase
      */
     async function loadUserPreferences(appName, userId = null) {
         const supabase = getSupabaseClient();
@@ -92,7 +92,7 @@
     }
 
     /**
-     * Sauvegarde les préférences utilisateur dans Supabase
+     * Sauvegarde les preferences utilisateur dans Supabase
      */
     async function saveUserPreferences(appName, preferences, userId = null) {
         const supabase = getSupabaseClient();
@@ -136,7 +136,7 @@
     }
 
     /**
-     * Charge depuis localStorage (fallback pour utilisateurs non authentifiés)
+     * Charge depuis localStorage (fallback pour utilisateurs non authentifies)
      */
     function loadFromLocalStorage(storageKey) {
         if (typeof window === 'undefined') return null;
@@ -152,7 +152,7 @@
     }
 
     /**
-     * Sauvegarde dans localStorage (fallback pour utilisateurs non authentifiés)
+     * Sauvegarde dans localStorage (fallback pour utilisateurs non authentifies)
      */
     function saveToLocalStorage(storageKey, data) {
         if (typeof window === 'undefined') return false;
@@ -167,7 +167,7 @@
     }
 
     /**
-     * Synchronise localStorage → Supabase (appelé au login)
+     * Synchronise localStorage -> Supabase (appele au login)
      */
     async function syncLocalStorageToSupabase(appName, storageKey, userId = null) {
         // Charger depuis localStorage
@@ -177,7 +177,7 @@
         // Charger depuis Supabase
         const supabaseData = await loadUserPreferences(appName, userId);
         
-        // Merger: Supabase a priorité, mais localStorage peut avoir des champs nouveaux
+        // Merger: Supabase a priorite, mais localStorage peut avoir des champs nouveaux
         const merged = supabaseData 
             ? { ...supabaseData, ...localData } // Supabase prioritaire, localStorage pour nouveaux champs
             : localData; // Si pas de Supabase, utiliser localStorage
@@ -186,14 +186,14 @@
         const saved = await saveUserPreferences(appName, merged, userId);
         
         if (saved) {
-            console.log(`✅ Synced ${appName} preferences: localStorage → Supabase`);
+            console.log(` Synced ${appName} preferences: localStorage -> Supabase`);
         }
         
         return saved;
     }
 
     /**
-     * Charge les préférences avec fallback automatique
+     * Charge les preferences avec fallback automatique
      */
     async function loadPreferencesWithFallback(appName, storageKey, defaultPreferences = {}, userId = null) {
         // Essayer Supabase d'abord
@@ -213,7 +213,7 @@
     }
 
     /**
-     * Sauvegarde les préférences avec fallback automatique
+     * Sauvegarde les preferences avec fallback automatique
      */
     async function savePreferencesWithFallback(appName, storageKey, preferences, userId = null) {
         // Essayer Supabase d'abord
@@ -238,5 +238,5 @@
         USER_PREFERENCES_APPS
     };
 
-    console.log('✅ UserPreferencesService chargé');
+    console.log(' UserPreferencesService charge');
 })();

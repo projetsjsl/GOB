@@ -29,7 +29,7 @@ export function GraphFilters({ filters, onFiltersChange }: GraphFiltersProps) {
           Filtres Graphique
         </CardTitle>
 
-        {/* Affichage des données */}
+        {/* Affichage des donnees */}
         <div className="space-y-2">
           <label className="text-xs font-medium text-muted-foreground">Affichage</label>
           <div className="flex gap-2">
@@ -40,7 +40,7 @@ export function GraphFilters({ filters, onFiltersChange }: GraphFiltersProps) {
               className="h-8 text-xs gap-1"
             >
               {filters.showObserved ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-              Points Observés
+              Points Observes
             </Button>
             <Button
               size="sm"
@@ -54,9 +54,9 @@ export function GraphFilters({ filters, onFiltersChange }: GraphFiltersProps) {
           </div>
         </div>
 
-        {/* Type d'échelle */}
+        {/* Type d'echelle */}
         <div className="space-y-2">
-          <label className="text-xs font-medium text-muted-foreground">Échelle</label>
+          <label className="text-xs font-medium text-muted-foreground">Echelle</label>
           <Select
             value={filters.scaleType}
             onValueChange={(val) => onFiltersChange({ ...filters, scaleType: val as "linear" | "log" })}
@@ -65,15 +65,15 @@ export function GraphFilters({ filters, onFiltersChange }: GraphFiltersProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="linear">Linéaire</SelectItem>
+              <SelectItem value="linear">Lineaire</SelectItem>
               <SelectItem value="log">Logarithmique</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {/* Plage de maturités */}
+        {/* Plage de maturites */}
         <div className="space-y-2">
-          <label className="text-xs font-medium text-muted-foreground">Maturités</label>
+          <label className="text-xs font-medium text-muted-foreground">Maturites</label>
           <div className="flex gap-2">
             <Select
               value={filters.minMaturity}
@@ -90,7 +90,7 @@ export function GraphFilters({ filters, onFiltersChange }: GraphFiltersProps) {
                 ))}
               </SelectContent>
             </Select>
-            <span className="text-xs text-muted-foreground">à</span>
+            <span className="text-xs text-muted-foreground">a</span>
             <Select
               value={filters.maxMaturity}
               onValueChange={(val) => onFiltersChange({ ...filters, maxMaturity: val })}
@@ -109,10 +109,10 @@ export function GraphFilters({ filters, onFiltersChange }: GraphFiltersProps) {
           </div>
         </div>
 
-        {/* Opacité */}
+        {/* Opacite */}
         <div className="space-y-2">
           <label className="text-xs font-medium text-muted-foreground">
-            Opacité ({(filters.opacity * 100).toFixed(0)}%)
+            Opacite ({(filters.opacity * 100).toFixed(0)}%)
           </label>
           <Slider
             value={[filters.opacity]}

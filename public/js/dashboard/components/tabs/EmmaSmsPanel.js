@@ -65,7 +65,7 @@ const EmmaSmsPanel = () => {
                         body: JSON.stringify({ action: 'saveEnv', payload: envValues })
                     });
                     if (!res.ok) throw new Error('Erreur lors de la sauvegarde');
-                    setActionMessage({ type: 'success', text: 'Configuration enregistrée ✅' });
+                    setActionMessage({ type: 'success', text: 'Configuration enregistree ' });
                 } catch (error) {
                     setActionMessage({ type: 'error', text: error.message });
                 } finally {
@@ -86,7 +86,7 @@ const EmmaSmsPanel = () => {
                         const { error } = await res.json();
                         throw new Error(error || 'Erreur action serveur');
                     }
-                    setActionMessage({ type: 'success', text: action === 'startServer' ? 'Serveur démarré' : 'Serveur arrêté' });
+                    setActionMessage({ type: 'success', text: action === 'startServer' ? 'Serveur demarre' : 'Serveur arrete' });
                 } catch (error) {
                     setActionMessage({ type: 'error', text: error.message });
                 } finally {
@@ -104,10 +104,10 @@ const EmmaSmsPanel = () => {
                         body: JSON.stringify({ action: 'runScenarios' })
                     });
                     const data = await res.json();
-                    if (!res.ok || !data.success) throw new Error(data.error || 'Erreur scénarios');
-                    setScenarioOutput(data.output || 'Scénarios terminés.');
+                    if (!res.ok || !data.success) throw new Error(data.error || 'Erreur scenarios');
+                    setScenarioOutput(data.output || 'Scenarios termines.');
                 } catch (error) {
-                    setScenarioOutput(`❌ ${error.message}`);
+                    setScenarioOutput(` ${error.message}`);
                 } finally {
                     setScenarioLoading(false);
                 }
@@ -131,13 +131,13 @@ const EmmaSmsPanel = () => {
                 }`}>
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <h3 className="text-xl font-semibold flex items-center gap-2"><Icon emoji="📱" size={20}/> Emma SMS</h3>
-                            <p className="text-sm opacity-75">Gérez les webhooks n8n, le serveur de test et les variables SMS.</p>
+                            <h3 className="text-xl font-semibold flex items-center gap-2"><Icon emoji="" size={20}/> Emma SMS</h3>
+                            <p className="text-sm opacity-75">Gerez les webhooks n8n, le serveur de test et les variables SMS.</p>
                         </div>
                         <button
                             onClick={fetchStatus}
                             className={`px-3 py-2 rounded-lg text-sm font-medium ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}>
-                            Rafraîchir
+                            Rafraichir
                         </button>
                     </div>
 
@@ -159,7 +159,7 @@ const EmmaSmsPanel = () => {
                                 <div className="space-y-3">
                                     <label className={`text-sm font-semibold flex items-center justify-between ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                         Mode (presets)
-                                        {statusBadge(serverState.running ? 'Serveur actif' : 'Serveur arrêté', serverState.running ? 'success' : 'warning')}
+                                        {statusBadge(serverState.running ? 'Serveur actif' : 'Serveur arrete', serverState.running ? 'success' : 'warning')}
                                     </label>
                                     <div className="space-y-2">
                                         {Object.entries(modePresets).map(([key, preset]) => {
@@ -188,9 +188,9 @@ const EmmaSmsPanel = () => {
                                                         <div className="font-semibold">{preset.label}</div>
                                                         <div className="text-xs opacity-70">{preset.description}</div>
                                                         <div className="text-xs opacity-80">
-                                                            {key === 'test' && '💲 Gratuit (aucun SMS Twilio).'}
-                                                            {key === 'prod_local' && '💲 SMS facturés par Twilio (ton tunnel local).'}
-                                                            {key === 'prod_cloud' && '💲 SMS Twilio + hébergeur (Render/Railway).'}
+                                                            {key === 'test' && ' Gratuit (aucun SMS Twilio).'}
+                                                            {key === 'prod_local' && ' SMS factures par Twilio (ton tunnel local).'}
+                                                            {key === 'prod_cloud' && ' SMS Twilio + hebergeur (Render/Railway).'}
                                                         </div>
                                                     </div>
                                                 </label>
@@ -210,7 +210,7 @@ const EmmaSmsPanel = () => {
                                                     checked={(envValues.TEST_MODE || 'true') === value}
                                                     onChange={() => handleEnvChange('TEST_MODE', value)}
                                                 />
-                                                {value === 'true' ? 'true (aucun SMS réel)' : 'false (Twilio réel)'}
+                                                {value === 'true' ? 'true (aucun SMS reel)' : 'false (Twilio reel)'}
                                             </label>
                                         ))}
                                     </div>
@@ -260,56 +260,56 @@ const EmmaSmsPanel = () => {
                                     onClick={saveEnv}
                                     disabled={saving}
                                     className={`px-4 py-2 rounded-lg text-sm font-semibold text-white ${saving ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}>
-                                    💾 Sauvegarder la configuration
+                                     Sauvegarder la configuration
                                 </button>
                                 <button
                                     onClick={() => handleServerAction('startServer')}
                                     disabled={serverLoading}
                                     className={`px-4 py-2 rounded-lg text-sm font-semibold ${isDarkMode ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-emerald-500 hover:bg-emerald-600 text-white'}`}>
-                                    🚀 Démarrer serveur
+                                     Demarrer serveur
                                 </button>
                                 <button
                                     onClick={() => handleServerAction('stopServer')}
                                     disabled={serverLoading}
                                     className={`px-4 py-2 rounded-lg text-sm font-semibold ${isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'}`}>
-                                    🛑 Arrêter serveur
+                                     Arreter serveur
                                 </button>
                                 <button
                                     onClick={launchScenarios}
                                     disabled={scenarioLoading}
                                     className={`px-4 py-2 rounded-lg text-sm font-semibold ${isDarkMode ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-purple-500 hover:bg-purple-600 text-white'}`}>
-                                    🧪 Lancer scénarios
+                                     Lancer scenarios
                                 </button>
                             </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                            <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="📡" size={16}/> Webhook n8n</h4>
-                            <p className="text-xs break-all mb-2">{envValues.EMMA_WEBHOOK_URL || 'Non défini'}</p>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="" size={16}/> Webhook n8n</h4>
+                            <p className="text-xs break-all mb-2">{envValues.EMMA_WEBHOOK_URL || 'Non defini'}</p>
                             {webhookStatus && statusBadge(webhookStatus.status === 'ok' ? 'n8n OK' : webhookStatus.status.toUpperCase(), webhookStatus.status === 'ok' ? 'success' : 'error')}
                             <p className="text-xs opacity-70 mt-1">{webhookStatus?.message}</p>
                                 </div>
                                 <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                                    <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="🔌" size={16}/> Serveur local</h4>
+                                    <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="" size={16}/> Serveur local</h4>
                                     <p className="text-sm">Port: {serverState.info?.port || envValues.PORT || '3000'}</p>
                                     <p className="text-xs opacity-70">Mode: {serverState.info?.mode || envValues.MODE || 'test'}</p>
-                                    <p className="text-xs opacity-70">PID: {serverState.info?.pid || '—'}</p>
+                                    <p className="text-xs opacity-70">PID: {serverState.info?.pid || '-'}</p>
                                 </div>
                                 <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                                    <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="📝" size={16}/> Checklist Twilio</h4>
+                                    <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="" size={16}/> Checklist Twilio</h4>
                                     <ul className="text-xs space-y-1">
-                                        <li>{envValues.TWILIO_ACCOUNT_SID ? '✔️ SID configuré' : '⚠️ SID manquant'}</li>
-                                        <li>{envValues.TWILIO_AUTH_TOKEN ? '✔️ Token configuré' : '⚠️ Token manquant'}</li>
-                                        <li>{envValues.TWILIO_PHONE_NUMBER ? `📞 ${envValues.TWILIO_PHONE_NUMBER}` : '⚠️ Numéro Twilio manquant'}</li>
+                                        <li>{envValues.TWILIO_ACCOUNT_SID ? ' SID configure' : ' SID manquant'}</li>
+                                        <li>{envValues.TWILIO_AUTH_TOKEN ? ' Token configure' : ' Token manquant'}</li>
+                                        <li>{envValues.TWILIO_PHONE_NUMBER ? ` ${envValues.TWILIO_PHONE_NUMBER}` : ' Numero Twilio manquant'}</li>
                                     </ul>
                                 </div>
                             </div>
 
                             <div className={`rounded-lg border p-3 ${isDarkMode ? 'border-gray-800 bg-gray-900' : 'border-gray-100 bg-white'}`}>
-                                <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="📘" size={16}/> Instructions rapides</h4>
+                                <h4 className="font-semibold mb-2 flex items-center gap-2"><Icon emoji="" size={16}/> Instructions rapides</h4>
                                 <ol className="text-sm list-decimal list-inside space-y-1 opacity-80">
-                                    <li>Mode TEST : `EMMA_WEBHOOK_URL` → `.../gob-sms-webhook-test`, `TEST_MODE=true`, aucun coût Twilio.</li>
-                                    <li>Mode PROD LOCAL : définir `PUBLIC_URL` (ngrok), `MODE=prod_local`, `TEST_MODE=false`, configurer le webhook Twilio vers `PUBLIC_URL/webhook/sms`.</li>
+                                    <li>Mode TEST : `EMMA_WEBHOOK_URL` -> `.../gob-sms-webhook-test`, `TEST_MODE=true`, aucun cout Twilio.</li>
+                                    <li>Mode PROD LOCAL : definir `PUBLIC_URL` (ngrok), `MODE=prod_local`, `TEST_MODE=false`, configurer le webhook Twilio vers `PUBLIC_URL/webhook/sms`.</li>
                                     <li>Mode PROD CLOUD : `MODE=prod_cloud`, `PUBLIC_URL=https://gobapps.com`, garantir que Twilio pointe vers `https://gobapps.com/webhook/sms`.</li>
                                 </ol>
                             </div>
@@ -318,14 +318,14 @@ const EmmaSmsPanel = () => {
                                 <div className="flex items-center justify-between mb-2">
                                     <div>
                                         <h4 className="text-lg font-semibold flex items-center gap-2">
-                                            <Icon emoji="🖥️" size={16}/> Dashboard Remote
+                                            <Icon emoji="" size={16}/> Dashboard Remote
                                         </h4>
-                                        <p className="text-xs opacity-70 break-all">{publicUrl || '(PUBLIC_URL non défini)'}</p>
+                                        <p className="text-xs opacity-70 break-all">{publicUrl || '(PUBLIC_URL non defini)'}</p>
                                     </div>
                                     <button
                                         onClick={fetchStatus}
                                         className={`px-3 py-2 rounded-lg text-sm font-medium ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-100 hover:bg-gray-200'}`}>
-                                        🔄 Recharger
+                                         Recharger
                                     </button>
                                 </div>
                                 {publicUrl && publicUrl.startsWith('http') ? (
@@ -337,7 +337,7 @@ const EmmaSmsPanel = () => {
                                     />
                                 ) : (
                                     <p className="text-sm opacity-75">
-                                        Définissez `PUBLIC_URL` pour afficher le dashboard Render/Railway ici.
+                                        Definissez `PUBLIC_URL` pour afficher le dashboard Render/Railway ici.
                                     </p>
                                 )}
                             </div>

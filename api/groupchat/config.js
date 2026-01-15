@@ -21,7 +21,7 @@ export default async function handler(req, res) {
         description: 'Free demo - 10 simulated sites', 
         status: 'ready', 
         cost: 'FREE', 
-        icon: '🎭', 
+        icon: '', 
         endpoint: '/api/groupchat/simulate', 
         tier: 'free' 
       },
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
         description: 'Real cloud browser with live view',
         status: (process.env.BROWSERBASE_API_KEY && process.env.BROWSERBASE_PROJECT_ID) ? 'ready' : 'not_configured',
         cost: '$39+/mo', 
-        icon: '🌐', 
+        icon: '', 
         endpoint: '/api/groupchat/browser', 
         configUrl: 'https://browserbase.com', 
         tier: 'pro' 
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
         description: 'Alternative cloud browser',
         status: process.env.BROWSERLESS_API_KEY ? 'ready' : 'not_configured',
         cost: '$10+/mo', 
-        icon: '🔷', 
+        icon: '', 
         endpoint: '/api/groupchat/browser', 
         configUrl: 'https://browserless.io', 
         tier: 'pro' 
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
         description: 'AI-optimized sessions',
         status: process.env.STEEL_API_KEY ? 'ready' : 'not_configured',
         cost: 'Usage', 
-        icon: '🔩', 
+        icon: '', 
         endpoint: '/api/groupchat/browser', 
         configUrl: 'https://steel.dev', 
         tier: 'pro' 

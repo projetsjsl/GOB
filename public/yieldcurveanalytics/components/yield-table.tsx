@@ -12,7 +12,7 @@ interface YieldTableProps {
 }
 
 const COUNTRY_NAMES: Record<string, string> = {
-  US: "Trésor U.S.",
+  US: "Tresor U.S.",
   CA: "Gouvernement Canadien",
 }
 
@@ -49,8 +49,8 @@ export function YieldTable({ points, country = "US" }: YieldTableProps) {
           </CardTitle>
           <CardDescription className="text-muted-foreground">
             {country === "US"
-              ? "Rendements du Trésor U.S. par maturité"
-              : "Rendements par maturité du gouvernement canadien"}
+              ? "Rendements du Tresor U.S. par maturite"
+              : "Rendements par maturite du gouvernement canadien"}
           </CardDescription>
         </div>
         <Button variant="ghost" size="sm" onClick={handleExport}>
@@ -61,7 +61,7 @@ export function YieldTable({ points, country = "US" }: YieldTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="border-border">
-              <TableHead className="text-foreground">Maturité</TableHead>
+              <TableHead className="text-foreground">Maturite</TableHead>
               <TableHead className="text-right text-foreground">Rendement (%)</TableHead>
             </TableRow>
           </TableHeader>

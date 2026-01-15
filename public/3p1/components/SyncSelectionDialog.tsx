@@ -13,16 +13,16 @@ interface SyncSelectionDialogProps {
 
 type SyncFilter = 
   | 'all'
-  | 'portfolio'      // Étoiles (isWatchlist: false)
-  | 'watchlist'     // Œil (isWatchlist: true)
+  | 'portfolio'      // Etoiles (isWatchlist: false)
+  | 'watchlist'     // il (isWatchlist: true)
   | 'na'            // Tickers avec N/A
   | 'sector'        // Par secteur
   | 'recommendation' // Par recommandation
-  | 'metric'        // Par métrique (JPEGY, Ratio 3:1, etc.)
+  | 'metric'        // Par metrique (JPEGY, Ratio 3:1, etc.)
   | 'performance'   // Par performance (Top/Bottom)
-  | 'status'        // Par statut (approuvé, squelette)
-  | 'combined'      // Filtres combinés
-  | 'custom';       // Sélection manuelle
+  | 'status'        // Par statut (approuve, squelette)
+  | 'combined'      // Filtres combines
+  | 'custom';       // Selection manuelle
 
 type MetricFilter = 'jpegy' | 'ratio31' | 'return' | 'volatility' | 'pe' | 'yield';
 type MetricRange = '<' | 'between' | '>';
@@ -53,7 +53,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
   const [customSelection, setCustomSelection] = useState<Set<string>>(new Set());
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Calculer les métriques complètes pour tous les profils
+  // Calculer les metriques completes pour tous les profils
   const profileMetrics = useMemo(() => {
     return profiles.map(profile => {
       const currentPrice = Math.max(profile.assumptions?.currentPrice || 0, 0.01);
@@ -62,7 +62,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
       const hasValidEPS = baseEPS > 0.01;
       const basePE = hasValidEPS && currentPrice > 0 ? currentPrice / baseEPS : 0;
       const safeBasePE = basePE > 0 && basePE <= 1000 ? basePE : 0;
-      // BUG #3P1-2 FIX: Validation pour éviter NaN quand currentPrice = 0
+      // BUG #3P1-2 FIX: Validation pour eviter NaN quand currentPrice = 0
       const baseYield = currentPrice > 0 && profile.assumptions.currentDividend >= 0 
         ? (profile.assumptions.currentDividend / currentPrice) * 100 
         : 0;
@@ -90,7 +90,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
         ? ((targetPrice - currentPrice) / currentPrice) * 100
         : 0;
 
-      // Calculer volatilité (simplifié - écart-type des prix historiques)
+      // Calculer volatilite (simplifie - ecart-type des prix historiques)
       const prices = profile.data.map(d => (d.priceHigh + d.priceLow) / 2).filter(p => p > 0);
       const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
       const variance = prices.reduce((sum, p) => sum + Math.pow(p - avgPrice, 2), 0) / prices.length;
@@ -135,7 +135,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
     return Array.from(recSet).sort();
   }, [profileMetrics]);
 
-  // Filtrer les tickers selon les critères
+  // Filtrer les tickers selon les criteres
   const filteredTickers = useMemo(() => {
     let filtered = profileMetrics;
 
@@ -276,7 +276,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
 
   const handleConfirm = () => {
     if (filteredTickers.length === 0) {
-      alert('Aucun ticker ne correspond aux critères sélectionnés.');
+      alert('Aucun ticker ne correspond aux criteres selectionnes.');
       return;
     }
     onConfirm(filteredTickers);
@@ -287,16 +287,16 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
   const getFilterLabel = (filter: SyncFilter): string => {
     switch (filter) {
       case 'all': return 'Tous les tickers';
-      case 'portfolio': return 'Portefeuille (étoiles)';
-      case 'watchlist': return 'Watchlist (œil)';
+      case 'portfolio': return 'Portefeuille (etoiles)';
+      case 'watchlist': return 'Watchlist (il)';
       case 'na': return 'Tickers avec N/A';
       case 'sector': return 'Par secteur';
       case 'recommendation': return 'Par recommandation';
-      case 'metric': return 'Par métrique';
+      case 'metric': return 'Par metrique';
       case 'performance': return 'Par performance';
       case 'status': return 'Par statut';
-      case 'combined': return 'Filtres combinés';
-      case 'custom': return 'Sélection manuelle';
+      case 'combined': return 'Filtres combines';
+      case 'custom': return 'Selection manuelle';
       default: return '';
     }
   };
@@ -306,7 +306,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
       case 'jpegy': return 'JPEGY';
       case 'ratio31': return 'Ratio 3:1';
       case 'return': return 'Return %';
-      case 'volatility': return 'Volatilité %';
+      case 'volatility': return 'Volatilite %';
       case 'pe': return 'P/E';
       case 'yield': return 'Yield %';
       default: return '';
@@ -329,21 +329,21 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
         <div className="flex items-center gap-3 mb-6">
           <FunnelIcon className="w-6 h-6 text-blue-600" />
           <h2 className="text-xl font-bold text-gray-900">
-            Synchronisation avec critères avancés
+            Synchronisation avec criteres avances
           </h2>
         </div>
 
-        {/* Toggle avancé */}
+        {/* Toggle avance */}
         <div className="mb-4 flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Choisissez les critères pour sélectionner les tickers à synchroniser :
+            Choisissez les criteres pour selectionner les tickers a synchroniser :
           </p>
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
             className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
           >
             <ChartBarIcon className="w-4 h-4" />
-            {showAdvanced ? 'Options simples' : 'Options avancées'}
+            {showAdvanced ? 'Options simples' : 'Options avancees'}
           </button>
         </div>
 
@@ -380,7 +380,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
             <div className="flex items-center gap-2 flex-1">
               <StarIcon className="w-5 h-5 text-yellow-500" />
               <div>
-                <div className="font-semibold text-gray-900">Portefeuille (étoiles)</div>
+                <div className="font-semibold text-gray-900">Portefeuille (etoiles)</div>
                 <div className="text-xs text-gray-500">{profileMetrics.filter(m => !m.profile.isWatchlist).length} ticker(s)</div>
               </div>
             </div>
@@ -400,7 +400,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
             <div className="flex items-center gap-2 flex-1">
               <EyeIcon className="w-5 h-5 text-blue-500" />
               <div>
-                <div className="font-semibold text-gray-900">Watchlist (œil)</div>
+                <div className="font-semibold text-gray-900">Watchlist (il)</div>
                 <div className="text-xs text-gray-500">{profileMetrics.filter(m => m.profile.isWatchlist).length} ticker(s)</div>
               </div>
             </div>
@@ -443,7 +443,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                 <div className="text-xs text-gray-500">
                   {selectedSector 
                     ? `${profileMetrics.filter(m => m.profile.info.sector === selectedSector).length} ticker(s) dans "${selectedSector}"`
-                    : 'Sélectionnez un secteur'}
+                    : 'Selectionnez un secteur'}
                 </div>
               </div>
             </label>
@@ -455,7 +455,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                   onChange={(e) => setSelectedSector(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="">-- Sélectionnez un secteur --</option>
+                  <option value="">-- Selectionnez un secteur --</option>
                   {sectors.map(sector => (
                     <option key={sector} value={sector}>
                       {sector} ({profileMetrics.filter(m => m.profile.info.sector === sector).length} tickers)
@@ -483,7 +483,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                 <div className="text-xs text-gray-500">
                   {selectedRecommendation 
                     ? `${profileMetrics.filter(m => m.recommendation === selectedRecommendation).length} ticker(s) avec "${selectedRecommendation}"`
-                    : 'Sélectionnez une recommandation'}
+                    : 'Selectionnez une recommandation'}
                 </div>
               </div>
             </label>
@@ -495,10 +495,10 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                   onChange={(e) => setSelectedRecommendation(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="">-- Sélectionnez une recommandation --</option>
+                  <option value="">-- Selectionnez une recommandation --</option>
                   {recommendations.map(rec => {
                     const count = profileMetrics.filter(m => m.recommendation === rec).length;
-                    const emoji = rec === 'ACHAT' ? '🟢' : rec === 'CONSERVER' ? '🟡' : rec === 'VENTE' ? '🔴' : '⚪';
+                    const emoji = rec === 'ACHAT' ? '' : rec === 'CONSERVER' ? '' : rec === 'VENTE' ? '' : '';
                     return (
                       <option key={rec} value={rec}>
                         {emoji} {rec} ({count} tickers)
@@ -510,10 +510,10 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
             )}
           </div>
 
-          {/* Options avancées */}
+          {/* Options avancees */}
           {showAdvanced && (
             <>
-              {/* Par métrique avec plage */}
+              {/* Par metrique avec plage */}
               <div>
                 <label className="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                   style={{ borderColor: selectedFilter === 'metric' ? '#2563eb' : '#e5e7eb' }}>
@@ -526,7 +526,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                     className="w-4 h-4 text-blue-600"
                   />
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-900">Par métrique (plage de valeurs)</div>
+                    <div className="font-semibold text-gray-900">Par metrique (plage de valeurs)</div>
                     <div className="text-xs text-gray-500">Filtrer par JPEGY, Ratio 3:1, Return %, etc.</div>
                   </div>
                 </label>
@@ -541,7 +541,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                       <option value="jpegy">JPEGY</option>
                       <option value="ratio31">Ratio 3:1</option>
                       <option value="return">Return %</option>
-                      <option value="volatility">Volatilité %</option>
+                      <option value="volatility">Volatilite %</option>
                       <option value="pe">P/E</option>
                       <option value="yield">Yield %</option>
                     </select>
@@ -590,7 +590,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                   />
                   <div className="flex-1">
                     <div className="font-semibold text-gray-900">Par performance (Top/Bottom)</div>
-                    <div className="text-xs text-gray-500">Top 10 ou Bottom 10 par métrique</div>
+                    <div className="text-xs text-gray-500">Top 10 ou Bottom 10 par metrique</div>
                   </div>
                 </label>
                 
@@ -621,7 +621,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                       <option value="jpegy">JPEGY</option>
                       <option value="ratio31">Ratio 3:1</option>
                       <option value="return">Return %</option>
-                      <option value="volatility">Volatilité %</option>
+                      <option value="volatility">Volatilite %</option>
                       <option value="pe">P/E</option>
                       <option value="yield">Yield %</option>
                     </select>
@@ -643,7 +643,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                   />
                   <div className="flex-1">
                     <div className="font-semibold text-gray-900">Par statut</div>
-                    <div className="text-xs text-gray-500">Approuvé, non approuvé, ou squelette</div>
+                    <div className="text-xs text-gray-500">Approuve, non approuve, ou squelette</div>
                   </div>
                 </label>
                 
@@ -654,15 +654,15 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                       onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
-                      <option value="skeleton">Squelette (données incomplètes)</option>
-                      <option value="not-approved">Non approuvé</option>
-                      <option value="approved">Approuvé</option>
+                      <option value="skeleton">Squelette (donnees incompletes)</option>
+                      <option value="not-approved">Non approuve</option>
+                      <option value="approved">Approuve</option>
                     </select>
                   </div>
                 )}
               </div>
 
-              {/* Filtres combinés */}
+              {/* Filtres combines */}
               <div>
                 <label className="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                   style={{ borderColor: selectedFilter === 'combined' ? '#2563eb' : '#e5e7eb' }}>
@@ -675,8 +675,8 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                     className="w-4 h-4 text-blue-600"
                   />
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-900">Filtres combinés</div>
-                    <div className="text-xs text-gray-500">Combiner plusieurs critères</div>
+                    <div className="font-semibold text-gray-900">Filtres combines</div>
+                    <div className="text-xs text-gray-500">Combiner plusieurs criteres</div>
                   </div>
                 </label>
                 
@@ -689,7 +689,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                         onChange={(e) => setCombinedFilters({ ...combinedFilters, portfolio: e.target.checked })}
                         className="w-4 h-4"
                       />
-                      <span className="text-sm">Portefeuille (étoiles)</span>
+                      <span className="text-sm">Portefeuille (etoiles)</span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -698,7 +698,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                         onChange={(e) => setCombinedFilters({ ...combinedFilters, watchlist: e.target.checked })}
                         className="w-4 h-4"
                       />
-                      <span className="text-sm">Watchlist (œil)</span>
+                      <span className="text-sm">Watchlist (il)</span>
                     </label>
                     <select
                       value={combinedFilters.sector || ''}
@@ -724,7 +724,7 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                 )}
               </div>
 
-              {/* Sélection manuelle */}
+              {/* Selection manuelle */}
               <div>
                 <label className="flex items-center gap-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                   style={{ borderColor: selectedFilter === 'custom' ? '#2563eb' : '#e5e7eb' }}>
@@ -737,8 +737,8 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
                     className="w-4 h-4 text-blue-600"
                   />
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-900">Sélection manuelle</div>
-                    <div className="text-xs text-gray-500">{customSelection.size} ticker(s) sélectionné(s)</div>
+                    <div className="font-semibold text-gray-900">Selection manuelle</div>
+                    <div className="text-xs text-gray-500">{customSelection.size} ticker(s) selectionne(s)</div>
                   </div>
                 </label>
                 
@@ -773,10 +773,10 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
           )}
         </div>
 
-        {/* Résumé */}
+        {/* Resume */}
         <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <div className="text-sm font-semibold text-blue-900 mb-1">
-            Tickers sélectionnés : {filteredTickers.length}
+            Tickers selectionnes : {filteredTickers.length}
           </div>
           {filteredTickers.length > 0 && filteredTickers.length <= 10 && (
             <div className="text-xs text-blue-700 mt-1">

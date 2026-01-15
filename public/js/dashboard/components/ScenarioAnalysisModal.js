@@ -119,7 +119,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                     });
                 } catch (err) {
                     console.error('Error fetching baseline data:', err);
-                    setDataError('Impossible de récupérer toutes les données. Utilisation de valeurs par défaut.');
+                    setDataError('Impossible de recuperer toutes les donnees. Utilisation de valeurs par defaut.');
                 } finally {
                     setDataLoading(false);
                 }
@@ -132,7 +132,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
     }, [symbol, baselineData]);
     const [scenarios, setScenarios] = useState({
         pessimistic: {
-            name: 'Scénario Pessimiste',
+            name: 'Scenario Pessimiste',
             color: 'red',
             revenueGrowth: -5,
             marginChange: -2,
@@ -140,7 +140,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
             terminalGrowth: 1.5
         },
         base: {
-            name: 'Scénario de Base',
+            name: 'Scenario de Base',
             color: 'blue',
             revenueGrowth: baselineData?.avgGrowth || 5,
             marginChange: 0,
@@ -148,7 +148,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
             terminalGrowth: 2.5
         },
         optimistic: {
-            name: 'Scénario Optimiste',
+            name: 'Scenario Optimiste',
             color: 'green',
             revenueGrowth: 15,
             marginChange: 3,
@@ -156,7 +156,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
             terminalGrowth: 3.5
         },
         custom: {
-            name: 'Scénario Personnalisé',
+            name: 'Scenario Personnalise',
             color: 'purple',
             revenueGrowth: 10,
             marginChange: 1,
@@ -310,7 +310,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                             <span className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
                                 <i className="iconoir-graph-up text-purple-400 text-xl"></i>
                             </span>
-                            Analyse de Scénarios - {symbol}
+                            Analyse de Scenarios - {symbol}
                         </h2>
                         <p className="text-gray-400 text-sm mt-1">
                             Simulation What-If pour la valorisation DCF
@@ -330,7 +330,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                         <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mb-6">
                             <div className="flex items-center gap-3">
                                 <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
-                                <p className="text-blue-400 text-sm">Récupération des données financières depuis FMP...</p>
+                                <p className="text-blue-400 text-sm">Recuperation des donnees financieres depuis FMP...</p>
                             </div>
                         </div>
                     )}
@@ -345,12 +345,12 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
 
                     {/* Baseline Data Summary */}
                     <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-4 border border-gray-700 mb-6">
-                        <h3 className="text-lg font-bold text-white mb-3">Données de Base</h3>
+                        <h3 className="text-lg font-bold text-white mb-3">Donnees de Base</h3>
                         {validatedBaselineData.latestFCF <= 1000000 && (
                             <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
                                 <p className="text-yellow-400 text-xs">
-                                    ⚠️ Données par défaut utilisées. Les calculs peuvent ne pas être précis. 
-                                    Assurez-vous que baselineData contient les vraies données financières.
+                                     Donnees par defaut utilisees. Les calculs peuvent ne pas etre precis. 
+                                    Assurez-vous que baselineData contient les vraies donnees financieres.
                                 </p>
                             </div>
                         )}
@@ -359,7 +359,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                                 <div className="text-gray-400 text-xs mb-1">Free Cash Flow</div>
                                 <div className="text-white font-mono">${(validatedBaselineData.latestFCF / 1e9).toFixed(2)}B</div>
                                 {validatedBaselineData.latestFCF <= 1000000 && (
-                                    <div className="text-yellow-400 text-xs mt-1">(Par défaut)</div>
+                                    <div className="text-yellow-400 text-xs mt-1">(Par defaut)</div>
                                 )}
                             </div>
                             <div>
@@ -407,7 +407,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                                         </div>
 
                                         <div>
-                                            <label className="text-xs text-gray-400">Δ Marge (%)</label>
+                                            <label className="text-xs text-gray-400"> Marge (%)</label>
                                             <input
                                                 type="number"
                                                 value={scenario.marginChange}
@@ -512,7 +512,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                     {/* Multi-Scenario Comparison Chart */}
                     {ComposedChart && (
                         <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700 mb-6">
-                            <h3 className="text-xl font-bold text-white mb-4">Comparaison Multi-Scénarios</h3>
+                            <h3 className="text-xl font-bold text-white mb-4">Comparaison Multi-Scenarios</h3>
                             <ResponsiveContainer width="100%" height={400}>
                                 <ComposedChart data={Object.keys(scenarios).map(key => ({
                                     scenario: scenarios[key].name,
@@ -597,10 +597,10 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                     {LineChart && sensitivityData.length > 0 && (
                         <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700 mb-6">
                             <h3 className="text-xl font-bold text-white mb-4">
-                                Analyse de Sensibilité - Taux d'Actualisation
+                                Analyse de Sensibilite - Taux d'Actualisation
                             </h3>
                             <p className="text-sm text-gray-400 mb-4">
-                                Impact du taux d'actualisation sur la valorisation (scénario de base)
+                                Impact du taux d'actualisation sur la valorisation (scenario de base)
                             </p>
                             <ResponsiveContainer width="100%" height={300}>
                                 <LineChart data={sensitivityData}>
@@ -646,7 +646,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                                 Projection de Prix Futur - {scenarios[selectedScenario]?.name}
                             </h3>
                             <p className="text-sm text-gray-400 mb-4">
-                                Projection basée sur la croissance FCF et les multiples de valorisation
+                                Projection basee sur la croissance FCF et les multiples de valorisation
                             </p>
                             <ResponsiveContainer width="100%" height={300}>
                                 <AreaChart data={[
@@ -684,7 +684,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                                         stroke="#3b82f6" 
                                         fill="url(#priceGradient)" 
                                         strokeWidth={2}
-                                        name="Prix Projeté"
+                                        name="Prix Projete"
                                     />
                                     <Area 
                                         type="monotone" 
@@ -852,7 +852,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                         {results[selectedScenario] && (
                             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="bg-gray-800/50 rounded-lg p-4">
-                                    <h4 className="text-sm font-bold text-gray-300 mb-3">Détails du Calcul - {scenarios[selectedScenario]?.name}</h4>
+                                    <h4 className="text-sm font-bold text-gray-300 mb-3">Details du Calcul - {scenarios[selectedScenario]?.name}</h4>
                                     <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
                                             <span className="text-gray-400">PV des FCF (10 ans)</span>
@@ -881,7 +881,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                                     </div>
                                 </div>
                                 <div className="bg-gray-800/50 rounded-lg p-4">
-                                    <h4 className="text-sm font-bold text-gray-300 mb-3">Hypothèses</h4>
+                                    <h4 className="text-sm font-bold text-gray-300 mb-3">Hypotheses</h4>
                                     <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
                                             <span className="text-gray-400">FCF Initial</span>
@@ -892,7 +892,7 @@ const ScenarioAnalysisModal = ({ symbol, currentPrice, baselineData, onClose }) 
                                             <span className="text-white font-mono">{scenarios[selectedScenario]?.revenueGrowth.toFixed(1)}%</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-gray-400">Δ Marge</span>
+                                            <span className="text-gray-400"> Marge</span>
                                             <span className="text-white font-mono">{scenarios[selectedScenario]?.marginChange.toFixed(1)}%</span>
                                         </div>
                                         <div className="flex justify-between">

@@ -1,10 +1,10 @@
 /**
- * API endpoint pour générer le contenu des barres d'annonces via Gemini avec Google Search
- * Types de barres supportés selon l'article Elfsight :
- * - news: Actualités financières importantes
- * - update: Mises à jour du système
- * - event: Événements économiques
- * - market-alert: Alertes de marché
+ * API endpoint pour generer le contenu des barres d'annonces via Gemini avec Google Search
+ * Types de barres supportes selon l'article Elfsight :
+ * - news: Actualites financieres importantes
+ * - update: Mises a jour du systeme
+ * - event: Evenements economiques
+ * - market-alert: Alertes de marche
  * - promotion: Promotions sur services premium
  */
 
@@ -23,38 +23,38 @@ export default async function handler(req, res) {
     if (!GEMINI_API_KEY) {
         return res.status(503).json({
             success: false,
-            error: 'GEMINI_API_KEY non configurée'
+            error: 'GEMINI_API_KEY non configuree'
         });
     }
 
     try {
         const { type = 'news', section = 'top', config: customConfig = {} } = req.method === 'POST' ? req.body : req.query;
 
-        // Prompts par défaut selon le type de barre (basés sur l'article Elfsight)
+        // Prompts par defaut selon le type de barre (bases sur l'article Elfsight)
         const typePrompts = {
             'news': {
-                prompt: `Utilise Google Search pour trouver la principale actualité financière de l'heure. Génère un message court (max 80 caractères) pour une barre d'annonce en haut de page. Format: "📰 [Titre accrocheur]"`,
-                example: '📰 Tech rally lifts US stocks as traders eye earnings'
+                prompt: `Utilise Google Search pour trouver la principale actualite financiere de l'heure. Genere un message court (max 80 caracteres) pour une barre d'annonce en haut de page. Format: " [Titre accrocheur]"`,
+                example: ' Tech rally lifts US stocks as traders eye earnings'
             },
             'update': {
-                prompt: `Génère un message de mise à jour système court (max 80 caractères) pour une barre d'annonce. Format: "🆕 [Message de mise à jour]"`,
-                example: '🆕 Nouvelle fonctionnalité: Analyse IA améliorée disponible'
+                prompt: `Genere un message de mise a jour systeme court (max 80 caracteres) pour une barre d'annonce. Format: " [Message de mise a jour]"`,
+                example: ' Nouvelle fonctionnalite: Analyse IA amelioree disponible'
             },
             'event': {
-                prompt: `Utilise Google Search pour trouver le prochain événement économique important (Fed, GDP, emploi, etc.). Génère un message court (max 80 caractères). Format: "📅 [Événement] - [Date/Heure]"`,
-                example: '📅 Fed Meeting - 14h00 aujourd\'hui'
+                prompt: `Utilise Google Search pour trouver le prochain evenement economique important (Fed, GDP, emploi, etc.). Genere un message court (max 80 caracteres). Format: " [Evenement] - [Date/Heure]"`,
+                example: ' Fed Meeting - 14h00 aujourd\'hui'
             },
             'market-alert': {
-                prompt: `Utilise Google Search pour trouver une alerte de marché importante (volatilité, crash, rally). Génère un message court (max 80 caractères). Format: "⚠️ [Alerte]"`,
-                example: '⚠️ Volatilité élevée sur les indices US'
+                prompt: `Utilise Google Search pour trouver une alerte de marche importante (volatilite, crash, rally). Genere un message court (max 80 caracteres). Format: " [Alerte]"`,
+                example: ' Volatilite elevee sur les indices US'
             },
             'promotion': {
-                prompt: `Génère un message promotionnel court (max 80 caractères) pour services premium. Format: "🎁 [Offre]"`,
-                example: '🎁 30% OFF sur Premium - Offre limitée'
+                prompt: `Genere un message promotionnel court (max 80 caracteres) pour services premium. Format: " [Offre]"`,
+                example: ' 30% OFF sur Premium - Offre limitee'
             }
         };
 
-        // Utiliser la configuration personnalisée si fournie, sinon utiliser les valeurs par défaut
+        // Utiliser la configuration personnalisee si fournie, sinon utiliser les valeurs par defaut
         const defaultConfig = typePrompts[type] || typePrompts['news'];
         const prompt = customConfig.prompt || defaultConfig.prompt;
         const temperature = customConfig.temperature !== undefined ? customConfig.temperature : 0.7;
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
                     parts: [{ text: prompt }]
                 }],
                 tools: useGoogleSearch ? [{
-                    googleSearchRetrieval: {} // Active Google Search pour données à jour
+                    googleSearchRetrieval: {} // Active Google Search pour donnees a jour
                 }] : undefined,
                 generationConfig: {
                     temperature: temperature,

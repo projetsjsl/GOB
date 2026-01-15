@@ -20,7 +20,7 @@ export const FORMATTING = {
   },
 
   formatChangeDirection: (value: number) => ({
-    icon: value > 0 ? "↗" : value < 0 ? "↘" : "→",
+    icon: value > 0 ? "" : value < 0 ? "" : "->",
     color: value > 0 ? "text-red-500" : value < 0 ? "text-green-500" : "text-gray-500",
     label: value > 0 ? "Hausse" : value < 0 ? "Baisse" : "Stable",
   }),

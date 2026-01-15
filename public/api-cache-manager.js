@@ -1,11 +1,11 @@
 /**
- * 🚀 API CACHE MANAGER - Système de cache intelligent
- * Réduit drastiquement le nombre de requêtes API
+ *  API CACHE MANAGER - Systeme de cache intelligent
+ * Reduit drastiquement le nombre de requetes API
  * 
  * Limites APIs gratuites :
- * - FMP : 250 requêtes/jour
- * - Marketaux : 100 requêtes/jour
- * - Gemini : 60 requêtes/minute
+ * - FMP : 250 requetes/jour
+ * - Marketaux : 100 requetes/jour
+ * - Gemini : 60 requetes/minute
  */
 
 class ApiCacheManager {
@@ -18,19 +18,19 @@ class ApiCacheManager {
             gemini: { perMinute: 60, used: 0 }
         };
         
-        // Durées de cache (en millisecondes)
+        // Durees de cache (en millisecondes)
         this.cacheDurations = {
-            quote: 2 * 60 * 1000,        // 2 minutes (données en temps réel)
-            profile: 24 * 60 * 60 * 1000, // 24 heures (données statiques)
-            ratios: 6 * 60 * 60 * 1000,   // 6 heures (données fondamentales)
-            news: 15 * 60 * 1000,         // 15 minutes (actualités)
-            intraday: 5 * 60 * 1000,      // 5 minutes (données intraday)
-            default: 10 * 60 * 1000       // 10 minutes (par défaut)
+            quote: 2 * 60 * 1000,        // 2 minutes (donnees en temps reel)
+            profile: 24 * 60 * 60 * 1000, // 24 heures (donnees statiques)
+            ratios: 6 * 60 * 60 * 1000,   // 6 heures (donnees fondamentales)
+            news: 15 * 60 * 1000,         // 15 minutes (actualites)
+            intraday: 5 * 60 * 1000,      // 5 minutes (donnees intraday)
+            default: 10 * 60 * 1000       // 10 minutes (par defaut)
         };
     }
 
     /**
-     * Générer une clé de cache unique
+     * Generer une cle de cache unique
      */
     getCacheKey(endpoint, params) {
         const paramString = JSON.stringify(params || {});
@@ -38,7 +38,7 @@ class ApiCacheManager {
     }
 
     /**
-     * Vérifier si une donnée en cache est valide
+     * Verifier si une donnee en cache est valide
      */
     isValid(cacheKey, duration) {
         try {
@@ -56,7 +56,7 @@ class ApiCacheManager {
     }
 
     /**
-     * Récupérer des données du cache
+     * Recuperer des donnees du cache
      */
     get(endpoint, params, type = 'default') {
         const cacheKey = this.getCacheKey(endpoint, params);
@@ -64,19 +64,19 @@ class ApiCacheManager {
 
         if (this.isValid(cacheKey, duration)) {
             const cached = JSON.parse(localStorage.getItem(cacheKey));
-            console.log(`✅ Cache HIT: ${endpoint}`, {
+            console.log(` Cache HIT: ${endpoint}`, {
                 age: Math.round((Date.now() - cached.timestamp) / 1000) + 's',
                 expiresIn: Math.round((duration - (Date.now() - cached.timestamp)) / 1000) + 's'
             });
             return cached.data;
         }
 
-        console.log(`❌ Cache MISS: ${endpoint}`);
+        console.log(` Cache MISS: ${endpoint}`);
         return null;
     }
 
     /**
-     * Sauvegarder des données dans le cache
+     * Sauvegarder des donnees dans le cache
      */
     set(endpoint, params, data, type = 'default') {
         try {
@@ -88,7 +88,7 @@ class ApiCacheManager {
             };
 
             localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-            console.log(`💾 Cache SAVED: ${endpoint}`, {
+            console.log(` Cache SAVED: ${endpoint}`, {
                 expiresIn: Math.round(this.cacheDurations[type] / 1000) + 's'
             });
         } catch (error) {
@@ -107,17 +107,17 @@ class ApiCacheManager {
         const endpoint = url.split('?')[0];
         const params = url.split('?')[1] || '';
 
-        // Vérifier le cache d'abord
+        // Verifier le cache d'abord
         const cached = this.get(endpoint, params, cacheType);
         if (cached) {
             return cached;
         }
 
-        // Incrémenter le compteur AVANT la requête
+        // Incrementer le compteur AVANT la requete
         this.incrementRequestCounter();
 
-        // Faire la requête
-        console.log(`🌐 API Request: ${endpoint}`);
+        // Faire la requete
+        console.log(` API Request: ${endpoint}`);
         const response = await fetch(url, options);
         
         if (!response.ok) {
@@ -133,10 +133,10 @@ class ApiCacheManager {
     }
 
     /**
-     * Nettoyer le cache expiré
+     * Nettoyer le cache expire
      */
     clearOldCache() {
-        console.log('🧹 Nettoyage du cache expiré...');
+        console.log(' Nettoyage du cache expire...');
         const keys = Object.keys(localStorage);
         let cleaned = 0;
 
@@ -152,14 +152,14 @@ class ApiCacheManager {
                         cleaned++;
                     }
                 } catch (error) {
-                    // Supprimer les entrées corrompues
+                    // Supprimer les entrees corrompues
                     localStorage.removeItem(key);
                     cleaned++;
                 }
             }
         });
 
-        console.log(`✅ ${cleaned} entrées nettoyées`);
+        console.log(` ${cleaned} entrees nettoyees`);
     }
 
     /**
@@ -172,11 +172,11 @@ class ApiCacheManager {
                 localStorage.removeItem(key);
             }
         });
-        console.log('🗑️ Cache complètement vidé');
+        console.log(' Cache completement vide');
     }
 
     /**
-     * Compteur de requêtes
+     * Compteur de requetes
      */
     loadRequestCounter() {
         try {
@@ -200,7 +200,7 @@ class ApiCacheManager {
         
         // Avertissement si limite proche
         if (this.requestCounter.count > 200) {
-            console.warn(`⚠️ ATTENTION: ${this.requestCounter.count} requêtes aujourd'hui (limite FMP: 250)`);
+            console.warn(` ATTENTION: ${this.requestCounter.count} requetes aujourd'hui (limite FMP: 250)`);
         }
     }
 
@@ -233,14 +233,14 @@ class ApiCacheManager {
     }
 }
 
-// Créer une instance globale
+// Creer une instance globale
 window.apiCache = new ApiCacheManager();
 
-// Nettoyer le cache au chargement si nécessaire
+// Nettoyer le cache au chargement si necessaire
 window.addEventListener('load', () => {
     window.apiCache.clearOldCache();
-    console.log('📊 Cache Stats:', window.apiCache.getStats());
+    console.log(' Cache Stats:', window.apiCache.getStats());
 });
 
-console.log('✅ API Cache Manager initialisé');
+console.log(' API Cache Manager initialise');
 

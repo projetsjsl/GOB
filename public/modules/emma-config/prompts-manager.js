@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // PROMPTS MANAGER - Gestion des prompts et configurations
-// ═══════════════════════════════════════════════════════════════
+// 
 
 import { loadAllConfigs as apiLoadAll, saveCurrentConfig as apiSave, deleteCurrentConfig as apiDelete } from './api-client.js';
 import { showStatus, getSectionEmoji, getChannelBadge, getChannelEmoji } from './ui-helpers.js';
@@ -12,7 +12,7 @@ let allConfigs = {};
 let currentConfig = null;
 
 /**
- * Obtient une config par catégorie et key
+ * Obtient une config par categorie et key
  */
 export function getConfig(category, key) {
     return allConfigs[category]?.[key] || null;
@@ -34,13 +34,13 @@ export async function loadConfigs() {
         allConfigs = await apiLoadAll();
         renderConfigList();
         updateStats();
-        showStatus('✅ Chargé', 'success');
+        showStatus(' Charge', 'success');
 
         // Invalider le cache du dashboard
         invalidateDashboardCache();
     } catch (error) {
         console.error('Erreur chargement:', error);
-        showStatus('❌ ' + error.message, 'error');
+        showStatus(' ' + error.message, 'error');
     }
 }
 
@@ -62,7 +62,7 @@ export function renderConfigList() {
     sections.forEach(section => {
         if (!allConfigs[section]) return;
 
-        // Items filtrés
+        // Items filtres
         let items = Object.entries(allConfigs[section]).filter(([key, config]) => {
             // Filtre recherche
             if (searchTerm) {
@@ -147,7 +147,7 @@ export function renderConfigList() {
     });
 
     if (container.children.length === 0) {
-        container.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Aucun résultat</div>';
+        container.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Aucun resultat</div>';
     }
 
     // Update stats
@@ -155,7 +155,7 @@ export function renderConfigList() {
 }
 
 /**
- * Sélectionne une config pour édition
+ * Selectionne une config pour edition
  */
 export function selectConfig(section, key, config) {
     currentConfig = { section, key, ...config };
@@ -176,7 +176,7 @@ export function selectConfig(section, key, config) {
         }
     }
 
-    // Afficher éditeur
+    // Afficher editeur
     document.getElementById('editorEmpty').classList.add('hidden');
     document.getElementById('editorContent').classList.remove('hidden');
     document.getElementById('saveBtn').classList.remove('hidden');
@@ -185,7 +185,7 @@ export function selectConfig(section, key, config) {
     // Remplir
     document.getElementById('editorTitle').textContent = key;
     const channelEmoji = getChannelEmoji(config.metadata?.channel || '');
-    document.getElementById('editorSubtitle').textContent = `${section} • ${config.type || 'string'} ${channelEmoji}`;
+    document.getElementById('editorSubtitle').textContent = `${section} - ${config.type || 'string'} ${channelEmoji}`;
     document.getElementById('editSection').value = section;
     document.getElementById('editKey').value = key;
     document.getElementById('editDescription').value = config.description || '';
@@ -207,18 +207,18 @@ export function selectConfig(section, key, config) {
     document.getElementById('editVersion').textContent = config.version || '1';
     document.getElementById('editIsOverride').textContent = config.is_override ? 'Oui' : 'Non';
 
-    // Header - Mettre à jour l'indicateur du prompt actuel
+    // Header - Mettre a jour l'indicateur du prompt actuel
     const channelLabel = {
-        'web': '💬 Web',
-        'sms': '📱 SMS',
-        'email': '📧 Email',
-        'messenger': '💬 Messenger',
-        'multicanal': '🌐 Multicanal'
-    }[config.metadata?.channel || ''] || '📝 Tous canaux';
+        'web': ' Web',
+        'sms': ' SMS',
+        'email': ' Email',
+        'messenger': ' Messenger',
+        'multicanal': ' Multicanal'
+    }[config.metadata?.channel || ''] || ' Tous canaux';
 
     document.getElementById('currentPromptTitle').textContent = key || 'Sans titre';
     document.getElementById('currentPromptSection').textContent = section || 'Section';
-    document.getElementById('currentPromptKey').textContent = key || 'Clé';
+    document.getElementById('currentPromptKey').textContent = key || 'Cle';
     document.getElementById('currentPromptChannel').textContent = channelLabel;
     document.getElementById('currentPromptUpdated').textContent = config.updated_at
         ? new Date(config.updated_at).toLocaleString('fr-FR', {
@@ -229,7 +229,7 @@ export function selectConfig(section, key, config) {
         })
         : '-';
 
-    // Mettre à jour le preview et les badges de canaux
+    // Mettre a jour le preview et les badges de canaux
     updatePreview();
     updateChannelBadges(key);
 
@@ -272,14 +272,14 @@ export async function saveConfig() {
         );
 
         if (success) {
-            showStatus('✅ Sauvegardé', 'success');
+            showStatus(' Sauvegarde', 'success');
             await loadConfigs();
-            // loadConfigs() invalide déjà le cache, pas besoin de le faire ici
+            // loadConfigs() invalide deja le cache, pas besoin de le faire ici
         } else {
-            showStatus('❌ Erreur sauvegarde', 'error');
+            showStatus(' Erreur sauvegarde', 'error');
         }
     } catch (error) {
-        showStatus('❌ ' + error.message, 'error');
+        showStatus(' ' + error.message, 'error');
     }
 }
 
@@ -294,26 +294,26 @@ export async function deleteConfig() {
         const success = await apiDelete(currentConfig.section, currentConfig.key);
 
         if (success) {
-            showStatus('✅ Supprimé', 'success');
+            showStatus(' Supprime', 'success');
             document.getElementById('editorContent').classList.add('hidden');
             document.getElementById('editorEmpty').classList.remove('hidden');
             await loadConfigs();
-            // loadConfigs() invalide déjà le cache, pas besoin de le faire ici
+            // loadConfigs() invalide deja le cache, pas besoin de le faire ici
         } else {
-            showStatus('❌ Erreur suppression', 'error');
+            showStatus(' Erreur suppression', 'error');
         }
     } catch (error) {
-        showStatus('❌ ' + error.message, 'error');
+        showStatus(' ' + error.message, 'error');
     }
 }
 
 /**
- * Crée une nouvelle config
+ * Cree une nouvelle config
  */
 export function createNewConfig() {
     const section = prompt('Section (prompts, variables, directives, routing):');
     if (!section) return;
-    const key = prompt('Clé (nom unique):');
+    const key = prompt('Cle (nom unique):');
     if (!key) return;
 
     currentConfig = { section, key, value: '', type: 'string', description: '', category: '', priority: 0 };
@@ -322,7 +322,7 @@ export function createNewConfig() {
 }
 
 /**
- * Met à jour les stats
+ * Met a jour les stats
  */
 function updateStats() {
     let total = 0;

@@ -1,6 +1,6 @@
 /**
- * NewsBanner - Design Premium Réinventé
- * UI/UX Professionnel avec Hiérarchie Visuelle Claire
+ * NewsBanner - Design Premium Reinvente
+ * UI/UX Professionnel avec Hierarchie Visuelle Claire
  */
 
 const { useState, useEffect, useRef } = React;
@@ -105,8 +105,8 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
             if (news.length === 0) {
                 setNews([{
                     time: 'Aujourd\'hui',
-                    headline: 'Les actualités sont temporairement indisponibles. Veuillez réessayer plus tard.',
-                    source: 'Système',
+                    headline: 'Les actualites sont temporairement indisponibles. Veuillez reessayer plus tard.',
+                    source: 'Systeme',
                     type: 'other',
                     url: null,
                     isError: true
@@ -117,7 +117,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
         try {
             setIsLoading(true);
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000); // Réduit à 5s comme recommandé
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // Reduit a 5s comme recommande
             
             const response = await fetch(`/api/finviz-news?type=${newsType}&limit=40`, {
                 signal: controller.signal
@@ -132,7 +132,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
             if (data.success && data.news && data.news.length > 0) {
                 setNews(data.news);
             } else {
-                // Fallback avec données par défaut
+                // Fallback avec donnees par defaut
                 setNews([{
                     time: 'Aujourd\'hui, 11:15 AM',
                     headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
@@ -143,20 +143,20 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
             }
         } catch (error) {
             clearTimeout(loadingTimeout);
-            console.error('Erreur chargement actualités:', error);
+            console.error('Erreur chargement actualites:', error);
             
-            // BUG #2 FIX: Afficher message d'erreur explicite au lieu de données par défaut
+            // BUG #2 FIX: Afficher message d'erreur explicite au lieu de donnees par defaut
             if (error.name === 'AbortError' || error.message.includes('Timeout')) {
                 setNews([{
                     time: 'Aujourd\'hui',
-                    headline: 'Les actualités sont temporairement indisponibles. Veuillez réessayer plus tard.',
-                    source: 'Système',
+                    headline: 'Les actualites sont temporairement indisponibles. Veuillez reessayer plus tard.',
+                    source: 'Systeme',
                     type: 'other',
                     url: null,
                     isError: true
                 }]);
             } else {
-                // Pour autres erreurs, utiliser données par défaut
+                // Pour autres erreurs, utiliser donnees par defaut
                 setNews([{
                     time: 'Aujourd\'hui, 11:15 AM',
                     headline: 'Tech rally and Bitcoin surge lift US stocks as traders eye earnings and economic data',
@@ -201,37 +201,37 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
 
     const getTypeIcon = (type) => {
         const icons = {
-            'market': '📈', 'economy': '🏛️', 'stocks': '💼', 'crypto': '₿',
-            'forex': '💱', 'commodities': '🛢️', 'earnings': '📊', 'ipo': '🚀',
-            'mergers': '🤝', 'other': '📰'
+            'market': '', 'economy': '', 'stocks': '', 'crypto': '',
+            'forex': '', 'commodities': '', 'earnings': '', 'ipo': '',
+            'mergers': '', 'other': ''
         };
         return icons[type] || icons['other'];
     };
 
     const getSourceIcon = (source) => {
         const sourceLower = source.toLowerCase();
-        if (sourceLower.includes('bloomberg')) return '🔵';
-        if (sourceLower.includes('reuters')) return '🔴';
-        if (sourceLower.includes('marketwatch')) return '🟡';
-        if (sourceLower.includes('cnbc')) return '🟢';
-        if (sourceLower.includes('wsj') || sourceLower.includes('wall street')) return '📰';
-        if (sourceLower.includes('ft') || sourceLower.includes('financial times')) return '📄';
-        if (sourceLower.includes('yahoo')) return '💜';
-        if (sourceLower.includes('finviz')) return '📊';
-        return '📰';
+        if (sourceLower.includes('bloomberg')) return '';
+        if (sourceLower.includes('reuters')) return '';
+        if (sourceLower.includes('marketwatch')) return '';
+        if (sourceLower.includes('cnbc')) return '';
+        if (sourceLower.includes('wsj') || sourceLower.includes('wall street')) return '';
+        if (sourceLower.includes('ft') || sourceLower.includes('financial times')) return '';
+        if (sourceLower.includes('yahoo')) return '';
+        if (sourceLower.includes('finviz')) return '';
+        return '';
     };
 
     const newsTypes = [
-        { value: 'all', label: 'Toutes', icon: '📰' },
-        { value: 'market', label: 'Marché', icon: '📈' },
-        { value: 'economy', label: 'Économie', icon: '🏛️' },
-        { value: 'stocks', label: 'Actions', icon: '💼' },
-        { value: 'crypto', label: 'Crypto', icon: '₿' },
-        { value: 'forex', label: 'Forex', icon: '💱' },
-        { value: 'commodities', label: 'Matières', icon: '🛢️' },
-        { value: 'earnings', label: 'Résultats', icon: '📊' },
-        { value: 'ipo', label: 'IPO', icon: '🚀' },
-        { value: 'mergers', label: 'Fusions', icon: '🤝' }
+        { value: 'all', label: 'Toutes', icon: '' },
+        { value: 'market', label: 'Marche', icon: '' },
+        { value: 'economy', label: 'Economie', icon: '' },
+        { value: 'stocks', label: 'Actions', icon: '' },
+        { value: 'crypto', label: 'Crypto', icon: '' },
+        { value: 'forex', label: 'Forex', icon: '' },
+        { value: 'commodities', label: 'Matieres', icon: '' },
+        { value: 'earnings', label: 'Resultats', icon: '' },
+        { value: 'ipo', label: 'IPO', icon: '' },
+        { value: 'mergers', label: 'Fusions', icon: '' }
     ];
 
     if (!isVisible && !forceVisible) return null;
@@ -327,7 +327,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                             className="type-badge px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 hover:scale-105"
                             style={{ color: 'var(--theme-primary, #10b981)' }}
                         >
-                            <span className="text-sm">{newsTypes.find(t => t.value === newsType)?.icon || '📰'}</span>
+                            <span className="text-sm">{newsTypes.find(t => t.value === newsType)?.icon || ''}</span>
                             <span>{newsTypes.find(t => t.value === newsType)?.label || 'Toutes'}</span>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`w-3 h-3 transition-transform duration-200 ${showTypeSelector ? 'rotate-180' : ''}`}>
                                 <polyline points="6 9 12 15 18 9"></polyline>
@@ -408,7 +408,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                         <div className="flex items-center gap-3 px-6 w-full">
                             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ color: 'var(--theme-primary, #10b981)' }}></div>
                             <span className="text-sm font-medium" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}>
-                                Chargement des actualités...
+                                Chargement des actualites...
                             </span>
                         </div>
                     ) : news.length > 0 && currentNews ? (
@@ -436,7 +436,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                             {/* Divider */}
                             <div className="w-px h-6 flex-shrink-0" style={{ backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)' }}></div>
                             
-                            {/* Headline - BUG #6 FIX: Améliorer ellipsis pour texte tronqué */}
+                            {/* Headline - BUG #6 FIX: Ameliorer ellipsis pour texte tronque */}
                             <span 
                                 className="news-headline font-semibold flex-1 transition-colors duration-200" 
                                 style={{ 
@@ -507,7 +507,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                                             border: `1px solid ${isDarkMode ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.2)'}`
                                         }}
                                     >
-                                        Réessayer
+                                        Reessayer
                                     </button>
                                 </>
                             ) : (
@@ -517,7 +517,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                                         <line x1="12" y1="8" x2="12" y2="12"></line>
                                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                     </svg>
-                                    <span>Aucune actualité disponible</span>
+                                    <span>Aucune actualite disponible</span>
                                 </>
                             )}
                         </div>
@@ -549,7 +549,7 @@ const NewsBanner = ({ isDarkMode = true, forceVisible = false }) => {
                             backgroundColor: isDarkMode ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.08)',
                             border: `1px solid ${isDarkMode ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.15)'}`
                         }}
-                        title="Fermer le bandeau d'actualités"
+                        title="Fermer le bandeau d'actualites"
                     >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
                             <line x1="18" y1="6" x2="6" y2="18"></line>

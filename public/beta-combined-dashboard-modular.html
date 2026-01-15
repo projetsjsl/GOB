@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSLAI</title>
+    <title>GOB Apps - Dashboard Financier Beta - Propulse par JSLAI</title>
     <!-- Version: 2.1.0 - JLab V2 with Synchronized Widgets - 2025-10-25 -->
     <!-- Favicon JLab -->
     <link rel="icon" type="image/png" href="/jlab.png">
@@ -34,7 +34,7 @@
     </style>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
+    <!-- Note: Babel Standalone utilise intentionnellement pour ce fichier standalone -->
     <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
 
     <!-- Fix for "exports is not defined" error when Babel transpiles modules -->
@@ -49,7 +49,7 @@
                 window.module = { exports: window.exports };
             }
 
-            // 🔥 FIX: Add require() polyfill for react-grid-layout
+            //  FIX: Add require() polyfill for react-grid-layout
             if (typeof window.require === 'undefined') {
                 window.require = function(moduleName) {
                     // Return window globals for known modules
@@ -70,9 +70,9 @@
     </script>
 
 
-    <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
+    <!-- TradingView Lightweight Charts - Bibliotheque officielle pour graphiques personnalises -->
     <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
-    <!-- Note: CDN Tailwind utilisé intentionnellement pour ce fichier standalone -->
+    <!-- Note: CDN Tailwind utilise intentionnellement pour ce fichier standalone -->
     <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/themes.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -81,40 +81,40 @@
     <!-- Iconoir - Beautiful open source icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
     
-    <!-- Script pour exposer les bibliothèques globalement -->
+    <!-- Script pour exposer les bibliotheques globalement -->
         <script>
             // Exposer Recharts globalement
             window.Recharts = window.Recharts || {};
             
-            // Gestionnaire d'erreur global pour éviter que les erreurs de scripts externes cassent l'application
+            // Gestionnaire d'erreur global pour eviter que les erreurs de scripts externes cassent l'application
             window.addEventListener('error', function(event) {
                 // Ignorer les erreurs de scripts externes (extensions, etc.)
                 if (event.filename && (event.filename.includes('share-modal') || event.filename.includes('extension'))) {
-                    console.warn('⚠️ Erreur ignorée depuis un script externe:', event.filename);
+                    console.warn(' Erreur ignoree depuis un script externe:', event.filename);
                     event.preventDefault();
                     return true;
                 }
             }, true);
             
-            // Protection contre les addEventListener sur des éléments null
+            // Protection contre les addEventListener sur des elements null
             const originalAddEventListener = EventTarget.prototype.addEventListener;
             EventTarget.prototype.addEventListener = function(type, listener, options) {
                 if (this === null || this === undefined) {
-                    console.warn('⚠️ Tentative d\'ajouter un event listener sur un élément null/undefined:', type);
+                    console.warn(' Tentative d\'ajouter un event listener sur un element null/undefined:', type);
                     return;
                 }
                 return originalAddEventListener.call(this, type, listener, options);
             };
             
-            // Vérifier le chargement des bibliothèques
+            // Verifier le chargement des bibliotheques
             window.addEventListener('load', function() {
-                console.log('📚 Vérification des bibliothèques:');
+                console.log(' Verification des bibliotheques:');
                 console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
                 console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
                 
                 // Message informatif sur les avertissements de production
-                console.log('ℹ️ Note: Les avertissements Tailwind/Babel sont normaux pour ce fichier standalone');
-                console.log('ℹ️ Ce fichier utilise intentionnellement des CDN pour la portabilité');
+                console.log('i Note: Les avertissements Tailwind/Babel sont normaux pour ce fichier standalone');
+                console.log('i Ce fichier utilise intentionnellement des CDN pour la portabilite');
             });
         </script>
     
@@ -138,7 +138,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* 🎨 Animations pour la bottom bar avec icônes Iconoir */
+        /*  Animations pour la bottom bar avec icones Iconoir */
         @keyframes slide-down {
             from {
                 opacity: 0;
@@ -166,12 +166,12 @@
             animation: slide-down 0.3s ease-out;
         }
 
-        /* Effet de glow sur l'icône active */
+        /* Effet de glow sur l'icone active */
         nav button:has(i.scale-110) i {
             filter: drop-shadow(0 0 8px currentColor);
         }
 
-        /* Styles pour garantir l'affichage des icônes Iconoir sur mobile */
+        /* Styles pour garantir l'affichage des icones Iconoir sur mobile */
         .iconoir-chart-line,
         .iconoir-trending-up,
         .iconoir-chat-bubble,
@@ -195,7 +195,7 @@
             -moz-osx-font-smoothing: grayscale !important;
         }
 
-        /* Transition fluide pour toutes les icônes */
+        /* Transition fluide pour toutes les icones */
         nav button i {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -218,9 +218,9 @@
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
 
-        /* 💎 VAGUES 3+4 - Finance Pro UI Effects */
+        /*  VAGUES 3+4 - Finance Pro UI Effects */
 
-        /* 🌫️ Glassmorphism Effect */
+        /*  Glassmorphism Effect */
         .glass-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -237,7 +237,7 @@
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
         }
 
-        /* ⬆️ Hover Lift Effect (-4px translateY) */
+        /*  Hover Lift Effect (-4px translateY) */
         .hover-lift {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -247,7 +247,7 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
         }
 
-        /* ✨ Shine Effect (horizontal sweep) */
+        /*  Shine Effect (horizontal sweep) */
         .shine-effect {
             position: relative;
             overflow: hidden;
@@ -273,7 +273,7 @@
             left: 100%;
         }
 
-        /* 🌟 Glow Animation for Important Metrics */
+        /*  Glow Animation for Important Metrics */
         .glow-pulse {
             animation: glow-pulse 2s ease-in-out infinite;
         }
@@ -325,7 +325,7 @@
             }
         }
 
-        /* 💫 Shimmer Effect for Loading States */
+        /*  Shimmer Effect for Loading States */
         .shimmer {
             background: linear-gradient(
                 90deg,
@@ -346,7 +346,7 @@
             }
         }
 
-        /* 🔒 Prévention du scroll horizontal sur tous les appareils */
+        /*  Prevention du scroll horizontal sur tous les appareils */
         html, body {
             overflow-x: hidden;
             max-width: 100%;
@@ -363,13 +363,13 @@
             padding: 0;
         }
 
-        /* Empêcher tout débordement des éléments enfants */
+        /* Empecher tout debordement des elements enfants */
         #root {
             overflow-x: hidden;
             max-width: 100%;
         }
 
-        /* 📱 MOBILE - COMPACT VIEW for Global Overview */
+        /*  MOBILE - COMPACT VIEW for Global Overview */
         @media (max-width: 768px) {
             /* Compact global scaling for dashboard view */
             html {
@@ -474,7 +474,7 @@
             -webkit-box-orient: vertical;
         }
         
-        /* Scrollbar personnalisée */
+        /* Scrollbar personnalisee */
         .scrollbar-thin {
             scrollbar-width: thin;
         }
@@ -550,7 +550,7 @@
         .emma-intro-image { animation: emma-zoom-in 800ms ease-out; }
     </style>
 
-    <!-- 🔐 Auth Guard - Protection du Dashboard -->
+    <!--  Auth Guard - Protection du Dashboard -->
     <script src="/js/auth-guard.js"></script>
 </head>
 <body class="min-h-screen">

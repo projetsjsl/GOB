@@ -2,7 +2,7 @@
                             showEmmaAvatar ? 'pr-28' : ''
                         }`}>
                         <div className="fixed bottom-24 md:bottom-10 right-6 z-50 flex flex-col items-end gap-0.5 pointer-events-none">
-                    'admin-jslai': 'iconoir-settings', // ✅ Icône valide
+                    'admin-jslai': 'iconoir-settings', //  Icone valide
                 { id: 'admin-jslai', label: 'Admin JSL AI', component: AdminJSLaiTab },
                         <div className={`flex items-center gap-1 px-2 pb-safe overflow-x-auto no-scrollbar ${
                             {tabs.map(tab => {

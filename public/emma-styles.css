@@ -58,7 +58,7 @@
   margin: 4px 0 0 0;
 }
 
-/* Spécialités */
+/* Specialites */
 .emma-specialties-section h4 {
   font-size: 16px;
   font-weight: 600;
@@ -377,7 +377,7 @@
   background: #4f46e5;
 }
 
-/* Éditeur de prompt */
+/* Editeur de prompt */
 .emma-prompt-editor {
   background: white;
   border-radius: 12px;
@@ -742,7 +742,7 @@
   }
 }
 
-/* Réduction globale pour mobile: police et espacements à 50% */
+/* Reduction globale pour mobile: police et espacements a 50% */
 @media (max-width: 768px) {
   html {
     font-size: 50%;

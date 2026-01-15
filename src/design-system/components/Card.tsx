@@ -1,7 +1,7 @@
 /**
  * GOB Design System - Card Component
  * 
- * Composant carte réutilisable utilisant les tokens du design system
+ * Composant carte reutilisable utilisant les tokens du design system
  */
 
 import React from 'react';

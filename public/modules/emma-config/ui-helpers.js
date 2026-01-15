@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // UI HELPERS - Utilitaires pour l'interface
-// ═══════════════════════════════════════════════════════════════
+// 
 
 /**
  * Affiche un message de status
@@ -72,14 +72,14 @@ export function switchMainTab(tab) {
 
     // Update header
     const titles = {
-        dashboard: '📊 Configuration',
-        prompts: '📝 Gestion des Prompts',
-        design: '🎨 Design des Emails',
-        sms: '📱 Configuration SMS',
-        email: '📧 Gestion & Tests Email',
-        help: '📖 Mode d\'Emploi',
-        emmaia: '🤖 Emma IA - Modèles Chat',
-        builder: '🏗️ Visual Email Builder'
+        dashboard: ' Configuration',
+        prompts: ' Gestion des Prompts',
+        design: ' Design des Emails',
+        sms: ' Configuration SMS',
+        email: ' Gestion & Tests Email',
+        help: ' Mode d\'Emploi',
+        emmaia: ' Emma IA - Modeles Chat',
+        builder: ' Visual Email Builder'
     };
     document.getElementById('editorTitle').textContent = titles[tab] || 'Configuration';
     document.getElementById('editorSubtitle').textContent = '';
@@ -98,12 +98,12 @@ export function switchMainTab(tab) {
 }
 
 /**
- * Toggle icon (▶ / ▼)
+ * Toggle icon ( / )
  */
 export function toggleIcon(iconId) {
     const icon = document.getElementById(iconId);
     if (icon) {
-        icon.textContent = icon.textContent === '▶' ? '▼' : '▶';
+        icon.textContent = icon.textContent === '' ? '' : '';
     }
 }
 
@@ -122,12 +122,12 @@ export function clearFilters() {
  */
 export function getSectionEmoji(section) {
     const emojis = {
-        'prompts': '📝',
-        'variables': '⚙️',
-        'directives': '🎯',
-        'routing': '🧭'
+        'prompts': '',
+        'variables': '',
+        'directives': '',
+        'routing': ''
     };
-    return emojis[section] || '📄';
+    return emojis[section] || '';
 }
 
 /**
@@ -135,11 +135,11 @@ export function getSectionEmoji(section) {
  */
 export function getChannelBadge(channel) {
     const badges = {
-        'web': '💬 Web',
-        'sms': '📱 SMS',
-        'email': '📧 Email',
-        'messenger': '💬 MSG',
-        'multicanal': '🌐 Multi'
+        'web': ' Web',
+        'sms': ' SMS',
+        'email': ' Email',
+        'messenger': ' MSG',
+        'multicanal': ' Multi'
     };
     return badges[channel] || '';
 }
@@ -149,11 +149,11 @@ export function getChannelBadge(channel) {
  */
 export function getChannelEmoji(channel) {
     const emojis = {
-        'web': '💬',
-        'sms': '📱',
-        'email': '📧',
-        'messenger': '💬',
-        'multicanal': '🌐'
+        'web': '',
+        'sms': '',
+        'email': '',
+        'messenger': '',
+        'multicanal': ''
     };
-    return emojis[channel] ? `• ${emojis[channel]}` : '';
+    return emojis[channel] ? `- ${emojis[channel]}` : '';
 }

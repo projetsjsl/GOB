@@ -1,7 +1,7 @@
 // ====================================================================
 // API HYBRID DATA FETCHER
 // ====================================================================
-// Version simplifiée de l'API hybride qui fonctionne sans Supabase
+// Version simplifiee de l'API hybride qui fonctionne sans Supabase
 
 export type DataType = 'quote' | 'profile' | 'ratios' | 'news' | 'prices' | 'analyst' | 'earnings';
 
@@ -22,7 +22,7 @@ export interface HybridDataResponse {
 
 export const fetchHybridData = async (symbol: string, dataType: DataType): Promise<HybridDataResponse> => {
   try {
-    console.log(`🔄 Récupération ${dataType} pour ${symbol}`);
+    console.log(` Recuperation ${dataType} pour ${symbol}`);
 
     // Utiliser les APIs fonctionnelles avec indicateurs de fallback
     let apiUrl = '';
@@ -32,7 +32,7 @@ export const fetchHybridData = async (symbol: string, dataType: DataType): Promi
         apiUrl = `/api/marketdata?endpoint=quote&symbol=${symbol}&source=auto`;
         break;
       case 'profile':
-        // Utiliser l'API marketdata pour les données de base
+        // Utiliser l'API marketdata pour les donnees de base
         apiUrl = `/api/marketdata?endpoint=fundamentals&symbol=${symbol}&source=auto`;
         break;
       case 'ratios':
@@ -44,7 +44,7 @@ export const fetchHybridData = async (symbol: string, dataType: DataType): Promi
         apiUrl = `/api/fmp?endpoint=news&symbols=${symbol}&limit=10`;
         break;
       case 'prices':
-        // Utiliser l'API marketdata pour les données intraday (OHLCV 5min)
+        // Utiliser l'API marketdata pour les donnees intraday (OHLCV 5min)
         apiUrl = `/api/marketdata?endpoint=intraday&symbol=${symbol}&interval=5min&outputsize=78`;
         break;
       case 'analyst':
@@ -56,14 +56,14 @@ export const fetchHybridData = async (symbol: string, dataType: DataType): Promi
         apiUrl = `/api/marketdata?endpoint=earnings&symbol=${symbol}&source=auto`;
         break;
       default:
-        throw new Error(`Type de données non supporté: ${dataType}`);
+        throw new Error(`Type de donnees non supporte: ${dataType}`);
     }
 
-    // Gérer les appels spéciaux - FMP News (GRATUIT)
+    // Gerer les appels speciaux - FMP News (GRATUIT)
     if (dataType === 'news') {
       const response = await fetch(apiUrl);
       if (!response.ok) {
-        throw new Error(`API news échouée: ${response.status}`);
+        throw new Error(`API news echouee: ${response.status}`);
       }
       const data = await response.json();
 
@@ -94,11 +94,11 @@ export const fetchHybridData = async (symbol: string, dataType: DataType): Promi
 
     const response = await fetch(apiUrl);
     if (!response.ok) {
-      throw new Error(`API ${dataType} échouée: ${response.status}`);
+      throw new Error(`API ${dataType} echouee: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log(`✅ ${dataType} récupéré pour ${symbol}`);
+    console.log(` ${dataType} recupere pour ${symbol}`);
 
     return {
       success: true,
@@ -115,7 +115,7 @@ export const fetchHybridData = async (symbol: string, dataType: DataType): Promi
     };
 
   } catch (error: unknown) {
-    console.error(`❌ Erreur ${dataType} pour ${symbol}:`, error);
+    console.error(` Erreur ${dataType} pour ${symbol}:`, error);
 
     // Propager l'erreur
     const errorMessage = error instanceof Error ? error.message : String(error);

@@ -35,10 +35,10 @@ const ThemeSelector = () => {
             document.addEventListener('keydown', handleEsc);
             // Prevent body scroll when modal is open
             document.body.style.overflow = 'hidden';
-            // Émettre événement pour NewsBanner
+            // Emettre evenement pour NewsBanner
             window.dispatchEvent(new CustomEvent('themeSelectorOpen'));
         } else {
-            // Émettre événement de fermeture
+            // Emettre evenement de fermeture
             window.dispatchEvent(new CustomEvent('themeSelectorClose'));
         }
 
@@ -58,7 +58,7 @@ const ThemeSelector = () => {
             // Show toast feedback
             if (window.showToast) {
                 const themeName = window.GOBThemes.themes[themeId]?.name || themeId;
-                window.showToast(`Thème activé : ${themeName}`, 'info');
+                window.showToast(`Theme active : ${themeName}`, 'info');
             }
         }
     };
@@ -83,7 +83,7 @@ const ThemeSelector = () => {
         }
     };
 
-    // Créer un aperçu visuel style iPhone pour un thème
+    // Creer un apercu visuel style iPhone pour un theme
     const ThemePreview = ({ themeId, theme }) => {
         const isActive = currentTheme === themeId;
         
@@ -259,11 +259,11 @@ const ThemeSelector = () => {
         );
     };
 
-    // Organiser les thèmes par catégories
+    // Organiser les themes par categories
     const themeCategories = {
         'Mode': ['light', 'darkmode', 'ia', 'terminal'],
         'Professionnel': ['marketq', 'marketq-dark', 'bloomberg-terminal', 'seeking-alpha'],
-        'Spécial': ['bloomberg-mobile', 'bloomberg-nostalgie', 'desjardins', 'default'] // ✅ lightglass retiré car désactivé
+        'Special': ['bloomberg-mobile', 'bloomberg-nostalgie', 'desjardins', 'default'] //  lightglass retire car desactive
     };
 
     return (
@@ -277,25 +277,25 @@ const ThemeSelector = () => {
                     color: 'var(--theme-text, #ffffff)',
                     boxShadow: '0 4px 12px rgba(var(--theme-primary-rgb, 59, 130, 246), 0.3)',
                 }}
-                title="Choisir un thème - Cliquez pour ouvrir"
+                title="Choisir un theme - Cliquez pour ouvrir"
             >
                 <i className={`iconoir-${getIcon(currentTheme)} text-xl`} style={{ color: 'var(--theme-primary, #3b82f6)' }}></i>
                 <span className="text-sm font-semibold">
-                    {window.GOBThemes?.themes[currentTheme]?.name || 'Thème'}
+                    {window.GOBThemes?.themes[currentTheme]?.name || 'Theme'}
                 </span>
                 <i className="iconoir-nav-arrow-down text-xs" style={{ color: 'var(--theme-primary, #3b82f6)' }}></i>
             </button>
 
-            {/* Fenêtre Popup - Portail vers body pour éviter les problèmes de z-index/transform */}
+            {/* Fenetre Popup - Portail vers body pour eviter les problemes de z-index/transform */}
             {isOpen && ReactDOM.createPortal(
                 <div style={{ position: 'fixed', inset: 0, zIndex: 10000, pointerEvents: 'none' }}>
-                    {/* Overlay semi-transparent pour fermer en cliquant à l'extérieur */}
+                    {/* Overlay semi-transparent pour fermer en cliquant a l'exterieur */}
                     <div 
                         className="fixed inset-0 bg-black/60 backdrop-blur-sm"
                         style={{ pointerEvents: 'auto' }}
                         onClick={() => setIsOpen(false)}
                     />
-                    {/* Fenêtre centrée */}
+                    {/* Fenetre centree */}
                     <div 
                         ref={modalRef}
                         ref={modalRef}
@@ -312,7 +312,7 @@ const ThemeSelector = () => {
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Header avec X - Style fenêtre */}
+                        {/* Header avec X - Style fenetre */}
                         <div 
                             className="flex items-center justify-between px-5 py-4 border-b cursor-move flex-shrink-0"
                             style={{
@@ -334,13 +334,13 @@ const ThemeSelector = () => {
                                         className="text-lg font-bold leading-tight"
                                         style={{ color: 'var(--theme-text, #ffffff)' }}
                                     >
-                                        Choisir un thème
+                                        Choisir un theme
                                     </h2>
                                     <p 
                                         className="text-xs mt-0.5 opacity-75"
                                         style={{ color: 'var(--theme-text-secondary, #9ca3af)' }}
                                     >
-                                        Sélectionnez un thème pour personnaliser votre dashboard
+                                        Selectionnez un theme pour personnaliser votre dashboard
                                     </p>
                                 </div>
                             </div>
@@ -368,7 +368,7 @@ const ThemeSelector = () => {
                                 {Object.entries(themeCategories).map(([category, themeIds]) => {
                                     const themes = themeIds
                                         .map(id => ({ id, theme: window.GOBThemes?.themes[id] }))
-                                        .filter(({ theme }) => theme); // Filtrer les thèmes inexistants
+                                        .filter(({ theme }) => theme); // Filtrer les themes inexistants
 
                                     if (themes.length === 0) return null;
 
@@ -401,5 +401,5 @@ const ThemeSelector = () => {
 // Expose to window
 window.ThemeSelector = ThemeSelector;
 
-// Debug: Vérifier que le composant est bien chargé
-void('✅ ThemeSelector chargé:', typeof window.ThemeSelector !== 'undefined');
+// Debug: Verifier que le composant est bien charge
+void(' ThemeSelector charge:', typeof window.ThemeSelector !== 'undefined');

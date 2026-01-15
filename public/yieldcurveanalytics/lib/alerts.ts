@@ -3,7 +3,7 @@
 import React from "react"
 
 /**
- * Système de notifications et d'alertes pour CurveWatch
+ * Systeme de notifications et d'alertes pour CurveWatch
  */
 
 export type AlertLevel = "info" | "warning" | "error" | "success"
@@ -27,7 +27,7 @@ class AlertManager {
   private timers: Map<string, NodeJS.Timeout> = new Map()
 
   /**
-   * Créer une alerte
+   * Creer une alerte
    */
   createAlert(
     title: string,

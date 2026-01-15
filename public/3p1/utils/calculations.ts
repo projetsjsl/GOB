@@ -120,12 +120,12 @@ export const calculateMultiPeriodCAGR = (
 };
 
 /**
- * Calcule la croissance historique sur une période donnée (par défaut 5 ans) pour une métrique
- * Utilisé pour initialiser automatiquement les taux de croissance si absents
+ * Calcule la croissance historique sur une periode donnee (par defaut 5 ans) pour une metrique
+ * Utilise pour initialiser automatiquement les taux de croissance si absents
  * 
- * @param data - Données historiques annuelles
- * @param metricKey - Clé de la métrique à calculer ('earningsPerShare', 'cashFlowPerShare', etc.)
- * @param period - Période en années (par défaut 5 ans)
+ * @param data - Donnees historiques annuelles
+ * @param metricKey - Cle de la metrique a calculer ('earningsPerShare', 'cashFlowPerShare', etc.)
+ * @param period - Periode en annees (par defaut 5 ans)
  * @returns Taux de croissance en pourcentage (CAGR)
  */
 export const calculateHistoricalGrowth = (
@@ -135,7 +135,7 @@ export const calculateHistoricalGrowth = (
 ): number => {
   if (!data || data.length < 2) return 0;
   
-  // Trier par année
+  // Trier par annee
   const sorted = [...data].sort((a, b) => Number(a.year) - Number(b.year));
   const last = sorted[sorted.length - 1];
   const lastValue = Number(last[metricKey]);
@@ -144,12 +144,12 @@ export const calculateHistoricalGrowth = (
 
   const targetStartYear = Number(last.year) - period;
   
-  // Chercher le point de départ valide le plus proche de N-period
+  // Chercher le point de depart valide le plus proche de N-period
   let startCandidate = sorted
     .filter(d => Number(d.year) <= targetStartYear && Number(d[metricKey]) > 0)
     .sort((a, b) => Number(b.year) - Number(a.year))[0];
 
-  // Fallback: Si rien trouvé, essayer n'importe quel point antérieur
+  // Fallback: Si rien trouve, essayer n'importe quel point anterieur
   if (!startCandidate) {
     startCandidate = sorted
       .filter(d => Number(d.year) < Number(last.year) && Number(d[metricKey]) > 0)
@@ -168,7 +168,7 @@ export const calculateHistoricalGrowth = (
 
 
 export const formatCurrency = (val: number | undefined | null) => {
-  // ✅ CRITIQUE : Gérer undefined/null pour éviter d'afficher "0,00 $" pour des valeurs non chargées
+  //  CRITIQUE : Gerer undefined/null pour eviter d'afficher "0,00 $" pour des valeurs non chargees
   if (val === undefined || val === null || !isFinite(val) || val === 0) {
     return 'N/A';
   }
@@ -176,7 +176,7 @@ export const formatCurrency = (val: number | undefined | null) => {
 };
 
 export const formatPercent = (val: number) => {
-  // ✅ Validation pour éviter NaN
+  //  Validation pour eviter NaN
   if (val == null || !isFinite(val) || isNaN(val)) {
     return 'N/A';
   }
@@ -185,7 +185,7 @@ export const formatPercent = (val: number) => {
 
 /**
  * S1-CALC-004: Calculate Graham Number
- * Graham Number = √(22.5 × EPS × Book Value Per Share)
+ * Graham Number = (22.5 x EPS x Book Value Per Share)
  * Represents Ben Graham's intrinsic value estimate
  *
  * @param eps - Earnings Per Share
@@ -256,8 +256,8 @@ export const calculateDCF = (
 
 /**
  * S1-CALC-007: Calculate Dividend Discount Model (DDM) Valuation
- * Gordon Growth Model: Value = D₁ / (r - g)
- * where D₁ = next year's dividend, r = required return, g = growth rate
+ * Gordon Growth Model: Value = D1 / (r - g)
+ * where D1 = next year's dividend, r = required return, g = growth rate
  *
  * @param currentDividend - Current dividend per share
  * @param growthRate - Expected dividend growth rate (%)
@@ -281,7 +281,7 @@ export const calculateDDM = (
 
 /**
  * S1-CALC-008: Calculate Margin of Safety
- * MOS = (Intrinsic Value - Current Price) / Intrinsic Value × 100
+ * MOS = (Intrinsic Value - Current Price) / Intrinsic Value x 100
  *
  * @param intrinsicValue - Estimated intrinsic value
  * @param currentPrice - Current market price
@@ -324,7 +324,7 @@ export const calculateFCFYield = (fcfPerShare: number, price: number): number =>
 /**
  * S1-CALC-012: Calculate ROIC (Return on Invested Capital)
  * ROIC = NOPAT / Invested Capital
- * Approximation: ROIC ≈ Operating Income × (1 - Tax Rate) / (Total Assets - Current Liabilities)
+ * Approximation: ROIC  Operating Income x (1 - Tax Rate) / (Total Assets - Current Liabilities)
  *
  * @param operatingIncome - Operating income
  * @param taxRate - Effective tax rate (%)
@@ -352,8 +352,8 @@ export const calculateROIC = (
 
 /**
  * S1-CALC-013: ROE Decomposition (DuPont Analysis)
- * ROE = Net Profit Margin × Asset Turnover × Equity Multiplier
- * ROE = (Net Income / Revenue) × (Revenue / Assets) × (Assets / Equity)
+ * ROE = Net Profit Margin x Asset Turnover x Equity Multiplier
+ * ROE = (Net Income / Revenue) x (Revenue / Assets) x (Assets / Equity)
  *
  * @param netIncome - Net income
  * @param revenue - Total revenue
@@ -547,18 +547,18 @@ export const calculateCashConversion = (operatingCashFlow: number, netIncome: nu
 };
 
 /**
- * Détecte si un ticker est probablement un fonds mutuel
- * Basé sur des patterns communs de symboles de fonds mutuels
+ * Detecte si un ticker est probablement un fonds mutuel
+ * Base sur des patterns communs de symboles de fonds mutuels
  * 
- * @param symbol - Le symbole du ticker à vérifier
- * @param companyName - Le nom de la compagnie (optionnel, pour validation supplémentaire)
- * @returns true si le ticker semble être un fonds mutuel
+ * @param symbol - Le symbole du ticker a verifier
+ * @param companyName - Le nom de la compagnie (optionnel, pour validation supplementaire)
+ * @returns true si le ticker semble etre un fonds mutuel
  */
 export const isMutualFund = (symbol: string, companyName?: string): boolean => {
   const symbolUpper = symbol.toUpperCase().trim();
   const nameUpper = (companyName || '').toUpperCase();
   
-  // Liste exhaustive d'actions légitimes qui pourraient être confondues
+  // Liste exhaustive d'actions legitimes qui pourraient etre confondues
   const knownStocksWhitelist = [
     'CGNX', 'EQIX', 'GATX', 'HOLX', 'LRCX', 'NBIX', 'NFLX', 'OTEX', 'PAYX', 
     'IDXX', 'VRTX', 'TXN', 'XOM', 'XEL', 'XPO', 'XRAY', 'XYL', 'XEC', 'XENE',
@@ -572,22 +572,22 @@ export const isMutualFund = (symbol: string, companyName?: string): boolean => {
     return false;
   }
   
-  // Vérifier le nom de la compagnie pour des indicateurs de fonds mutuel (MÉTHODE PRINCIPALE)
+  // Verifier le nom de la compagnie pour des indicateurs de fonds mutuel (METHODE PRINCIPALE)
   if (nameUpper.includes('MUTUAL FUND') || 
       nameUpper.includes('FUND TRUST') ||
       nameUpper.includes('INVESTMENT FUND') ||
       nameUpper.includes('INDEX FUND') ||
       /* nameUpper.includes('ETF') || */ // ETF sont OK, on les garde souvent
       (nameUpper.includes('FUND') && nameUpper.includes('SERIES')) ||
-      nameUpper.includes('VANGUARD FUNDS') || // Plus spécifique
+      nameUpper.includes('VANGUARD FUNDS') || // Plus specifique
       nameUpper.includes('FIDELITY FUNDS')
       /* Removed T. ROWE PRICE checks which was flagging the company itself */) {
     return true;
   }
   
-  // Patterns spécifiques connus de fonds mutuels (Vanguard, Fidelity, etc.)
+  // Patterns specifiques connus de fonds mutuels (Vanguard, Fidelity, etc.)
   // VTSAX, VFIAX, VTSIX, etc. - fonds Vanguard avec pattern V + 3-4 lettres + X/IX
-  // DOIT faire 5 lettres pour être un mutual fund typique US
+  // DOIT faire 5 lettres pour etre un mutual fund typique US
   const vanguardPattern = /^V[A-Z]{3}X$/; 
   if (vanguardPattern.test(symbolUpper) && symbolUpper.length === 5) {
     return true;
@@ -599,22 +599,22 @@ export const isMutualFund = (symbol: string, companyName?: string): boolean => {
     return true;
   }
   
-  // Fonds avec suffixe XX (double X) - très commun pour les fonds mutuels
+  // Fonds avec suffixe XX (double X) - tres commun pour les fonds mutuels
   // MAIS attention aux actions comme MAXX, TJX, etc.
   // On exige 5 lettres minimum pour ce pattern
   if (symbolUpper.endsWith('XX') && symbolUpper.length >= 5) {
     return true;
   }
   
-  // Ne PAS détecter comme fonds mutuel si :
+  // Ne PAS detecter comme fonds mutuel si :
   // - Le symbole contient un point (ex: XOM.MX = bourse mexicaine)
-  // - Le symbole est trop court (< 4 caractères)
-  // - Le symbole est trop long (> 6 caractères, sauf patterns spécifiques)
+  // - Le symbole est trop court (< 4 caracteres)
+  // - Le symbole est trop long (> 6 caracteres, sauf patterns specifiques)
   if (symbolUpper.includes('.') || symbolUpper.length < 5) { // Mutual funds are usually 5 chars
     return false;
   }
   
-  // Par défaut, ne pas considérer comme fonds mutuel
+  // Par defaut, ne pas considerer comme fonds mutuel
   return false;
 };
 
@@ -663,37 +663,37 @@ export const calculateRecommendation = (
 };
 
 /**
- * Auto-fill assumptions basées sur les données historiques FMP
- * Cette fonction centralise la logique d'auto-fill pour garantir la cohérence
- * Utilisée lors de la création de nouveaux profils et lors de la synchronisation
+ * Auto-fill assumptions basees sur les donnees historiques FMP
+ * Cette fonction centralise la logique d'auto-fill pour garantir la coherence
+ * Utilisee lors de la creation de nouveaux profils et lors de la synchronisation
  * 
- * @param data - Données historiques annuelles depuis FMP
+ * @param data - Donnees historiques annuelles depuis FMP
  * @param currentPrice - Prix actuel de l'action
- * @param existingAssumptions - Assumptions existantes (pour préserver les valeurs non calculées)
- * @returns Nouvelles assumptions avec métriques auto-remplies
+ * @param existingAssumptions - Assumptions existantes (pour preserver les valeurs non calculees)
+ * @returns Nouvelles assumptions avec metriques auto-remplies
  */
 export const autoFillAssumptionsFromFMPData = (
   data: AnnualData[],
   currentPrice: number,
   existingAssumptions?: Partial<Assumptions>,
-  currentDividendFromAPI?: number // ✅ NOUVEAU: Dividende actuel depuis l'API FMP
+  currentDividendFromAPI?: number //  NOUVEAU: Dividende actuel depuis l'API FMP
 ): Partial<Assumptions> => {
   // Guard clause for empty or invalid data
   if (!data || data.length === 0) {
-    console.warn('⚠️ autoFillAssumptionsFromFMPData: Aucune donnée fournie pour les calculs');
+    console.warn(' autoFillAssumptionsFromFMPData: Aucune donnee fournie pour les calculs');
     return existingAssumptions || {};
   }
 
-  // Filtrer les données valides (avec prix High/Low > 0)
+  // Filtrer les donnees valides (avec prix High/Low > 0)
   const validHistory = data.filter(d => d.priceHigh > 0 && d.priceLow > 0);
   
-  // Trouver la dernière année avec EPS valide pour Base Year
+  // Trouver la derniere annee avec EPS valide pour Base Year
   const lastValidData = [...data].reverse().find(d => d.earningsPerShare > 0) || data[data.length - 1];
   const lastData = data[data.length - 1];
   const firstData = data[0];
   const yearsDiff = Math.max(1, lastValidData.year - firstData.year); // Au moins 1 an
   
-  // Helper pour calculer la moyenne (arithmétique) - demandé par l'utilisateur "5 ans moyen"
+  // Helper pour calculer la moyenne (arithmetique) - demande par l'utilisateur "5 ans moyen"
   const calculateAverage = (values: number[]): number => {
     if (values.length === 0) return 0;
     const sum = values.reduce((a, b) => a + b, 0);
@@ -704,30 +704,30 @@ export const autoFillAssumptionsFromFMPData = (
   const calculate5YearGrowth = (paramData: AnnualData[], metricKey: keyof AnnualData): number => {
     if (paramData.length < 2) return 0;
     
-    // Trier par année et assurer typage numérique
+    // Trier par annee et assurer typage numerique
     const sorted = [...paramData].sort((a, b) => Number(a.year) - Number(b.year));
-    const last = sorted[sorted.length - 1]; // Année N
+    const last = sorted[sorted.length - 1]; // Annee N
     const lastValue = Number(last[metricKey]);
 
-    if (lastValue <= 0) return 0; // Si la fin est négative, croissance indéfinie
+    if (lastValue <= 0) return 0; // Si la fin est negative, croissance indefinie
 
     const targetStartYear = Number(last.year) - 5;
     
-    // Stratégie plus robuste: Chercher le point de départ VALIDE (> 0) le plus proche de N-5 (en reculant)
+    // Strategie plus robuste: Chercher le point de depart VALIDE (> 0) le plus proche de N-5 (en reculant)
     // On cherche d'abord exactement N-5, sinon N-6, etc.
-    // On veut un point au moins 5 ans en arrière pour avoir une tendance long terme
+    // On veut un point au moins 5 ans en arriere pour avoir une tendance long terme
     let startCandidate = sorted
         .filter(d => Number(d.year) <= targetStartYear && Number(d[metricKey]) > 0)
-        .sort((a, b) => Number(b.year) - Number(a.year))[0]; // Prendre le plus récent parmi les anciens (le plus proche de N-5)
+        .sort((a, b) => Number(b.year) - Number(a.year))[0]; // Prendre le plus recent parmi les anciens (le plus proche de N-5)
 
-    // Fallback: Si rien trouvé avant N-5, essayer de trouver n'importe quel point de départ positif valide antérieur à N
+    // Fallback: Si rien trouve avant N-5, essayer de trouver n'importe quel point de depart positif valide anterieur a N
     if (!startCandidate) {
         startCandidate = sorted
             .filter(d => Number(d.year) < Number(last.year) && Number(d[metricKey]) > 0)
             .sort((a, b) => Number(a.year) - Number(b.year))[0]; // Prendre le plus ancien disponible positif
     }
 
-    if (!startCandidate) return 0; // Aucun historique positif trouvé
+    if (!startCandidate) return 0; // Aucun historique positif trouve
 
     const startValue = Number(startCandidate[metricKey]);
     const years = Number(last.year) - Number(startCandidate.year);
@@ -744,8 +744,8 @@ export const autoFillAssumptionsFromFMPData = (
   const growthDiv = calculate5YearGrowth(data, 'dividendPerShare');
 
   // 2. Calculer Ratios Moyens 5 Ans
-  // Prendre les 5 dernières années de données VALIDES (avec prix)
-  const last5YearsData = validHistory.slice(-5); // Les 5 derniers éléments (supposant tri croissant)
+  // Prendre les 5 dernieres annees de donnees VALIDES (avec prix)
+  const last5YearsData = validHistory.slice(-5); // Les 5 derniers elements (supposant tri croissant)
 
   // P/E = Prix moyen / EPS moyen (Moyenne 5 ans)
   const peRatios = last5YearsData
@@ -788,52 +788,52 @@ export const autoFillAssumptionsFromFMPData = (
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   };
 
-  // ✅ HELPER : Préserver les valeurs existantes si elles sont déjà définies (non-0 pour les taux)
-  // Cela permet de préserver les valeurs manuelles (orange) entrées par l'utilisateur
+  //  HELPER : Preserver les valeurs existantes si elles sont deja definies (non-0 pour les taux)
+  // Cela permet de preserver les valeurs manuelles (orange) entrees par l'utilisateur
   const preserveIfExists = (calculated: number, existing: number | undefined | null, isGrowthRate: boolean = false): number => {
-    // Pour les taux de croissance, préserver si la valeur existante est non-null, non-undefined, et non-0
-    // (0 signifie généralement "non défini" pour les taux de croissance)
+    // Pour les taux de croissance, preserver si la valeur existante est non-null, non-undefined, et non-0
+    // (0 signifie generalement "non defini" pour les taux de croissance)
     if (isGrowthRate && existing !== undefined && existing !== null && existing !== 0) {
-      return existing; // Préserver la valeur manuelle (orange)
+      return existing; // Preserver la valeur manuelle (orange)
     }
-    // Pour les autres valeurs, préserver si définie
+    // Pour les autres valeurs, preserver si definie
     if (!isGrowthRate && existing !== undefined && existing !== null) {
-      return existing; // Préserver la valeur manuelle
+      return existing; // Preserver la valeur manuelle
     }
-    return calculated; // Utiliser la valeur calculée
+    return calculated; // Utiliser la valeur calculee
   };
 
-  // ✅ AMÉLIORATION: Utiliser le dividende depuis l'API FMP si disponible (priorité 1)
-  // Sinon, trouver le dividende le plus récent dans les données historiques
+  //  AMELIORATION: Utiliser le dividende depuis l'API FMP si disponible (priorite 1)
+  // Sinon, trouver le dividende le plus recent dans les donnees historiques
   let finalCurrentDividend = 0;
   
-  // Priorité 1: Utiliser le dividende depuis l'API FMP (calculé depuis key metrics ou yield)
+  // Priorite 1: Utiliser le dividende depuis l'API FMP (calcule depuis key metrics ou yield)
   if (currentDividendFromAPI !== undefined && currentDividendFromAPI > 0) {
     finalCurrentDividend = currentDividendFromAPI;
   } else {
-    // Priorité 2: Trouver le dividende le plus récent (année en cours ou dernière année avec dividende > 0)
+    // Priorite 2: Trouver le dividende le plus recent (annee en cours ou derniere annee avec dividende > 0)
     const currentYear = new Date().getFullYear();
     
-    // 1. Chercher le dividende de l'année en cours d'abord
+    // 1. Chercher le dividende de l'annee en cours d'abord
     const currentYearData = data.find(d => d.year === currentYear && d.dividendPerShare > 0);
     if (currentYearData) {
       finalCurrentDividend = currentYearData.dividendPerShare;
     } else {
-      // 2. Chercher la dernière année avec un dividende > 0 (en ordre décroissant)
+      // 2. Chercher la derniere annee avec un dividende > 0 (en ordre decroissant)
       const sortedData = [...data].sort((a, b) => b.year - a.year);
       const lastYearWithDividend = sortedData.find(d => d.dividendPerShare > 0);
       if (lastYearWithDividend) {
         finalCurrentDividend = lastYearWithDividend.dividendPerShare;
       } else {
-        // 3. Fallback: utiliser lastData.dividendPerShare même si 0
+        // 3. Fallback: utiliser lastData.dividendPerShare meme si 0
         finalCurrentDividend = lastData.dividendPerShare || 0;
       }
     }
     
-    // Priorité 3: Si le dividende est toujours 0 mais qu'on a un prix actuel, 
-    // essayer de calculer à partir du yield moyen historique (si disponible)
+    // Priorite 3: Si le dividende est toujours 0 mais qu'on a un prix actuel, 
+    // essayer de calculer a partir du yield moyen historique (si disponible)
     if (finalCurrentDividend === 0 && currentPrice > 0 && data.length > 0) {
-      // Calculer le yield moyen historique pour les années avec dividende
+      // Calculer le yield moyen historique pour les annees avec dividende
       const yearsWithDividend = data.filter(d => d.dividendPerShare > 0 && d.priceHigh > 0);
       if (yearsWithDividend.length > 0) {
         const avgYield = yearsWithDividend.reduce((sum, d) => {
@@ -841,23 +841,23 @@ export const autoFillAssumptionsFromFMPData = (
           return sum + yieldPercent;
         }, 0) / yearsWithDividend.length;
         
-        // Si le yield moyen est raisonnable (0.1% à 20%), utiliser pour estimer le dividende actuel
+        // Si le yield moyen est raisonnable (0.1% a 20%), utiliser pour estimer le dividende actuel
         if (avgYield > 0.1 && avgYield < 20) {
           finalCurrentDividend = (avgYield / 100) * currentPrice;
-          console.log(`ℹ️ Dividende estimé à partir du yield moyen historique (${avgYield.toFixed(2)}%): ${finalCurrentDividend.toFixed(4)}`);
+          console.log(`i Dividende estime a partir du yield moyen historique (${avgYield.toFixed(2)}%): ${finalCurrentDividend.toFixed(4)}`);
         }
       }
     }
   }
 
   // Retourner les assumptions auto-remplies avec limites STRICTES
-  // Ces limites sont cruciales pour éviter les prix cibles aberrants
+  // Ces limites sont cruciales pour eviter les prix cibles aberrants
   const rawAssumptions: Partial<Assumptions> = {
-    currentPrice: round(currentPrice, 2), // ✅ Toujours mettre à jour le prix actuel
+    currentPrice: round(currentPrice, 2), //  Toujours mettre a jour le prix actuel
     currentDividend: preserveIfExists(
       round(finalCurrentDividend, 4),
       existingAssumptions?.currentDividend,
-      true // ✅ FIX: Traiter comme un taux - ne pas préserver si existant est 0
+      true //  FIX: Traiter comme un taux - ne pas preserver si existant est 0
     ),
     baseYear: preserveIfExists(
       lastValidData.year,
@@ -865,11 +865,11 @@ export const autoFillAssumptionsFromFMPData = (
       false
     ),
     
-    // ✅ Taux de croissance: PRÉSERVER les valeurs existantes (orange) si définies
+    //  Taux de croissance: PRESERVER les valeurs existantes (orange) si definies
     growthRateEPS: preserveIfExists(
       round(Math.min(Math.max(growthEPS, -20), 20), 2),
       existingAssumptions?.growthRateEPS,
-      true // ✅ Flag pour indiquer que c'est un taux de croissance
+      true //  Flag pour indiquer que c'est un taux de croissance
     ),
     growthRateSales: preserveIfExists(
       round(Math.min(Math.max(growthCF, -20), 20), 2),
@@ -892,7 +892,7 @@ export const autoFillAssumptionsFromFMPData = (
       true
     ),
     
-    // ✅ Ratios cibles: PRÉSERVER les valeurs existantes (orange) si définies
+    //  Ratios cibles: PRESERVER les valeurs existantes (orange) si definies
     targetPE: preserveIfExists(
       round(Math.max(5, Math.min(avgPE, 50)), 1),
       existingAssumptions?.targetPE,
@@ -914,7 +914,7 @@ export const autoFillAssumptionsFromFMPData = (
       false
     ),
     
-    // Préserver les autres valeurs existantes si fournies
+    // Preserver les autres valeurs existantes si fournies
     requiredReturn: existingAssumptions?.requiredReturn,
     dividendPayoutRatio: existingAssumptions?.dividendPayoutRatio,
     excludeEPS: existingAssumptions?.excludeEPS,
@@ -923,11 +923,11 @@ export const autoFillAssumptionsFromFMPData = (
     excludeDIV: existingAssumptions?.excludeDIV
   };
 
-  // ✅ SANITISER les assumptions avec les paramètres personnalisés avant de retourner
-  // Cela garantit que même si les calculs génèrent des valeurs aberrantes, elles seront corrigées
+  //  SANITISER les assumptions avec les parametres personnalises avant de retourner
+  // Cela garantit que meme si les calculs generent des valeurs aberrantes, elles seront corrigees
   const sanitized = sanitizeAssumptionsSync(rawAssumptions);
   
-  // Retourner en Partial pour préserver la compatibilité
+  // Retourner en Partial pour preserver la compatibilite
   return {
     ...sanitized,
     excludeEPS: rawAssumptions.excludeEPS,

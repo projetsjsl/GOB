@@ -1,8 +1,8 @@
 /**
- * Service pour charger les données depuis Supabase au lieu de FMP
+ * Service pour charger les donnees depuis Supabase au lieu de FMP
  * Optimise le chargement initial en utilisant les snapshots existants
  * 
- * IMPORTANT: Toutes les assumptions chargées sont sanitisées pour éviter les valeurs aberrantes
+ * IMPORTANT: Toutes les assumptions chargees sont sanitisees pour eviter les valeurs aberrantes
  */
 
 import { AnnualData, CompanyInfo, Assumptions, AnalysisProfile } from '../types';
@@ -20,7 +20,7 @@ export interface SupabaseSnapshotData {
 
 /**
  * Charge le snapshot actuel depuis Supabase pour un ticker
- * Retourne null si aucun snapshot trouvé
+ * Retourne null si aucun snapshot trouve
  */
 export async function loadCurrentSnapshotFromSupabase(
   ticker: string
@@ -57,7 +57,7 @@ export async function loadCurrentSnapshotFromSupabase(
       return null;
     }
 
-    // Prioriser is_current=true, sinon prendre le plus récent
+    // Prioriser is_current=true, sinon prendre le plus recent
     const currentSnapshot = snapshots.find((s: any) => s.is_current === true) || snapshots[0];
 
     return {
@@ -69,28 +69,28 @@ export async function loadCurrentSnapshotFromSupabase(
       auto_fetched: currentSnapshot.auto_fetched
     };
   } catch (error) {
-    console.error(`❌ Erreur chargement snapshot Supabase pour ${ticker}:`, error);
+    console.error(` Erreur chargement snapshot Supabase pour ${ticker}:`, error);
     return null;
   }
 }
 
-// ✅ CACHE GLOBAL: Store all snapshots in memory after first load
+//  CACHE GLOBAL: Store all snapshots in memory after first load
 let allSnapshotsCache: Map<string, SupabaseSnapshotData> | null = null;
 let allSnapshotsCacheTimestamp: number = 0;
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 /**
  * Charge TOUS les snapshots actuels depuis Supabase en UN SEUL appel API
- * Utilise ?all=true&current=true pour récupérer tous les snapshots is_current=true
+ * Utilise ?all=true&current=true pour recuperer tous les snapshots is_current=true
  *
- * Cette fonction est le cœur de l'optimisation - au lieu de 1000+ appels API,
- * on fait UN SEUL appel qui charge tout en mémoire
+ * Cette fonction est le cur de l'optimisation - au lieu de 1000+ appels API,
+ * on fait UN SEUL appel qui charge tout en memoire
  */
 export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string, SupabaseSnapshotData>> {
   // Check cache first
   const now = Date.now();
   if (allSnapshotsCache && (now - allSnapshotsCacheTimestamp) < CACHE_TTL_MS) {
-    console.log(`📦 Using cached snapshots (${allSnapshotsCache.size} tickers, age: ${Math.round((now - allSnapshotsCacheTimestamp) / 1000)}s)`);
+    console.log(` Using cached snapshots (${allSnapshotsCache.size} tickers, age: ${Math.round((now - allSnapshotsCacheTimestamp) / 1000)}s)`);
     return allSnapshotsCache;
   }
 
@@ -98,12 +98,12 @@ export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string,
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
   try {
-    console.log('🚀 Loading ALL current snapshots from Supabase...');
+    console.log(' Loading ALL current snapshots from Supabase...');
     const startTime = Date.now();
 
     let snapshots: any[] = [];
 
-    // ✅ ESSAI 1: API route (production)
+    //  ESSAI 1: API route (production)
     try {
       const { getConfigValue } = await import('./appConfigApi');
       const limit = await getConfigValue('snapshots_limit');
@@ -116,11 +116,11 @@ export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string,
         throw new Error(`API error: ${response.status}`);
       }
     } catch (apiError) {
-      console.warn('⚠️ API route failed:', apiError);
+      console.warn(' API route failed:', apiError);
 
-      // ✅ ESSAI 2: Localhost - chargement direct depuis Supabase (contourne HTTP 431)
+      //  ESSAI 2: Localhost - chargement direct depuis Supabase (contourne HTTP 431)
       if (isLocalhost) {
-        console.log('🔄 Localhost détecté - Chargement direct snapshots depuis Supabase...');
+        console.log(' Localhost detecte - Chargement direct snapshots depuis Supabase...');
         const { getSupabaseClient } = await import('./supabase');
         const supabase = getSupabaseClient();
 
@@ -133,9 +133,9 @@ export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string,
 
           if (!error && data) {
             snapshots = data;
-            console.log(`✅ ${snapshots.length} snapshots chargés directement depuis Supabase (localhost)`);
+            console.log(` ${snapshots.length} snapshots charges directement depuis Supabase (localhost)`);
           } else {
-            console.error('❌ Erreur Supabase direct:', error);
+            console.error(' Erreur Supabase direct:', error);
           }
         }
       }
@@ -159,7 +159,7 @@ export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string,
     }
 
     const loadTime = Date.now() - startTime;
-    console.log(`✅ Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms`);
+    console.log(` Loaded ${snapshotMap.size} current snapshots in ${loadTime}ms`);
 
     // Update cache
     allSnapshotsCache = snapshotMap;
@@ -167,7 +167,7 @@ export async function loadAllCurrentSnapshotsFromSupabase(): Promise<Map<string,
 
     return snapshotMap;
   } catch (error) {
-    console.error('❌ Error loading all snapshots from Supabase:', error);
+    console.error(' Error loading all snapshots from Supabase:', error);
     return new Map();
   }
 }
@@ -198,13 +198,13 @@ export async function loadProfileFromSupabase(
       ? marketData.currentPrice 
       : (snapshot.assumptions?.currentPrice || 0);
 
-    // 3. Mettre à jour le prix dans les assumptions et SANITISER pour éviter aberrations
+    // 3. Mettre a jour le prix dans les assumptions et SANITISER pour eviter aberrations
     const updatedAssumptions = sanitizeAssumptionsSync({
       ...snapshot.assumptions,
       currentPrice: currentPrice > 0 ? currentPrice : snapshot.assumptions?.currentPrice || 0
     });
 
-    console.log(`✅ ${upperTicker}: Chargé depuis Supabase (snapshot du ${snapshot.snapshot_date})`);
+    console.log(` ${upperTicker}: Charge depuis Supabase (snapshot du ${snapshot.snapshot_date})`);
 
     return {
       data: snapshot.annual_data,
@@ -215,10 +215,10 @@ export async function loadProfileFromSupabase(
     };
   }
 
-  // 4. Fallback sur FMP si demandé
+  // 4. Fallback sur FMP si demande
   if (fallbackToFMP) {
-    console.log(`⚠️ ${upperTicker}: Pas de snapshot Supabase, fallback sur FMP`);
-    // Importer dynamiquement pour éviter les dépendances circulaires
+    console.log(` ${upperTicker}: Pas de snapshot Supabase, fallback sur FMP`);
+    // Importer dynamiquement pour eviter les dependances circulaires
     const { fetchCompanyData } = await import('./financeApi');
     try {
       const fmpResult = await fetchCompanyData(upperTicker);
@@ -227,7 +227,7 @@ export async function loadProfileFromSupabase(
         source: 'fmp'
       };
     } catch (error) {
-      console.error(`❌ ${upperTicker}: Erreur FMP fallback:`, error);
+      console.error(` ${upperTicker}: Erreur FMP fallback:`, error);
       return {
         data: [],
         info: {},
@@ -242,7 +242,7 @@ export async function loadProfileFromSupabase(
 
 /**
  * Charge plusieurs profils depuis Supabase en batch
- * ✅ OPTIMISÉ: Utilise loadAllCurrentSnapshotsFromSupabase pour charger tous les snapshots en UN SEUL appel
+ *  OPTIMISE: Utilise loadAllCurrentSnapshotsFromSupabase pour charger tous les snapshots en UN SEUL appel
  */
 export async function loadProfilesBatchFromSupabase(
   tickers: string[]
@@ -255,14 +255,14 @@ export async function loadProfilesBatchFromSupabase(
 }>> {
   const results: Record<string, any> = {};
 
-  // ✅ OPTIMISATION MAJEURE: Charger TOUS les snapshots en UN SEUL appel API
+  //  OPTIMISATION MAJEURE: Charger TOUS les snapshots en UN SEUL appel API
   // Au lieu de 50+ appels individuels, on utilise le cache global
   const allSnapshots = await loadAllCurrentSnapshotsFromSupabase();
 
-  // ✅ OPTIMISATION: Charger tous les prix en UN SEUL appel batch
+  //  OPTIMISATION: Charger tous les prix en UN SEUL appel batch
   let priceMap: Map<string, number> = new Map();
   try {
-    // Limiter à 100 tickers max par requête (limite API)
+    // Limiter a 100 tickers max par requete (limite API)
     const tickersToFetch = tickers.slice(0, 100).map(t => t.toUpperCase());
     if (tickersToFetch.length > 0) {
       const batchResult = await fetchMarketDataBatch(tickersToFetch);
@@ -275,10 +275,10 @@ export async function loadProfilesBatchFromSupabase(
       }
     }
   } catch (e) {
-    console.warn('⚠️ fetchMarketDataBatch failed, using snapshot prices:', e);
+    console.warn(' fetchMarketDataBatch failed, using snapshot prices:', e);
   }
 
-  // Combiner les résultats
+  // Combiner les resultats
   tickers.forEach((ticker) => {
     const upperTicker = ticker.toUpperCase();
     const snapshot = allSnapshots.get(upperTicker);
@@ -289,7 +289,7 @@ export async function loadProfilesBatchFromSupabase(
       const snapshotPrice = snapshot.assumptions?.currentPrice || 0;
       const currentPrice = batchPrice > 0 ? batchPrice : snapshotPrice;
 
-      // ✅ SANITISER les assumptions pour éviter les valeurs aberrantes
+      //  SANITISER les assumptions pour eviter les valeurs aberrantes
       results[upperTicker] = {
         data: snapshot.annual_data || [],
         info: snapshot.company_info || {},
@@ -301,7 +301,7 @@ export async function loadProfilesBatchFromSupabase(
         source: 'supabase' as const
       };
     } else {
-      // Pas de snapshot - marquer pour chargement FMP ultérieur
+      // Pas de snapshot - marquer pour chargement FMP ulterieur
       const batchPrice = priceMap.get(upperTicker) || 0;
       results[upperTicker] = {
         data: [],

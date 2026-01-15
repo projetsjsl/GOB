@@ -1,6 +1,6 @@
 /**
- * API endpoint pour récupérer la variable d'environnement VITE_GROUP_CHAT_URL
- * Utilisé par ChatGPTGroupTab pour charger l'URL par défaut
+ * API endpoint pour recuperer la variable d'environnement VITE_GROUP_CHAT_URL
+ * Utilise par ChatGPTGroupTab pour charger l'URL par defaut
  */
 
 export default async function handler(req, res) {
@@ -18,9 +18,9 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Récupérer la variable d'environnement
-        // Note: En Vercel, les variables VITE_* sont disponibles côté serveur
-        // mais doivent être préfixées VITE_ pour être accessibles côté client
+        // Recuperer la variable d'environnement
+        // Note: En Vercel, les variables VITE_* sont disponibles cote serveur
+        // mais doivent etre prefixees VITE_ pour etre accessibles cote client
         const groupChatUrl = process.env.VITE_GROUP_CHAT_URL || '';
 
         return res.status(200).json({

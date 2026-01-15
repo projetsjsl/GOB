@@ -14,7 +14,7 @@ const AdminJSLaiTab = ({
                 setShowLengthEditor,
                 isDarkMode = true
             }) => {
-                // Vérifier que isDarkMode est défini et créer une variable locale darkMode
+                // Verifier que isDarkMode est defini et creer une variable locale darkMode
                 const darkMode = isDarkMode !== undefined ? isDarkMode : true;
                 
                 return (
@@ -22,38 +22,38 @@ const AdminJSLaiTab = ({
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
-                        }`}>⚙️ Admin-JSLAI</h2>
+                        }`}> Admin-JSLAI</h2>
                     </div>
 
                     {typeof EmmaSmsPanel !== 'undefined' && <EmmaSmsPanel />}
 
-                    {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
+                    {/*  Debug des Donnees (deplace ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {typeof Icon !== 'undefined' ? {typeof Icon !== 'undefined' ? <Icon emoji="🔍" size={20} /> : '🔍'} : '🔍'}
-                            Debug des Données
+                            {typeof Icon !== 'undefined' ? {typeof Icon !== 'undefined' ? <Icon emoji="" size={20} /> : ''} : ''}
+                            Debug des Donnees
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
-                                    {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={18} /> : '📊'}
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="" size={18} /> : ''}
                                     Stock Data
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Tickers: {typeof tickers !== 'undefined' ? tickers.length : 0} ({typeof tickers !== 'undefined' ? tickers.join(', ') : 'N/A'})
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Données chargées: {typeof stockData !== 'undefined' ? Object.keys(stockData).length : 0}
+                                    Donnees chargees: {typeof stockData !== 'undefined' ? Object.keys(stockData).length : 0}
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Dernière MAJ: {typeof lastUpdate !== 'undefined' && lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
+                                    Derniere MAJ: {typeof lastUpdate !== 'undefined' && lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
                                 </div>
                             </div>
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
-                                    {typeof Icon !== 'undefined' ? <Icon emoji="📰" size={18} /> : '📰'}
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="" size={18} /> : ''}
                                     News Data
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -65,7 +65,7 @@ const AdminJSLaiTab = ({
                             </div>
                             <div className={`${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
-                                    {typeof Icon !== 'undefined' ? <Icon emoji="🎯" size={18} /> : '🎯'}
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="" size={18} /> : ''}
                                     Seeking Alpha
                                 </div>
                                 <div className={darkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -78,13 +78,13 @@ const AdminJSLaiTab = ({
                         </div>
                     </div>
 
-                    {/* 📦 Gestion du Cache Supabase */}
+                    {/*  Gestion du Cache Supabase */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-blue-300' : 'text-blue-900'}`}>
-                                {typeof Icon !== 'undefined' ? <Icon emoji="📦" size={20} /> : '📦'}
+                                {typeof Icon !== 'undefined' ? <Icon emoji="" size={20} /> : ''}
                                 Gestion du Cache Supabase
                             </h3>
                             <button
@@ -99,7 +99,7 @@ const AdminJSLaiTab = ({
                                             if (typeof setCacheStatus === 'function') setCacheStatus(data.status || {});
                                         }
                                     } catch (error) {
-                                        console.error('Erreur récupération statut cache:', error);
+                                        console.error('Erreur recuperation statut cache:', error);
                                     } finally {
                                         if (typeof setLoadingCacheStatus === 'function') setLoadingCacheStatus(false);
                                     }
@@ -111,21 +111,21 @@ const AdminJSLaiTab = ({
                                         : darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                                 }`}
                             >
-                                {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
+                                {loadingCacheStatus ? ' Chargement...' : ' Actualiser'}
                             </button>
                         </div>
 
-                        {/* Paramètres du Cache */}
+                        {/* Parametres du Cache */}
                         <div className={`space-y-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
-                                    {typeof Icon !== 'undefined' ? <Icon emoji="⚙️" size={16} /> : '⚙️'}
-                                    Paramètres du Cache
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="" size={16} /> : ''}
+                                    Parametres du Cache
                                 </div>
                                 <div className="space-y-3">
                                     <div>
                                         <label className="block text-sm mb-2">
-                                        Durée du cache (heures): <span className="font-bold text-blue-600">{typeof cacheSettings !== 'undefined' && cacheSettings.maxAgeHours ? cacheSettings.maxAgeHours : 4}h</span>
+                                        Duree du cache (heures): <span className="font-bold text-blue-600">{typeof cacheSettings !== 'undefined' && cacheSettings.maxAgeHours ? cacheSettings.maxAgeHours : 4}h</span>
                                     </label>
                                     <input
                                         type="range"
@@ -162,13 +162,13 @@ const AdminJSLaiTab = ({
                                             className="rounded"
                                         />
                                         <label htmlFor="refreshOnNavigation" className="text-sm">
-                                            Rafraîchir les données tickers lors de la navigation
+                                            Rafraichir les donnees tickers lors de la navigation
                                         </label>
                                     </div>
                                     {typeof cacheSettings !== 'undefined' && cacheSettings.refreshOnNavigation && (
                                         <div className="ml-6">
                                             <label className="block text-sm mb-2">
-                                                Intervalle de rafraîchissement (minutes): <span className="font-bold text-blue-600">{cacheSettings.refreshIntervalMinutes} min</span>
+                                                Intervalle de rafraichissement (minutes): <span className="font-bold text-blue-600">{cacheSettings.refreshIntervalMinutes} min</span>
                                             </label>
                                             <input
                                                 type="range"
@@ -188,16 +188,16 @@ const AdminJSLaiTab = ({
                                 </div>
                             </div>
 
-                            {/* État du Cache */}
+                            {/* Etat du Cache */}
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
-                                    {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={16} /> : '📊'}
-                                    État du Cache
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="" size={16} /> : ''}
+                                    Etat du Cache
                                 </div>
                                 <div className="space-y-2 text-xs">
                                     {Object.keys(cacheStatus).length === 0 ? (
                                         <div className={`text-center py-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                            Cliquez sur "Actualiser" pour voir l'état du cache
+                                            Cliquez sur "Actualiser" pour voir l'etat du cache
                                         </div>
                                     ) : (
                                         Object.entries(cacheStatus).map(([type, status]) => (
@@ -213,12 +213,12 @@ const AdminJSLaiTab = ({
                                                             ? 'bg-yellow-500 text-white'
                                                             : 'bg-green-500 text-white'
                                                     }`}>
-                                                        {status.expired ? '⚠️ Expiré' : '✅ Valide'}
+                                                        {status.expired ? ' Expire' : ' Valide'}
                                                     </span>
                                                 </div>
                                                 {status.age_hours && (
                                                     <div className="mt-1 text-gray-600">
-                                                        Âge: {parseFloat(status.age_hours).toFixed(1)}h / {status.max_age_hours || cacheSettings.maxAgeHours}h max
+                                                        Age: {parseFloat(status.age_hours).toFixed(1)}h / {status.max_age_hours || cacheSettings.maxAgeHours}h max
                                                     </div>
                                                 )}
                                             </div>
@@ -231,13 +231,13 @@ const AdminJSLaiTab = ({
                             <div className="flex gap-2">
                                 <button
                                     onClick={async () => {
-                                        if (confirm('Vider tout le cache Supabase ? Les données seront rechargées depuis les APIs.')) {
+                                        if (confirm('Vider tout le cache Supabase ? Les donnees seront rechargees depuis les APIs.')) {
                                             try {
                                                 const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache`, {
                                                     method: 'DELETE'
                                                 });
                                                 if (response.ok) {
-                                                    alert('Cache vidé avec succès');
+                                                    alert('Cache vide avec succes');
                                                     setCacheStatus({});
                                                 }
                                             } catch (error) {
@@ -249,7 +249,7 @@ const AdminJSLaiTab = ({
                                         darkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
                                     }`}
                                 >
-                                    🗑️ Vider le Cache
+                                     Vider le Cache
                                 </button>
                                 <button
                                     onClick={() => {
@@ -260,26 +260,26 @@ const AdminJSLaiTab = ({
                                         };
                                         setCacheSettings(defaultSettings);
                                         localStorage.setItem('cacheSettings', JSON.stringify(defaultSettings));
-                                        alert('Paramètres réinitialisés aux valeurs par défaut');
+                                        alert('Parametres reinitialises aux valeurs par defaut');
                                     }}
                                     className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
                                         darkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
                                     }`}
                                 >
-                                    🔄 Réinitialiser
+                                     Reinitialiser
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    {/* 📋 Logs Système - Nouveau */}
+                    {/*  Logs Systeme - Nouveau */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                                {typeof Icon !== 'undefined' ? <Icon emoji="📋" size={20} /> : '📋'}
-                                Logs Système
+                                {typeof Icon !== 'undefined' ? <Icon emoji="" size={20} /> : ''}
+                                Logs Systeme
                             </h3>
                             <button
                                 onClick={() => setSystemLogs([])}
@@ -315,13 +315,13 @@ const AdminJSLaiTab = ({
                         </div>
                     </div>
 
-                    {/* 🧠 Deep Think - Analyses Profondes */}
+                    {/*  Deep Think - Analyses Profondes */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                {typeof Icon !== 'undefined' ? <Icon emoji="🧠" size={20} /> : '🧠'}
+                                {typeof Icon !== 'undefined' ? <Icon emoji="" size={20} /> : ''}
                                 Deep Think
                             </h3>
                             <span className={`px-2 py-1 text-xs rounded ${darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'}`}>
@@ -331,36 +331,36 @@ const AdminJSLaiTab = ({
                         <div className={`space-y-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
-                                    {typeof Icon !== 'undefined' ? <Icon emoji="🎯" size={16} /> : '🎯'}
-                                    Statut du système
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="" size={16} /> : ''}
+                                    Statut du systeme
                                 </div>
                                 <div className="text-xs space-y-1">
-                                    <div>• Gemini API: {typeof window !== 'undefined' ? '✅ Actif' : '⚠️ Vérification...'}</div>
-                                    <div>• Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? '✅ Opérationnel' : '⏸️ En attente'}</div>
-                                    <div>• Deep Analysis: {stockData && Object.keys(stockData).length > 0 ? '✅ Données disponibles' : '⚠️ Pas de données'}</div>
+                                    <div>- Gemini API: {typeof window !== 'undefined' ? ' Actif' : ' Verification...'}</div>
+                                    <div>- Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? ' Operationnel' : ' En attente'}</div>
+                                    <div>- Deep Analysis: {stockData && Object.keys(stockData).length > 0 ? ' Donnees disponibles' : ' Pas de donnees'}</div>
                                 </div>
                             </div>
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
-                                    {typeof Icon !== 'undefined' ? <Icon emoji="📊" size={16} /> : '📊'}
-                                    Métriques
+                                    {typeof Icon !== 'undefined' ? <Icon emoji="" size={16} /> : ''}
+                                    Metriques
                                 </div>
                                 <div className="text-xs space-y-1">
-                                    <div>• Analyses effectuées: {systemLogs.filter(l => l.type === 'success').length}</div>
-                                    <div>• Requêtes API: {systemLogs.length}</div>
-                                    <div>• Dernière analyse: {systemLogs[0]?.timestamp || 'N/A'}</div>
+                                    <div>- Analyses effectuees: {systemLogs.filter(l => l.type === 'success').length}</div>
+                                    <div>- Requetes API: {systemLogs.length}</div>
+                                    <div>- Derniere analyse: {systemLogs[0]?.timestamp || 'N/A'}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* ⚠️ Violations & Diagnostics */}
+                    {/*  Violations & Diagnostics */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gradient-to-br from-red-900/20 to-gray-900 border-red-700' : 'bg-gradient-to-br from-red-50 to-gray-50 border-red-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-red-300' : 'text-red-900'}`}>
-                                {typeof Icon !== 'undefined' ? <Icon emoji="⚠️" size={20} /> : '⚠️'}
+                                {typeof Icon !== 'undefined' ? <Icon emoji="" size={20} /> : ''}
                                 Violations
                             </h3>
                             <span className={`px-2 py-1 text-xs rounded ${
@@ -376,7 +376,7 @@ const AdminJSLaiTab = ({
                         }`}>
                             {systemLogs.filter(l => l.type === 'error').length === 0 ? (
                                 <div className={`text-center py-4 ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
-                                    ✅ Aucune violation détectée - Système opérationnel
+                                     Aucune violation detectee - Systeme operationnel
                                 </div>
                             ) : (
                                 <div className="space-y-2">
@@ -388,7 +388,7 @@ const AdminJSLaiTab = ({
                                             }`}
                                         >
                                             <div className="flex items-start gap-2">
-                                                <span className="text-red-500">⚠️</span>
+                                                <span className="text-red-500"></span>
                                                 <div className="flex-1">
                                                     <div className="font-semibold text-xs">[{log.timestamp}]</div>
                                                     <div className="mt-1">{log.text}</div>
@@ -400,32 +400,32 @@ const AdminJSLaiTab = ({
                             )}
                         </div>
                         <div className={`mt-3 p-2 rounded text-xs ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                            💡 <strong>Info:</strong> Les violations sont automatiquement trackées. Consultez les logs système ci-dessus pour plus de détails.
+                             <strong>Info:</strong> Les violations sont automatiquement trackees. Consultez les logs systeme ci-dessus pour plus de details.
                         </div>
                     </div>
 
-                    {/* 🎨 Mode Professionnel / Fun */}
+                    {/*  Mode Professionnel / Fun */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gradient-to-br from-indigo-900/20 to-gray-900 border-indigo-700' : 'bg-gradient-to-br from-indigo-50 to-gray-50 border-indigo-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-indigo-300' : 'text-indigo-900'}`}>
-                                {typeof Icon !== 'undefined' ? <Icon emoji="🎨" size={20} /> : '🎨'}
-                                Mode d'Affichage des Icônes
+                                {typeof Icon !== 'undefined' ? <Icon emoji="" size={20} /> : ''}
+                                Mode d'Affichage des Icones
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
                                 isProfessionalMode
                                     ? darkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-200 text-blue-900'
                                     : darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'
                             }`}>
-                                {isProfessionalMode ? '💼 Professionnel' : '🎉 Fun'}
+                                {isProfessionalMode ? ' Professionnel' : ' Fun'}
                             </div>
                         </div>
                         <div className={`space-y-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
-                                        <Icon emoji={isProfessionalMode ? "💼" : "🎉"} size={18} />
+                                        <Icon emoji={isProfessionalMode ? "" : ""} size={18} />
                                         <span className="font-semibold">
                                             {isProfessionalMode ? 'Mode Professionnel' : 'Mode Fun'}
                                         </span>
@@ -448,7 +448,7 @@ const AdminJSLaiTab = ({
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <span>🎉</span>
+                                                <span></span>
                                                 Mode Fun
                                             </span>
                                         )}
@@ -457,30 +457,30 @@ const AdminJSLaiTab = ({
                                 <div className={`text-xs mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                     {isProfessionalMode ? (
                                         <>
-                                            <p className="mb-1">✅ Icônes professionnelles Iconoir activées</p>
-                                            <p>Les emojis sont remplacés par des icônes vectorielles modernes pour une apparence plus professionnelle.</p>
+                                            <p className="mb-1"> Icones professionnelles Iconoir activees</p>
+                                            <p>Les emojis sont remplaces par des icones vectorielles modernes pour une apparence plus professionnelle.</p>
                                         </>
                                     ) : (
                                         <>
-                                            <p className="mb-1">✅ Mode Fun avec emojis activé</p>
-                                            <p>Les icônes sont affichées sous forme d'emojis colorés pour une expérience plus décontractée.</p>
+                                            <p className="mb-1"> Mode Fun avec emojis active</p>
+                                            <p>Les icones sont affichees sous forme d'emojis colores pour une experience plus decontractee.</p>
                                         </>
                                     )}
                                 </div>
                             </div>
                             <div className={`p-2 rounded text-xs ${darkMode ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-50 text-gray-600'}`}>
-                                💡 <strong>Astuce:</strong> Le mode sélectionné est sauvegardé automatiquement et s'applique à tous les onglets du dashboard.
+                                 <strong>Astuce:</strong> Le mode selectionne est sauvegarde automatiquement et s'applique a tous les onglets du dashboard.
                             </div>
                         </div>
                     </div>
 
-                    {/* 🤖 Configuration Emma IA */}
+                    {/*  Configuration Emma IA */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         darkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${darkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
-                                {typeof Icon !== 'undefined' ? <Icon emoji="🤖" size={20} /> : '🤖'}
+                                {typeof Icon !== 'undefined' ? <Icon emoji="" size={20} /> : ''}
                                 Configuration Emma IA
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
@@ -488,7 +488,7 @@ const AdminJSLaiTab = ({
                                     ? darkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
                                     : darkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-200 text-red-900'
                             }`}>
-                                {emmaConnected ? '✅ Gemini Actif' : '❌ Gemini Inactif'}
+                                {emmaConnected ? ' Gemini Actif' : ' Gemini Inactif'}
                             </div>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -500,7 +500,7 @@ const AdminJSLaiTab = ({
                                         : 'bg-purple-600 hover:bg-purple-700 text-white'
                                 }`}
                             >
-                                📝 Modifier Prompt
+                                 Modifier Prompt
                             </button>
                             <button
                                 onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
@@ -510,7 +510,7 @@ const AdminJSLaiTab = ({
                                         : 'bg-gray-800 hover:bg-gray-700 text-white'
                                 }`}
                             >
-                                🌡️ Température
+                                 Temperature
                             </button>
                             <button
                                 onClick={() => setShowLengthEditor(!showLengthEditor)}
@@ -520,11 +520,11 @@ const AdminJSLaiTab = ({
                                         : 'bg-green-600 hover:bg-green-700 text-white'
                                 }`}
                             >
-                                📏 Longueur Réponse
+                                 Longueur Reponse
                             </button>
                         </div>
                         <div className={`mt-3 p-2 rounded text-xs ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                            💡 <strong>Info:</strong> Ces paramètres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquées immédiatement.
+                             <strong>Info:</strong> Ces parametres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquees immediatement.
                         </div>
                     </div>
 
@@ -537,7 +537,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                        <Icon emoji="" size={20} className="mr-2 inline-block" />
                         Gestion des Stocks
                     </h3>
                         <div className="flex flex-wrap gap-2">
@@ -558,9 +558,9 @@ const AdminJSLaiTab = ({
                     </div>
 
                     {/* Section Scraping Seeking Alpha */}
-                    {/* WORKFLOW EN 3 ÉTAPES CLAIRES */}
+                    {/* WORKFLOW EN 3 ETAPES CLAIRES */}
                     <div className="space-y-4">
-                        {/* ÉTAPE 1: SCRAPING BATCH */}
+                        {/* ETAPE 1: SCRAPING BATCH */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
                             darkMode
                                 ? 'bg-gradient-to-r from-gray-900/40 to-gray-800/40 border-gray-500/50'
@@ -570,8 +570,8 @@ const AdminJSLaiTab = ({
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
                                     darkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                <Icon emoji="📊" size={20} className="mr-2 inline-block" />
-                                ÉTAPE 1: SCRAPING BATCH (25 tickers)
+                                <Icon emoji="" size={20} className="mr-2 inline-block" />
+                                ETAPE 1: SCRAPING BATCH (25 tickers)
                             </h3>
                                 <span className={`px-4 py-2 rounded-full text-sm font-bold ${
                                     scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
@@ -579,10 +579,10 @@ const AdminJSLaiTab = ({
                                     scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
                                     'bg-red-500 text-white'
                                 }`}>
-                                    {scrapingStatus === 'idle' ? '⏸️ EN ATTENTE' :
-                                     scrapingStatus === 'running' ? '🔄 SCRAPING...' :
-                                     scrapingStatus === 'completed' ? '✅ TERMINÉ' :
-                                     '❌ ERREUR'}
+                                    {scrapingStatus === 'idle' ? ' EN ATTENTE' :
+                                     scrapingStatus === 'running' ? ' SCRAPING...' :
+                                     scrapingStatus === 'completed' ? ' TERMINE' :
+                                     ' ERREUR'}
                                 </span>
                             </div>
 
@@ -606,41 +606,41 @@ const AdminJSLaiTab = ({
                                 <p className={`text-sm mb-3 font-semibold transition-colors duration-300 ${
                                     darkMode ? 'text-yellow-300' : 'text-yellow-800'
                                 }`}>
-                                    ⚠️ IMPORTANT: Connectez-vous AVANT de lancer le scraping!
+                                     IMPORTANT: Connectez-vous AVANT de lancer le scraping!
                                 </p>
                                 <ol className={`text-sm space-y-2 transition-colors duration-300 ${
                                     darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    <li><strong>1.</strong> Cliquez "🔐 SE CONNECTER" → Login Seeking Alpha</li>
-                                    <li><strong>2.</strong> Cliquez "🚀 LANCER SCRAPING BATCH" → Toutes les popups s'ouvrent</li>
-                                    <li><strong>3.</strong> Pour CHAQUE popup: F12 → Console → Collez script → Entrée</li>
-                                    <li><strong>4.</strong> Fermez la popup après copie</li>
-                                    <li><strong>5.</strong> Les données sont auto-sauvegardées dans Supabase</li>
+                                    <li><strong>1.</strong> Cliquez " SE CONNECTER" -> Login Seeking Alpha</li>
+                                    <li><strong>2.</strong> Cliquez " LANCER SCRAPING BATCH" -> Toutes les popups s'ouvrent</li>
+                                    <li><strong>3.</strong> Pour CHAQUE popup: F12 -> Console -> Collez script -> Entree</li>
+                                    <li><strong>4.</strong> Fermez la popup apres copie</li>
+                                    <li><strong>5.</strong> Les donnees sont auto-sauvegardees dans Supabase</li>
                                 </ol>
                             </div>
 
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => {
-                                        addScrapingLog('🔐 Ouverture de la page de connexion Seeking Alpha...', 'info');
+                                        addScrapingLog(' Ouverture de la page de connexion Seeking Alpha...', 'info');
                                         window.open('https://seekingalpha.com/account/login', '_blank');
-                                        addScrapingLog('✅ Connectez-vous, puis revenez ici', 'success');
+                                        addScrapingLog(' Connectez-vous, puis revenez ici', 'success');
                                     }}
                                     className="flex-1 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-bold text-lg shadow-lg"
                                 >
-                                    🔐 SE CONNECTER À SEEKING ALPHA
+                                     SE CONNECTER A SEEKING ALPHA
                                 </button>
                                 <button
                                     onClick={runSeekingAlphaScraper}
                                     disabled={scrapingStatus === 'running'}
                                     className="flex-1 px-6 py-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg hover:from-violet-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-lg shadow-lg"
                                 >
-                                    {scrapingStatus === 'running' ? '⏳ SCRAPING EN COURS...' : '🚀 LANCER SCRAPING BATCH'}
+                                    {scrapingStatus === 'running' ? ' SCRAPING EN COURS...' : ' LANCER SCRAPING BATCH'}
                                 </button>
                             </div>
                         </div>
 
-                        {/* ÉTAPE 2: ANALYSE PERPLEXITY */}
+                        {/* ETAPE 2: ANALYSE PERPLEXITY */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
                             darkMode
                                 ? 'bg-gradient-to-r from-pink-900/40 to-rose-900/40 border-pink-500/50'
@@ -649,8 +649,8 @@ const AdminJSLaiTab = ({
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 darkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
-                            ÉTAPE 2: ANALYSE BATCH PERPLEXITY
+                            <Icon emoji="" size={20} className="mr-2 inline-block" />
+                            ETAPE 2: ANALYSE BATCH PERPLEXITY
                         </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
@@ -659,57 +659,57 @@ const AdminJSLaiTab = ({
                                 <p className={`text-sm mb-3 transition-colors duration-300 ${
                                     darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    📊 Cliquez pour analyser TOUTES les données scrapées en une seule fois:
+                                     Cliquez pour analyser TOUTES les donnees scrapees en une seule fois:
                                 </p>
                                 <ul className={`text-sm space-y-2 transition-colors duration-300 ${
                                     darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    <li>✓ Récupère tous les raw scrapes depuis Supabase</li>
-                                    <li>✓ Analyse avec Perplexity AI en batch</li>
-                                    <li>✓ Formate en JSON structuré</li>
-                                    <li>✓ Sauvegarde dans seeking_alpha_analysis</li>
-                                    <li>✓ Affiche les résultats dans le tableau ci-dessous</li>
+                                    <li> Recupere tous les raw scrapes depuis Supabase</li>
+                                    <li> Analyse avec Perplexity AI en batch</li>
+                                    <li> Formate en JSON structure</li>
+                                    <li> Sauvegarde dans seeking_alpha_analysis</li>
+                                    <li> Affiche les resultats dans le tableau ci-dessous</li>
                                 </ul>
                             </div>
 
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🤖 Démarrage analyse Perplexity BATCH...', 'info');
+                                    addScrapingLog(' Demarrage analyse Perplexity BATCH...', 'info');
                                     try {
-                                        // Récupérer tous les raw scrapes depuis Supabase
-                                        addScrapingLog('📥 Récupération des données depuis Supabase...', 'info');
+                                        // Recuperer tous les raw scrapes depuis Supabase
+                                        addScrapingLog(' Recuperation des donnees depuis Supabase...', 'info');
                                         const response = await fetch('/api/seeking-alpha-scraping?type=raw&limit=100');
                                         const data = await response.json();
 
                                         if (data.success && data.data && data.data.length > 0) {
-                                            addScrapingLog(`✅ ${data.data.length} raw scrapes trouvés`, 'success');
+                                            addScrapingLog(` ${data.data.length} raw scrapes trouves`, 'success');
 
                                             for (const item of data.data) {
                                                 const ticker = item.ticker;
-                                                addScrapingLog(`🔄 Analyse de ${ticker} avec Perplexity...`, 'info');
+                                                addScrapingLog(` Analyse de ${ticker} avec Perplexity...`, 'info');
                                                 await analyzeWithPerplexityAndUpdate(ticker, {
                                                     fullText: item.raw_text,
                                                     url: item.url,
                                                     content: {}
                                                 });
                                             }
-                                            addScrapingLog('🎉 Analyse Perplexity terminée pour TOUS les tickers!', 'success');
-                                            addScrapingLog('💾 Résultats sauvegardés dans Supabase', 'success');
+                                            addScrapingLog(' Analyse Perplexity terminee pour TOUS les tickers!', 'success');
+                                            addScrapingLog(' Resultats sauvegardes dans Supabase', 'success');
                                         } else {
-                                            addScrapingLog('⚠️ Aucune donnée trouvée dans Supabase', 'warning');
-                                            addScrapingLog('💡 Effectuez d\'abord le scraping (Étape 1)', 'info');
+                                            addScrapingLog(' Aucune donnee trouvee dans Supabase', 'warning');
+                                            addScrapingLog(' Effectuez d\'abord le scraping (Etape 1)', 'info');
                                         }
                                     } catch (error) {
-                                        addScrapingLog(`❌ Erreur: ${error.message}`, 'error');
+                                        addScrapingLog(` Erreur: ${error.message}`, 'error');
                                     }
                                 }}
                                 className="w-full px-6 py-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all font-bold text-lg shadow-lg"
                             >
-                                🤖 ANALYSER TOUT AVEC PERPLEXITY ({tickers.length} tickers)
+                                 ANALYSER TOUT AVEC PERPLEXITY ({tickers.length} tickers)
                             </button>
                         </div>
 
-                        {/* ÉTAPE 3: RÉSULTATS */}
+                        {/* ETAPE 3: RESULTATS */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
                             darkMode
                                 ? 'bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-emerald-500/50'
@@ -718,8 +718,8 @@ const AdminJSLaiTab = ({
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 darkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="📊" size={20} className="mr-2 inline-block" />
-                            ÉTAPE 3: RÉSULTATS & AFFICHAGE
+                            <Icon emoji="" size={20} className="mr-2 inline-block" />
+                            ETAPE 3: RESULTATS & AFFICHAGE
                         </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
@@ -728,20 +728,20 @@ const AdminJSLaiTab = ({
                                 <p className={`text-sm transition-colors duration-300 ${
                                     darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    Toutes les analyses apparaissent dans le tableau ci-dessous. Cliquez sur "RAFRAÎCHIR" pour recharger les dernières données depuis Supabase.
+                                    Toutes les analyses apparaissent dans le tableau ci-dessous. Cliquez sur "RAFRAICHIR" pour recharger les dernieres donnees depuis Supabase.
                                 </p>
                             </div>
 
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🔄 Rafraîchissement des données depuis Supabase...', 'info');
+                                    addScrapingLog(' Rafraichissement des donnees depuis Supabase...', 'info');
                                     await fetchSeekingAlphaData();
                                     await fetchSeekingAlphaStockData();
-                                    addScrapingLog('✅ Données rafraîchies!', 'success');
+                                    addScrapingLog(' Donnees rafraichies!', 'success');
                                 }}
                                 className="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all font-bold text-lg shadow-lg"
                             >
-                                🔄 RAFRAÎCHIR LES DONNÉES DU TABLEAU
+                                 RAFRAICHIR LES DONNEES DU TABLEAU
                             </button>
                         </div>
                     </div>
@@ -755,7 +755,7 @@ const AdminJSLaiTab = ({
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 darkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📋 Logs de Scraping</h3>
+                            }`}> Logs de Scraping</h3>
                             <div className={`max-h-64 overflow-y-auto space-y-2 ${
                                 darkMode ? 'bg-gray-800' : 'bg-white'
                             } rounded-lg p-4`}>
@@ -776,7 +776,7 @@ const AdminJSLaiTab = ({
                         </div>
                     )}
 
-                    {/* Section État des Connexions & Diagnostic des APIs - FUSIONNÉE */}
+                    {/* Section Etat des Connexions & Diagnostic des APIs - FUSIONNEE */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                         darkMode 
                             ? 'bg-gray-900 border-gray-700' 
@@ -785,7 +785,7 @@ const AdminJSLaiTab = ({
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold transition-colors duration-300 ${
                                 darkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🔗 État des Connexions & Diagnostic des APIs</h3>
+                            }`}> Etat des Connexions & Diagnostic des APIs</h3>
                             <div className="flex gap-2">
                                 <button
                                     onClick={async () => {
@@ -799,7 +799,7 @@ const AdminJSLaiTab = ({
                                             : 'bg-gray-800 text-white hover:bg-gray-700'
                                     }`}
                                 >
-                                    {healthCheckLoading ? 'Vérification...' : '🔄 Vérifier Toutes'}
+                                    {healthCheckLoading ? 'Verification...' : ' Verifier Toutes'}
                                 </button>
                             </div>
                         </div>
@@ -822,8 +822,8 @@ const AdminJSLaiTab = ({
                                                 ? 'text-yellow-800'
                                                 : 'text-red-800'
                                         }`}>
-                                            {healthStatus.overall_status === 'healthy' ? '🟢' :
-                                             healthStatus.overall_status === 'degraded' ? '🟡' : '🔴'}
+                                            {healthStatus.overall_status === 'healthy' ? '' :
+                                             healthStatus.overall_status === 'degraded' ? '' : ''}
                                             Status Global: {healthStatus.overall_status.toUpperCase()}
                                         </h4>
                                         <p className={`text-sm ${
@@ -833,7 +833,7 @@ const AdminJSLaiTab = ({
                                                 ? 'text-yellow-600'
                                                 : 'text-red-600'
                                         }`}>
-                                            {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs opérationnelles
+                                            {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs operationnelles
                                             ({Math.round((healthStatus.healthy_apis / healthStatus.total_apis) * 100)}%)
                                         </p>
                                     </div>
@@ -855,12 +855,12 @@ const AdminJSLaiTab = ({
                             </div>
                         )}
 
-                        {/* Liste détaillée des connexions */}
+                        {/* Liste detaillee des connexions */}
                         {Object.keys(apiStatus).length > 0 && (
                             <div className="space-y-3 mb-4">
                                 <h4 className={`text-sm font-semibold mb-2 transition-colors duration-300 ${
                                     darkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>Connexions détaillées:</h4>
+                                }`}>Connexions detaillees:</h4>
                                 {Object.entries(apiStatus).map(([api, status]) => (
                                     <div key={api} className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-300 ${
                                         darkMode ? 'bg-gray-800' : 'bg-gray-100'
@@ -909,7 +909,7 @@ const AdminJSLaiTab = ({
                                 <h4 className={`font-semibold mb-3 ${
                                     darkMode ? 'text-white' : 'text-blue-900'
                                 }`}>
-                                    💡 Recommandations
+                                     Recommandations
                                 </h4>
                                 <div className="space-y-2">
                                     {healthStatus.recommendations.map((rec, index) => (
@@ -925,8 +925,8 @@ const AdminJSLaiTab = ({
                                                         rec.priority === 'high' ? 'text-green-800' :
                                                         'text-yellow-800'
                                                     }`}>
-                                                        {rec.priority === 'critical' ? '🚨' :
-                                                         rec.priority === 'high' ? '⚠️' : '💡'}
+                                                        {rec.priority === 'critical' ? '' :
+                                                         rec.priority === 'high' ? '' : ''}
                                                         {rec.message}
                                                     </p>
                                                     <p className="text-xs text-gray-600 mt-1">
@@ -942,7 +942,7 @@ const AdminJSLaiTab = ({
 
                         {Object.keys(apiStatus).length === 0 && !healthStatus && (
                             <div className={`text-center py-8 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <p>Cliquez sur "🔄 Vérifier Toutes" pour diagnostiquer les connexions</p>
+                                <p>Cliquez sur " Verifier Toutes" pour diagnostiquer les connexions</p>
                             </div>
                         )}
                     </div>
@@ -956,7 +956,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
+                        <Icon emoji="" size={20} className="mr-2 inline-block" />
                         Monitoring Emma AI
                     </h3>
                         <div className="space-y-4">
@@ -965,13 +965,13 @@ const AdminJSLaiTab = ({
                                     darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
                                     <div className="text-purple-600 font-medium mb-2 flex items-center gap-2">
-                                        {typeof Icon !== 'undefined' ? <Icon emoji="🧠" size={18} /> : '🧠'}
+                                        {typeof Icon !== 'undefined' ? <Icon emoji="" size={18} /> : ''}
                                         Emma Agent
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        Status: <span className="text-green-500">✅ Opérationnel</span>
+                                        Status: <span className="text-green-500"> Operationnel</span>
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -982,26 +982,26 @@ const AdminJSLaiTab = ({
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                                     darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
-                                    <div className="text-blue-600 font-medium mb-2">📧 Briefings</div>
+                                    <div className="text-blue-600 font-medium mb-2"> Briefings</div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        Cron: <span className="text-green-500">✅ Actif</span>
+                                        Cron: <span className="text-green-500"> Actif</span>
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        Horaires: 7h20 • 11h50 • 16h20
+                                        Horaires: 7h20 - 11h50 - 16h20
                                     </div>
                                 </div>
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                                     darkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
-                                    <div className="text-emerald-600 font-medium mb-2">🗄️ Supabase</div>
+                                    <div className="text-emerald-600 font-medium mb-2"> Supabase</div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         darkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        Tables: 4 créées
+                                        Tables: 4 creees
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -1023,17 +1023,17 @@ const AdminJSLaiTab = ({
                                         }).then(response => response.json())
                                         .then(data => {
                                             if (data.success) {
-                                                showMessage('✅ Emma Agent opérationnel', 'success');
+                                                showMessage(' Emma Agent operationnel', 'success');
                                             } else {
-                                                showMessage('❌ Emma Agent erreur: ' + data.error, 'error');
+                                                showMessage(' Emma Agent erreur: ' + data.error, 'error');
                                             }
                                         }).catch(error => {
-                                            showMessage('❌ Erreur connexion Emma Agent', 'error');
+                                            showMessage(' Erreur connexion Emma Agent', 'error');
                                         });
                                     }}
                                     className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
                                 >
-                                    🧪 Tester Emma Agent
+                                     Tester Emma Agent
                                 </button>
                                 <button
                                     onClick={() => {
@@ -1041,17 +1041,17 @@ const AdminJSLaiTab = ({
                                         .then(response => response.json())
                                         .then(data => {
                                             if (data.success) {
-                                                showMessage('✅ Emma Briefing opérationnel', 'success');
+                                                showMessage(' Emma Briefing operationnel', 'success');
                                             } else {
-                                                showMessage('❌ Emma Briefing erreur: ' + data.error, 'error');
+                                                showMessage(' Emma Briefing erreur: ' + data.error, 'error');
                                             }
                                         }).catch(error => {
-                                            showMessage('❌ Erreur connexion Emma Briefing', 'error');
+                                            showMessage(' Erreur connexion Emma Briefing', 'error');
                                         });
                                     }}
                                     className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
                                 >
-                                    📧 Tester Briefing
+                                     Tester Briefing
                                 </button>
                             </div>
                         </div>
@@ -1065,7 +1065,7 @@ const AdminJSLaiTab = ({
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Gestion des Outils Emma</h3>
+                        }`}> Gestion des Outils Emma</h3>
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
@@ -1074,25 +1074,25 @@ const AdminJSLaiTab = ({
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                         darkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                    <Icon emoji="📊" size={18} className="mr-2 inline-block" />
+                                    <Icon emoji="" size={18} className="mr-2 inline-block" />
                                     Outils Financiers
                                 </h4>
                                     <div className="space-y-1 text-sm">
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Polygon Stock Price</div>
+                                        }`}>- Polygon Stock Price</div>
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• FMP Fundamentals</div>
+                                        }`}>- FMP Fundamentals</div>
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Finnhub News</div>
+                                        }`}>- Finnhub News</div>
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Twelve Data Technical</div>
+                                        }`}>- Twelve Data Technical</div>
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Alpha Vantage Ratios</div>
+                                        }`}>- Alpha Vantage Ratios</div>
                                     </div>
                                 </div>
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
@@ -1100,23 +1100,23 @@ const AdminJSLaiTab = ({
                                 }`}>
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                         darkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>🗄️ Outils Supabase</h4>
+                                    }`}> Outils Supabase</h4>
                                     <div className="space-y-1 text-sm">
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Watchlist Manager</div>
+                                        }`}>- Watchlist Manager</div>
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Team Tickers</div>
+                                        }`}>- Team Tickers</div>
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Economic Calendar</div>
+                                        }`}>- Economic Calendar</div>
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Earnings Calendar</div>
+                                        }`}>- Earnings Calendar</div>
                                         <div className={`transition-colors duration-300 ${
                                             darkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Analyst Recommendations</div>
+                                        }`}>- Analyst Recommendations</div>
                                     </div>
                                 </div>
                             </div>
@@ -1133,18 +1133,18 @@ const AdminJSLaiTab = ({
                                         }).then(response => response.json())
                                         .then(data => {
                                             if (data.success) {
-                                                showMessage('✅ Configuration des outils récupérée', 'success');
+                                                showMessage(' Configuration des outils recuperee', 'success');
                                                 console.log('Tools Config:', data.tools_config);
                                             } else {
-                                                showMessage('❌ Erreur récupération config', 'error');
+                                                showMessage(' Erreur recuperation config', 'error');
                                             }
                                         }).catch(error => {
-                                            showMessage('❌ Erreur connexion', 'error');
+                                            showMessage(' Erreur connexion', 'error');
                                         });
                                     }}
                                     className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
                                 >
-                                    ⚙️ Voir Configuration
+                                     Voir Configuration
                                 </button>
                             </div>
                         </div>
@@ -1160,7 +1160,7 @@ const AdminJSLaiTab = ({
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             darkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="⚙️" size={20} className="mr-2 inline-block" />
+                        <Icon emoji="" size={20} className="mr-2 inline-block" />
                         Configuration
                     </h3>
                         <div className="space-y-4">
@@ -1168,7 +1168,7 @@ const AdminJSLaiTab = ({
                                 <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
                                     darkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    Token GitHub (pour les mises à jour)
+                                    Token GitHub (pour les mises a jour)
                                 </label>
                                 <input
                                     type="password"
@@ -1187,7 +1187,7 @@ const AdminJSLaiTab = ({
                                     onClick={() => setShowSettings(!showSettings)}
                                     className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
                                 >
-                                    {showSettings ? 'Masquer' : 'Afficher'} les paramètres
+                                    {showSettings ? 'Masquer' : 'Afficher'} les parametres
                                 </button>
                             </div>
                         </div>

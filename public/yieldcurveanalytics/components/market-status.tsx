@@ -52,12 +52,12 @@ export function MarketStatus({ lastUpdate, onRefresh }: MarketStatusProps) {
           <div className="space-y-2 min-w-0">
             <div className="flex items-center gap-2">
               <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
-              <span className="text-xs sm:text-sm font-semibold text-foreground">Dernière actualisation</span>
+              <span className="text-xs sm:text-sm font-semibold text-foreground">Derniere actualisation</span>
             </div>
             <p className="text-lg sm:text-xl font-bold text-foreground break-words">
               {formatDateTime(lastRefreshTime)}
             </p>
-            <p className="text-xs text-muted-foreground">Données de marché: {lastUpdate}</p>
+            <p className="text-xs text-muted-foreground">Donnees de marche: {lastUpdate}</p>
           </div>
 
           <div className="flex flex-col gap-2 sm:gap-3">
@@ -65,7 +65,7 @@ export function MarketStatus({ lastUpdate, onRefresh }: MarketStatusProps) {
               <div
                 className={`w-2 h-2 rounded-full flex-shrink-0 ${isMarketHours ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`}
               />
-              <span className="font-medium text-foreground">{isMarketHours ? "Marché Ouvert" : "Marché Fermé"}</span>
+              <span className="font-medium text-foreground">{isMarketHours ? "Marche Ouvert" : "Marche Ferme"}</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-background border border-border text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
               <Clock className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />

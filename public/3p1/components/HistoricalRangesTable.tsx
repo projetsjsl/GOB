@@ -21,7 +21,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
   const [isLoadingSector, setIsLoadingSector] = useState(false);
   const [sectorError, setSectorError] = useState<string | null>(null);
 
-  // Charger les données sectorielles depuis l'API
+  // Charger les donnees sectorielles depuis l'API
   useEffect(() => {
     const loadSectorData = async () => {
       const sectorKey = sector || info.sector;
@@ -40,16 +40,16 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
         if (result.success && result.data) {
           setSectorDataFromAPI(result.data);
         } else {
-          // API n'a pas retourné de données, on utilisera les valeurs par défaut
-          // Ne pas afficher de warning en production pour éviter le bruit dans la console
+          // API n'a pas retourne de donnees, on utilisera les valeurs par defaut
+          // Ne pas afficher de warning en production pour eviter le bruit dans la console
           if (process.env.NODE_ENV === 'development') {
-            console.warn(`⚠️ Aucune donnée sectorielle disponible pour "${sectorKey}", utilisation des valeurs par défaut`);
+            console.warn(` Aucune donnee sectorielle disponible pour "${sectorKey}", utilisation des valeurs par defaut`);
           }
         }
       } catch (error: any) {
-        console.error('❌ Erreur chargement données sectorielles:', error);
+        console.error(' Erreur chargement donnees sectorielles:', error);
         setSectorError(error.message);
-        // En cas d'erreur, on utilisera les valeurs par défaut
+        // En cas d'erreur, on utilisera les valeurs par defaut
       } finally {
         setIsLoadingSector(false);
       }
@@ -87,7 +87,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       if (row.earningsPerShare > 0) {
         const peHigh = row.priceHigh / row.earningsPerShare;
         const peLow = row.priceLow / row.earningsPerShare;
-        // ✅ Filtrer directement : P/E doit être entre 1x et 200x
+        //  Filtrer directement : P/E doit etre entre 1x et 200x
         addRatioIfValid(peRatios, peHigh, 'pe', 1, 200);
         addRatioIfValid(peRatios, peLow, 'pe', 1, 200);
       }
@@ -95,7 +95,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       if (row.cashFlowPerShare > 0) {
         const pcfHigh = row.priceHigh / row.cashFlowPerShare;
         const pcfLow = row.priceLow / row.cashFlowPerShare;
-        // ✅ Filtrer directement : P/CF doit être entre 1x et 200x
+        //  Filtrer directement : P/CF doit etre entre 1x et 200x
         addRatioIfValid(pcfRatios, pcfHigh, 'pcf', 1, 200);
         addRatioIfValid(pcfRatios, pcfLow, 'pcf', 1, 200);
       }
@@ -103,48 +103,48 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       if (row.bookValuePerShare > 0) {
         const pbvHigh = row.priceHigh / row.bookValuePerShare;
         const pbvLow = row.priceLow / row.bookValuePerShare;
-        // ✅ Filtrer directement : P/BV doit être entre 0.1x et 50x
+        //  Filtrer directement : P/BV doit etre entre 0.1x et 50x
         addRatioIfValid(pbvRatios, pbvHigh, 'pbv', 0.1, 50);
         addRatioIfValid(pbvRatios, pbvLow, 'pbv', 0.1, 50);
       }
 
       if (row.priceHigh > 0 && row.dividendPerShare > 0) {
         const yieldValue = (row.dividendPerShare / row.priceHigh) * 100;
-        // ✅ Filtrer directement : Yield doit être entre 0% et 50%
+        //  Filtrer directement : Yield doit etre entre 0% et 50%
         addRatioIfValid(yields, yieldValue, 'yield', 0, 50);
       }
 
-      // Calculer les taux de croissance entre années consécutives
+      // Calculer les taux de croissance entre annees consecutives
       if (idx > 0) {
         const prevRow = validData[idx - 1];
         
         if (prevRow.earningsPerShare > 0 && row.earningsPerShare > 0) {
           const growth = ((row.earningsPerShare - prevRow.earningsPerShare) / prevRow.earningsPerShare) * 100;
-          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          //  Filtrer directement : Growth doit etre entre -50% et +100%
           addRatioIfValid(epsGrowthRates, growth, 'growth', -50, 100);
         }
 
         if (prevRow.cashFlowPerShare > 0 && row.cashFlowPerShare > 0) {
           const growth = ((row.cashFlowPerShare - prevRow.cashFlowPerShare) / prevRow.cashFlowPerShare) * 100;
-          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          //  Filtrer directement : Growth doit etre entre -50% et +100%
           addRatioIfValid(cfGrowthRates, growth, 'growth', -50, 100);
         }
 
         if (prevRow.bookValuePerShare > 0 && row.bookValuePerShare > 0) {
           const growth = ((row.bookValuePerShare - prevRow.bookValuePerShare) / prevRow.bookValuePerShare) * 100;
-          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          //  Filtrer directement : Growth doit etre entre -50% et +100%
           addRatioIfValid(bvGrowthRates, growth, 'growth', -50, 100);
         }
 
         if (prevRow.dividendPerShare > 0 && row.dividendPerShare > 0) {
           const growth = ((row.dividendPerShare - prevRow.dividendPerShare) / prevRow.dividendPerShare) * 100;
-          // ✅ Filtrer directement : Growth doit être entre -50% et +100%
+          //  Filtrer directement : Growth doit etre entre -50% et +100%
           addRatioIfValid(divGrowthRates, growth, 'growth', -50, 100);
         }
       }
     });
 
-    // Calculer CAGR sur toute la période
+    // Calculer CAGR sur toute la periode
     const firstRow = validData[0];
     const lastRow = validData[validData.length - 1];
     const yearsDiff = lastRow.year - firstRow.year;
@@ -165,17 +165,17 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       ? calculateCAGR(firstRow.dividendPerShare, lastRow.dividendPerShare, yearsDiff)
       : null;
 
-    // Filtrer les ratios avec des limites réalistes selon le type
+    // Filtrer les ratios avec des limites realistes selon le type
     const filterRatios = (values: number[], type: 'pe' | 'pcf' | 'pbv' | 'yield' | 'growth'): number[] => {
       if (values.length === 0) return [];
       
-      // Limites réalistes selon le type de ratio
+      // Limites realistes selon le type de ratio
       const limits: Record<string, { min: number; max: number }> = {
-        pe: { min: 1, max: 200 },      // P/E: 1x à 200x (au-delà c'est aberrant)
-        pcf: { min: 1, max: 200 },     // P/CF: 1x à 200x
-        pbv: { min: 0.1, max: 50 },    // P/BV: 0.1x à 50x
-        yield: { min: 0, max: 50 },    // Yield: 0% à 50%
-        growth: { min: -50, max: 100 }  // Growth: -50% à +100% (pour les cas extrêmes mais réalistes)
+        pe: { min: 1, max: 200 },      // P/E: 1x a 200x (au-dela c'est aberrant)
+        pcf: { min: 1, max: 200 },     // P/CF: 1x a 200x
+        pbv: { min: 0.1, max: 50 },    // P/BV: 0.1x a 50x
+        yield: { min: 0, max: 50 },    // Yield: 0% a 50%
+        growth: { min: -50, max: 100 }  // Growth: -50% a +100% (pour les cas extremes mais realistes)
       };
       
       const limit = limits[type] || { min: -100, max: 1000 };
@@ -213,9 +213,9 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
     };
   }, [data]);
 
-  // Valeurs de référence sectorielles (depuis API FMP ou valeurs par défaut)
+  // Valeurs de reference sectorielles (depuis API FMP ou valeurs par defaut)
   const sectorRanges = useMemo(() => {
-    // Si on a des données depuis l'API, les utiliser
+    // Si on a des donnees depuis l'API, les utiliser
     if (sectorDataFromAPI) {
       return {
         pe: sectorDataFromAPI.pe || null,
@@ -229,7 +229,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       };
     }
 
-    // Fallback: Valeurs typiques par secteur (utilisées si API non disponible)
+    // Fallback: Valeurs typiques par secteur (utilisees si API non disponible)
     const sectorDefaults: Record<string, any> = {
       'Technology': {
         pe: { min: 15, max: 35, avg: 25 },
@@ -293,15 +293,15 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       matchedSector = sectorDefaults['Technology'];
     } else if (normalizedSector.includes('finance') || normalizedSector.includes('financial')) {
       matchedSector = sectorDefaults['Financials'];
-    } else if (normalizedSector.includes('health') || normalizedSector.includes('santé')) {
+    } else if (normalizedSector.includes('health') || normalizedSector.includes('sante')) {
       matchedSector = sectorDefaults['Healthcare'];
     } else if (normalizedSector.includes('consumer') || normalizedSector.includes('consommation')) {
       matchedSector = sectorDefaults['Consumer'];
-    } else if (normalizedSector.includes('energy') || normalizedSector.includes('énergie')) {
+    } else if (normalizedSector.includes('energy') || normalizedSector.includes('energie')) {
       matchedSector = sectorDefaults['Energy'];
     }
 
-    // Valeurs par défaut génériques si secteur non trouvé (fallback uniquement)
+    // Valeurs par defaut generiques si secteur non trouve (fallback uniquement)
     return matchedSector || {
       pe: { min: 10, max: 25, avg: 17 },
       pcf: { min: 8, max: 20, avg: 14 },
@@ -314,7 +314,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
     };
   }, [sector, info.sector, sectorDataFromAPI]);
 
-  // Calculer les projections 5 ans pour le titre (basées sur les assumptions actuelles)
+  // Calculer les projections 5 ans pour le titre (basees sur les assumptions actuelles)
   const title5YearProjections = useMemo(() => {
     if (!titleRanges) return null;
 
@@ -331,7 +331,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
     const bv5Y = projectFutureValue(baseBV, assumptions.growthRateBV, 5);
     const div5Y = projectFutureValue(baseDiv, assumptions.growthRateDiv, 5);
 
-    // Calculer les ratios projetés
+    // Calculer les ratios projetes
     const targetPriceEPS = eps5Y * assumptions.targetPE;
     const targetPriceCF = cf5Y * assumptions.targetPCF;
     const targetPriceBV = bv5Y * assumptions.targetPBV;
@@ -350,7 +350,7 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
     };
   }, [titleRanges, assumptions, data]);
 
-  // Projections 5 ans typiques pour le secteur (basées sur les moyennes sectorielles)
+  // Projections 5 ans typiques pour le secteur (basees sur les moyennes sectorielles)
   const sector5YearProjections = useMemo(() => {
     // Utiliser les moyennes sectorielles comme base pour les projections
     const safeAvg = (r: Range | null, defaultVal: number = 0) => (r != null && r.avg != null && isFinite(r.avg)) ? r.avg : defaultVal;
@@ -385,8 +385,8 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
   if (!titleRanges) {
     return (
       <div className="bg-white p-5 rounded-lg shadow border border-gray-200 mt-6">
-        <h3 className="text-lg font-bold text-gray-700 mb-4">Intervalles de Référence</h3>
-        <p className="text-sm text-gray-500">Données insuffisantes pour calculer les intervalles historiques</p>
+        <h3 className="text-lg font-bold text-gray-700 mb-4">Intervalles de Reference</h3>
+        <p className="text-sm text-gray-500">Donnees insuffisantes pour calculer les intervalles historiques</p>
       </div>
     );
   }
@@ -394,17 +394,17 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
   return (
     <div className="bg-white p-5 rounded-lg shadow border border-gray-200 mt-6 print-break-inside-avoid">
       <h3 className="text-lg font-bold text-gray-700 mb-4">
-        📊 Intervalles de Référence Historiques
+         Intervalles de Reference Historiques
       </h3>
       <p className="text-xs text-gray-500 mb-4">
-        Utilisez ces intervalles pour guider vos hypothèses (champs orange). Les valeurs du titre sont calculées à partir de vos données historiques. Les valeurs du secteur sont des références typiques.
+        Utilisez ces intervalles pour guider vos hypotheses (champs orange). Les valeurs du titre sont calculees a partir de vos donnees historiques. Les valeurs du secteur sont des references typiques.
       </p>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse">
           <thead className="bg-slate-100 text-gray-600 uppercase text-xs">
             <tr>
-              <th className="p-2 text-left border">Métrique</th>
+              <th className="p-2 text-left border">Metrique</th>
               <th className="p-2 border bg-blue-50">Titre Historique</th>
               <th className="p-2 border bg-purple-50">Secteur Typique</th>
               <th className="p-2 border bg-green-50">5 Ans Titre</th>
@@ -552,18 +552,18 @@ export const HistoricalRangesTable: React.FC<HistoricalRangesTableProps> = ({ da
       </div>
 
       <div className="mt-4 text-xs text-gray-500">
-        <p><strong>Titre Historique:</strong> Calculé à partir de vos données historiques récupérées par API ({data.length} années : {data[0]?.year || 'N/A'} - {data[data.length - 1]?.year || 'N/A'})</p>
+        <p><strong>Titre Historique:</strong> Calcule a partir de vos donnees historiques recuperees par API ({data.length} annees : {data[0]?.year || 'N/A'} - {data[data.length - 1]?.year || 'N/A'})</p>
         <p><strong>Secteur Typique:</strong> {isLoadingSector ? (
-          <span className="text-blue-600">Chargement des données sectorielles depuis l'API...</span>
+          <span className="text-blue-600">Chargement des donnees sectorielles depuis l'API...</span>
         ) : sectorDataFromAPI ? (
-          <span className="text-green-600">Données récupérées depuis FMP API (secteur: {info.sector || sector || 'non spécifié'})</span>
+          <span className="text-green-600">Donnees recuperees depuis FMP API (secteur: {info.sector || sector || 'non specifie'})</span>
         ) : sectorError ? (
-          <span className="text-orange-600">Valeurs par défaut (erreur API: {sectorError})</span>
+          <span className="text-orange-600">Valeurs par defaut (erreur API: {sectorError})</span>
         ) : (
-          <span>Valeurs de référence pour le secteur {info.sector || sector || 'non spécifié'} (valeurs par défaut)</span>
+          <span>Valeurs de reference pour le secteur {info.sector || sector || 'non specifie'} (valeurs par defaut)</span>
         )}</p>
-        <p><strong>5 Ans Titre:</strong> Projections basées sur vos hypothèses actuelles (champs orange)</p>
-        <p><strong>5 Ans Secteur:</strong> Projections typiques pour le secteur basées sur les moyennes sectorielles</p>
+        <p><strong>5 Ans Titre:</strong> Projections basees sur vos hypotheses actuelles (champs orange)</p>
+        <p><strong>5 Ans Secteur:</strong> Projections typiques pour le secteur basees sur les moyennes sectorielles</p>
       </div>
     </div>
   );

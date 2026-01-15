@@ -27,8 +27,8 @@ export default async function handler(req, res) {
     if (!endpoint) {
       return res.status(200).json({
         status: 'healthy',
-        message: 'FMP API opérationnel',
-        apiKey: apiKey ? 'Configurée' : 'Manquante',
+        message: 'FMP API operationnel',
+        apiKey: apiKey ? 'Configuree' : 'Manquante',
         timestamp: new Date().toISOString()
       });
     }
@@ -217,7 +217,7 @@ export default async function handler(req, res) {
         fmpUrl = `${basePath}?${queryString}`;
     }
 
-    console.log(`🔗 FMP API call: ${endpoint} - ${fmpUrl.split('?')[0]}`);
+    console.log(` FMP API call: ${endpoint} - ${fmpUrl.split('?')[0]}`);
 
     // Fetch from FMP with proper headers (User-Agent required to avoid 403)
     const fmpResponse = await fetch(fmpUrl, {
@@ -234,7 +234,7 @@ export default async function handler(req, res) {
       let errorBody = '';
       try {
         errorBody = await fmpResponse.text();
-        console.error(`❌ FMP Error Response: ${errorBody}`);
+        console.error(` FMP Error Response: ${errorBody}`);
         errorDetails += ` - ${errorBody}`;
       } catch (e) {
         // Ignore parse error
@@ -242,7 +242,7 @@ export default async function handler(req, res) {
 
       // Handle 402 Payment Required specifically
       if (fmpResponse.status === 402) {
-        console.error(`❌ FMP API: Endpoint ${endpoint} requires a paid subscription`);
+        console.error(` FMP API: Endpoint ${endpoint} requires a paid subscription`);
         return res.status(402).json({
           success: false,
           error: 'FMP API endpoint restricted',
@@ -257,29 +257,29 @@ export default async function handler(req, res) {
 
       // Handle 401 Unauthorized (invalid API key)
       if (fmpResponse.status === 401 || fmpResponse.status === 403) {
-        console.error(`❌ FMP API: Invalid API key`);
+        console.error(` FMP API: Invalid API key`);
         return res.status(401).json({
           success: false,
           error: 'FMP API key invalid',
-          message: 'La clé API FMP est invalide ou expirée',
+          message: 'La cle API FMP est invalide ou expiree',
           details: errorBody || 'Unauthorized',
           endpoint,
-          fix: 'Vérifiez FMP_API_KEY dans les variables d\'environnement Vercel',
+          fix: 'Verifiez FMP_API_KEY dans les variables d\'environnement Vercel',
           timestamp: new Date().toISOString()
         });
       }
 
       // Handle 429 Rate Limit
       if (fmpResponse.status === 429) {
-        console.error(`❌ FMP API: Rate limit exceeded`);
+        console.error(` FMP API: Rate limit exceeded`);
         return res.status(429).json({
           success: false,
           error: 'FMP rate limit exceeded',
-          message: 'Limite de requêtes FMP atteinte',
+          message: 'Limite de requetes FMP atteinte',
           details: errorBody || 'Too many requests',
           endpoint,
           retryAfter: 60,
-          suggestion: 'Attendez quelques secondes avant de réessayer',
+          suggestion: 'Attendez quelques secondes avant de reessayer',
           timestamp: new Date().toISOString()
         });
       }
@@ -310,7 +310,7 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Upstream invalid response', details: e.message });
     }
 
-    console.log(`✅ FMP API success: ${endpoint} - ${Array.isArray(data) ? data.length : 'object'} items`);
+    console.log(` FMP API success: ${endpoint} - ${Array.isArray(data) ? data.length : 'object'} items`);
 
     // Return data with metadata
     return res.status(200).json({
@@ -324,9 +324,9 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ FMP API Error:', error.message);
+    console.error(' FMP API Error:', error.message);
     
-    // ✅ FIX: Distinguer les types d'erreurs pour codes HTTP appropriés
+    //  FIX: Distinguer les types d'erreurs pour codes HTTP appropries
     let statusCode = 500;
     let errorType = 'Erreur FMP API';
     

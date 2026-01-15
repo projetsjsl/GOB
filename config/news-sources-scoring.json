@@ -11,15 +11,15 @@
   },
   "contexts": {
     "general": {
-      "description": "News générales du marché financier",
+      "description": "News generales du marche financier",
       "preferred_sources": ["bloomberg", "wsj", "reuters", "cnbc", "marketwatch", "yahoo_finance"]
     },
     "crypto": {
-      "description": "Actualités cryptomonnaies",
+      "description": "Actualites cryptomonnaies",
       "preferred_sources": ["coindesk", "cointelegraph", "cryptoslate"]
     },
     "sectorial": {
-      "description": "News sectorielles spécialisées",
+      "description": "News sectorielles specialisees",
       "preferred_sources": ["seeking_alpha", "zero_hedge", "the_big_picture"]
     },
     "analysis": {
@@ -27,11 +27,11 @@
       "preferred_sources": ["seeking_alpha", "calculated_risk", "the_capital_spectator", "strategy"]
     },
     "quebec": {
-      "description": "Actualités financières québécoises et françaises canadiennes",
+      "description": "Actualites financieres quebecoises et francaises canadiennes",
       "preferred_sources": ["les_affaires", "la_presse", "le_devoir", "radio_canada_economie", "bnn_bloomberg_fr"]
     },
     "french_canada": {
-      "description": "Actualités en français canadien",
+      "description": "Actualites en francais canadien",
       "preferred_sources": ["les_affaires", "la_presse", "le_devoir", "radio_canada_economie", "journal_montreal", "le_soleil"]
     }
   },
@@ -52,7 +52,7 @@
       "direct_api": false,
       "rss_available": false,
       "cost": "premium_api_2000_plus_month",
-      "notes": "Source premium, accessible via agrégateurs uniquement"
+      "notes": "Source premium, accessible via agregateurs uniquement"
     },
     "wsj": {
       "name": "Wall Street Journal",
@@ -70,7 +70,7 @@
       "direct_api": false,
       "rss_available": false,
       "cost": "premium_api_paid",
-      "notes": "Source premium, accessible via agrégateurs uniquement"
+      "notes": "Source premium, accessible via agregateurs uniquement"
     },
     "reuters": {
       "name": "Reuters",
@@ -88,7 +88,7 @@
       "direct_api": false,
       "rss_available": false,
       "cost": "premium_api_paid",
-      "notes": "Source premium, accessible via agrégateurs uniquement"
+      "notes": "Source premium, accessible via agregateurs uniquement"
     },
     "cnbc": {
       "name": "CNBC",
@@ -106,7 +106,7 @@
       "direct_api": false,
       "rss_available": true,
       "cost": "free",
-      "notes": "RSS disponible, bonne accessibilité"
+      "notes": "RSS disponible, bonne accessibilite"
     },
     "marketwatch": {
       "name": "MarketWatch",
@@ -160,7 +160,7 @@
       "direct_api": false,
       "rss_available": true,
       "cost": "free",
-      "notes": "Moins spécialisé finance mais très fiable"
+      "notes": "Moins specialise finance mais tres fiable"
     },
     "nyt": {
       "name": "The New York Times",
@@ -178,7 +178,7 @@
       "direct_api": false,
       "rss_available": false,
       "cost": "premium_api_paid",
-      "notes": "Source premium, accès limité"
+      "notes": "Source premium, acces limite"
     },
     "yahoo_finance": {
       "name": "Yahoo Finance",
@@ -196,7 +196,7 @@
       "direct_api": true,
       "rss_available": true,
       "cost": "free",
-      "notes": "Excellente accessibilité, gratuit"
+      "notes": "Excellente accessibilite, gratuit"
     },
     "seeking_alpha": {
       "name": "Seeking Alpha",
@@ -214,7 +214,7 @@
       "direct_api": false,
       "rss_available": true,
       "cost": "free",
-      "notes": "Blog financier de référence, RSS disponible"
+      "notes": "Blog financier de reference, RSS disponible"
     },
     "zero_hedge": {
       "name": "Zero Hedge",
@@ -250,7 +250,7 @@
       "direct_api": false,
       "rss_available": true,
       "cost": "free",
-      "notes": "Analyse macroéconomique, RSS disponible"
+      "notes": "Analyse macroeconomique, RSS disponible"
     },
     "calculated_risk": {
       "name": "Calculated Risk",
@@ -268,7 +268,7 @@
       "direct_api": false,
       "rss_available": true,
       "cost": "free",
-      "notes": "Analyse économique approfondie, RSS disponible"
+      "notes": "Analyse economique approfondie, RSS disponible"
     },
     "the_capital_spectator": {
       "name": "The Capital Spectator",
@@ -322,7 +322,7 @@
       "direct_api": true,
       "rss_available": false,
       "cost": "paid_99_plus_month",
-      "notes": "API payante, priorité basse"
+      "notes": "API payante, priorite basse"
     },
     "coindesk": {
       "name": "CoinDesk",
@@ -340,7 +340,7 @@
       "direct_api": false,
       "rss_available": true,
       "cost": "free",
-      "notes": "Source crypto de référence, RSS disponible"
+      "notes": "Source crypto de reference, RSS disponible"
     },
     "cointelegraph": {
       "name": "Cointelegraph",
@@ -394,7 +394,7 @@
       "direct_api": false,
       "rss_available": false,
       "cost": "premium_api_paid",
-      "notes": "Source premium, accessible via agrégateurs"
+      "notes": "Source premium, accessible via agregateurs"
     },
     "forbes": {
       "name": "Forbes",
@@ -448,7 +448,7 @@
       "direct_api": false,
       "rss_available": false,
       "cost": "premium_api_paid",
-      "notes": "Source premium, accessible via agrégateurs"
+      "notes": "Source premium, accessible via agregateurs"
     },
     "motley_fool": {
       "name": "Motley Fool",
@@ -520,7 +520,7 @@
       "direct_api": false,
       "rss_available": false,
       "cost": "premium_api_paid",
-      "notes": "API payante, accessible via agrégateurs"
+      "notes": "API payante, accessible via agregateurs"
     },
     "zacks": {
       "name": "Zacks",
@@ -538,7 +538,7 @@
       "direct_api": false,
       "rss_available": false,
       "cost": "premium_api_paid",
-      "notes": "API payante, accessible via agrégateurs"
+      "notes": "API payante, accessible via agregateurs"
     },
     "les_affaires": {
       "name": "Les Affaires",
@@ -557,7 +557,7 @@
       "rss_available": true,
       "cost": "free",
       "language": "fr-CA",
-      "notes": "Source financière québécoise de référence, RSS disponible"
+      "notes": "Source financiere quebecoise de reference, RSS disponible"
     },
     "la_presse": {
       "name": "La Presse",
@@ -576,7 +576,7 @@
       "rss_available": true,
       "cost": "free",
       "language": "fr-CA",
-      "notes": "Source québécoise majeure, RSS disponible"
+      "notes": "Source quebecoise majeure, RSS disponible"
     },
     "le_devoir": {
       "name": "Le Devoir",
@@ -595,10 +595,10 @@
       "rss_available": true,
       "cost": "free",
       "language": "fr-CA",
-      "notes": "Source québécoise indépendante, RSS disponible"
+      "notes": "Source quebecoise independante, RSS disponible"
     },
     "radio_canada_economie": {
-      "name": "Radio-Canada Économie",
+      "name": "Radio-Canada Economie",
       "category": "quebec",
       "scores": {
         "reliability": 9,
@@ -614,10 +614,10 @@
       "rss_available": true,
       "cost": "free",
       "language": "fr-CA",
-      "notes": "Source publique québécoise, RSS disponible"
+      "notes": "Source publique quebecoise, RSS disponible"
     },
     "journal_montreal": {
-      "name": "Le Journal de Montréal",
+      "name": "Le Journal de Montreal",
       "category": "quebec",
       "scores": {
         "reliability": 7,
@@ -633,7 +633,7 @@
       "rss_available": true,
       "cost": "free",
       "language": "fr-CA",
-      "notes": "Source québécoise populaire, RSS disponible"
+      "notes": "Source quebecoise populaire, RSS disponible"
     },
     "le_soleil": {
       "name": "Le Soleil",
@@ -652,10 +652,10 @@
       "rss_available": true,
       "cost": "free",
       "language": "fr-CA",
-      "notes": "Source régionale québécoise, RSS disponible"
+      "notes": "Source regionale quebecoise, RSS disponible"
     },
     "tva_nouvelles": {
-      "name": "TVA Nouvelles Économie",
+      "name": "TVA Nouvelles Economie",
       "category": "quebec",
       "scores": {
         "reliability": 7,
@@ -671,7 +671,7 @@
       "rss_available": true,
       "cost": "free",
       "language": "fr-CA",
-      "notes": "Source québécoise TV, RSS disponible"
+      "notes": "Source quebecoise TV, RSS disponible"
     },
     "bnn_bloomberg_fr": {
       "name": "BNN Bloomberg (FR)",
@@ -690,7 +690,7 @@
       "rss_available": true,
       "cost": "free",
       "language": "fr-CA",
-      "notes": "Source financière canadienne en français, RSS disponible"
+      "notes": "Source financiere canadienne en francais, RSS disponible"
     }
   },
   "aggregators": {

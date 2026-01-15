@@ -2,13 +2,13 @@
  * API Prompt Delivery Config - Configuration d'envoi par prompt
  *
  * Usage:
- * GET /api/prompt-delivery-config - Liste tous les prompts configurés pour envoi
- * GET /api/prompt-delivery-config?prompt_id=briefing_morning - Config d'un prompt spécifique
- * POST /api/prompt-delivery-config - Mettre à jour la config d'envoi d'un prompt
+ * GET /api/prompt-delivery-config - Liste tous les prompts configures pour envoi
+ * GET /api/prompt-delivery-config?prompt_id=briefing_morning - Config d'un prompt specifique
+ * POST /api/prompt-delivery-config - Mettre a jour la config d'envoi d'un prompt
  *
- * Utilisé par:
+ * Utilise par:
  * - n8n workflows pour router les briefings
- * - emma-config.html pour gérer les destinataires
+ * - emma-config.html pour gerer les destinataires
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -29,14 +29,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    // ═══════════════════════════════════════════════════════════
-    // GET: Récupérer les configurations
-    // ═══════════════════════════════════════════════════════════
+    // 
+    // GET: Recuperer les configurations
+    // 
     if (req.method === 'GET') {
       const { prompt_id } = req.query;
 
       if (prompt_id) {
-        // Config d'un prompt spécifique
+        // Config d'un prompt specifique
         const { data, error } = await supabase
           .rpc('get_prompt_delivery_config', { p_prompt_id: prompt_id });
 
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
           config: data[0]
         });
       } else {
-        // Liste tous les prompts configurés
+        // Liste tous les prompts configures
         const { data, error } = await supabase
           .from('prompt_delivery_configs')
           .select('*')
@@ -73,9 +73,9 @@ export default async function handler(req, res) {
       }
     }
 
-    // ═══════════════════════════════════════════════════════════
-    // POST: Mettre à jour la configuration d'envoi
-    // ═══════════════════════════════════════════════════════════
+    // 
+    // POST: Mettre a jour la configuration d'envoi
+    // 
     if (req.method === 'POST') {
       const {
         key,
@@ -91,7 +91,7 @@ export default async function handler(req, res) {
       // Le prompt_id est simplement le key
       const prompt_id = key;
 
-      // Mettre à jour la config
+      // Mettre a jour la config
       const { data, error } = await supabase
         .from('emma_config')
         .update({

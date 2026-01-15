@@ -1,37 +1,37 @@
 // ========================================
-// API ROUTE VERCEL - CLÉ GEMINI
+// API ROUTE VERCEL - CLE GEMINI
 // ========================================
 
 export default async function handler(req, res) {
   try {
-    // Ajouter des headers CORS pour éviter les problèmes de cross-origin
+    // Ajouter des headers CORS pour eviter les problemes de cross-origin
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-    // Gérer les requêtes OPTIONS (preflight)
+    // Gerer les requetes OPTIONS (preflight)
     if (req.method === 'OPTIONS') {
       return res.status(200).end();
     }
 
-    // Vérifier que c'est une requête GET
+    // Verifier que c'est une requete GET
     if (req.method !== 'GET') {
-      console.log('❌ Méthode non autorisée:', req.method);
-      return res.status(405).json({ error: 'Méthode non autorisée' });
+      console.log(' Methode non autorisee:', req.method);
+      return res.status(405).json({ error: 'Methode non autorisee' });
     }
 
-    console.log('🔑 Tentative de récupération de la clé API Gemini...');
+    console.log(' Tentative de recuperation de la cle API Gemini...');
 
-    // Récupérer la clé API depuis les variables d'environnement Vercel
+    // Recuperer la cle API depuis les variables d'environnement Vercel
     const geminiApiKey = process.env.GEMINI_API_KEY;
 
-    console.log('🔍 Variables d\'environnement disponibles:', Object.keys(process.env).filter(key => key.includes('GEMINI')));
-    console.log('🔑 Clé API trouvée:', geminiApiKey ? 'OUI (masquée)' : 'NON');
+    console.log(' Variables d\'environnement disponibles:', Object.keys(process.env).filter(key => key.includes('GEMINI')));
+    console.log(' Cle API trouvee:', geminiApiKey ? 'OUI (masquee)' : 'NON');
 
     if (!geminiApiKey) {
-      console.log('❌ Clé API Gemini non configurée');
+      console.log(' Cle API Gemini non configuree');
       return res.status(500).json({
-        error: 'Clé API Gemini non configurée',
+        error: 'Cle API Gemini non configuree',
         message: 'Veuillez configurer la variable d\'environnement GEMINI_API_KEY dans Vercel',
         debug: {
           availableEnvVars: Object.keys(process.env).filter(key => key.includes('GEMINI')),
@@ -40,10 +40,10 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log('✅ Clé API Gemini récupérée avec succès');
+    console.log(' Cle API Gemini recuperee avec succes');
 
-    // Retourner seulement la validation (ne pas exposer la clé complète)
-    // Si le client a besoin de la clé, il doit l'obtenir via localStorage ou appeler directement l'API
+    // Retourner seulement la validation (ne pas exposer la cle complete)
+    // Si le client a besoin de la cle, il doit l'obtenir via localStorage ou appeler directement l'API
     const keyPreview = `${geminiApiKey.substring(0, 8)}...${geminiApiKey.substring(geminiApiKey.length - 4)}`;
 
     return res.status(200).json({
@@ -52,10 +52,10 @@ export default async function handler(req, res) {
       keyPreview: keyPreview,
       timestamp: new Date().toISOString(),
       status: 'success',
-      message: 'Clé API Gemini configurée sur le serveur. Utilisez /api/gemini-proxy pour les appels.'
+      message: 'Cle API Gemini configuree sur le serveur. Utilisez /api/gemini-proxy pour les appels.'
     });
   } catch (error) {
-    console.error('❌ Erreur dans gemini-key API:', error);
+    console.error(' Erreur dans gemini-key API:', error);
     return res.status(500).json({
       error: 'Internal server error',
       message: error.message,

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Intégrations GOB - FastGraph & Ground News</title>
+    <title>Test Integrations GOB - FastGraph & Ground News</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -111,10 +111,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>🧪 Test Intégrations GOB Dashboard</h1>
+        <h1> Test Integrations GOB Dashboard</h1>
         
         <div class="summary">
-            <h2>📊 Résumé des Tests</h2>
+            <h2> Resume des Tests</h2>
             <div class="summary-stats">
                 <div class="stat">
                     <div class="stat-value" id="totalTests">0</div>
@@ -122,11 +122,11 @@
                 </div>
                 <div class="stat">
                     <div class="stat-value" id="passedTests">0</div>
-                    <div class="stat-label">Réussis</div>
+                    <div class="stat-label">Reussis</div>
                 </div>
                 <div class="stat">
                     <div class="stat-value" id="failedTests">0</div>
-                    <div class="stat-label">Échoués</div>
+                    <div class="stat-label">Echoues</div>
                 </div>
                 <div class="stat">
                     <div class="stat-value" id="consoleErrors">0</div>
@@ -136,27 +136,27 @@
         </div>
 
         <div class="test-section">
-            <h2>🎨 Test Tailwind CSS</h2>
+            <h2> Test Tailwind CSS</h2>
             <div id="tailwindTests"></div>
         </div>
 
         <div class="test-section">
-            <h2>📊 Test FastGraph Integration</h2>
+            <h2> Test FastGraph Integration</h2>
             <div id="fastgraphTests"></div>
         </div>
 
         <div class="test-section">
-            <h2>🌍 Test Ground News Integration</h2>
+            <h2> Test Ground News Integration</h2>
             <div id="groundnewsTests"></div>
         </div>
 
         <div class="test-section">
-            <h2>📝 Console Logs</h2>
+            <h2> Console Logs</h2>
             <div class="console-section" id="consoleLogs"></div>
         </div>
 
         <div class="test-section">
-            <h2>🔍 Détails Techniques</h2>
+            <h2> Details Techniques</h2>
             <div id="technicalDetails"></div>
         </div>
     </div>
@@ -267,17 +267,17 @@
 
         // Tests Tailwind
         function testTailwind() {
-            // Test 1: CSS Tailwind chargé
+            // Test 1: CSS Tailwind charge
             const tailwindLink = document.querySelector('link[href="/css/tailwind.css"]');
-            addTest('tailwind', 'CSS Tailwind compilé chargé', !!tailwindLink, 
-                tailwindLink ? 'Fichier /css/tailwind.css trouvé' : 'Fichier /css/tailwind.css non trouvé');
+            addTest('tailwind', 'CSS Tailwind compile charge', !!tailwindLink, 
+                tailwindLink ? 'Fichier /css/tailwind.css trouve' : 'Fichier /css/tailwind.css non trouve');
 
             // Test 2: Pas de CDN Tailwind
             const cdnScripts = Array.from(document.querySelectorAll('script')).filter(s => 
                 s.src && s.src.includes('cdn.tailwindcss.com')
             );
             addTest('tailwind', 'Pas de CDN Tailwind', cdnScripts.length === 0,
-                cdnScripts.length === 0 ? 'Aucun CDN Tailwind détecté ✅' : `${cdnScripts.length} CDN Tailwind détecté(s) ❌`);
+                cdnScripts.length === 0 ? 'Aucun CDN Tailwind detecte ' : `${cdnScripts.length} CDN Tailwind detecte(s) `);
 
             // Test 3: Classes Tailwind fonctionnelles
             const testDiv = document.createElement('div');
@@ -287,20 +287,20 @@
             const computedStyle = window.getComputedStyle(testDiv);
             const hasTailwind = computedStyle.backgroundColor !== '' || computedStyle.padding !== '';
             addTest('tailwind', 'Classes Tailwind fonctionnelles', hasTailwind,
-                hasTailwind ? 'Les classes Tailwind sont appliquées' : 'Les classes Tailwind ne sont pas appliquées');
+                hasTailwind ? 'Les classes Tailwind sont appliquees' : 'Les classes Tailwind ne sont pas appliquees');
             document.body.removeChild(testDiv);
         }
 
         // Tests FastGraph
         function testFastGraph() {
-            // Vérifier si le composant FastGraph est présent dans le DOM
+            // Verifier si le composant FastGraph est present dans le DOM
             const bodyText = document.body.textContent || '';
             const hasFastGraph = bodyText.includes('FastGraphs') || bodyText.includes('FastGraph');
             
-            addTest('fastgraph', 'Section FastGraph présente', hasFastGraph,
-                hasFastGraph ? 'Section FastGraph trouvée dans le DOM' : 'Section FastGraph non trouvée');
+            addTest('fastgraph', 'Section FastGraph presente', hasFastGraph,
+                hasFastGraph ? 'Section FastGraph trouvee dans le DOM' : 'Section FastGraph non trouvee');
 
-            // Vérifier localStorage
+            // Verifier localStorage
             try {
                 const fastgraphExpanded = localStorage.getItem('fastgraph_expanded');
                 addTest('fastgraph', 'localStorage fastgraph_expanded disponible', true,
@@ -309,31 +309,31 @@
                 addTest('fastgraph', 'localStorage fastgraph_expanded disponible', false, e.message);
             }
 
-            // Vérifier l'API endpoint
+            // Verifier l'API endpoint
             fetch('/api/fastgraphs-login', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
                 .then(async res => {
-                    // Vérifier si la réponse est vide
+                    // Verifier si la reponse est vide
                     const text = await res.text();
                     if (!text || text.trim() === '') {
                         addTest('fastgraph', 'API /api/fastgraphs-login accessible', res.ok,
-                            `Réponse vide (status: ${res.status}) - API peut nécessiter des credentials`);
+                            `Reponse vide (status: ${res.status}) - API peut necessiter des credentials`);
                         renderTests();
                         return;
                     }
                     try {
                         const data = JSON.parse(text);
                         addTest('fastgraph', 'API /api/fastgraphs-login accessible', res.ok,
-                            `Status: ${res.status}, Réponse: ${JSON.stringify(data).substring(0, 100)}`);
+                            `Status: ${res.status}, Reponse: ${JSON.stringify(data).substring(0, 100)}`);
                         renderTests();
                     } catch (parseErr) {
                         addTest('fastgraph', 'API /api/fastgraphs-login accessible', false,
-                            `Réponse invalide (status: ${res.status}): ${text.substring(0, 100)}`);
+                            `Reponse invalide (status: ${res.status}): ${text.substring(0, 100)}`);
                         renderTests();
                     }
                 })
                 .catch(err => {
                     addTest('fastgraph', 'API /api/fastgraphs-login accessible', false, 
-                        `Erreur réseau: ${err.message}`);
+                        `Erreur reseau: ${err.message}`);
                     renderTests();
                 });
         }
@@ -343,10 +343,10 @@
             const bodyText = document.body.textContent || '';
             const hasGroundNews = bodyText.includes('Ground News') || bodyText.includes('ground.news');
             
-            addTest('groundnews', 'Section Ground News présente', hasGroundNews,
-                hasGroundNews ? 'Section Ground News trouvée dans le DOM' : 'Section Ground News non trouvée');
+            addTest('groundnews', 'Section Ground News presente', hasGroundNews,
+                hasGroundNews ? 'Section Ground News trouvee dans le DOM' : 'Section Ground News non trouvee');
 
-            // Vérifier localStorage
+            // Verifier localStorage
             try {
                 const groundnewsExpanded = localStorage.getItem('groundnews_expanded');
                 addTest('groundnews', 'localStorage groundnews_expanded disponible', true,
@@ -356,7 +356,7 @@
             }
         }
 
-        // Détails techniques
+        // Details techniques
         function addTechnicalDetails() {
             const detailsDiv = document.getElementById('technicalDetails');
             const details = {
@@ -379,9 +379,9 @@
             });
         }
 
-        // Exécuter les tests
+        // Executer les tests
         window.addEventListener('DOMContentLoaded', () => {
-            console.log('🧪 Démarrage des tests d\'intégration...');
+            console.log(' Demarrage des tests d\'integration...');
             
             setTimeout(() => {
                 testTailwind();
@@ -390,12 +390,12 @@
                 addTechnicalDetails();
                 renderTests();
                 
-                console.log('✅ Tests terminés');
-                console.log('📊 Résultats:', results);
+                console.log(' Tests termines');
+                console.log(' Resultats:', results);
             }, 2000);
         });
 
-        // Exporter les résultats pour inspection
+        // Exporter les resultats pour inspection
         window.testResults = results;
     </script>
 

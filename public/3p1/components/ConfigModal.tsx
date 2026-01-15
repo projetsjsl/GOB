@@ -27,7 +27,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
     if (!isOpen) return null;
 
     const handleReset = () => {
-        if (confirm('Réinitialiser toutes les configurations aux valeurs par défaut ?')) {
+        if (confirm('Reinitialiser toutes les configurations aux valeurs par defaut ?')) {
             setLocalConfig(DEFAULT_CONFIG);
         }
     };
@@ -71,7 +71,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                         </div>
                         <div>
                             <h3 className="text-xl font-bold text-gray-800">Configuration Globale</h3>
-                            <p className="text-xs text-gray-500">Ajustez les garde-fous et limites du système</p>
+                            <p className="text-xs text-gray-500">Ajustez les garde-fous et limites du systeme</p>
                         </div>
                     </div>
                     <button
@@ -113,7 +113,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                             <div>
                                 <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                                     <ShieldCheckIcon className="w-5 h-5 text-gray-500" />
-                                    Limites de Raisonnabilité
+                                    Limites de Raisonnabilite
                                 </h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <ConfigInput
@@ -132,7 +132,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                                         label="Max Dividend Multiplier (x Prix)"
                                         value={localConfig.projections.maxDividendMultiplier}
                                         onChange={(v) => updateConfig('projections', 'maxDividendMultiplier', v)}
-                                        help="Plafond des dividendes cumulés sur 5 ans"
+                                        help="Plafond des dividendes cumules sur 5 ans"
                                     />
                                 </div>
                             </div>
@@ -144,13 +144,13 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                                 </h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <ConfigInput
-                                        label="Rendement Min Accepté (%)"
+                                        label="Rendement Min Accepte (%)"
                                         value={localConfig.returns.min}
                                         onChange={(v) => updateConfig('returns', 'min', v)}
                                         help="Seuil minimum (ex: -100%)"
                                     />
                                     <ConfigInput
-                                        label="Rendement Max Accepté (%)"
+                                        label="Rendement Max Accepte (%)"
                                         value={localConfig.returns.max}
                                         onChange={(v) => updateConfig('returns', 'max', v)}
                                         help="Seuil maximum pour filtrer les bugs (ex: 1000%)"
@@ -163,21 +163,21 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                     {activeTab === 'growth' && (
                         <div className="space-y-6">
                             <p className="text-sm text-gray-600 bg-blue-50 p-4 rounded-lg border border-blue-100">
-                                Ces limites s'appliquent aux taux de croissance (EPS, CF, BV, Dividendes) utilisés pour les projections.
-                                Cela empêche des projections exponentielles irréalistes.
+                                Ces limites s'appliquent aux taux de croissance (EPS, CF, BV, Dividendes) utilises pour les projections.
+                                Cela empeche des projections exponentielles irrealistes.
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <ConfigInput
                                     label="Croissance Min (%)"
                                     value={localConfig.growth.min}
                                     onChange={(v) => updateConfig('growth', 'min', v)}
-                                    help="Baisse maximale projetée par an"
+                                    help="Baisse maximale projetee par an"
                                 />
                                 <ConfigInput
                                     label="Croissance Max (%)"
                                     value={localConfig.growth.max}
                                     onChange={(v) => updateConfig('growth', 'max', v)}
-                                    help="Hausse maximale projetée par an"
+                                    help="Hausse maximale projetee par an"
                                 />
                             </div>
                         </div>
@@ -213,7 +213,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                     {activeTab === 'outliers' && (
                         <div className="space-y-6">
                             <p className="text-sm text-gray-600 bg-blue-50 p-4 rounded-lg border border-blue-100">
-                                Filtres utilisés pour exclure les données historiques aberrantes lors du calcul des moyennes (ex: P/E de 5000x lors d'une année de crise).
+                                Filtres utilises pour exclure les donnees historiques aberrantes lors du calcul des moyennes (ex: P/E de 5000x lors d'une annee de crise).
                             </p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <ConfigInput
@@ -238,7 +238,7 @@ export const ConfigModal: React.FC<ConfigModalProps> = ({
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-red-600 transition-colors"
                     >
                         <ArrowPathIcon className="w-4 h-4" />
-                        Réinitialiser
+                        Reinitialiser
                     </button>
                     <div className="flex gap-3">
                         <button

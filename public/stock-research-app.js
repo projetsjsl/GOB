@@ -256,7 +256,7 @@ function renderColumn2(metrics, news, profile) {
                         ${item.title}
                     </a>
                     <div style="font-size: 12px; color: #6b7280;">
-                        ${item.site} • ${new Date(item.publishedDate).toLocaleDateString()}
+                        ${item.site} - ${new Date(item.publishedDate).toLocaleDateString()}
                     </div>
                 </div>
             `).join('')}

@@ -1,5 +1,5 @@
 /**
- * API endpoint pour récupérer les participants actifs d'un salon
+ * API endpoint pour recuperer les participants actifs d'un salon
  * GET /api/groupchat/integrated/get-participants?roomId=xxx
  */
 
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
             process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
-        // Récupérer les participants en ligne (dernière activité < 30 secondes)
+        // Recuperer les participants en ligne (derniere activite < 30 secondes)
         const thirtySecondsAgo = new Date(Date.now() - 30000).toISOString();
 
         const { data: participants, error: participantsError } = await supabase
@@ -44,10 +44,10 @@ export default async function handler(req, res) {
             .order('last_seen', { ascending: false });
 
         if (participantsError) {
-            console.error('Erreur récupération participants:', participantsError);
+            console.error('Erreur recuperation participants:', participantsError);
             return res.status(500).json({
                 success: false,
-                error: 'Erreur récupération participants',
+                error: 'Erreur recuperation participants',
                 details: participantsError.message
             });
         }

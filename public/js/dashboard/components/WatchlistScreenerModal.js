@@ -193,7 +193,7 @@ const WatchlistScreenerModal = ({ watchlist, onClose, onSelectStock }) => {
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-white">Watchlist Screener</h2>
-                            <p className="text-gray-400 text-sm">AI-powered ranking • {watchlist.length} stocks analyzed</p>
+                            <p className="text-gray-400 text-sm">AI-powered ranking - {watchlist.length} stocks analyzed</p>
                         </div>
                     </div>
                     <button title="Action"
@@ -260,31 +260,31 @@ const WatchlistScreenerModal = ({ watchlist, onClose, onSelectStock }) => {
                                             className="text-left text-gray-400 font-semibold py-3 px-4 cursor-pointer hover:text-white transition-colors"
                                             onClick={() => handleSort('symbol')}
                                         >
-                                            Symbol {sortBy === 'symbol' && (sortDirection === 'desc' ? '↓' : '↑')}
+                                            Symbol {sortBy === 'symbol' && (sortDirection === 'desc' ? 'v' : '^')}
                                         </th>
                                         <th
                                             className="text-right text-gray-400 font-semibold py-3 px-4 cursor-pointer hover:text-white transition-colors"
                                             onClick={() => handleSort('aiScore')}
                                         >
-                                            AI Score {sortBy === 'aiScore' && (sortDirection === 'desc' ? '↓' : '↑')}
+                                            AI Score {sortBy === 'aiScore' && (sortDirection === 'desc' ? 'v' : '^')}
                                         </th>
                                         <th
                                             className="text-right text-gray-400 font-semibold py-3 px-4 cursor-pointer hover:text-white transition-colors"
                                             onClick={() => handleSort('price')}
                                         >
-                                            Price {sortBy === 'price' && (sortDirection === 'desc' ? '↓' : '↑')}
+                                            Price {sortBy === 'price' && (sortDirection === 'desc' ? 'v' : '^')}
                                         </th>
                                         <th
                                             className="text-right text-gray-400 font-semibold py-3 px-4 cursor-pointer hover:text-white transition-colors"
                                             onClick={() => handleSort('change')}
                                         >
-                                            Change {sortBy === 'change' && (sortDirection === 'desc' ? '↓' : '↑')}
+                                            Change {sortBy === 'change' && (sortDirection === 'desc' ? 'v' : '^')}
                                         </th>
                                         <th
                                             className="text-right text-gray-400 font-semibold py-3 px-4 cursor-pointer hover:text-white transition-colors"
                                             onClick={() => handleSort('pe')}
                                         >
-                                            P/E {sortBy === 'pe' && (sortDirection === 'desc' ? '↓' : '↑')}
+                                            P/E {sortBy === 'pe' && (sortDirection === 'desc' ? 'v' : '^')}
                                         </th>
                                         <th className="text-center text-gray-400 font-semibold py-3 px-4">
                                             Actions

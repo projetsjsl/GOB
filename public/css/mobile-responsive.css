@@ -2,14 +2,14 @@
  * Styles Responsive Mobile
  * 
  * Extrait depuis beta-combined-dashboard.html
- * Styles spécifiques pour mobile et tablettes
+ * Styles specifiques pour mobile et tablettes
  */
 
 /* =====================================================
  * SCROLL PREVENTION
  * ===================================================== */
 
-/* 🔒 Prévention du scroll horizontal sur tous les appareils */
+/*  Prevention du scroll horizontal sur tous les appareils */
 html,
 body {
     overflow-x: hidden;
@@ -27,7 +27,7 @@ body {
     padding: 0;
 }
 
-/* Empêcher tout débordement des éléments enfants */
+/* Empecher tout debordement des elements enfants */
 #root {
     overflow-x: hidden;
     max-width: 100%;

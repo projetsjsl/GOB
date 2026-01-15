@@ -1,7 +1,7 @@
 /**
  * API d'Authentification GOB
- * Gère la connexion, déconnexion et validation des utilisateurs
- * Gère maintenant la gestion des utilisateurs (CRUD) via Supabase
+ * Gere la connexion, deconnexion et validation des utilisateurs
+ * Gere maintenant la gestion des utilisateurs (CRUD) via Supabase
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -42,7 +42,7 @@ try {
       process.env.SUPABASE_KEY
     );
   } else {
-    console.error('⚠️ Supabase credentials missing (SUPABASE_URL or SUPABASE_KEY)');
+    console.error(' Supabase credentials missing (SUPABASE_URL or SUPABASE_KEY)');
   }
 } catch (error) {
   console.error('Failed to initialize Supabase client:', error);
@@ -51,7 +51,7 @@ try {
 // Fallback roles only used for bootstrapping/fallback if DB is empty
 const DEFAULT_ROLES_FALLBACK = {
   invite: {
-    display_name: 'Invité',
+    display_name: 'Invite',
     permissions: { view_dashboard: true, view_emma: true, save_conversations: false, view_own_history: false, view_all_history: false }
   },
   client: {
@@ -84,7 +84,7 @@ export default async function handler(req, res) {
     }
 
     if (req.method !== 'POST') {
-      return res.status(405).json({ error: 'Méthode non autorisée' });
+      return res.status(405).json({ error: 'Methode non autorisee' });
     }
 
     if (!supabase) {
@@ -160,7 +160,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
           success: true,
-          message: 'Connexion réussie',
+          message: 'Connexion reussie',
           user: sanitizeUser(user)
         });
       }
@@ -253,7 +253,7 @@ export default async function handler(req, res) {
         // or check if the requester is at least authenticated context
         // For now, we keep the check but use the robust verifier
         if (admin_username && !(await verifyAdmin(admin_username))) {
-            return res.status(403).json({ success: false, error: 'Non autorisé' });
+            return res.status(403).json({ success: false, error: 'Non autorise' });
         }
         
         const users = await listAllUsers();
@@ -275,7 +275,7 @@ export default async function handler(req, res) {
     // ============================================================
     if (action === 'create_user') {
         if (!(await verifyAdmin(admin_username))) {
-            return res.status(403).json({ success: false, error: 'Non autorisé' });
+            return res.status(403).json({ success: false, error: 'Non autorise' });
         }
         
         const { new_username, display_name, role, permissions, password: initialPassword } = payload;
@@ -302,7 +302,7 @@ export default async function handler(req, res) {
     // ============================================================
     if (action === 'update_user') {
         if (!(await verifyAdmin(admin_username))) {
-            return res.status(403).json({ success: false, error: 'Non autorisé' });
+            return res.status(403).json({ success: false, error: 'Non autorise' });
         }
 
         const { target_id, updates } = payload; 
@@ -328,7 +328,7 @@ export default async function handler(req, res) {
     // ============================================================
     if (action === 'delete_user') {
         if (!(await verifyAdmin(admin_username))) {
-            return res.status(403).json({ success: false, error: 'Non autorisé' });
+            return res.status(403).json({ success: false, error: 'Non autorise' });
         }
 
         const { target_id } = payload;

@@ -2,7 +2,7 @@
 // TYPES GLOBAUX DU DASHBOARD
 // ====================================================================
 
-// Données de stock
+// Donnees de stock
 export interface StockData {
   symbol: string;
   price?: number;
@@ -31,7 +31,7 @@ export interface NewsArticle {
   image?: string;
 }
 
-// Événement du calendrier économique
+// Evenement du calendrier economique
 export interface EconomicEvent {
   date: string;
   time?: string;
@@ -51,7 +51,7 @@ export interface SeekingAlphaArticle {
   [key: string]: string | number | boolean | undefined;
 }
 
-// Données Seeking Alpha
+// Donnees Seeking Alpha
 export interface SeekingAlphaData {
   symbol?: string;
   rating?: string;
@@ -86,7 +86,7 @@ export type TabName =
 
 // Props des tabs
 export interface TabProps {
-  // États partagés du dashboard
+  // Etats partages du dashboard
   tickers?: string[];
   teamTickers?: string[];
   watchlistTickers?: string[];
@@ -147,7 +147,7 @@ export interface TabProps {
     [key: string]: string | number | boolean | undefined;
   }>;
 
-  // État du système
+  // Etat du systeme
   loading?: boolean;
   isDarkMode?: boolean;
   lastUpdate?: Date | null;
@@ -175,7 +175,7 @@ export interface TabProps {
   LucideIcon?: React.FC<{ name: string; className?: string }>;
   IconoirIcon?: React.FC<{ name: string; className?: string }>;
 
-  // Autres props spécifiques
+  // Autres props specifiques
   [key: string]: any;
 }
 

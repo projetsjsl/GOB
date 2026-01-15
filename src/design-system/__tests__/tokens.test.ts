@@ -1,7 +1,7 @@
 /**
  * Tests pour les Design Tokens
  * 
- * Vérifie que tous les tokens sont correctement définis et cohérents
+ * Verifie que tous les tokens sont correctement definis et coherents
  */
 
 import { describe, it, expect } from 'vitest';

@@ -1,11 +1,11 @@
 /**
- * GOB Design System - Source Unique de Vérité
+ * GOB Design System - Source Unique de Verite
  * 
  * Toutes les couleurs, espacements, typographie et tokens de design
- * doivent être définis ici et utilisés dans tout le projet.
+ * doivent etre definis ici et utilises dans tout le projet.
  * 
  * Migration depuis:
- * - theme-system.js (thèmes dashboard)
+ * - theme-system.js (themes dashboard)
  * - config/theme-colors.json (couleurs emails/site)
  * - v0-bootstrap.js (tokens composants V0)
  * - tailwind.config.ts (couleurs custom)
@@ -13,15 +13,15 @@
 
 export const GOBDesignTokens = {
   /**
-   * Couleurs Sémantiques (utilisées partout)
-   * Ces couleurs sont les couleurs de base, indépendantes des thèmes
+   * Couleurs Semantiques (utilisees partout)
+   * Ces couleurs sont les couleurs de base, independantes des themes
    */
   colors: {
     // Couleurs principales
     primary: {
       light: '#8b5cf6',    // violet-500 (pour gradients)
       default: '#6366f1',  // indigo-500 (couleur principale)
-      dark: '#4f46e5',     // indigo-600 (variante foncée)
+      dark: '#4f46e5',     // indigo-600 (variante foncee)
       darker: '#4338ca',   // indigo-700
     },
     secondary: {
@@ -30,7 +30,7 @@ export const GOBDesignTokens = {
       dark: '#6d28d9',     // violet-700
     },
     
-    // Couleurs d'état
+    // Couleurs d'etat
     success: '#10b981',    // emerald-500
     successLight: '#34d399', // emerald-400
     successDark: '#059669',  // emerald-600
@@ -73,7 +73,7 @@ export const GOBDesignTokens = {
       accent: 'rgba(99, 102, 241, 0.3)', // indigo avec transparence
     },
     
-    // Couleurs spéciales pour thèmes spécifiques
+    // Couleurs speciales pour themes specifiques
     terminal: {
       primary: '#ffcc00',   // yellow terminal
       secondary: '#00ff00', // green terminal
@@ -90,7 +90,7 @@ export const GOBDesignTokens = {
   },
 
   /**
-   * Espacements Standardisés (échelle de 4px)
+   * Espacements Standardises (echelle de 4px)
    */
   spacing: {
     xs: '4px',   // 0.25rem

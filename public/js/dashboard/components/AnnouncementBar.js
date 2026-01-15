@@ -1,6 +1,6 @@
 /**
- * Composant AnnouncementBar - Barre d'annonce dynamique alimentée par Gemini
- * Basé sur les exemples de l'article Elfsight
+ * Composant AnnouncementBar - Barre d'annonce dynamique alimentee par Gemini
+ * Base sur les exemples de l'article Elfsight
  */
 
 const { useState, useEffect, useRef } = React;
@@ -18,7 +18,7 @@ const AnnouncementBar = ({
     const [isDismissed, setIsDismissed] = useState(false);
     const barRef = useRef(null);
 
-    // Vérifier si la barre a été fermée (localStorage)
+    // Verifier si la barre a ete fermee (localStorage)
     useEffect(() => {
         const dismissedKey = `announcement-${type}-${section}-dismissed`;
         const dismissed = localStorage.getItem(dismissedKey);
@@ -36,7 +36,7 @@ const AnnouncementBar = ({
             try {
                 setLoading(true);
                 
-                // Récupérer la configuration personnalisée depuis localStorage
+                // Recuperer la configuration personnalisee depuis localStorage
                 let customConfig = {};
                 try {
                     const savedConfig = typeof window.getAnnouncementBarsConfig === 'function' 
@@ -52,7 +52,7 @@ const AnnouncementBar = ({
                         };
                     }
                 } catch (e) {
-                    console.warn('Erreur récupération config personnalisée:', e);
+                    console.warn('Erreur recuperation config personnalisee:', e);
                 }
                 
                 const response = await fetch('/api/announcement-bars', {
@@ -82,12 +82,12 @@ const AnnouncementBar = ({
 
         loadContent();
         
-        // Rafraîchir toutes les 30 minutes
+        // Rafraichir toutes les 30 minutes
         const interval = setInterval(loadContent, 30 * 60 * 1000);
         return () => clearInterval(interval);
     }, [type, section, isDismissed]);
 
-    // Gérer la fermeture
+    // Gerer la fermeture
     const handleClose = () => {
         setIsVisible(false);
         const dismissedKey = `announcement-${type}-${section}-dismissed`;
@@ -95,7 +95,7 @@ const AnnouncementBar = ({
         onClose();
     };
 
-    // Styles selon le type (basés sur l'article Elfsight)
+    // Styles selon le type (bases sur l'article Elfsight)
     const getStyles = () => {
         const baseStyles = {
             news: {

@@ -100,7 +100,7 @@ export const ValidationSettingsPanel: React.FC<ValidationSettingsPanelProps> = (
     };
 
     const handleReset = () => {
-        if (confirm('Réinitialiser tous les paramètres aux valeurs par défaut ?')) {
+        if (confirm('Reinitialiser tous les parametres aux valeurs par defaut ?')) {
             const defaults = getDefaultValidationSettings();
             setSettings(defaults);
             setHasChanges(true);
@@ -143,9 +143,9 @@ export const ValidationSettingsPanel: React.FC<ValidationSettingsPanelProps> = (
                             <ShieldCheckIcon className="w-7 h-7 text-white" />
                         </div>
                         <div>
-                            <h3 className="text-2xl font-bold text-gray-900">Paramètres de Validation</h3>
+                            <h3 className="text-2xl font-bold text-gray-900">Parametres de Validation</h3>
                             <p className="text-sm text-gray-600 mt-1">
-                                Gestion sophistiquée des limites et ajustements pour la cohérence FMP/Supabase
+                                Gestion sophistiquee des limites et ajustements pour la coherence FMP/Supabase
                             </p>
                         </div>
                     </div>
@@ -160,7 +160,7 @@ export const ValidationSettingsPanel: React.FC<ValidationSettingsPanelProps> = (
                         {saveStatus === 'saved' && (
                             <div className="flex items-center gap-2 text-green-600 text-sm">
                                 <CheckCircleIconSolid className="w-5 h-5" />
-                                <span>Sauvegardé</span>
+                                <span>Sauvegarde</span>
                             </div>
                         )}
                         {saveStatus === 'error' && (
@@ -172,7 +172,7 @@ export const ValidationSettingsPanel: React.FC<ValidationSettingsPanelProps> = (
                         {hasChanges && saveStatus === 'idle' && (
                             <div className="flex items-center gap-2 text-amber-600 text-sm">
                                 <InformationCircleIcon className="w-5 h-5" />
-                                <span>Modifications non sauvegardées</span>
+                                <span>Modifications non sauvegardees</span>
                             </div>
                         )}
                         <button
@@ -196,11 +196,11 @@ export const ValidationSettingsPanel: React.FC<ValidationSettingsPanelProps> = (
                 {/* Tabs */}
                 <div className="flex border-b border-gray-200 overflow-x-auto bg-gray-50 px-6">
                     {[
-                        { id: 'growth' as TabType, label: 'Taux de Croissance', icon: '📈' },
-                        { id: 'ratios' as TabType, label: 'Ratios Cibles', icon: '📊' },
-                        { id: 'precision' as TabType, label: 'Précision', icon: '🎯' },
-                        { id: 'automation' as TabType, label: 'Automatisation', icon: '⚙️' },
-                        { id: 'consistency' as TabType, label: 'Cohérence FMP/Supabase', icon: '🔗' }
+                        { id: 'growth' as TabType, label: 'Taux de Croissance', icon: '' },
+                        { id: 'ratios' as TabType, label: 'Ratios Cibles', icon: '' },
+                        { id: 'precision' as TabType, label: 'Precision', icon: '' },
+                        { id: 'automation' as TabType, label: 'Automatisation', icon: '' },
+                        { id: 'consistency' as TabType, label: 'Coherence FMP/Supabase', icon: '' }
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -252,11 +252,11 @@ export const ValidationSettingsPanel: React.FC<ValidationSettingsPanelProps> = (
                             className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors bg-white border border-gray-300 rounded-lg hover:bg-red-50"
                         >
                             <ArrowPathIcon className="w-4 h-4" />
-                            Réinitialiser
+                            Reinitialiser
                         </button>
                         {lastSaved && (
                             <span className="text-xs text-gray-500">
-                                Dernière sauvegarde: {lastSaved.toLocaleTimeString('fr-FR')}
+                                Derniere sauvegarde: {lastSaved.toLocaleTimeString('fr-FR')}
                             </span>
                         )}
                     </div>
@@ -284,7 +284,7 @@ const GrowthTab: React.FC<{
                     <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
                         <p className="font-medium mb-1">Limites des Taux de Croissance</p>
-                        <p>Ces limites s'appliquent à tous les taux de croissance (EPS, CF, BV, Dividendes) pour éviter des projections irréalistes.</p>
+                        <p>Ces limites s'appliquent a tous les taux de croissance (EPS, CF, BV, Dividendes) pour eviter des projections irrealistes.</p>
                     </div>
                 </div>
             </div>
@@ -305,23 +305,23 @@ const GrowthTab: React.FC<{
             </div>
 
             <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-semibold text-gray-800 mb-3">Valeurs Recommandées</h4>
+                <h4 className="font-semibold text-gray-800 mb-3">Valeurs Recommandees</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                         <span className="text-gray-600">Conservateur:</span>
-                        <span className="ml-2 font-medium text-gray-800">-10% à +10%</span>
+                        <span className="ml-2 font-medium text-gray-800">-10% a +10%</span>
                     </div>
                     <div>
-                        <span className="text-gray-600">Modéré:</span>
-                        <span className="ml-2 font-medium text-gray-800">-15% à +15%</span>
+                        <span className="text-gray-600">Modere:</span>
+                        <span className="ml-2 font-medium text-gray-800">-15% a +15%</span>
                     </div>
                     <div>
-                        <span className="text-gray-600">Par défaut:</span>
-                        <span className="ml-2 font-medium text-blue-600">-20% à +20%</span>
+                        <span className="text-gray-600">Par defaut:</span>
+                        <span className="ml-2 font-medium text-blue-600">-20% a +20%</span>
                     </div>
                     <div>
                         <span className="text-gray-600">Permissif:</span>
-                        <span className="ml-2 font-medium text-gray-800">-30% à +30%</span>
+                        <span className="ml-2 font-medium text-gray-800">-30% a +30%</span>
                     </div>
                 </div>
             </div>
@@ -348,7 +348,7 @@ const RatiosTab: React.FC<{
                     <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
                         <p className="font-medium mb-1">Limites des Ratios Cibles</p>
-                        <p>Définissez les plages acceptables pour chaque ratio utilisé dans les projections de valorisation.</p>
+                        <p>Definissez les plages acceptables pour chaque ratio utilise dans les projections de valorisation.</p>
                     </div>
                 </div>
             </div>
@@ -386,36 +386,36 @@ const PrecisionTab: React.FC<{
                 <div className="flex items-start gap-3">
                     <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
-                        <p className="font-medium mb-1">Précision des Arrondis</p>
-                        <p>Définissez le nombre de décimales pour l'arrondi des valeurs calculées.</p>
+                        <p className="font-medium mb-1">Precision des Arrondis</p>
+                        <p>Definissez le nombre de decimales pour l'arrondi des valeurs calculees.</p>
                     </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <NumberInput
-                    label="Précision Taux de Croissance"
+                    label="Precision Taux de Croissance"
                     value={settings.growth_precision}
                     onChange={(v) => onUpdate('growth_precision', v)}
                     min={0}
                     max={4}
-                    help="Nombre de décimales (0-4)"
+                    help="Nombre de decimales (0-4)"
                 />
                 <NumberInput
-                    label="Précision Ratios"
+                    label="Precision Ratios"
                     value={settings.ratio_precision}
                     onChange={(v) => onUpdate('ratio_precision', v)}
                     min={0}
                     max={4}
-                    help="Nombre de décimales (0-4)"
+                    help="Nombre de decimales (0-4)"
                 />
                 <NumberInput
-                    label="Précision Yield"
+                    label="Precision Yield"
                     value={settings.yield_precision}
                     onChange={(v) => onUpdate('yield_precision', v)}
                     min={0}
                     max={4}
-                    help="Nombre de décimales (0-4)"
+                    help="Nombre de decimales (0-4)"
                 />
             </div>
         </div>
@@ -455,7 +455,7 @@ const AutomationTab: React.FC<{
                     <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
                         <p className="font-medium mb-1">Automatisation de la Sanitisation</p>
-                        <p>Activez ou désactivez la sanitisation automatique à différents moments du cycle de vie des données.</p>
+                        <p>Activez ou desactivez la sanitisation automatique a differents moments du cycle de vie des donnees.</p>
                     </div>
                 </div>
             </div>
@@ -486,22 +486,22 @@ const ConsistencyTab: React.FC<{
                 <div className="flex items-start gap-3">
                     <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
-                        <p className="font-medium mb-1">Cohérence FMP / Supabase</p>
-                        <p>Paramètres pour garantir la cohérence entre les données FMP et les enregistrements Supabase.</p>
+                        <p className="font-medium mb-1">Coherence FMP / Supabase</p>
+                        <p>Parametres pour garantir la coherence entre les donnees FMP et les enregistrements Supabase.</p>
                     </div>
                 </div>
             </div>
 
             <div className="space-y-6">
                 <ToggleSwitch
-                    label="Forcer la cohérence FMP/Supabase"
-                    description="Rejette les données incohérentes entre FMP et Supabase"
+                    label="Forcer la coherence FMP/Supabase"
+                    description="Rejette les donnees incoherentes entre FMP et Supabase"
                     enabled={settings.enforce_fmp_supabase_consistency}
                     onChange={(enabled) => onUpdate('enforce_fmp_supabase_consistency', enabled)}
                 />
                 <ToggleSwitch
-                    label="Rejeter les données placeholder"
-                    description="Rejette automatiquement les données placeholder (prix = 0, 100, etc.)"
+                    label="Rejeter les donnees placeholder"
+                    description="Rejette automatiquement les donnees placeholder (prix = 0, 100, etc.)"
                     enabled={settings.reject_placeholder_data}
                     onChange={(enabled) => onUpdate('reject_placeholder_data', enabled)}
                 />

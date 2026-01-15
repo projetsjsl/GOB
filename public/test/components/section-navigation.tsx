@@ -5,10 +5,10 @@ import { ChevronUp, ChevronDown, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const SECTIONS = [
-  { id: "section-overview", label: "Aperçu", icon: "📊" },
-  { id: "section-comparison", label: "Comparaison", icon: "📈" },
-  { id: "section-analytics", label: "Analytique", icon: "🔍" },
-  { id: "section-historical", label: "Historique", icon: "📉" },
+  { id: "section-overview", label: "Apercu", icon: "" },
+  { id: "section-comparison", label: "Comparaison", icon: "" },
+  { id: "section-analytics", label: "Analytique", icon: "" },
+  { id: "section-historical", label: "Historique", icon: "" },
 ]
 
 export function SectionNavigation() {
@@ -68,7 +68,7 @@ export function SectionNavigation() {
           onClick={goToPrevious}
           disabled={currentSection === 0}
           className="h-10 w-10 rounded-full bg-card border-border/50 hover:bg-card-hover shadow-lg transition-all"
-          title="Section précédente"
+          title="Section precedente"
         >
           <ChevronUp className="h-5 w-5" />
         </Button>

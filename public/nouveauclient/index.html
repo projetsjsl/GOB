@@ -429,33 +429,33 @@
         <!-- Visual Side -->
         <aside class="visual-side">
             <div class="hero-content">
-                <h1>L'intelligence financière <br><i>au service de vos ouvertures de comptes</i></h1>
-                <p class="hero-subtitle">Une plateforme d'ouverture de nouveau compte client nouvelle génération. Sécurisée, intuitive et entièrement paramétrable pour les cabinets d'élite.</p>
+                <h1>L'intelligence financiere <br><i>au service de vos ouvertures de comptes</i></h1>
+                <p class="hero-subtitle">Une plateforme d'ouverture de nouveau compte client nouvelle generation. Securisee, intuitive et entierement parametrable pour les cabinets d'elite.</p>
                 
                 <div class="features">
                     <div class="feature-item">
-                        <div class="feature-icon">⚡️</div>
+                        <div class="feature-icon"></div>
                         <div class="feature-text">
-                            <h3>Ouverture Sécurisée</h3>
-                            <p>Collecte de données en 3 étapes simples</p>
+                            <h3>Ouverture Securisee</h3>
+                            <p>Collecte de donnees en 3 etapes simples</p>
                         </div>
                     </div>
                     <div class="feature-item">
-                        <div class="feature-icon">🛡️</div>
+                        <div class="feature-icon"></div>
                         <div class="feature-text">
-                            <h3>Sécurité Maximale</h3>
+                            <h3>Securite Maximale</h3>
                             <p>Chiffrement de bout en bout</p>
                         </div>
                     </div>
                     <div class="feature-item">
-                        <div class="feature-icon">📊</div>
+                        <div class="feature-icon"></div>
                         <div class="feature-text">
-                            <h3>Exports Automatisés</h3>
-                            <p>PDF et Excel générés instantanément</p>
+                            <h3>Exports Automatises</h3>
+                            <p>PDF et Excel generes instantanement</p>
                         </div>
                     </div>
                     <div class="feature-item">
-                        <div class="feature-icon">🤖</div>
+                        <div class="feature-icon"></div>
                         <div class="feature-text">
                             <h3>Assistant IA</h3>
                             <p>Support intelligent 24/7</p>
@@ -470,17 +470,17 @@
             <div class="login-card">
                 <div class="login-header">
                     <h2>Ouverture de Compte</h2>
-                    <p>Débutez l'ouverture de votre nouveau compte client</p>
+                    <p>Debutez l'ouverture de votre nouveau compte client</p>
                 </div>
 
                 <div class="error-toast" id="errorMessage">
-                    ⚠️ Identifiants incorrects
+                     Identifiants incorrects
                 </div>
 
                 <form id="loginForm">
                     <div class="form-group">
                         <label class="form-label" for="username">Identifiant</label>
-                        <span class="input-icon">👤</span>
+                        <span class="input-icon"></span>
                         <input 
                             type="text" 
                             id="username" 
@@ -493,23 +493,23 @@
 
                     <div class="form-group">
                         <label class="form-label" for="password">Mot de passe</label>
-                        <span class="input-icon">🔒</span>
+                        <span class="input-icon"></span>
                         <input 
                             type="password" 
                             id="password" 
                             class="form-input"
-                            placeholder="••••••••"
+                            placeholder="--------"
                             required
                             autocomplete="current-password"
                         >
                     </div>
 
-                    <button type="submit" class="btn-submit">Débuter l'ouverture</button>
+                    <button type="submit" class="btn-submit">Debuter l'ouverture</button>
                 </form>
 
             </div>
 
-    <div class="powered-by">Propulsé par <strong>JSLAI</strong></div>
+    <div class="powered-by">Propulse par <strong>JSLAI</strong></div>
         </main>
     </div>
 
@@ -548,14 +548,14 @@
                     company: 'Votre Entreprise',
                     fields: {
                         section1: [
-                            { id: 'firstname', label: 'Prénom', type: 'text', required: true, visible: true },
+                            { id: 'firstname', label: 'Prenom', type: 'text', required: true, visible: true },
                             { id: 'lastname', label: 'Nom', type: 'text', required: true, visible: true },
                             { id: 'email', label: 'Email', type: 'email', required: true, visible: true },
-                            { id: 'phone', label: 'Téléphone', type: 'tel', required: true, visible: true },
+                            { id: 'phone', label: 'Telephone', type: 'tel', required: true, visible: true },
                             { id: 'address', label: 'Adresse', type: 'text', required: true, visible: true }
                         ],
                         section2: [
-                            { id: 'civil_status', label: 'État civil', type: 'select', options: ['Célibataire', 'Marié', 'Divorcé', 'Veuf'], required: true, visible: true },
+                            { id: 'civil_status', label: 'Etat civil', type: 'select', options: ['Celibataire', 'Marie', 'Divorce', 'Veuf'], required: true, visible: true },
                             { id: 'birthdate', label: 'Date de naissance', type: 'date', required: true, visible: true },
                             { id: 'nas', label: 'NAS', type: 'text', required: false, visible: true }
                         ],
@@ -566,7 +566,7 @@
                         ]
                     },
                     pdfTemplate: {
-                        title: 'Formulaire de Collecte de Données',
+                        title: 'Formulaire de Collecte de Donnees',
                         sections: ['section1', 'section2', 'section3'],
                         includeSignature: true
                     }
@@ -606,7 +606,7 @@
                     errorToast.classList.remove('show');
                     window.location.href = user.role === 'admin' ? 'admin.html' : 'app.html';
                 } else {
-                    errorToast.textContent = '❌ Identifiants incorrects';
+                    errorToast.textContent = ' Identifiants incorrects';
                     errorToast.classList.add('show');
                     passwordInput.value = '';
                     passwordInput.focus();
@@ -832,16 +832,16 @@
         }
     </style>
     <div class="emma-container">
-        <button class="emma-toggle" id="emmaToggle" title="Emma IA Assistant">💬</button>
+        <button class="emma-toggle" id="emmaToggle" title="Emma IA Assistant"></button>
         <div class="emma-window" id="emmaWindow">
             <div class="emma-header">
                 <span>Emma IA</span>
-                <button class="emma-close" id="emmaClose">✕</button>
+                <button class="emma-close" id="emmaClose"></button>
             </div>
             <div class="emma-messages" id="emmaMessages"></div>
             <div class="emma-input-area">
                 <input type="text" id="emmaInput" placeholder="Posez une question..." autocomplete="off">
-                <button class="emma-send" id="emmaSend">➤</button>
+                <button class="emma-send" id="emmaSend"></button>
             </div>
         </div>
     </div>

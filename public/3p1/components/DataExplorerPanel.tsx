@@ -242,7 +242,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
       
       const result = await res.json();
       if (result.success) {
-        addNotification('success', isNew ? 'Enregistrement créé avec succès' : 'Modification enregistrée');
+        addNotification('success', isNew ? 'Enregistrement cree avec succes' : 'Modification enregistree');
         setIsEditModalOpen(false);
         setEditingRow(null);
         loadTableData();
@@ -271,11 +271,11 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
     logger.debug(`Deleting from ${selectedTable}, PK=${pk}, ID=${id}`, row);
 
     if (!id) {
-       addNotification('error', `Impossible de trouver l'ID (clé primaire: ${pk}) pour cet enregistrement`);
+       addNotification('error', `Impossible de trouver l'ID (cle primaire: ${pk}) pour cet enregistrement`);
        return;
     }
 
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer cet enregistrement ?\nTable: ${selectedTable}\nID: ${id}`)) return;
+    if (!confirm(`Etes-vous sur de vouloir supprimer cet enregistrement ?\nTable: ${selectedTable}\nID: ${id}`)) return;
     
     setLoading(true);
     try {
@@ -290,7 +290,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
       
       const result = await res.json();
       if (result.success) {
-        addNotification('success', 'Enregistrement supprimé');
+        addNotification('success', 'Enregistrement supprime');
         // Remove from local state immediately for better UI feedback
         setTableData(prev => prev.filter(r => (r[pk] || r.id || r.ticker) !== id));
         loadTables(); // Refresh counts in background
@@ -310,7 +310,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
   const handleSyncFMP = async (ticker: string) => {
     if (!ticker) return;
     setLoading(true);
-    addNotification('success', `Synchro FMP démarrée pour ${ticker}...`);
+    addNotification('success', `Synchro FMP demarree pour ${ticker}...`);
     try {
       const res = await fetch('/api/fmp-sync', {
         method: 'POST',
@@ -319,7 +319,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
       });
       const data = await res.json();
       if (data.success) {
-        addNotification('success', `Synchro terminée pour ${ticker}`);
+        addNotification('success', `Synchro terminee pour ${ticker}`);
         loadTableData();
       } else {
         addNotification('error', data.error || 'Erreur inconnue');
@@ -498,7 +498,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                         ? 'bg-blue-600/20 border-blue-500 text-blue-400'
                         : 'bg-slate-900 border-slate-600 text-slate-400 hover:text-white'
                     }`}
-                    title="Filtres avancés"
+                    title="Filtres avances"
                   >
                     <FunnelIcon className="w-5 h-5" />
                   </button>
@@ -570,8 +570,8 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                               checked={selectedRows.size === tableData.length && tableData.length > 0}
                               onChange={selectAllRows}
                               className="rounded bg-slate-700 border-slate-600"
-                              aria-label="Sélectionner toutes les lignes"
-                              title="Sélectionner toutes les lignes"
+                              aria-label="Selectionner toutes les lignes"
+                              title="Selectionner toutes les lignes"
                             />
                           </th>
                           {columns.slice(0, 8).map(col => (
@@ -605,8 +605,8 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                                 checked={selectedRows.has(row.id || row.ticker)}
                                 onChange={() => toggleRowSelection(row.id || row.ticker)}
                                 className="rounded bg-slate-700 border-slate-600"
-                                aria-label={`Sélectionner ${row.ticker || row.id}`}
-                                title={`Sélectionner ${row.ticker || row.id}`}
+                                aria-label={`Selectionner ${row.ticker || row.id}`}
+                                title={`Selectionner ${row.ticker || row.id}`}
                               />
                             </td>
                             {columns.slice(0, 8).map(col => (
@@ -664,7 +664,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                       disabled={page === 1}
                       className="px-3 py-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm"
                     >
-                      Précédent
+                      Precedent
                     </button>
                     <button
                       onClick={() => setPage(Math.min(totalPages, page + 1))}
@@ -679,8 +679,8 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
             ) : showSummary ? (
               <div className="flex-1 overflow-auto p-8">
                 <div className="max-w-4xl mx-auto">
-                  <h1 className="text-3xl font-bold text-white mb-2">Rapport de Données 3P1</h1>
-                  <p className="text-slate-400 mb-8">Vue d'ensemble de la santé des tables Supabase et colonnes visibles.</p>
+                  <h1 className="text-3xl font-bold text-white mb-2">Rapport de Donnees 3P1</h1>
+                  <p className="text-slate-400 mb-8">Vue d'ensemble de la sante des tables Supabase et colonnes visibles.</p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {tables.map(t => (
@@ -701,7 +701,7 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
                             <span className="text-white font-mono">{t.count.toLocaleString()}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-slate-400">Dernière Sync:</span>
+                            <span className="text-slate-400">Derniere Sync:</span>
                             <span className="text-white">{formatLastUpdate(t.lastUpdate)}</span>
                           </div>
                           {t.error && (
@@ -727,8 +727,8 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
               <div className="flex-1 flex items-center justify-center text-slate-500">
                 <div className="text-center">
                   <TableCellsIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg">Sélectionnez une table</p>
-                  <p className="text-sm mt-2">pour visualiser les données</p>
+                  <p className="text-lg">Selectionnez une table</p>
+                  <p className="text-sm mt-2">pour visualiser les donnees</p>
                 </div>
               </div>
             )}
@@ -739,9 +739,9 @@ const DataExplorerPanel: React.FC<DataExplorerPanelProps> = ({ isOpen, onClose, 
         {showSyncPanel && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <div className="bg-slate-800 border border-slate-600 rounded-xl p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-bold text-white mb-4">Synchroniser les sélections</h3>
+              <h3 className="text-lg font-bold text-white mb-4">Synchroniser les selections</h3>
               <p className="text-slate-300 mb-4">
-                {selectedRows.size} élément(s) sélectionné(s) pour synchronisation.
+                {selectedRows.size} element(s) selectionne(s) pour synchronisation.
               </p>
               <div className="flex gap-3">
                 <button
@@ -905,11 +905,11 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
         // Store FMP value for selection instead of overwriting immediately
         setFmpValues(prev => ({ ...prev, [fieldName]: value }));
       } else {
-        alert("Donnée non trouvée chez FMP pour ce champ.");
+        alert("Donnee non trouvee chez FMP pour ce champ.");
       }
     } catch (e) {
       logger.error('Error:', e);
-      alert("Erreur lors de la récupération FMP");
+      alert("Erreur lors de la recuperation FMP");
     } finally {
       setLoadingField(null);
     }
@@ -931,7 +931,7 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
       <div className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-2xl shadow-2xl flex flex-col max-h-[80vh]">
         <div className="p-4 border-b border-slate-700 flex justify-between items-center">
           <h3 className="text-xl font-bold text-white">{title}</h3>
-          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg" aria-label="Fermer le modal d'édition"><XMarkIcon className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-lg" aria-label="Fermer le modal d'edition"><XMarkIcon className="w-5 h-5" /></button>
         </div>
         <div className="p-6 overflow-y-auto space-y-4">
           {columns.map(col => {
@@ -958,8 +958,8 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
                         onClick={() => handleFetchField(col.name)}
                         disabled={!!loadingField}
                         className={`flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded transition-colors disabled:opacity-50 ${hasFmpValue ? 'bg-green-600/20 text-green-400' : 'bg-blue-600/20 text-blue-400 hover:bg-blue-600/30'}`}
-                        title="Récupérer depuis FMP"
-                        aria-label={`Récupérer ${col.name} depuis FMP`}
+                        title="Recuperer depuis FMP"
+                        aria-label={`Recuperer ${col.name} depuis FMP`}
                       >
                         {loadingField === col.name ? (
                           <ArrowPathIcon className="w-3 h-3 animate-spin" />
@@ -1027,7 +1027,7 @@ const EditModal: React.FC<EditModalProps> = ({ title, initialData, columns, onCl
                     }}
                     className="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-white font-mono text-sm h-32 focus:border-blue-500 outline-none"
                     aria-label={col.name.replace(/_/g, ' ')}
-                    title={`Éditer ${col.name.replace(/_/g, ' ')} (format JSON)`}
+                    title={`Editer ${col.name.replace(/_/g, ' ')} (format JSON)`}
                   />
                 ) : (
                   <div className="relative">

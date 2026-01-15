@@ -13,7 +13,7 @@ const BUFFER_SIZE = 4096;
 const getStockPriceTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
   name: "getStockPrice",
   description: lang === 'fr-CA'
-    ? "Outil essentiel pour obtenir le prix actuel, la variation et la performance d'une action. À utiliser dès que l'utilisateur mentionne une entreprise, demande 'comment ça va' pour une action, ou demande des 'résultats' ou chiffres récents."
+    ? "Outil essentiel pour obtenir le prix actuel, la variation et la performance d'une action. A utiliser des que l'utilisateur mentionne une entreprise, demande 'comment ca va' pour une action, ou demande des 'resultats' ou chiffres recents."
     : "Essential tool to get current price, change, and performance of a stock. Use immediately when user mentions a company, asks 'how is it doing', or asks for 'results' or recent numbers.",
   parameters: {
     type: Type.OBJECT,
@@ -30,14 +30,14 @@ const getStockPriceTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
 const getMarketNewsTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
   name: "getMarketNews",
   description: lang === 'fr-CA'
-    ? "Obtenir les grands titres de l'actualité financière récente. Utile pour expliquer pourquoi une action monte ou descend."
+    ? "Obtenir les grands titres de l'actualite financiere recente. Utile pour expliquer pourquoi une action monte ou descend."
     : "Get recent financial news headlines. Useful to explain why a stock is moving up or down.",
   parameters: {
     type: Type.OBJECT,
     properties: {
       category: {
         type: Type.STRING,
-        description: lang === 'fr-CA' ? "La catégorie (ex: Tech, Marchés, Crypto, Général)." : "The category (e.g. Tech, Markets, Crypto, General).",
+        description: lang === 'fr-CA' ? "La categorie (ex: Tech, Marches, Crypto, General)." : "The category (e.g. Tech, Markets, Crypto, General).",
       },
     },
     required: ["category"],
@@ -47,7 +47,7 @@ const getMarketNewsTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
 const getStockHistoryTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
   name: "getStockHistory",
   description: lang === 'fr-CA'
-    ? "Obtenir l'historique des prix pour afficher un graphique. A utiliser quand l'utilisateur demande de voir l'évolution, la courbe ou l'historique sur une période."
+    ? "Obtenir l'historique des prix pour afficher un graphique. A utiliser quand l'utilisateur demande de voir l'evolution, la courbe ou l'historique sur une periode."
     : "Get price history to display a chart. Use when user asks to see the trend, the curve, or history over a period.",
   parameters: {
     type: Type.OBJECT,
@@ -58,7 +58,7 @@ const getStockHistoryTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
       },
       period: {
         type: Type.STRING,
-        description: lang === 'fr-CA' ? "La période (ex: 1M, 6M, 1Y). Par défaut 1M." : "The period (e.g. 1M, 6M, 1Y). Default 1M.",
+        description: lang === 'fr-CA' ? "La periode (ex: 1M, 6M, 1Y). Par defaut 1M." : "The period (e.g. 1M, 6M, 1Y). Default 1M.",
       },
     },
     required: ["symbol"],
@@ -68,13 +68,13 @@ const getStockHistoryTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
 const getAnalyzeStockTool = (lang: 'fr-CA' | 'en-CA'): FunctionDeclaration => ({
   name: "analyzeStock",
   description: lang === 'fr-CA'
-    ? "Effectuer une analyse approfondie, stratégique et raisonnée (Thinking Mode) d'une action ou d'un marché. À utiliser quand l'utilisateur demande une 'analyse profonde', 'pourquoi ça monte vraiment', 'fais une recherche approfondie', ou des prédictions complexes nécessitant du raisonnement."
+    ? "Effectuer une analyse approfondie, strategique et raisonnee (Thinking Mode) d'une action ou d'un marche. A utiliser quand l'utilisateur demande une 'analyse profonde', 'pourquoi ca monte vraiment', 'fais une recherche approfondie', ou des predictions complexes necessitant du raisonnement."
     : "Perform a deep, strategic, and reasoned analysis (Thinking Mode) of a stock or market. Use when user asks for 'deep analysis', 'why is it really moving', 'do thorough research', or complex predictions requiring reasoning.",
   parameters: {
     type: Type.OBJECT,
     properties: {
       symbol: { type: Type.STRING, description: lang === 'fr-CA' ? "Symbole de l'action ou sujet principal." : "Stock symbol or main subject." },
-      question: { type: Type.STRING, description: lang === 'fr-CA' ? "La question spécifique ou le contexte complet de l'analyse." : "The specific question or full context of the analysis." }
+      question: { type: Type.STRING, description: lang === 'fr-CA' ? "La question specifique ou le contexte complet de l'analyse." : "The specific question or full context of the analysis." }
     },
     required: ["symbol", "question"]
   }
@@ -188,10 +188,10 @@ const fetchMarketNews = (category: string, lang: 'fr-CA' | 'en-CA') => {
 
   const newsItemsFr = [
     { title: "La Fed signale une possible baisse des taux le mois prochain.", source: "Bloomberg" },
-    { title: "Le secteur technologique bondit après des résultats trimestriels records.", source: "Reuters" },
-    { title: "Le Bitcoin atteint un nouveau seuil de résistance.", source: "CoinDesk" },
-    { title: "L'inflation en zone euro ralentit plus vite que prévu.", source: "Les Echos" },
-    { title: "Nouvelles régulations annoncées pour les marchés des dérivés.", source: "Financial Times" }
+    { title: "Le secteur technologique bondit apres des resultats trimestriels records.", source: "Reuters" },
+    { title: "Le Bitcoin atteint un nouveau seuil de resistance.", source: "CoinDesk" },
+    { title: "L'inflation en zone euro ralentit plus vite que prevu.", source: "Les Echos" },
+    { title: "Nouvelles regulations annoncees pour les marches des derives.", source: "Financial Times" }
   ];
 
   const newsItemsEn = [
@@ -294,7 +294,7 @@ const performDeepAnalysis = async (symbol: string, question: string, lang: 'fr-C
         tools: [{ googleSearch: {} }]
       }
     });
-    return response.text || (lang === 'fr-CA' ? "Analyse terminée." : "Analysis complete.");
+    return response.text || (lang === 'fr-CA' ? "Analyse terminee." : "Analysis complete.");
   } catch (error) {
     console.warn("Deep analysis (Flash) failed, falling back to 2.0...", error);
     try {
@@ -304,13 +304,13 @@ const performDeepAnalysis = async (symbol: string, question: string, lang: 'fr-C
         contents: prompt,
       });
       const note = lang === 'fr-CA'
-        ? "\n\n*(Note: Généré avec le modèle de secours Gemini 2.0 Flash)*"
+        ? "\n\n*(Note: Genere avec le modele de secours Gemini 2.0 Flash)*"
         : "\n\n*(Note: Generated with fallback model Gemini 2.0 Flash)*";
-      return (response.text || (lang === 'fr-CA' ? "Analyse terminée." : "Analysis complete.")) + note;
+      return (response.text || (lang === 'fr-CA' ? "Analyse terminee." : "Analysis complete.")) + note;
     } catch (fallbackError) {
       console.error("Deep analysis fallback failed", fallbackError);
       return lang === 'fr-CA'
-        ? "Désolé, l'analyse approfondie a échoué. Veuillez réessayer plus tard."
+        ? "Desole, l'analyse approfondie a echoue. Veuillez reessayer plus tard."
         : "Sorry, deep analysis failed. Please try again later.";
     }
   }
@@ -349,7 +349,7 @@ export const useGeminiLive = () => {
     if (language === 'fr-CA') {
       instruction += `You speak French. `;
       if (useAccent) {
-        instruction += `You MUST speak with a natural French Canadian (Québécois) accent. Use local expressions when appropriate but remain professional. `;
+        instruction += `You MUST speak with a natural French Canadian (Quebecois) accent. Use local expressions when appropriate but remain professional. `;
       } else {
         instruction += `You speak standard international French. `;
       }
@@ -368,7 +368,7 @@ export const useGeminiLive = () => {
   5. 'googleSearch': Use this for factual questions not covered by the other tools (e.g. CEO names, specific dates).
   
   Behavior Guidelines:
-  - If a user asks for "results" (e.g., "résultats de Nvidia"), assume they want the current stock price and recent movement.
+  - If a user asks for "results" (e.g., "resultats de Nvidia"), assume they want the current stock price and recent movement.
   - Be natural and conversational.
   `;
     return instruction;
@@ -399,7 +399,7 @@ export const useGeminiLive = () => {
       });
       audioStreamRef.current = stream;
       const apiKey = process.env.API_KEY || (window as any).ENV_CONFIG?.GEMINI_API_KEY;
-      if (!apiKey) throw new Error("Clé API Gemini manquante.");
+      if (!apiKey) throw new Error("Cle API Gemini manquante.");
 
       const ai = new GoogleGenAI({ apiKey });
 

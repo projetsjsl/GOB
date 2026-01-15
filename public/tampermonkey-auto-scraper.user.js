@@ -13,9 +13,9 @@
 (async function() {
     'use strict';
 
-    console.log('🤖 GOB AUTO-SCRAPER ACTIVÉ');
+    console.log(' GOB AUTO-SCRAPER ACTIVE');
 
-    // Attendre que la page soit complètement chargée
+    // Attendre que la page soit completement chargee
     if (document.readyState !== 'complete') {
         window.addEventListener('load', startScraping);
     } else {
@@ -31,13 +31,13 @@
         const ticker = urlMatch ? urlMatch[1] : null;
 
         if (!ticker) {
-            console.error('❌ Impossible d\'extraire le ticker de l\'URL');
+            console.error(' Impossible d\'extraire le ticker de l\'URL');
             return;
         }
 
-        console.log(`📊 Scraping automatique de ${ticker}...`);
+        console.log(` Scraping automatique de ${ticker}...`);
 
-        // Créer un indicateur visuel en haut de la page
+        // Creer un indicateur visuel en haut de la page
         const indicator = document.createElement('div');
         indicator.id = 'gob-scraper-indicator';
         indicator.style.cssText = `
@@ -55,7 +55,7 @@
             z-index: 999999;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         `;
-        indicator.innerHTML = `🤖 GOB Auto-Scraper: Scraping ${ticker}... <span id="gob-status">En cours</span>`;
+        indicator.innerHTML = ` GOB Auto-Scraper: Scraping ${ticker}... <span id="gob-status">En cours</span>`;
         document.body.prepend(indicator);
 
         const updateStatus = (message, color = 'white') => {
@@ -69,9 +69,9 @@
         try {
             // Extraire tout le texte de la page
             const fullText = document.body.innerText;
-            console.log(`✅ ${fullText.length} caractères extraits`);
+            console.log(` ${fullText.length} caracteres extraits`);
 
-            // Extraire des sections structurées
+            // Extraire des sections structurees
             const sections = {};
             const sectionHeaders = [
                 'Investment Thesis',
@@ -92,12 +92,12 @@
                 }
             });
 
-            console.log(`📦 ${Object.keys(sections).length} sections trouvées`);
-            updateStatus('Extraction terminée ✅');
+            console.log(` ${Object.keys(sections).length} sections trouvees`);
+            updateStatus('Extraction terminee ');
 
-            // 1. Sauvegarder les données brutes
+            // 1. Sauvegarder les donnees brutes
             updateStatus('Sauvegarde Supabase...', 'yellow');
-            console.log('💾 Sauvegarde Supabase...');
+            console.log(' Sauvegarde Supabase...');
 
             const saveResponse = await fetch('https://gobapps.com/api/seeking-alpha-scraping?type=raw', {
                 method: 'POST',
@@ -111,28 +111,28 @@
             });
 
             if (saveResponse.ok) {
-                console.log(`✅ Données brutes sauvegardées`);
-                updateStatus('Données sauvegardées ✅', 'lightgreen');
+                console.log(` Donnees brutes sauvegardees`);
+                updateStatus('Donnees sauvegardees ', 'lightgreen');
             } else {
-                console.warn(`⚠️ Erreur sauvegarde (${saveResponse.status})`);
+                console.warn(` Erreur sauvegarde (${saveResponse.status})`);
             }
 
-            // 2. SKIP Perplexity (mode BATCH - on analyse tout à la fin!)
-            console.log('⏭️ Analyse Perplexity sera faite en BATCH plus tard');
-            console.log('💡 Utilisez le bouton "Analyser TOUT avec Perplexity" dans le dashboard');
-            updateStatus('Scraping terminé - Analyse en batch plus tard ⏭️', 'lightgreen');
+            // 2. SKIP Perplexity (mode BATCH - on analyse tout a la fin!)
+            console.log(' Analyse Perplexity sera faite en BATCH plus tard');
+            console.log(' Utilisez le bouton "Analyser TOUT avec Perplexity" dans le dashboard');
+            updateStatus('Scraping termine - Analyse en batch plus tard ', 'lightgreen');
 
             // SUCCESS!
-            console.log(`\n🎉 TRAITEMENT COMPLET POUR ${ticker}!\n`);
-            updateStatus(`TERMINÉ pour ${ticker} 🎉`, 'lightgreen');
+            console.log(`\n TRAITEMENT COMPLET POUR ${ticker}!\n`);
+            updateStatus(`TERMINE pour ${ticker} `, 'lightgreen');
 
             // Changer la couleur du bandeau en vert
             indicator.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
 
-            // Fermeture automatique après 3 secondes
+            // Fermeture automatique apres 3 secondes
             await new Promise(resolve => setTimeout(resolve, 3000));
 
-            console.log('🚪 Fermeture automatique...');
+            console.log(' Fermeture automatique...');
             updateStatus('Fermeture automatique...', 'white');
 
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -140,12 +140,12 @@
             try {
                 window.close();
             } catch (e) {
-                console.log('💡 Impossible de fermer automatiquement - fermez manuellement');
-                indicator.innerHTML = `🎉 TERMINÉ pour ${ticker}! Vous pouvez fermer cette page.`;
+                console.log(' Impossible de fermer automatiquement - fermez manuellement');
+                indicator.innerHTML = ` TERMINE pour ${ticker}! Vous pouvez fermer cette page.`;
             }
 
         } catch (error) {
-            console.error(`❌ Erreur: ${error.message}`);
+            console.error(` Erreur: ${error.message}`);
             updateStatus(`ERREUR: ${error.message}`, 'red');
             indicator.style.background = 'linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)';
 

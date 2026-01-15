@@ -11,7 +11,7 @@ async function saveProfileToSupabase(profile, notes) {
       profile.data,
       profile.assumptions,
       profile.info,
-      notes || `Profil sauvegardé automatiquement`,
+      notes || `Profil sauvegarde automatiquement`,
       true,
       // is_current
       false,
@@ -27,7 +27,7 @@ async function saveProfileToSupabase(profile, notes) {
     );
     return result;
   } catch (error) {
-    console.error(`❌ Erreur sauvegarde profil ${profile.id} dans Supabase:`, error);
+    console.error(` Erreur sauvegarde profil ${profile.id} dans Supabase:`, error);
     return { success: false, error: error.message || "Erreur inconnue" };
   }
 }
@@ -36,7 +36,7 @@ async function saveProfilesBatchToSupabase(profiles) {
   let successCount = 0;
   let failedCount = 0;
   const errors = [];
-  console.log(`💾 Sauvegarde batch de ${tickers.length} profils dans Supabase...`);
+  console.log(` Sauvegarde batch de ${tickers.length} profils dans Supabase...`);
   const { getConfigValue } = await __vitePreload(async () => {
     const { getConfigValue: getConfigValue2 } = await import("./appConfigApi.js");
     return { getConfigValue: getConfigValue2 };
@@ -65,7 +65,7 @@ async function saveProfilesBatchToSupabase(profiles) {
       await new Promise((resolve) => setTimeout(resolve, batchDelayMs));
     }
   }
-  console.log(`✅ Sauvegarde batch terminée: ${successCount} succès, ${failedCount} échecs`);
+  console.log(` Sauvegarde batch terminee: ${successCount} succes, ${failedCount} echecs`);
   return {
     success: successCount,
     failed: failedCount,
@@ -85,7 +85,7 @@ async function loadAllProfilesFromSupabase() {
     }
     const result = await response.json();
     if (!result.success || !result.data) {
-      return { success: false, profiles: {}, error: "Format de réponse invalide" };
+      return { success: false, profiles: {}, error: "Format de reponse invalide" };
     }
     const profiles = {};
     result.data.forEach((snapshot) => {
@@ -98,17 +98,17 @@ async function loadAllProfilesFromSupabase() {
           info: snapshot.company_info || {},
           notes: snapshot.notes || "",
           isWatchlist: null
-          // Sera déterminé depuis tickers table
+          // Sera determine depuis tickers table
         };
       }
     });
-    console.log(`✅ ${Object.keys(profiles).length} profils chargés depuis Supabase`);
+    console.log(` ${Object.keys(profiles).length} profils charges depuis Supabase`);
     return {
       success: true,
       profiles
     };
   } catch (error) {
-    console.error("❌ Erreur chargement profils depuis Supabase:", error);
+    console.error(" Erreur chargement profils depuis Supabase:", error);
     return {
       success: false,
       profiles: {},

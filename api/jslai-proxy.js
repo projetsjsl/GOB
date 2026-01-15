@@ -1,8 +1,8 @@
 /**
  * Proxy serveur pour jslai.app
- * Récupère le contenu HTML et le sert depuis gobapps.com
+ * Recupere le contenu HTML et le sert depuis gobapps.com
  * Contourne le firewall en gardant l'URL gobapps.com dans la barre d'adresse
- * Réécrit toutes les URLs pour que les ressources se chargent correctement
+ * Reecrit toutes les URLs pour que les ressources se chargent correctement
  */
 
 export default async function handler(req, res) {
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ 
         error: 'Path parameter required',
         example: 'GET /api/jslai-proxy?path=reee',
-        description: 'Le paramètre path doit être le chemin relatif sur jslai.app (ex: "reee", "evaluation")'
+        description: 'Le parametre path doit etre le chemin relatif sur jslai.app (ex: "reee", "evaluation")'
       });
     }
 
@@ -21,9 +21,9 @@ export default async function handler(req, res) {
     const targetUrl = `https://jslai.app/${path}`;
     const baseUrl = 'https://jslai.app';
     
-    console.log(`📡 JSL AI Proxy: ${targetUrl}`);
+    console.log(` JSL AI Proxy: ${targetUrl}`);
 
-    // Récupérer le contenu HTML
+    // Recuperer le contenu HTML
     const response = await fetch(targetUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      console.error(`❌ JSL AI Proxy Error: ${response.status} ${response.statusText}`);
+      console.error(` JSL AI Proxy Error: ${response.status} ${response.statusText}`);
       return res.status(response.status).send(`
         <!DOCTYPE html>
         <html>
@@ -51,16 +51,16 @@ export default async function handler(req, res) {
 
     let html = await response.text();
 
-    // Fonction pour réécrire une URL relative en URL absolue vers jslai.app
+    // Fonction pour reecrire une URL relative en URL absolue vers jslai.app
     const rewriteUrl = (url) => {
       if (!url || url.trim() === '') return url;
       
-      // Si c'est déjà une URL absolue, la garder
+      // Si c'est deja une URL absolue, la garder
       if (url.startsWith('http://') || url.startsWith('https://')) {
         return url;
       }
       
-      // Si c'est un hash ou un protocole spécial, le garder
+      // Si c'est un hash ou un protocole special, le garder
       if (url.startsWith('#') || url.startsWith('javascript:') || url.startsWith('data:')) {
         return url;
       }
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
       return `${baseUrl}${basePath}/${url}`.replace(/\/+/g, '/');
     };
 
-    // Fonction pour réécrire les liens internes vers notre proxy
+    // Fonction pour reecrire les liens internes vers notre proxy
     const rewriteLink = (url) => {
       if (!url || url.trim() === '') return url;
       
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
         return url;
       }
       
-      // Si c'est un hash ou un protocole spécial, le garder
+      // Si c'est un hash ou un protocole special, le garder
       if (url.startsWith('#') || url.startsWith('javascript:') || url.startsWith('data:')) {
         return url;
       }
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
       return `/api/jslai-proxy?path=${encodeURIComponent(fullPath)}`;
     };
 
-    // Fonction pour réécrire les ressources vers notre proxy de ressources
+    // Fonction pour reecrire les ressources vers notre proxy de ressources
     const rewriteResource = (url) => {
       const absoluteUrl = rewriteUrl(url);
       // Si c'est une URL jslai.app, utiliser notre proxy de ressources
@@ -117,28 +117,28 @@ export default async function handler(req, res) {
       return absoluteUrl;
     };
 
-    // Réécrire les balises <link> (CSS) - utiliser le proxy de ressources
+    // Reecrire les balises <link> (CSS) - utiliser le proxy de ressources
     html = html.replace(/<link([^>]*href=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
       const newUrl = rewriteResource(url);
       return `<link${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les balises <script> avec src (JavaScript externe) - utiliser le proxy de ressources
+    // Reecrire les balises <script> avec src (JavaScript externe) - utiliser le proxy de ressources
     // IMPORTANT: Ne pas toucher aux scripts inline (sans src)
     html = html.replace(/<script([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
       const newUrl = rewriteResource(url);
       return `<script${before}${newUrl}${after}>`;
     });
     
-    // Les scripts inline (sans src) sont préservés automatiquement car ils ne matchent pas le pattern ci-dessus
+    // Les scripts inline (sans src) sont preserves automatiquement car ils ne matchent pas le pattern ci-dessus
 
-    // Réécrire les balises <img> (Images) - utiliser le proxy de ressources
+    // Reecrire les balises <img> (Images) - utiliser le proxy de ressources
     html = html.replace(/<img([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
       const newUrl = rewriteResource(url);
       return `<img${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les attributs srcset - utiliser le proxy de ressources
+    // Reecrire les attributs srcset - utiliser le proxy de ressources
     html = html.replace(/srcset=["']([^"']+)["']/gi, (match, srcset) => {
       const newSrcset = srcset.split(',').map(item => {
         const parts = item.trim().split(/\s+/);
@@ -149,7 +149,7 @@ export default async function handler(req, res) {
       return `srcset="${newSrcset}"`;
     });
 
-    // Réécrire les attributs data-src, data-srcset, etc. - utiliser le proxy de ressources pour les images
+    // Reecrire les attributs data-src, data-srcset, etc. - utiliser le proxy de ressources pour les images
     html = html.replace(/(data-(?:src|srcset)=["'])([^"']+)(["'])/gi, (match, attr, url, quote) => {
       const newUrl = rewriteResource(url);
       return `${attr}${newUrl}${quote}`;
@@ -161,19 +161,19 @@ export default async function handler(req, res) {
       return `${attr}${newUrl}${quote}`;
     });
 
-    // Réécrire les balises <a> (Liens)
+    // Reecrire les balises <a> (Liens)
     html = html.replace(/<a([^>]*href=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
       const newUrl = rewriteLink(url);
       return `<a${before}${newUrl}${after}>`;
     });
 
-    // Réécrire les URLs dans les styles inline (url(...)) - utiliser le proxy de ressources
+    // Reecrire les URLs dans les styles inline (url(...)) - utiliser le proxy de ressources
     html = html.replace(/url\(["']?([^"')]+)["']?\)/gi, (match, url) => {
       const newUrl = rewriteResource(url);
       return `url(${newUrl})`;
     });
 
-    // Réécrire les URLs dans les attributs style - utiliser le proxy de ressources
+    // Reecrire les URLs dans les attributs style - utiliser le proxy de ressources
     html = html.replace(/style=["']([^"']*url\([^)]+\)[^"']*)["']/gi, (match, styleContent) => {
       const newStyle = styleContent.replace(/url\(["']?([^"')]+)["']?\)/gi, (urlMatch, url) => {
         return `url(${rewriteResource(url)})`;
@@ -181,7 +181,7 @@ export default async function handler(req, res) {
       return `style="${newStyle}"`;
     });
 
-    // Réécrire les balises <source> (pour les images responsives) - utiliser le proxy de ressources
+    // Reecrire les balises <source> (pour les images responsives) - utiliser le proxy de ressources
     html = html.replace(/<source([^>]*srcset=["'])([^"']+)(["'][^>]*)>/gi, (match, before, srcset, after) => {
       const newSrcset = srcset.split(',').map(item => {
         const parts = item.trim().split(/\s+/);
@@ -192,24 +192,24 @@ export default async function handler(req, res) {
       return `<source${before}${newSrcset}${after}>`;
     });
 
-    // Réécrire les balises <source> avec src - utiliser le proxy de ressources
+    // Reecrire les balises <source> avec src - utiliser le proxy de ressources
     html = html.replace(/<source([^>]*src=["'])([^"']+)(["'][^>]*)>/gi, (match, before, url, after) => {
       const newUrl = rewriteResource(url);
       return `<source${before}${newUrl}${after}>`;
     });
 
-    // Ajouter une balise <base> pour gérer les chemins relatifs
+    // Ajouter une balise <base> pour gerer les chemins relatifs
     if (!html.includes('<base')) {
       html = html.replace(/<head([^>]*)>/i, `<head$1><base href="${baseUrl}/${path.endsWith('/') ? path : path + '/'}">`);
     }
 
-    // Injecter un script pour s'assurer que tous les scripts sont chargés avant d'exposer les fonctions
-    // Ce script attend que tous les scripts soient chargés et expose les fonctions globalement
+    // Injecter un script pour s'assurer que tous les scripts sont charges avant d'exposer les fonctions
+    // Ce script attend que tous les scripts soient charges et expose les fonctions globalement
     const scriptInjection = `
     <script>
-      // Attendre que tous les scripts soient chargés
+      // Attendre que tous les scripts soient charges
       (function() {
-        // Fonction pour vérifier si tous les scripts sont chargés
+        // Fonction pour verifier si tous les scripts sont charges
         function allScriptsLoaded() {
           const scripts = document.querySelectorAll('script[src]');
           let loaded = 0;
@@ -235,7 +235,7 @@ export default async function handler(req, res) {
             
             if (loaded === total) resolve(true);
             
-            // ✅ FIX BUG-017: Timeout réduit à 5 secondes (au lieu de 10s)
+            //  FIX BUG-017: Timeout reduit a 5 secondes (au lieu de 10s)
             setTimeout(() => resolve(true), 5000);
           });
         }
@@ -244,14 +244,14 @@ export default async function handler(req, res) {
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', () => {
             allScriptsLoaded().then(() => {
-              console.log('✅ All scripts loaded');
-              // Déclencher un événement personnalisé pour indiquer que tout est prêt
+              console.log(' All scripts loaded');
+              // Declencher un evenement personnalise pour indiquer que tout est pret
               window.dispatchEvent(new Event('allScriptsLoaded'));
             });
           });
         } else {
           allScriptsLoaded().then(() => {
-            console.log('✅ All scripts loaded');
+            console.log(' All scripts loaded');
             window.dispatchEvent(new Event('allScriptsLoaded'));
           });
         }
@@ -259,11 +259,11 @@ export default async function handler(req, res) {
         // Exposer les fonctions globales si elles existent
         window.addEventListener('load', () => {
           setTimeout(() => {
-            // Vérifier et exposer startEvaluation si elle existe
+            // Verifier et exposer startEvaluation si elle existe
             if (typeof window.startEvaluation === 'function') {
-              console.log('✅ startEvaluation is available');
+              console.log(' startEvaluation is available');
             } else {
-              console.warn('⚠️ startEvaluation not found, trying to find it...');
+              console.warn(' startEvaluation not found, trying to find it...');
               // Chercher dans window
               for (let key in window) {
                 if (key.toLowerCase().includes('startevaluation') || key.toLowerCase().includes('evaluation')) {
@@ -271,7 +271,7 @@ export default async function handler(req, res) {
                   // Essayer de l'exposer
                   if (typeof window[key] === 'function') {
                     window.startEvaluation = window[key];
-                    console.log('✅ Exposed startEvaluation from:', key);
+                    console.log(' Exposed startEvaluation from:', key);
                   }
                 }
               }
@@ -280,18 +280,18 @@ export default async function handler(req, res) {
               try {
                 if (typeof startEvaluation === 'function') {
                   window.startEvaluation = startEvaluation;
-                  console.log('✅ Exposed startEvaluation from global scope');
+                  console.log(' Exposed startEvaluation from global scope');
                 }
               } catch(e) {
                 console.log('startEvaluation not in global scope');
               }
             }
             
-            // Vérifier et exposer ShowGuide si elle existe
+            // Verifier et exposer ShowGuide si elle existe
             if (typeof window.ShowGuide === 'function') {
-              console.log('✅ ShowGuide is available');
+              console.log(' ShowGuide is available');
             } else {
-              console.warn('⚠️ ShowGuide not found, trying to find it...');
+              console.warn(' ShowGuide not found, trying to find it...');
               // Chercher dans window
               for (let key in window) {
                 if (key.toLowerCase().includes('showguide') || key.toLowerCase().includes('guide')) {
@@ -299,7 +299,7 @@ export default async function handler(req, res) {
                   // Essayer de l'exposer
                   if (typeof window[key] === 'function') {
                     window.ShowGuide = window[key];
-                    console.log('✅ Exposed ShowGuide from:', key);
+                    console.log(' Exposed ShowGuide from:', key);
                   }
                 }
               }
@@ -308,20 +308,20 @@ export default async function handler(req, res) {
               try {
                 if (typeof ShowGuide === 'function') {
                   window.ShowGuide = ShowGuide;
-                  console.log('✅ Exposed ShowGuide from global scope');
+                  console.log(' Exposed ShowGuide from global scope');
                 }
               } catch(e) {
                 console.log('ShowGuide not in global scope');
               }
             }
             
-            // Vérifier tous les scripts chargés
+            // Verifier tous les scripts charges
             const scripts = document.querySelectorAll('script[src]');
-            console.log('📜 Total scripts: ' + scripts.length);
+            console.log(' Total scripts: ' + scripts.length);
             scripts.forEach((script, index) => {
-              console.log('  ' + (index + 1) + '. ' + script.src + ' - ' + (script.complete ? '✅ Loaded' : '⏳ Loading'));
+              console.log('  ' + (index + 1) + '. ' + script.src + ' - ' + (script.complete ? ' Loaded' : ' Loading'));
             });
-          }, 3000); // Augmenter le délai à 3 secondes
+          }, 3000); // Augmenter le delai a 3 secondes
         });
       })();
     </script>
@@ -336,7 +336,7 @@ export default async function handler(req, res) {
       html += scriptInjection;
     }
 
-    // Définir le Content-Type
+    // Definir le Content-Type
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'public, max-age=300'); // Cache 5 minutes
     res.setHeader('X-Proxy-Source', 'jslai.app');
@@ -344,7 +344,7 @@ export default async function handler(req, res) {
     return res.status(200).send(html);
 
   } catch (error) {
-    console.error('❌ JSL AI Proxy Error:', error);
+    console.error(' JSL AI Proxy Error:', error);
     return res.status(500).send(`
       <!DOCTYPE html>
       <html>

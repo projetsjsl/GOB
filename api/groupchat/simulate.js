@@ -6,7 +6,7 @@
 
 const SITES = {
   google: {
-    url: 'https://www.google.com', name: 'Google', icon: '🔍', selector: 'input[name="q"]',
+    url: 'https://www.google.com', name: 'Google', icon: '', selector: 'input[name="q"]',
     color: { bg: '#fff', accent: '#4285f4', text: '#202124' },
     generate: (q) => Array.from({length: 6}, (_, i) => ({
       title: i === 0 ? `${q} - Wikipedia` : i === 1 ? `${q} Official` : `${q} ${['Guide', 'Tutorial', 'Review', 'News'][i-2] || 'Result'}`,
@@ -15,28 +15,28 @@ const SITES = {
     }))
   },
   booking: {
-    url: 'https://www.booking.com', name: 'Booking.com', icon: '🏨', selector: 'input[name="ss"]',
+    url: 'https://www.booking.com', name: 'Booking.com', icon: '', selector: 'input[name="ss"]',
     color: { bg: '#003580', accent: '#feba02', text: '#fff' },
     generate: (q) => [
-      { title: `Hôtel Le Marais ★★★★`, description: `${q} centre. WiFi, breakfast, spa.`, price: '€145', rating: '8.9', reviews: '2,847' },
-      { title: `Grand Palace ★★★★★`, description: `${q} luxury. Pool, restaurant.`, price: '€289', rating: '9.4', reviews: '1,523' },
-      { title: `Budget Inn ★★★`, description: `${q} budget friendly.`, price: '€65', rating: '7.8', reviews: '4,102' },
-      { title: `Boutique Residence ★★★★`, description: `${q} design apartments.`, price: '€175', rating: '9.1', reviews: '892' },
-      { title: `City Suites ★★★★`, description: `${q} downtown.`, price: '€198', rating: '8.7', reviews: '1,234' },
+      { title: `Hotel Le Marais `, description: `${q} centre. WiFi, breakfast, spa.`, price: 'EUR145', rating: '8.9', reviews: '2,847' },
+      { title: `Grand Palace `, description: `${q} luxury. Pool, restaurant.`, price: 'EUR289', rating: '9.4', reviews: '1,523' },
+      { title: `Budget Inn `, description: `${q} budget friendly.`, price: 'EUR65', rating: '7.8', reviews: '4,102' },
+      { title: `Boutique Residence `, description: `${q} design apartments.`, price: 'EUR175', rating: '9.1', reviews: '892' },
+      { title: `City Suites `, description: `${q} downtown.`, price: 'EUR198', rating: '8.7', reviews: '1,234' },
     ]
   },
   github: {
-    url: 'https://github.com', name: 'GitHub', icon: '💻', selector: 'input[name="q"]',
+    url: 'https://github.com', name: 'GitHub', icon: '', selector: 'input[name="q"]',
     color: { bg: '#0d1117', accent: '#238636', text: '#c9d1d9' },
     generate: (q) => [
-      { title: `awesome-${q.toLowerCase()}`, description: `🎉 Curated ${q} resources`, stars: '45.2k', forks: '5.8k', lang: 'Markdown' },
-      { title: `${q.toLowerCase()}-starter`, description: `🚀 Production ${q} template`, stars: '12.8k', forks: '2.1k', lang: 'TypeScript' },
-      { title: `learn-${q.toLowerCase()}`, description: `📚 Free ${q} course`, stars: '28.5k', forks: '8.2k', lang: 'JavaScript' },
-      { title: `${q.toLowerCase()}-cli`, description: `⚡ Fast ${q} CLI`, stars: '8.1k', forks: '1.2k', lang: 'Rust' },
+      { title: `awesome-${q.toLowerCase()}`, description: ` Curated ${q} resources`, stars: '45.2k', forks: '5.8k', lang: 'Markdown' },
+      { title: `${q.toLowerCase()}-starter`, description: ` Production ${q} template`, stars: '12.8k', forks: '2.1k', lang: 'TypeScript' },
+      { title: `learn-${q.toLowerCase()}`, description: ` Free ${q} course`, stars: '28.5k', forks: '8.2k', lang: 'JavaScript' },
+      { title: `${q.toLowerCase()}-cli`, description: ` Fast ${q} CLI`, stars: '8.1k', forks: '1.2k', lang: 'Rust' },
     ]
   },
   amazon: {
-    url: 'https://www.amazon.com', name: 'Amazon', icon: '🛒', selector: 'input#twotabsearchtextbox',
+    url: 'https://www.amazon.com', name: 'Amazon', icon: '', selector: 'input#twotabsearchtextbox',
     color: { bg: '#131921', accent: '#ff9900', text: '#fff' },
     generate: (q) => [
       { title: `${q} - Best Seller`, description: `Top rated. Prime shipping.`, price: '$299.99', rating: '4.8', reviews: '15,234', prime: true },
@@ -45,7 +45,7 @@ const SITES = {
     ]
   },
   linkedin: {
-    url: 'https://www.linkedin.com/jobs', name: 'LinkedIn', icon: '💼', selector: 'input',
+    url: 'https://www.linkedin.com/jobs', name: 'LinkedIn', icon: '', selector: 'input',
     color: { bg: '#f3f2ef', accent: '#0a66c2', text: '#000' },
     generate: (q) => [
       { title: `Senior ${q} Engineer`, company: 'Google', location: 'Remote', salary: '$180-250k' },
@@ -54,7 +54,7 @@ const SITES = {
     ]
   },
   youtube: {
-    url: 'https://www.youtube.com', name: 'YouTube', icon: '📺', selector: 'input#search',
+    url: 'https://www.youtube.com', name: 'YouTube', icon: '', selector: 'input#search',
     color: { bg: '#0f0f0f', accent: '#ff0000', text: '#fff' },
     generate: (q) => [
       { title: `${q} Tutorial Beginners`, channel: 'TechMaster', views: '2.4M', duration: '45:32' },
@@ -63,15 +63,15 @@ const SITES = {
     ]
   },
   twitter: {
-    url: 'https://twitter.com', name: 'X/Twitter', icon: '🐦', selector: 'input',
+    url: 'https://twitter.com', name: 'X/Twitter', icon: '', selector: 'input',
     color: { bg: '#000', accent: '#1d9bf0', text: '#e7e9ea' },
     generate: (q) => [
-      { author: '@techleader', content: `Amazing ${q} thread 🧵`, likes: '12.4K', retweets: '3.2K' },
+      { author: '@techleader', content: `Amazing ${q} thread `, likes: '12.4K', retweets: '3.2K' },
       { author: '@devnews', content: `Breaking: ${q} update!`, likes: '8.9K', retweets: '2.1K' },
     ]
   },
   reddit: {
-    url: 'https://www.reddit.com', name: 'Reddit', icon: '🔴', selector: 'input',
+    url: 'https://www.reddit.com', name: 'Reddit', icon: '', selector: 'input',
     color: { bg: '#1a1a1b', accent: '#ff4500', text: '#d7dadc' },
     generate: (q) => [
       { title: `Best ${q} resources?`, subreddit: `r/${q.toLowerCase()}`, upvotes: '2.4K', comments: '342' },
@@ -79,12 +79,12 @@ const SITES = {
     ]
   },
   wikipedia: {
-    url: 'https://www.wikipedia.org', name: 'Wikipedia', icon: '📚', selector: 'input#searchInput',
+    url: 'https://www.wikipedia.org', name: 'Wikipedia', icon: '', selector: 'input#searchInput',
     color: { bg: '#fff', accent: '#3366cc', text: '#202122' },
     generate: (q) => [{ title: q, description: `${q} is a significant topic.`, sections: ['History', 'Overview', 'Applications'] }]
   },
   imdb: {
-    url: 'https://www.imdb.com', name: 'IMDb', icon: '🎬', selector: 'input',
+    url: 'https://www.imdb.com', name: 'IMDb', icon: '', selector: 'input',
     color: { bg: '#121212', accent: '#f5c518', text: '#fff' },
     generate: (q) => [{ title: q, year: '2024', rating: '8.5', votes: '125K', genre: 'Drama/Thriller' }]
   },
@@ -99,18 +99,18 @@ function genSVG(site, query, step, prog) {
     <text x="200" y="31" fill="${text}" font-family="system-ui" font-size="13" opacity="0.8">${query}</text>
     <rect fill="${bg}" x="440" y="760" width="400" height="4" rx="2" opacity="0.2"/>
     <rect fill="${accent}" x="440" y="760" width="${Math.round(prog*400)}" height="4" rx="2"/>
-    <text x="640" y="340" fill="${accent}" font-family="system-ui" font-size="56" text-anchor="middle">🤖</text>
+    <text x="640" y="340" fill="${accent}" font-family="system-ui" font-size="56" text-anchor="middle"></text>
     <text x="640" y="400" fill="${text}" font-family="system-ui" font-size="24" font-weight="700" text-anchor="middle">JSLAI RobotWeb Ultimate</text>
     <text x="640" y="432" fill="${text}" font-family="system-ui" font-size="14" text-anchor="middle" opacity="0.6">${step}</text>
     <rect fill="${accent}" x="560" y="460" width="160" height="28" rx="14" opacity="0.12"/>
-    <text x="640" y="480" fill="${accent}" font-family="system-ui" font-size="11" font-weight="600" text-anchor="middle">🎭 SIMULATION</text>
+    <text x="640" y="480" fill="${accent}" font-family="system-ui" font-size="11" font-weight="600" text-anchor="middle"> SIMULATION</text>
   </svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }
 
 function detect(task) {
   const t = task.toLowerCase();
-  if (/booking|hotel|hôtel/.test(t)) { const m = task.match(/(?:à|in|on)\s+(\w+)/i); return { site: SITES.booking, name: 'booking', query: m?.[1] || 'Paris' }; }
+  if (/booking|hotel|hotel/.test(t)) { const m = task.match(/(?:a|in|on)\s+(\w+)/i); return { site: SITES.booking, name: 'booking', query: m?.[1] || 'Paris' }; }
   if (/github|repo/.test(t)) { const m = task.match(/(\w+)\s+(?:sur|on)\s+github/i) || task.match(/projet\s+(\w+)/i); return { site: SITES.github, name: 'github', query: m?.[1] || 'React' }; }
   if (/amazon|buy|prix|acheter/.test(t)) { const m = task.match(/(?:buy|prix|acheter)\s+(.+?)(?:\s+sur|$)/i); return { site: SITES.amazon, name: 'amazon', query: m?.[1]?.trim() || 'laptop' }; }
   if (/linkedin|job|emploi/.test(t)) { return { site: SITES.linkedin, name: 'linkedin', query: 'Developer' }; }
@@ -165,7 +165,7 @@ async function handler(req, res) {
       
       const { site, name, query } = detect(task);
       send({ type: 'init', mode: 'simulation', provider: 'internal', version: '5.0', site: name });
-      send({ type: 'status', message: `🎭 Simulation: ${site.name}` });
+      send({ type: 'status', message: ` Simulation: ${site.name}` });
       await new Promise(r => setTimeout(r, config.speed === 'fast' ? 100 : 300));
       
       send({ type: 'session', sessionId: `sim-${Date.now()}`, mode: 'simulation' });
@@ -204,7 +204,7 @@ async function handler(req, res) {
         type: 'complete', 
         results, 
         finalUrl: url, 
-        message: `✅ ${results.length} results`, 
+        message: ` ${results.length} results`, 
         mode: 'simulation',
         stats: { totalTime: Date.now()-startTime, actions: actions.length, results: results.length } 
       });

@@ -44,18 +44,18 @@ export const SanitizationReport: React.FC<SanitizationReportProps> = ({
         
         let reason = '';
         if (category === 'growth') {
-          if (original < -20) reason = 'Croissance négative trop extrême (< -20%)';
-          else if (original > 20) reason = 'Croissance trop élevée (> 20%)';
+          if (original < -20) reason = 'Croissance negative trop extreme (< -20%)';
+          else if (original > 20) reason = 'Croissance trop elevee (> 20%)';
           else reason = 'Valeur hors limites de validation';
         } else if (category === 'ratio') {
-          if (original < 0) reason = 'Ratio négatif invalide';
-          else if (original > 100) reason = 'Ratio trop élevé (> 100x)';
+          if (original < 0) reason = 'Ratio negatif invalide';
+          else if (original > 100) reason = 'Ratio trop eleve (> 100x)';
           else reason = 'Valeur hors limites de validation';
         } else if (category === 'price') {
-          if (original <= 0) reason = 'Prix invalide (≤ 0)';
-          else reason = 'Valeur corrigée par validation';
+          if (original <= 0) reason = 'Prix invalide (<= 0)';
+          else reason = 'Valeur corrigee par validation';
         } else {
-          reason = 'Valeur sanitisée selon les paramètres de validation';
+          reason = 'Valeur sanitisee selon les parametres de validation';
         }
 
         changesList.push({
@@ -71,7 +71,7 @@ export const SanitizationReport: React.FC<SanitizationReportProps> = ({
       }
     };
 
-    // Comparer tous les champs numériques
+    // Comparer tous les champs numeriques
     compareField('growthRateEPS', 'Croissance EPS', 'growth', originalAssumptions.growthRateEPS || 0, sanitizedAssumptions.growthRateEPS || 0);
     compareField('growthRateSales', 'Croissance Ventes', 'growth', originalAssumptions.growthRateSales || 0, sanitizedAssumptions.growthRateSales || 0);
     compareField('growthRateCF', 'Croissance CF', 'growth', originalAssumptions.growthRateCF || 0, sanitizedAssumptions.growthRateCF || 0);
@@ -91,7 +91,7 @@ export const SanitizationReport: React.FC<SanitizationReportProps> = ({
     return changesList;
   }, [originalAssumptions, sanitizedAssumptions]);
 
-  // Préparer les données pour le graphique
+  // Preparer les donnees pour le graphique
   const chartData = useMemo(() => {
     return changes.map(change => ({
       field: change.label,
@@ -113,23 +113,23 @@ export const SanitizationReport: React.FC<SanitizationReportProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
+      {/* En-tete */}
       <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white p-4 rounded-lg shadow-lg">
         <h2 className="text-xl font-bold flex items-center gap-2">
           <CheckCircleIcon className="w-6 h-6" />
           Rapport de Sanitisation - {ticker}
         </h2>
         <p className="text-purple-100 text-sm mt-1">
-          Visualisation des corrections automatiques appliquées aux hypothèses
+          Visualisation des corrections automatiques appliquees aux hypotheses
         </p>
       </div>
 
-      {/* Résumé */}
+      {/* Resume */}
       {changes.length === 0 ? (
         <div className="bg-green-50 p-6 rounded-lg border border-green-200 text-center">
           <CheckCircleIcon className="w-12 h-12 text-green-600 mx-auto mb-2" />
-          <h3 className="text-lg font-bold text-green-800 mb-2">Aucune correction nécessaire</h3>
-          <p className="text-green-600">Toutes les hypothèses sont dans les limites de validation acceptables.</p>
+          <h3 className="text-lg font-bold text-green-800 mb-2">Aucune correction necessaire</h3>
+          <p className="text-green-600">Toutes les hypotheses sont dans les limites de validation acceptables.</p>
         </div>
       ) : (
         <>
@@ -137,7 +137,7 @@ export const SanitizationReport: React.FC<SanitizationReportProps> = ({
           <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
               <BarChart className="w-5 h-5 text-purple-600" />
-              Comparaison Avant/Après Sanitisation
+              Comparaison Avant/Apres Sanitisation
             </h3>
             <div className="h-96">
               <ResponsiveContainer width="100%" height="100%">
@@ -148,26 +148,26 @@ export const SanitizationReport: React.FC<SanitizationReportProps> = ({
                   <Tooltip />
                   <Legend />
                   <Bar dataKey="original" fill="#ef4444" name="Valeur Originale" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="sanitized" fill="#10b981" name="Valeur Sanitisée" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="sanitized" fill="#10b981" name="Valeur Sanitisee" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Tableau détaillé des changements */}
+          {/* Tableau detaille des changements */}
           <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
               <ExclamationTriangleIcon className="w-5 h-5" />
-              Détails des Corrections ({changes.length})
+              Details des Corrections ({changes.length})
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="p-3 text-left">Paramètre</th>
+                    <th className="p-3 text-left">Parametre</th>
                     <th className="p-3 text-right">Valeur Originale</th>
-                    <th className="p-3 text-center">→</th>
-                    <th className="p-3 text-right">Valeur Sanitisée</th>
+                    <th className="p-3 text-center">-></th>
+                    <th className="p-3 text-right">Valeur Sanitisee</th>
                     <th className="p-3 text-right">Changement</th>
                     <th className="p-3 text-right">Changement %</th>
                     <th className="p-3 text-left">Raison</th>
@@ -224,7 +224,7 @@ export const SanitizationReport: React.FC<SanitizationReportProps> = ({
             </div>
           </div>
 
-          {/* Statistiques par catégorie */}
+          {/* Statistiques par categorie */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="text-sm text-blue-600 font-semibold mb-1">Croissance</div>

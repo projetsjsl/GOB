@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Emma - Assistante Financière</title>
+    <title>Test Emma - Assistante Financiere</title>
     <link rel="stylesheet" href="emma-styles.css">
     <style>
-        /* Réduction globale pour mobile: police et espacements à 50% */
+        /* Reduction globale pour mobile: police et espacements a 50% */
         @media (max-width: 768px) {
             html { font-size: 50%; }
         }
@@ -86,31 +86,31 @@
 <body>
     <div class="test-container">
         <div class="test-header">
-            <h1>🧪 Test Emma - Assistante Financière</h1>
-            <p>Page de test pour vérifier le fonctionnement d'Emma</p>
+            <h1> Test Emma - Assistante Financiere</h1>
+            <p>Page de test pour verifier le fonctionnement d'Emma</p>
         </div>
 
         <div class="test-controls">
             <button class="test-btn test-btn-primary" onclick="testEmmaInterface()">
-                🎨 Tester l'Interface
+                 Tester l'Interface
             </button>
             <button class="test-btn test-btn-secondary" onclick="testGeminiConnection()">
-                🔗 Tester Gemini
+                 Tester Gemini
             </button>
             <button class="test-btn test-btn-secondary" onclick="testPromptEditor()">
-                📝 Tester l'Éditeur
+                 Tester l'Editeur
             </button>
             <button class="test-btn test-btn-secondary" onclick="clearTestResults()">
-                🗑️ Effacer
+                 Effacer
             </button>
         </div>
 
         <div id="test-status" class="test-status info">
-            Prêt pour les tests - Cliquez sur un bouton pour commencer
+            Pret pour les tests - Cliquez sur un bouton pour commencer
         </div>
 
         <div id="emma-test-container">
-            <!-- L'interface Emma sera injectée ici -->
+            <!-- L'interface Emma sera injectee ici -->
         </div>
     </div>
 
@@ -131,7 +131,7 @@
             statusDiv.textContent = message;
         }
 
-        // Fonction pour ajouter un résultat de test
+        // Fonction pour ajouter un resultat de test
         function addTestResult(test, result, details = '') {
             window.testResults.push({
                 test: test,
@@ -139,7 +139,7 @@
                 details: details,
                 timestamp: new Date().toLocaleTimeString('fr-FR')
             });
-            console.log(`[${result ? '✅' : '❌'}] ${test}: ${details}`);
+            console.log(`[${result ? '' : ''}] ${test}: ${details}`);
         }
 
         // Test de l'interface Emma
@@ -149,21 +149,21 @@
             try {
                 // Charger le profil financier
                 const profile = getFinancialProfile();
-                addTestResult('Chargement du profil', true, `Profil chargé: ${profile.name}`);
+                addTestResult('Chargement du profil', true, `Profil charge: ${profile.name}`);
 
                 // Injecter l'interface
                 const container = document.getElementById('emma-test-container');
                 container.innerHTML = EmmaChatInterface();
-                addTestResult('Injection de l\'interface', true, 'Interface Emma injectée');
+                addTestResult('Injection de l\'interface', true, 'Interface Emma injectee');
 
-                // Attacher les événements de test
+                // Attacher les evenements de test
                 attachTestEvents();
 
-                showStatus('✅ Interface Emma testée avec succès !', 'success');
-                addTestResult('Test complet de l\'interface', true, 'Tous les composants chargés');
+                showStatus(' Interface Emma testee avec succes !', 'success');
+                addTestResult('Test complet de l\'interface', true, 'Tous les composants charges');
 
             } catch (error) {
-                showStatus(`❌ Erreur lors du test de l'interface: ${error.message}`, 'error');
+                showStatus(` Erreur lors du test de l'interface: ${error.message}`, 'error');
                 addTestResult('Test de l\'interface', false, error.message);
             }
         };
@@ -173,67 +173,67 @@
             showStatus('Test de la connexion Gemini en cours...', 'info');
             
             try {
-                // Vérifier le statut actuel
+                // Verifier le statut actuel
                 const status = emmaGeminiService.getConnectionStatus();
-                addTestResult('Statut Gemini', true, `API Key: ${status.hasApiKey ? 'Présente' : 'Absente'}, Connecté: ${status.isConnected ? 'Oui' : 'Non'}`);
+                addTestResult('Statut Gemini', true, `API Key: ${status.hasApiKey ? 'Presente' : 'Absente'}, Connecte: ${status.isConnected ? 'Oui' : 'Non'}`);
 
                 if (status.hasApiKey) {
                     // Tester la connexion
                     await emmaGeminiService.testConnection();
-                    addTestResult('Test de connexion Gemini', true, 'Connexion réussie');
-                    showStatus('✅ Connexion Gemini réussie !', 'success');
+                    addTestResult('Test de connexion Gemini', true, 'Connexion reussie');
+                    showStatus(' Connexion Gemini reussie !', 'success');
                 } else {
-                    addTestResult('Test de connexion Gemini', false, 'Aucune clé API configurée');
-                    showStatus('⚠️ Aucune clé API Gemini configurée. Configurez-la d\'abord.', 'error');
+                    addTestResult('Test de connexion Gemini', false, 'Aucune cle API configuree');
+                    showStatus(' Aucune cle API Gemini configuree. Configurez-la d\'abord.', 'error');
                 }
 
             } catch (error) {
-                showStatus(`❌ Erreur de connexion Gemini: ${error.message}`, 'error');
+                showStatus(` Erreur de connexion Gemini: ${error.message}`, 'error');
                 addTestResult('Test de connexion Gemini', false, error.message);
             }
         };
 
-        // Test de l'éditeur de prompt
+        // Test de l'editeur de prompt
         window.testPromptEditor = async function() {
-            showStatus('Test de l\'éditeur de prompt en cours...', 'info');
+            showStatus('Test de l\'editeur de prompt en cours...', 'info');
             
             try {
                 // Charger le prompt actuel
                 const profile = getFinancialProfile();
-                addTestResult('Chargement du prompt', true, `Prompt chargé (${profile.prompt.length} caractères)`);
+                addTestResult('Chargement du prompt', true, `Prompt charge (${profile.prompt.length} caracteres)`);
 
-                // Injecter l'éditeur
+                // Injecter l'editeur
                 const container = document.getElementById('emma-test-container');
                 container.innerHTML = EmmaPromptEditor();
-                addTestResult('Injection de l\'éditeur', true, 'Éditeur de prompt injecté');
+                addTestResult('Injection de l\'editeur', true, 'Editeur de prompt injecte');
 
                 // Remplir le textarea
                 const textarea = document.getElementById('emma-prompt-textarea');
                 if (textarea) {
                     textarea.value = profile.prompt;
-                    addTestResult('Remplissage du textarea', true, 'Prompt chargé dans l\'éditeur');
+                    addTestResult('Remplissage du textarea', true, 'Prompt charge dans l\'editeur');
                 }
 
-                // Attacher les événements de test
+                // Attacher les evenements de test
                 attachPromptEditorEvents();
 
-                showStatus('✅ Éditeur de prompt testé avec succès !', 'success');
-                addTestResult('Test complet de l\'éditeur', true, 'Éditeur fonctionnel');
+                showStatus(' Editeur de prompt teste avec succes !', 'success');
+                addTestResult('Test complet de l\'editeur', true, 'Editeur fonctionnel');
 
             } catch (error) {
-                showStatus(`❌ Erreur lors du test de l'éditeur: ${error.message}`, 'error');
-                addTestResult('Test de l\'éditeur', false, error.message);
+                showStatus(` Erreur lors du test de l'editeur: ${error.message}`, 'error');
+                addTestResult('Test de l\'editeur', false, error.message);
             }
         };
 
-        // Effacer les résultats de test
+        // Effacer les resultats de test
         window.clearTestResults = function() {
             window.testResults = [];
             document.getElementById('emma-test-container').innerHTML = '';
-            showStatus('Résultats effacés - Prêt pour de nouveaux tests', 'info');
+            showStatus('Resultats effaces - Pret pour de nouveaux tests', 'info');
         };
 
-        // Attacher les événements de test pour l'interface
+        // Attacher les evenements de test pour l'interface
         function attachTestEvents() {
             // Test d'envoi de message
             const sendButton = document.getElementById('emma-send-input');
@@ -243,25 +243,25 @@
                 sendButton.addEventListener('click', () => {
                     const message = inputField.value.trim();
                     if (message) {
-                        addTestResult('Envoi de message', true, `Message envoyé: "${message}"`);
-                        // Simuler une réponse
+                        addTestResult('Envoi de message', true, `Message envoye: "${message}"`);
+                        // Simuler une reponse
                         setTimeout(() => {
-                            addTestResult('Réception de réponse', true, 'Réponse simulée reçue');
+                            addTestResult('Reception de reponse', true, 'Reponse simulee recue');
                         }, 1000);
                     }
                 });
             }
 
-            // Test des boutons de contrôle
+            // Test des boutons de controle
             const clearButton = document.getElementById('emma-clear-chat');
             if (clearButton) {
                 clearButton.addEventListener('click', () => {
-                    addTestResult('Effacement du chat', true, 'Chat effacé');
+                    addTestResult('Effacement du chat', true, 'Chat efface');
                 });
             }
         }
 
-        // Attacher les événements de test pour l'éditeur
+        // Attacher les evenements de test pour l'editeur
         function attachPromptEditorEvents() {
             const saveButton = document.getElementById('emma-save-prompt');
             const resetButton = document.getElementById('emma-reset-prompt');
@@ -271,7 +271,7 @@
                 saveButton.addEventListener('click', () => {
                     const newPrompt = textarea.value.trim();
                     updateFinancialPrompt(newPrompt);
-                    addTestResult('Sauvegarde du prompt', true, `Prompt sauvegardé (${newPrompt.length} caractères)`);
+                    addTestResult('Sauvegarde du prompt', true, `Prompt sauvegarde (${newPrompt.length} caracteres)`);
                 });
             }
 
@@ -279,18 +279,18 @@
                 resetButton.addEventListener('click', () => {
                     resetFinancialPrompt();
                     textarea.value = getFinancialProfile().prompt;
-                    addTestResult('Réinitialisation du prompt', true, 'Prompt réinitialisé');
+                    addTestResult('Reinitialisation du prompt', true, 'Prompt reinitialise');
                 });
             }
         }
 
         // Test automatique au chargement
         document.addEventListener('DOMContentLoaded', () => {
-            showStatus('Page de test chargée - Prêt pour les tests', 'success');
-            addTestResult('Chargement de la page', true, 'Page de test initialisée');
+            showStatus('Page de test chargee - Pret pour les tests', 'success');
+            addTestResult('Chargement de la page', true, 'Page de test initialisee');
         });
 
-        // Afficher les résultats dans la console
+        // Afficher les resultats dans la console
         setInterval(() => {
             if (window.testResults.length > 0) {
                 console.table(window.testResults);

@@ -19,13 +19,13 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
   assumptions, 
   info 
 }) => {
-  // Préparer toutes les données pour visualisation
+  // Preparer toutes les donnees pour visualisation
   const visualizationData = useMemo(() => {
     return data.map(row => {
       const ratios = calculateRowRatios(row);
       return {
         year: row.year,
-        // Données financières
+        // Donnees financieres
         EPS: row.earningsPerShare,
         CF: row.cashFlowPerShare,
         BV: row.bookValuePerShare,
@@ -45,7 +45,7 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
         PBV_Low: ratios.pbvLow,
         PBV_Avg: (ratios.pbvHigh + ratios.pbvLow) / 2,
         Yield: ratios.yield,
-        // Croissance (calculée)
+        // Croissance (calculee)
         EPS_Growth: row.year > data[0]?.year 
           ? ((row.earningsPerShare - (data.find(d => d.year === row.year - 1)?.earningsPerShare || 0)) / 
              Math.max(data.find(d => d.year === row.year - 1)?.earningsPerShare || 1, 0.01)) * 100
@@ -85,20 +85,20 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
+      {/* En-tete */}
       <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-lg shadow-lg">
         <h2 className="text-xl font-bold flex items-center gap-2">
           <ChartBarIcon className="w-6 h-6" />
-          Visualisation Complète des Données - {info.symbol}
+          Visualisation Complete des Donnees - {info.symbol}
         </h2>
         <p className="text-indigo-100 text-sm mt-1">
-          Analyse visuelle complète de toutes les données historiques, ratios et métriques
+          Analyse visuelle complete de toutes les donnees historiques, ratios et metriques
         </p>
       </div>
 
-      {/* Graphique 1: Données Financières Principales */}
+      {/* Graphique 1: Donnees Financieres Principales */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Données Financières Principales</h3>
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Donnees Financieres Principales</h3>
         <div className="h-96">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={visualizationData}>
@@ -124,7 +124,7 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
 
       {/* Graphique 2: Prix et Plages */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Évolution des Prix (High/Low/Avg)</h3>
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Evolution des Prix (High/Low/Avg)</h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={visualizationData}>
@@ -212,7 +212,7 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
 
       {/* Graphique 5: Scatter Plot Ratios vs Prix */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Corrélation Ratios vs Prix</h3>
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Correlation Ratios vs Prix</h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <ScatterChart data={visualizationData}>
@@ -221,7 +221,7 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
               <YAxis dataKey="PriceAvg" name="Prix" />
               <Tooltip cursor={{ strokeDasharray: '3 3' }} />
               <Legend />
-              <Scatter name="Données" dataKey="PriceAvg" fill="#3b82f6">
+              <Scatter name="Donnees" dataKey="PriceAvg" fill="#3b82f6">
                 {visualizationData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.isEstimate ? '#f59e0b' : '#3b82f6'} />
                 ))}
@@ -231,7 +231,7 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
         </div>
       </div>
 
-      {/* Statistiques Résumées */}
+      {/* Statistiques Resumees */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
           <div className="text-sm text-blue-600 font-semibold mb-2">EPS - Statistiques</div>
@@ -249,7 +249,7 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
               <span>{formatCurrency(stats.eps.max)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Écart-type:</span>
+              <span>Ecart-type:</span>
               <span>{formatCurrency(stats.eps.stdDev)}</span>
             </div>
           </div>
@@ -270,7 +270,7 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
               <span>{formatCurrency(stats.cf.max)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Écart-type:</span>
+              <span>Ecart-type:</span>
               <span>{formatCurrency(stats.cf.stdDev)}</span>
             </div>
           </div>
@@ -291,7 +291,7 @@ export const FullDataVisualization: React.FC<FullDataVisualizationProps> = ({
               <span>{formatCurrency(stats.bv.max)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Écart-type:</span>
+              <span>Ecart-type:</span>
               <span>{formatCurrency(stats.bv.stdDev)}</span>
             </div>
           </div>

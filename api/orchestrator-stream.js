@@ -38,9 +38,9 @@ export default async function handler(req, res) {
 
     ensureInitialized();
 
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // SSE STREAMING (GET)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     if (req.method === 'GET') {
         const { message, persona, tickers } = req.query;
 
@@ -100,9 +100,9 @@ export default async function handler(req, res) {
         return;
     }
 
-    // ═══════════════════════════════════════════════════════════════
+    // 
     // STREAMING POST (for longer messages/contexts)
-    // ═══════════════════════════════════════════════════════════════
+    // 
     if (req.method === 'POST') {
         const { message, persona, tickers, context: additionalContext } = req.body;
 
@@ -185,9 +185,9 @@ export default async function handler(req, res) {
 }
 
 /**
- * ═══════════════════════════════════════════════════════════════════
+ * 
  * FRONTEND USAGE
- * ═══════════════════════════════════════════════════════════════════
+ * 
  * 
  * // Simple GET streaming:
  * const eventSource = new EventSource('/api/orchestrator-stream?message=Analyse AAPL&persona=finance');

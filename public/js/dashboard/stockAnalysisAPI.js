@@ -139,12 +139,12 @@ function calculateFairValue(financialData, assumptions = {}) {
     } = financialData;
 
     const {
-        discountRate = 0.10, // 10% WACC par défaut
-        terminalGrowthRate = 0.03, // 3% croissance perpétuelle
+        discountRate = 0.10, // 10% WACC par defaut
+        terminalGrowthRate = 0.03, // 3% croissance perpetuelle
         projectionYears = 5
     } = assumptions;
 
-    // Méthode 1: DCF (Discounted Cash Flow)
+    // Methode 1: DCF (Discounted Cash Flow)
     let dcfValue = null;
     if (cashFlow && cashFlow.length > 0) {
         const latestFCF = cashFlow[0].freeCashFlow || 0;
@@ -172,27 +172,27 @@ function calculateFairValue(financialData, assumptions = {}) {
         dcfValue = equityValue / sharesOutstanding;
     }
 
-    // Méthode 2: P/E Multiple
+    // Methode 2: P/E Multiple
     let peValue = null;
     if (incomeStatement && incomeStatement.length > 0 && keyMetrics && keyMetrics.length > 0) {
         const eps = incomeStatement[0].eps || 0;
-        const industryPE = 20; // P/E moyen du secteur (à ajuster)
+        const industryPE = 20; // P/E moyen du secteur (a ajuster)
         peValue = eps * industryPE;
     }
 
-    // Méthode 3: P/B Multiple
+    // Methode 3: P/B Multiple
     let pbValue = null;
     if (balanceSheet && balanceSheet.length > 0 && keyMetrics && keyMetrics.length > 0) {
         const bookValuePerShare = keyMetrics[0].bookValuePerShare || 0;
-        const industryPB = 3; // P/B moyen du secteur (à ajuster)
+        const industryPB = 3; // P/B moyen du secteur (a ajuster)
         pbValue = bookValuePerShare * industryPB;
     }
 
-    // Moyenne pondérée des méthodes
+    // Moyenne ponderee des methodes
     const values = [dcfValue, peValue, pbValue].filter(v => v !== null && v > 0);
     const fairValue = values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : null;
 
-    // Calcul de la marge de sécurité
+    // Calcul de la marge de securite
     const marginOfSafety = fairValue && currentPrice ?
         ((fairValue - currentPrice) / fairValue) * 100 : null;
 
@@ -238,12 +238,12 @@ async function generateAIInsights(symbol, financialData) {
     try {
         const { incomeStatement, balanceSheet, cashFlow, keyMetrics } = financialData;
 
-        // Préparer le contexte pour Gemini
+        // Preparer le contexte pour Gemini
         const context = `
-Analyse financière pour ${symbol}:
+Analyse financiere pour ${symbol}:
 
 Revenus (5 ans): ${incomeStatement?.slice(0, 5).map(is => `${is.date}: $${(is.revenue / 1e9).toFixed(2)}B`).join(', ')}
-Bénéfice net (5 ans): ${incomeStatement?.slice(0, 5).map(is => `${is.date}: $${(is.netIncome / 1e9).toFixed(2)}B`).join(', ')}
+Benefice net (5 ans): ${incomeStatement?.slice(0, 5).map(is => `${is.date}: $${(is.netIncome / 1e9).toFixed(2)}B`).join(', ')}
 Marge nette: ${incomeStatement?.[0] ? ((incomeStatement[0].netIncome / incomeStatement[0].revenue) * 100).toFixed(1) : 'N/A'}%
 ROE: ${keyMetrics?.[0]?.roe ? (keyMetrics[0].roe * 100).toFixed(1) : 'N/A'}%
 Ratio D/E: ${keyMetrics?.[0]?.debtToEquity?.toFixed(2) || 'N/A'}
@@ -252,7 +252,7 @@ Free Cash Flow: $${cashFlow?.[0] ? (cashFlow[0].freeCashFlow / 1e9).toFixed(2) :
 Fournis une analyse concise (max 150 mots) couvrant:
 1. Forces principales (2-3 points)
 2. Faiblesses/risques (2-3 points)
-3. Tendances clés observées
+3. Tendances cles observees
 4. Perspective d'investissement
 `;
 
@@ -301,8 +301,8 @@ function extractBulletPoints(text, section) {
             inSection = true;
             continue;
         }
-        if (inSection && (line.startsWith('-') || line.startsWith('•') || line.match(/^\d+\./))) {
-            points.push(line.replace(/^[-•\d.]\s*/, '').trim());
+        if (inSection && (line.startsWith('-') || line.startsWith('-') || line.match(/^\d+\./))) {
+            points.push(line.replace(/^[--\d.]\s*/, '').trim());
         }
         if (inSection && line.trim() === '') {
             break;
@@ -316,7 +316,7 @@ function extractBulletPoints(text, section) {
  * Fetch all financial data for analysis
  */
 async function fetchCompleteAnalysis(symbol, currentPrice) {
-    console.log(`📊 Fetching complete analysis for ${symbol}...`);
+    console.log(` Fetching complete analysis for ${symbol}...`);
 
     const [
         incomeResult,

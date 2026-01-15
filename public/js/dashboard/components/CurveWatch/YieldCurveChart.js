@@ -26,7 +26,7 @@ const CustomTooltip = ({ active, payload, label, colors }) => {
         color: colors.text,
         fontSize: '14px'
       }}>
-        Maturité: {label}
+        Maturite: {label}
       </p>
       {payload.map((entry, index) => (
         <div key={index} style={{
@@ -93,7 +93,7 @@ const CustomLegend = ({ payload, colors }) => {
 window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
   // Verify Recharts is available with safe destructuring
   if (!window.Recharts || typeof window.Recharts !== 'object') {
-    console.error('❌ Recharts not available in window.Recharts');
+    console.error(' Recharts not available in window.Recharts');
     return (
       <div style={{
         height: '100%',
@@ -123,7 +123,7 @@ window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
   } = RechartsLib || {};
 
   if (!LineChart || !ResponsiveContainer) {
-    console.error('❌ Recharts components not available:', {
+    console.error(' Recharts components not available:', {
       hasLineChart: !!LineChart,
       hasResponsiveContainer: !!ResponsiveContainer,
       availableKeys: window.Recharts ? Object.keys(window.Recharts) : 'Recharts not found'
@@ -143,7 +143,7 @@ window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
   }
 
   if (!data || data.length === 0) {
-    console.log('📊 YieldCurveChart: No data to display');
+    console.log(' YieldCurveChart: No data to display');
     return (
       <div style={{
         height: '100%',
@@ -152,7 +152,7 @@ window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
         justifyContent: 'center',
         color: colors.textMuted
       }}>
-        Aucune donnée disponible
+        Aucune donnee disponible
       </div>
     );
   }
@@ -164,7 +164,7 @@ window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
   );
 
   if (validData.length === 0) {
-    console.log('📊 YieldCurveChart: No valid data points to display after filtering');
+    console.log(' YieldCurveChart: No valid data points to display after filtering');
     return (
       <div style={{
         height: '100%',
@@ -173,7 +173,7 @@ window.YieldCurveChart = ({ data, colors, showUS, showCanada, isDark }) => {
         justifyContent: 'center',
         color: colors.textMuted
       }}>
-        Aucune donnée valide à afficher
+        Aucune donnee valide a afficher
       </div>
     );
   }

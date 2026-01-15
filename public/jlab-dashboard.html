@@ -312,7 +312,7 @@
 <body>
     <header class="header">
         <div class="logo">
-            <div class="logo-icon">🧪</div>
+            <div class="logo-icon"></div>
             <div>
                 <h1>JLAB Orchestrator</h1>
                 <span>Multi-Agent AI System</span>
@@ -339,7 +339,7 @@
     </header>
 
     <div class="container">
-        <h2 class="section-title">🤖 Registered Agents</h2>
+        <h2 class="section-title"> Registered Agents</h2>
         
         <div class="grid" id="agentGrid">
             <!-- Agent cards will be inserted here -->
@@ -347,7 +347,7 @@
 
         <div class="console-panel">
             <div class="console-header">
-                <h3>🖥️ Test Console</h3>
+                <h3> Test Console</h3>
                 <div>
                     <select id="agentSelect" class="btn btn-secondary" style="margin-right: 0.5rem;">
                         <option value="">Select Agent...</option>
@@ -359,15 +359,15 @@
                 <div class="console-input">
                     <textarea id="commandInput" placeholder='{"message": "Analyse AAPL"}'></textarea>
                     <div class="quick-actions">
-                        <button class="btn btn-secondary" onclick="loadExample('chat')">💬 Chat</button>
-                        <button class="btn btn-secondary" onclick="loadExample('research')">🔬 Research</button>
-                        <button class="btn btn-secondary" onclick="loadExample('tools')">🔧 Tools</button>
-                        <button class="btn btn-secondary" onclick="loadExample('portfolio')">💼 Portfolio</button>
+                        <button class="btn btn-secondary" onclick="loadExample('chat')"> Chat</button>
+                        <button class="btn btn-secondary" onclick="loadExample('research')"> Research</button>
+                        <button class="btn btn-secondary" onclick="loadExample('tools')"> Tools</button>
+                        <button class="btn btn-secondary" onclick="loadExample('portfolio')"> Portfolio</button>
                     </div>
                 </div>
                 <div class="console-output">
                     <div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem;">
-                        <button onclick="resetConsole()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem;">🗑️ Clear</button>
+                        <button onclick="resetConsole()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 0.8rem;"> Clear</button>
                     </div>
                     <pre id="outputPre">// Output will appear here...</pre>
                 </div>
@@ -379,49 +379,49 @@
     <script>
         // Agent definitions
         const agents = [
-            { id: 'modelSelector', name: 'Model Selector', icon: '🧠', type: 'core', 
+            { id: 'modelSelector', name: 'Model Selector', icon: '', type: 'core', 
               description: 'Selects optimal AI model based on task requirements.',
               actions: ['select_model', 'get_capabilities'] },
-            { id: 'workflow', name: 'Workflow', icon: '⚙️', type: 'core',
+            { id: 'workflow', name: 'Workflow', icon: '', type: 'core',
               description: 'Executes multi-step workflows and automations.',
               actions: ['execute_workflow', 'schedule', 'list_workflows'] },
-            { id: 'context', name: 'Context', icon: '💬', type: 'core',
+            { id: 'context', name: 'Context', icon: '', type: 'core',
               description: 'Manages conversation history and preferences.',
               actions: ['get_context', 'add_message', 'get_history'] },
-            { id: 'analytics', name: 'Analytics', icon: '📊', type: 'core',
+            { id: 'analytics', name: 'Analytics', icon: '', type: 'core',
               description: 'Tracks usage, performance, and generates insights.',
               actions: ['get_stats', 'get_latency_report', 'export'] },
-            { id: 'mcp', name: 'MCP Tools', icon: '🔌', type: 'core',
+            { id: 'mcp', name: 'MCP Tools', icon: '', type: 'core',
               description: 'Accesses Model Context Protocol tools.',
               actions: ['perplexity_ask', 'supabase_query', 'list_tools'] },
-            { id: 'data', name: 'Data', icon: '📈', type: 'data',
+            { id: 'data', name: 'Data', icon: '', type: 'data',
               description: 'Fetches real-time market data and quotes.',
               actions: ['get_stock_quote', 'get_company_data'] },
-            { id: 'tools', name: 'Tools', icon: '🔧', type: 'data',
+            { id: 'tools', name: 'Tools', icon: '', type: 'data',
               description: 'OpenAI-style function calling for structured data.',
               actions: ['get_stock_price', 'calculate_dcf', 'compare_stocks'] },
-            { id: 'research', name: 'Research', icon: '🔬', type: 'data',
+            { id: 'research', name: 'Research', icon: '', type: 'data',
               description: 'Deep financial analysis and thesis generation.',
               actions: ['analyze_stock', 'deep_dive', 'generate_thesis'] },
-            { id: 'news', name: 'News', icon: '📰', type: 'data',
+            { id: 'news', name: 'News', icon: '', type: 'data',
               description: 'Monitors and aggregates market news.',
               actions: ['monitor_news', 'weekly_digest'] },
-            { id: 'earnings', name: 'Earnings', icon: '📅', type: 'data',
+            { id: 'earnings', name: 'Earnings', icon: '', type: 'data',
               description: 'Tracks earnings calendar and announcements.',
               actions: ['daily_check', 'prepare_analysis'] },
-            { id: 'portfolio', name: 'Portfolio', icon: '💼', type: 'action',
+            { id: 'portfolio', name: 'Portfolio', icon: '', type: 'action',
               description: 'Manages portfolios with P&L tracking.',
               actions: ['analyze_portfolio', 'get_dividends', 'suggest_rebalance'] },
-            { id: 'alert', name: 'Alert', icon: '🔔', type: 'action',
+            { id: 'alert', name: 'Alert', icon: '', type: 'action',
               description: 'Price alerts with multi-channel notifications.',
               actions: ['create_alert', 'check_alerts', 'trigger_alert'] },
-            { id: 'briefing', name: 'Briefing', icon: '📧', type: 'action',
+            { id: 'briefing', name: 'Briefing', icon: '', type: 'action',
               description: 'Generates and sends email briefings.',
               actions: ['generate_morning', 'generate_weekly'] },
-            { id: 'sms', name: 'SMS', icon: '📱', type: 'action',
+            { id: 'sms', name: 'SMS', icon: '', type: 'action',
               description: 'Sends SMS notifications and alerts.',
               actions: ['send_sms', 'send_briefing_sms'] },
-            { id: 'scheduler', name: 'Scheduler', icon: '⏰', type: 'utility',
+            { id: 'scheduler', name: 'Scheduler', icon: '', type: 'utility',
               description: 'Cron-based task scheduling and automation.',
               actions: ['create_schedule', 'run_now', 'get_next_runs'] }
         ];
@@ -437,7 +437,7 @@
                         <div class="agent-icon ${agent.type}">${agent.icon}</div>
                         <div>
                             <div class="agent-name">${agent.name}</div>
-                            <div class="agent-type">${agent.id} • ${agent.type}</div>
+                            <div class="agent-type">${agent.id} - ${agent.type}</div>
                         </div>
                     </div>
                     <div class="agent-description">${agent.description}</div>
@@ -488,7 +488,7 @@
         // Load example command
         function loadExample(type) {
             const examples = {
-                chat: { message: "Analyse AAPL en français", persona: "finance" },
+                chat: { message: "Analyse AAPL en francais", persona: "finance" },
                 research: { agent: "research", action: "analyze_stock", ticker: "MSFT" },
                 tools: { agent: "tools", action: "get_stock_price", ticker: "NVDA" },
                 portfolio: { agent: "portfolio", action: "create_portfolio", portfolioId: "test", name: "Test Portfolio", holdings: [{ ticker: "AAPL", shares: 100, costBasis: 150 }] }
@@ -515,7 +515,7 @@
             const input = document.getElementById('commandInput').value;
             const output = document.getElementById('outputPre');
             
-            output.textContent = '⏳ Executing...';
+            output.textContent = ' Executing...';
             output.classList.add('loading');
 
             try {

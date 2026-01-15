@@ -75,7 +75,7 @@ export const CurveWatchTab = ({ isDarkMode: isDarkModeProp }: CurveWatchProps) =
     try {
       setError(null)
 
-      // Charger données mock (en prod, utiliser API réelle)
+      // Charger donnees mock (en prod, utiliser API reelle)
       const usData = getMockYieldData()
       const caData = getMockCanadianYieldData()
 
@@ -83,7 +83,7 @@ export const CurveWatchTab = ({ isDarkMode: isDarkModeProp }: CurveWatchProps) =
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Erreur inconnue"
       setError(errorMsg)
-      console.error("Erreur lors du chargement des données:", err)
+      console.error("Erreur lors du chargement des donnees:", err)
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -138,7 +138,7 @@ export const CurveWatchTab = ({ isDarkMode: isDarkModeProp }: CurveWatchProps) =
               className={`mt-3 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${isDark ? "bg-red-600 hover:bg-red-700" : "bg-red-500 hover:bg-red-600"} text-white text-sm`}
             >
               <RefreshCw className="size-4" />
-              Réessayer
+              Reessayer
             </button>
           </div>
         </div>
@@ -185,9 +185,9 @@ export const CurveWatchTab = ({ isDarkMode: isDarkModeProp }: CurveWatchProps) =
               checked={showUS}
               onChange={(e) => setShowUS(e.target.checked)}
               className="w-4 h-4 rounded"
-              aria-label="Afficher les États-Unis"
+              aria-label="Afficher les Etats-Unis"
             />
-            <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}>🇺🇸 US</span>
+            <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}> US</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -197,7 +197,7 @@ export const CurveWatchTab = ({ isDarkMode: isDarkModeProp }: CurveWatchProps) =
               className="w-4 h-4 rounded"
               aria-label="Afficher le Canada"
             />
-            <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}>🇨🇦 CA</span>
+            <span className={`text-sm ${isDark ? "text-gray-300" : "text-gray-700"}`}> CA</span>
           </label>
 
           <button
@@ -212,10 +212,10 @@ export const CurveWatchTab = ({ isDarkMode: isDarkModeProp }: CurveWatchProps) =
                   ? "bg-blue-600 hover:bg-blue-700 text-white"
                   : "bg-blue-500 hover:bg-blue-600 text-white"
             }`}
-            aria-label="Rafraîchir les données"
+            aria-label="Rafraichir les donnees"
           >
             <RefreshCw className={`size-4 ${refreshing ? "animate-spin" : ""}`} />
-            <span className="hidden sm:inline">Rafraîchir</span>
+            <span className="hidden sm:inline">Rafraichir</span>
           </button>
         </div>
       </div>
@@ -253,7 +253,7 @@ export const CurveWatchTab = ({ isDarkMode: isDarkModeProp }: CurveWatchProps) =
                   ))}
                 </div>
               ) : (
-                <p className={isDark ? "text-gray-400" : "text-gray-600"}>Aucune donnée disponible</p>
+                <p className={isDark ? "text-gray-400" : "text-gray-600"}>Aucune donnee disponible</p>
               )}
             </div>
 
@@ -288,7 +288,7 @@ export const CurveWatchTab = ({ isDarkMode: isDarkModeProp }: CurveWatchProps) =
                 </div>
               </div>
             ) : (
-              <p className={isDark ? "text-gray-400" : "text-gray-600"}>Données insuffisantes</p>
+              <p className={isDark ? "text-gray-400" : "text-gray-600"}>Donnees insuffisantes</p>
             )}
           </div>
         )}
@@ -305,7 +305,7 @@ export const CurveWatchTab = ({ isDarkMode: isDarkModeProp }: CurveWatchProps) =
                 className={`p-4 rounded-lg ${isDark ? "bg-blue-900/30 border-blue-500" : "bg-blue-50 border-blue-200"} border`}
               >
                 <p className={`text-xs sm:text-sm font-semibold ${isDark ? "text-blue-300" : "text-blue-700"}`}>
-                  États-Unis
+                  Etats-Unis
                 </p>
                 <p className="text-xl sm:text-2xl font-bold text-blue-500 mt-2">
                   {currentData.us?.points[8]?.yield?.toFixed(2) || "N/A"}%

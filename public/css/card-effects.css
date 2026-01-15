@@ -43,7 +43,7 @@
  * NAVIGATION BUTTON EFFECTS
  * ===================================================== */
 
-/* Transition fluide pour toutes les icônes */
+/* Transition fluide pour toutes les icones */
 nav button i {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

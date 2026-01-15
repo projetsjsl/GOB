@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // DASHBOARD MANAGER - Gestion du tableau de bord
-// ═══════════════════════════════════════════════════════════════
+// 
 
 import { loadAllConfigs } from './api-client.js';
 import { RUNTIME_FLOWS, getRelatedPrompts, getFlowsUsingPrompt } from './runtime-relationships.js';
@@ -10,14 +10,14 @@ let dashboardData = null;
 let currentFilter = 'all';
 let relationshipFilter = null; // Pour filtrer par relations
 let promptRelationships = {}; // Map des relations entre prompts
-let isLoadingDashboard = false; // Flag pour éviter les chargements multiples
-let dashboardLoaded = false; // Flag pour tracker si le dashboard a été chargé
+let isLoadingDashboard = false; // Flag pour eviter les chargements multiples
+let dashboardLoaded = false; // Flag pour tracker si le dashboard a ete charge
 
 /**
  * Affiche une erreur de chargement
  */
 function showDashboardError() {
-    showStatus('❌ Erreur chargement dashboard', 'error');
+    showStatus(' Erreur chargement dashboard', 'error');
     const container = document.getElementById('dashboardTabContent');
     if (container) {
         // Optionnel : Afficher un message d'erreur plus visible dans le dashboard
@@ -29,15 +29,15 @@ function showDashboardError() {
  * Charge et affiche le dashboard
  */
 export async function loadDashboard(forceReload = false) {
-    // Éviter les chargements multiples simultanés
+    // Eviter les chargements multiples simultanes
     if (isLoadingDashboard && !forceReload) {
-        console.log('⏳ Dashboard déjà en cours de chargement...');
+        console.log(' Dashboard deja en cours de chargement...');
         return;
     }
 
-    // Si déjà chargé et pas de force reload, juste re-render
+    // Si deja charge et pas de force reload, juste re-render
     if (dashboardLoaded && dashboardData && !forceReload) {
-        console.log('♻️ Dashboard déjà chargé, re-render rapide');
+        console.log(' Dashboard deja charge, re-render rapide');
         renderStatistics(dashboardData);
         renderCharts(dashboardData);
         renderTable(dashboardData);
@@ -47,7 +47,7 @@ export async function loadDashboard(forceReload = false) {
         return;
     }
 
-    console.log('🔄 Chargement complet du dashboard...');
+    console.log(' Chargement complet du dashboard...');
     isLoadingDashboard = true;
 
     try {
@@ -83,10 +83,10 @@ export async function loadDashboard(forceReload = false) {
                     buildPromptRelationships(dashboardData.allPrompts);
                     renderArchitecture(dashboardData);
                     dashboardLoaded = true;
-                    console.log('✅ Dashboard chargé complètement');
+                    console.log(' Dashboard charge completement');
                 } catch (innerError) {
-                    console.error('❌ Erreur rendering asynchrone dashboard:', innerError);
-                    showStatus('⚠️ Erreur affichage architecture', 'error');
+                    console.error(' Erreur rendering asynchrone dashboard:', innerError);
+                    showStatus(' Erreur affichage architecture', 'error');
                 } finally {
                     isLoadingDashboard = false;
                 }
@@ -94,7 +94,7 @@ export async function loadDashboard(forceReload = false) {
         });
 
     } catch (error) {
-        console.error('❌ Erreur chargement dashboard:', error);
+        console.error(' Erreur chargement dashboard:', error);
         showDashboardError();
         isLoadingDashboard = false;
         dashboardLoaded = false;
@@ -113,7 +113,7 @@ function processConfigsForDashboard(configs) {
         lastModified: null
     };
 
-    // Parcourir toutes les catégories
+    // Parcourir toutes les categories
     Object.keys(configs).forEach(category => {
         Object.keys(configs[category]).forEach(key => {
             const config = configs[category][key];
@@ -133,13 +133,13 @@ function processConfigsForDashboard(configs) {
             allPrompts.push(prompt);
             stats.total++;
 
-            // Stats par catégorie
+            // Stats par categorie
             stats.byCategory[category] = (stats.byCategory[category] || 0) + 1;
 
             // Stats par type
             stats.byType[prompt.type] = (stats.byType[prompt.type] || 0) + 1;
 
-            // Dernière modification
+            // Derniere modification
             if (config.updated_at) {
                 const date = new Date(config.updated_at);
                 if (!stats.lastModified || date > stats.lastModified) {
@@ -153,34 +153,34 @@ function processConfigsForDashboard(configs) {
 }
 
 /**
- * Construit la carte des relations entre prompts (optimisé)
+ * Construit la carte des relations entre prompts (optimise)
  */
 /**
- * Construit les relations entre prompts basées sur les FLUX D'EXÉCUTION RÉELS
+ * Construit les relations entre prompts basees sur les FLUX D'EXECUTION REELS
  *
- * Utilise RUNTIME_FLOWS qui mappe comment les prompts sont utilisés ensemble
- * lors de l'exécution (SMS, Web, Email, Briefings)
+ * Utilise RUNTIME_FLOWS qui mappe comment les prompts sont utilises ensemble
+ * lors de l'execution (SMS, Web, Email, Briefings)
  */
 function buildPromptRelationships(allPrompts) {
     console.time('Build runtime relationships');
-    console.log(`🚀 Analyzing RUNTIME EXECUTION relationships for ${allPrompts.length} prompts...`);
+    console.log(` Analyzing RUNTIME EXECUTION relationships for ${allPrompts.length} prompts...`);
 
     promptRelationships = {};
 
     // Initialiser les structures
     allPrompts.forEach(prompt => {
         promptRelationships[prompt.key] = {
-            references: [],      // Prompts utilisés avec celui-ci
+            references: [],      // Prompts utilises avec celui-ci
             referencedBy: [],    // Identique (relation bidirectionnelle)
-            flows: []            // Flux d'exécution utilisant ce prompt
+            flows: []            // Flux d'execution utilisant ce prompt
         };
     });
 
-    // ═══════════════════════════════════════════════════════════
-    // RELATIONS BASÉES SUR LES FLUX D'EXÉCUTION RUNTIME
-    // ═══════════════════════════════════════════════════════════
-    console.log('🎯 Building runtime execution relationships...');
-    console.log(`📊 Total flows mapped: ${Object.keys(RUNTIME_FLOWS).length}`);
+    // 
+    // RELATIONS BASEES SUR LES FLUX D'EXECUTION RUNTIME
+    // 
+    console.log(' Building runtime execution relationships...');
+    console.log(` Total flows mapped: ${Object.keys(RUNTIME_FLOWS).length}`);
     let runtimeRelationsAdded = 0;
 
     // Pour chaque prompt existant, trouver les flux qui l'utilisent
@@ -188,7 +188,7 @@ function buildPromptRelationships(allPrompts) {
         const key = prompt.key;
         const relatedData = getRelatedPrompts(key);
 
-        // Ajouter les prompts liés (utilisés dans les mêmes flux)
+        // Ajouter les prompts lies (utilises dans les memes flux)
         relatedData.references.forEach(relatedKey => {
             if (!promptRelationships[key].references.includes(relatedKey)) {
                 promptRelationships[key].references.push(relatedKey);
@@ -206,13 +206,13 @@ function buildPromptRelationships(allPrompts) {
         // Stocker les flux pour affichage
         promptRelationships[key].flows = relatedData.flows;
 
-        // Log détaillé des flows
+        // Log detaille des flows
         if (relatedData.flows.length > 0) {
-            console.log(`\n🔗 ${key}:`);
+            console.log(`\n ${key}:`);
             relatedData.flows.forEach(flow => {
-                console.log(`  ↳ ${flow.name}: ${flow.description}`);
+                console.log(`   ${flow.name}: ${flow.description}`);
             });
-            console.log(`  → Utilisé avec: ${relatedData.references.join(', ') || 'aucun'}`);
+            console.log(`  -> Utilise avec: ${relatedData.references.join(', ') || 'aucun'}`);
         }
     });
 
@@ -222,21 +222,21 @@ function buildPromptRelationships(allPrompts) {
         .filter(rel => rel.references.length > 0).length;
     const totalFlows = Object.keys(RUNTIME_FLOWS).length;
 
-    console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
-    console.log(`📊 RUNTIME RELATIONSHIPS SUMMARY:`);
-    console.log(`  ✅ ${totalPrompts} prompts analyzed`);
-    console.log(`  🔗 ${promptsWithRelations} prompts have runtime relations`);
-    console.log(`  🚀 ${totalFlows} execution flows mapped`);
-    console.log(`  ⚡ ${runtimeRelationsAdded} runtime relations created`);
-    console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+    console.log(`\n`);
+    console.log(` RUNTIME RELATIONSHIPS SUMMARY:`);
+    console.log(`   ${totalPrompts} prompts analyzed`);
+    console.log(`   ${promptsWithRelations} prompts have runtime relations`);
+    console.log(`   ${totalFlows} execution flows mapped`);
+    console.log(`   ${runtimeRelationsAdded} runtime relations created`);
+    console.log(`\n`);
 
     // Lister les flux disponibles
-    console.log(`🎯 EXECUTION FLOWS:`);
+    console.log(` EXECUTION FLOWS:`);
     Object.entries(RUNTIME_FLOWS).forEach(([flowId, flow]) => {
-        const channel = flow.channel === 'any' ? '🌐' :
-                       flow.channel === 'sms' ? '📱' :
-                       flow.channel === 'web' ? '💬' :
-                       flow.channel === 'email' ? '📧' : '💬';
+        const channel = flow.channel === 'any' ? '' :
+                       flow.channel === 'sms' ? '' :
+                       flow.channel === 'web' ? '' :
+                       flow.channel === 'email' ? '' : '';
         console.log(`  ${channel} ${flow.name} (${flow.prompts.length} prompts)`);
     });
 
@@ -260,13 +260,13 @@ function renderStatistics(data) {
     const systemPrompts = allPrompts.filter(p => p.category === 'system');
     document.getElementById('statSystemPrompts').textContent = systemPrompts.length;
 
-    // Dernière modification
+    // Derniere modification
     if (stats.lastModified) {
         const formatted = formatRelativeTime(stats.lastModified);
         document.getElementById('statLastModified').textContent = formatted;
     }
 
-    // Mettre à jour les compteurs de filtres
+    // Mettre a jour les compteurs de filtres
     document.getElementById('filterCountAll').textContent = stats.total;
     document.getElementById('filterCountPrompt').textContent = stats.byCategory.prompt || 0;
     document.getElementById('filterCountBriefing').textContent = stats.byCategory.briefing || 0;
@@ -280,28 +280,28 @@ function renderArchitecture(data) {
     const { allPrompts } = data;
     const container = document.getElementById('promptsArchitecture');
 
-    // Organiser les prompts par catégorie
+    // Organiser les prompts par categorie
     const system = allPrompts.filter(p => p.category === 'system' || p.key.includes('cfa_') || p.key.includes('identity'));
     const intents = allPrompts.filter(p => p.key.includes('intent_'));
     const briefings = allPrompts.filter(p => p.category === 'briefing');
     const others = allPrompts.filter(p => !system.includes(p) && !intents.includes(p) && !briefings.includes(p));
 
-    // Structure hiérarchique
+    // Structure hierarchique
     const architecture = `
         <div class="space-y-8">
-            <!-- Légende -->
+            <!-- Legende -->
             <div class="flex flex-wrap gap-4 text-xs">
                 <div class="flex items-center gap-2">
                     <div class="w-4 h-4 bg-purple-500 rounded"></div>
-                    <span class="text-gray-700">Système (Base)</span>
+                    <span class="text-gray-700">Systeme (Base)</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="w-4 h-4 bg-blue-500 rounded"></div>
-                    <span class="text-gray-700">Intents (Spécialisés)</span>
+                    <span class="text-gray-700">Intents (Specialises)</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="w-4 h-4 bg-green-500 rounded"></div>
-                    <span class="text-gray-700">Briefings (Automatisés)</span>
+                    <span class="text-gray-700">Briefings (Automatises)</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="w-4 h-4 bg-gray-400 rounded"></div>
@@ -309,12 +309,12 @@ function renderArchitecture(data) {
                 </div>
             </div>
 
-            <!-- Niveau 1: Prompts Système (Base) -->
+            <!-- Niveau 1: Prompts Systeme (Base) -->
             ${system.length > 0 ? `
             <div class="relative">
                 <div class="text-center mb-4">
                     <h4 class="text-sm font-bold text-purple-700 bg-purple-100 inline-block px-4 py-2 rounded-full">
-                        📋 Niveau 1: Prompts Système (Base)
+                         Niveau 1: Prompts Systeme (Base)
                     </h4>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-${Math.min(system.length, 4)} gap-4">
@@ -323,22 +323,22 @@ function renderArchitecture(data) {
             </div>
             ` : ''}
 
-            <!-- Flèche vers le bas -->
+            <!-- Fleche vers le bas -->
             ${system.length > 0 && intents.length > 0 ? `
             <div class="flex justify-center">
                 <div class="flex flex-col items-center">
-                    <div class="text-3xl text-gray-400">↓</div>
-                    <div class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">utilisés par</div>
+                    <div class="text-3xl text-gray-400">v</div>
+                    <div class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">utilises par</div>
                 </div>
             </div>
             ` : ''}
 
-            <!-- Niveau 2: Prompts d'Intent (Spécialisés) -->
+            <!-- Niveau 2: Prompts d'Intent (Specialises) -->
             ${intents.length > 0 ? `
             <div class="relative">
                 <div class="text-center mb-4">
                     <h4 class="text-sm font-bold text-blue-700 bg-blue-100 inline-block px-4 py-2 rounded-full">
-                        🎯 Niveau 2: Prompts d'Intent (Analyses Spécialisées)
+                         Niveau 2: Prompts d'Intent (Analyses Specialisees)
                     </h4>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-${Math.min(intents.length, 3)} gap-4">
@@ -347,22 +347,22 @@ function renderArchitecture(data) {
             </div>
             ` : ''}
 
-            <!-- Flèche vers le bas -->
+            <!-- Fleche vers le bas -->
             ${intents.length > 0 && briefings.length > 0 ? `
             <div class="flex justify-center">
                 <div class="flex flex-col items-center">
-                    <div class="text-3xl text-gray-400">↓</div>
-                    <div class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">intégrés dans</div>
+                    <div class="text-3xl text-gray-400">v</div>
+                    <div class="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">integres dans</div>
                 </div>
             </div>
             ` : ''}
 
-            <!-- Niveau 3: Briefings (Automatisés) -->
+            <!-- Niveau 3: Briefings (Automatises) -->
             ${briefings.length > 0 ? `
             <div class="relative">
                 <div class="text-center mb-4">
                     <h4 class="text-sm font-bold text-green-700 bg-green-100 inline-block px-4 py-2 rounded-full">
-                        📧 Niveau 3: Briefings Automatisés (Cron)
+                         Niveau 3: Briefings Automatises (Cron)
                     </h4>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -376,7 +376,7 @@ function renderArchitecture(data) {
             <div class="relative mt-8 pt-6 border-t-2 border-gray-200">
                 <div class="text-center mb-4">
                     <h4 class="text-sm font-bold text-gray-700 bg-gray-100 inline-block px-4 py-2 rounded-full">
-                        📦 Autres Configurations
+                         Autres Configurations
                     </h4>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -391,7 +391,7 @@ function renderArchitecture(data) {
 }
 
 /**
- * Crée un noeud d'architecture
+ * Cree un noeud d'architecture
  */
 function createArchitectureNode(prompt, color, isBriefing = false, isSmall = false) {
     const colors = {
@@ -434,20 +434,20 @@ function createArchitectureNode(prompt, color, isBriefing = false, isSmall = fal
             </div>
             ${isBriefing && prompt.delivery_enabled ? `
                 <div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow">
-                    ⏰
+                    
                 </div>
             ` : ''}
-            <!-- Bouton éditer au hover -->
+            <!-- Bouton editer au hover -->
             <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <button onclick="event.stopPropagation(); editPromptFromDashboard('${prompt.category}', '${prompt.key}')"
                         class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded-lg text-xs font-medium shadow-lg flex items-center gap-1">
-                    <span>✏️</span>
-                    <span>Éditer</span>
+                    <span></span>
+                    <span>Editer</span>
                 </button>
             </div>
             <!-- Indicateur de clic pour filtrage -->
             <div class="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-all duration-200 text-xs">
-                <span class="bg-blue-500 text-white px-2 py-1 rounded shadow-lg animate-pulse">🔗 Cliquer pour voir relations</span>
+                <span class="bg-blue-500 text-white px-2 py-1 rounded shadow-lg animate-pulse"> Cliquer pour voir relations</span>
             </div>
         </div>
     `;
@@ -459,7 +459,7 @@ function createArchitectureNode(prompt, color, isBriefing = false, isSmall = fal
 function renderCharts(data) {
     const { stats } = data;
 
-    // Graphique par catégorie
+    // Graphique par categorie
     const categoryChart = document.getElementById('categoryChart');
     categoryChart.innerHTML = '';
 
@@ -526,7 +526,7 @@ function renderTable(data) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-                    Aucun prompt trouvé
+                    Aucun prompt trouve
                 </td>
             </tr>
         `;
@@ -572,7 +572,7 @@ function renderTable(data) {
                 <td class="px-4 py-3 text-center">
                     <button onclick="editPromptFromDashboard('${prompt.category}', '${prompt.key}')"
                             class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                        ✏️ Éditer
+                         Editer
                     </button>
                 </td>
             </tr>
@@ -589,7 +589,7 @@ function renderBriefingSchedule(data) {
     const container = document.getElementById('briefingSchedule');
 
     if (briefings.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center col-span-3">Aucun briefing configuré</p>';
+        container.innerHTML = '<p class="text-gray-500 text-center col-span-3">Aucun briefing configure</p>';
         return;
     }
 
@@ -604,9 +604,9 @@ function renderBriefingSchedule(data) {
         const recipients = briefing.email_recipients ? briefing.email_recipients.length : 0;
         const enabled = briefing.delivery_enabled;
 
-        const icon = briefing.key.includes('morning') ? '🌅' :
-                     briefing.key.includes('midday') ? '☀️' :
-                     briefing.key.includes('evening') ? '🌙' : '📧';
+        const icon = briefing.key.includes('morning') ? '' :
+                     briefing.key.includes('midday') ? '' :
+                     briefing.key.includes('evening') ? '' : '';
 
         return `
             <div class="border-2 ${enabled ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-gray-50'} rounded-lg p-4">
@@ -619,17 +619,17 @@ function renderBriefingSchedule(data) {
                         </div>
                     </div>
                     <span class="px-2 py-1 rounded-full text-xs font-medium ${enabled ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}">
-                        ${enabled ? '✓ Actif' : '✗ Inactif'}
+                        ${enabled ? ' Actif' : ' Inactif'}
                     </span>
                 </div>
                 <div class="space-y-1 text-sm text-gray-700">
-                    <div><strong>⏰ Horaire:</strong> ${schedule}</div>
-                    <div><strong>🔁 Cron:</strong> <code class="bg-white px-1 py-0.5 rounded text-xs">${cron}</code></div>
-                    <div><strong>📧 Destinataires:</strong> ${recipients} personne${recipients > 1 ? 's' : ''}</div>
+                    <div><strong> Horaire:</strong> ${schedule}</div>
+                    <div><strong> Cron:</strong> <code class="bg-white px-1 py-0.5 rounded text-xs">${cron}</code></div>
+                    <div><strong> Destinataires:</strong> ${recipients} personne${recipients > 1 ? 's' : ''}</div>
                 </div>
                 <button onclick="editPromptFromDashboard('${briefing.category}', '${briefing.key}')"
                         class="mt-3 w-full text-center px-3 py-1.5 bg-white border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium">
-                    ⚙️ Configurer
+                     Configurer
                 </button>
             </div>
         `;
@@ -637,7 +637,7 @@ function renderBriefingSchedule(data) {
 }
 
 /**
- * Édite un prompt depuis le dashboard
+ * Edite un prompt depuis le dashboard
  */
 export function editPromptFromDashboard(category, key) {
     // Switch to prompts tab first
@@ -664,7 +664,7 @@ export function editPromptFromDashboard(category, key) {
  * Force le rechargement du dashboard
  */
 export function reloadDashboard() {
-    console.log('🔄 Force reload demandé');
+    console.log(' Force reload demande');
     dashboardLoaded = false;
     relationshipFilter = null;
     hideRelationshipFilterBanner();
@@ -672,10 +672,10 @@ export function reloadDashboard() {
 }
 
 /**
- * Invalide le cache du dashboard (appelé quand les prompts changent)
+ * Invalide le cache du dashboard (appele quand les prompts changent)
  */
 export function invalidateDashboardCache() {
-    console.log('♻️ Cache dashboard invalidé (prompts modifiés)');
+    console.log(' Cache dashboard invalide (prompts modifies)');
     dashboardLoaded = false;
     dashboardData = null;
 }
@@ -687,7 +687,7 @@ export function filterDashboard(category) {
     currentFilter = category;
     relationshipFilter = null; // Reset relationship filter
 
-    // Mettre à jour les boutons de filtre
+    // Mettre a jour les boutons de filtre
     document.querySelectorAll('.dashboard-filter-btn').forEach(btn => {
         btn.classList.remove('bg-indigo-600', 'text-white', 'active');
         btn.classList.add('bg-gray-200', 'text-gray-700');
@@ -709,17 +709,17 @@ export function filterDashboard(category) {
 }
 
 /**
- * Filtre par prompts reliés
+ * Filtre par prompts relies
  */
 export function filterByRelatedPrompts(promptKey) {
-    console.log(`🔗 filterByRelatedPrompts called for: ${promptKey}`);
+    console.log(` filterByRelatedPrompts called for: ${promptKey}`);
 
     relationshipFilter = promptKey;
 
     // Get related prompts
     const relationships = promptRelationships[promptKey];
     if (!relationships) {
-        console.error(`⚠️ No relationships map found for ${promptKey}`);
+        console.error(` No relationships map found for ${promptKey}`);
         console.log('Available relationships:', Object.keys(promptRelationships));
         return;
     }
@@ -733,12 +733,12 @@ export function filterByRelatedPrompts(promptKey) {
     const hasRelations = relationships.references.length > 0 || relationships.referencedBy.length > 0;
 
     if (!hasRelations) {
-        console.log(`ℹ️ "${promptKey}" n'a aucune relation détectée`);
-        console.log('   Les prompts ne semblent pas se référencer par clé.');
+        console.log(`i "${promptKey}" n'a aucune relation detectee`);
+        console.log('   Les prompts ne semblent pas se referencer par cle.');
         console.log('   Affichage du prompt seulement.');
     }
 
-    console.log(`✅ Filtering by prompts related to ${promptKey}:`, {
+    console.log(` Filtering by prompts related to ${promptKey}:`, {
         total: relatedKeys.length,
         self: promptKey,
         references: relationships.references,
@@ -759,7 +759,7 @@ export function filterByRelatedPrompts(promptKey) {
     if (dashboardData) {
         renderTable(dashboardData);
     } else {
-        console.error('❌ dashboardData is null, cannot render table');
+        console.error(' dashboardData is null, cannot render table');
     }
 
     // Scroll to table
@@ -770,16 +770,16 @@ export function filterByRelatedPrompts(promptKey) {
 }
 
 /**
- * Affiche la bannière de filtre par relations
+ * Affiche la banniere de filtre par relations
  */
 function showRelationshipFilterBanner(promptKey, count) {
     let banner = document.getElementById('relationshipFilterBanner');
 
     if (!banner) {
-        // Créer la bannière - chercher le tbody et remonter au container de la table
+        // Creer la banniere - chercher le tbody et remonter au container de la table
         const tableBody = document.getElementById('dashboardTableBody');
         if (!tableBody) {
-            console.error('❌ dashboardTableBody not found in DOM');
+            console.error(' dashboardTableBody not found in DOM');
             return;
         }
 
@@ -787,7 +787,7 @@ function showRelationshipFilterBanner(promptKey, count) {
         const tableContainer = table ? table.parentElement : null;
 
         if (!tableContainer) {
-            console.error('❌ Table container not found');
+            console.error(' Table container not found');
             return;
         }
 
@@ -796,36 +796,36 @@ function showRelationshipFilterBanner(promptKey, count) {
         tableContainer.insertBefore(banner, tableContainer.firstChild);
     }
 
-    // Récupérer les flux associés au prompt
+    // Recuperer les flux associes au prompt
     const promptFlows = promptRelationships[promptKey]?.flows || [];
     const flowsHtml = promptFlows.length > 0
         ? `<div class="text-xs text-blue-600 mt-1">
-            <strong>Flux d'exécution:</strong> ${promptFlows.map(f => f.name).join(', ')}
+            <strong>Flux d'execution:</strong> ${promptFlows.map(f => f.name).join(', ')}
            </div>`
         : '';
 
     banner.className = 'mb-4 p-4 bg-blue-50 border-2 border-blue-500 rounded-lg flex items-center justify-between';
     banner.innerHTML = `
         <div class="flex items-center gap-3">
-            <span class="text-2xl">🚀</span>
+            <span class="text-2xl"></span>
             <div>
                 <h4 class="font-bold text-blue-900">Filtrage par relations runtime actif</h4>
                 <p class="text-sm text-blue-700">
-                    Affichage de <strong>${count} prompt${count > 1 ? 's' : ''}</strong> utilisés avec <strong class="font-mono bg-blue-100 px-2 py-0.5 rounded">${promptKey}</strong>
+                    Affichage de <strong>${count} prompt${count > 1 ? 's' : ''}</strong> utilises avec <strong class="font-mono bg-blue-100 px-2 py-0.5 rounded">${promptKey}</strong>
                 </p>
                 ${flowsHtml}
             </div>
         </div>
         <button onclick="window.clearRelationshipFilter()"
                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
-            <span>✕</span>
+            <span></span>
             <span>Annuler le filtre</span>
         </button>
     `;
 }
 
 /**
- * Cache la bannière de filtre par relations
+ * Cache la banniere de filtre par relations
  */
 function hideRelationshipFilterBanner() {
     const banner = document.getElementById('relationshipFilterBanner');
@@ -838,7 +838,7 @@ function hideRelationshipFilterBanner() {
  * Annule le filtre par relations
  */
 export function clearRelationshipFilter() {
-    console.log('🔄 Clearing relationship filter');
+    console.log(' Clearing relationship filter');
     relationshipFilter = null;
     hideRelationshipFilterBanner();
 
@@ -855,10 +855,10 @@ export function clearRelationshipFilter() {
 }
 
 /**
- * Highlight le prompt sélectionné dans l'architecture
+ * Highlight le prompt selectionne dans l'architecture
  */
 function highlightPromptInArchitecture(promptKey) {
-    console.log(`🎨 Highlighting architecture for: ${promptKey}`);
+    console.log(` Highlighting architecture for: ${promptKey}`);
 
     // Get relationships
     const relationships = promptRelationships[promptKey];
@@ -889,11 +889,11 @@ function highlightPromptInArchitecture(promptKey) {
             // Selected node - Blue ring
             node.classList.add('ring-4', 'ring-blue-500', 'ring-offset-2');
             selectedNode = node;
-            console.log(`✅ Selected node: ${nodeKey}`);
+            console.log(` Selected node: ${nodeKey}`);
         } else if (relatedKeys.has(nodeKey)) {
             // Related node - Green ring
             node.classList.add('ring-4', 'ring-green-500', 'ring-offset-2');
-            console.log(`🔗 Related node: ${nodeKey}`);
+            console.log(` Related node: ${nodeKey}`);
         } else {
             // Unrelated node - Dim
             node.classList.add('opacity-30', 'scale-95');
@@ -913,18 +913,18 @@ function highlightPromptInArchitecture(promptKey) {
  */
 function getCategoryLabel(category) {
     const labels = {
-        prompt: '📝 Prompts',
-        briefing: '📧 Briefings',
-        system: '⚙️ System'
+        prompt: ' Prompts',
+        briefing: ' Briefings',
+        system: ' System'
     };
     return labels[category] || category;
 }
 
 function getCategoryBadge(category) {
     const badges = {
-        prompt: '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">📝 Prompt</span>',
-        briefing: '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">📧 Briefing</span>',
-        system: '<span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">⚙️ System</span>'
+        prompt: '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"> Prompt</span>',
+        briefing: '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium"> Briefing</span>',
+        system: '<span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium"> System</span>'
     };
     return badges[category] || `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">${category}</span>`;
 }
@@ -964,7 +964,7 @@ function formatRelativeTime(date) {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
-    if (minutes < 1) return 'À l\'instant';
+    if (minutes < 1) return 'A l\'instant';
     if (minutes < 60) return `${minutes}m`;
     if (hours < 24) return `${hours}h`;
     if (days < 7) return `${days}j`;
@@ -974,5 +974,5 @@ function formatRelativeTime(date) {
 function updateLastUpdateTime() {
     const now = new Date();
     document.getElementById('dashboardLastUpdate').textContent =
-        `Dernière mise à jour: ${formatDate(now)}`;
+        `Derniere mise a jour: ${formatDate(now)}`;
 }

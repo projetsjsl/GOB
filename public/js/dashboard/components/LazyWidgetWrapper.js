@@ -1,5 +1,5 @@
 const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeholderTitle = 'Chargement...', forceLoad = false }) => {
-    // Si forceLoad est true, rendre immédiatement sans lazy loading
+    // Si forceLoad est true, rendre immediatement sans lazy loading
     if (forceLoad) {
         return React.createElement('div', { 
             style: { minHeight: height, position: 'relative', width: '100%' },
@@ -14,7 +14,7 @@ const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeh
     React.useEffect(() => {
         isMountedRef.current = true;
 
-        // Vérifier si le container est déjà visible au montage
+        // Verifier si le container est deja visible au montage
         const checkInitialVisibility = () => {
             if (!containerRef.current) return false;
             const rect = containerRef.current.getBoundingClientRect();
@@ -27,7 +27,7 @@ const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeh
             return isInViewport;
         };
 
-        // Si déjà visible, charger immédiatement
+        // Si deja visible, charger immediatement
         if (checkInitialVisibility()) {
             setTimeout(() => {
                 if (isMountedRef.current && containerRef.current) {
@@ -56,11 +56,11 @@ const LazyWidgetWrapper = ({ children, height = '300px', threshold = 0.1, placeh
             observer.observe(containerRef.current);
         }
 
-        // Fallback: Si après 2 secondes le container n'est toujours pas visible mais existe, charger quand même
+        // Fallback: Si apres 2 secondes le container n'est toujours pas visible mais existe, charger quand meme
         const fallbackTimeout = setTimeout(() => {
             if (!isVisible && containerRef.current && isMountedRef.current) {
                 const rect = containerRef.current.getBoundingClientRect();
-                // Si le container a une taille, charger même s'il n'est pas dans le viewport
+                // Si le container a une taille, charger meme s'il n'est pas dans le viewport
                 if (rect.width > 0 && rect.height > 0) {
                     setIsVisible(true);
                     observer.disconnect();

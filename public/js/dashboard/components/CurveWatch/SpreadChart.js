@@ -50,7 +50,7 @@ const SpreadTooltip = ({ active, payload, label, colors }) => {
           backgroundColor: isInverted ? colors.spreadNegative : colors.spreadPositive,
           color: '#ffffff'
         }}>
-          {isInverted ? 'INVERSÉE' : 'NORMALE'}
+          {isInverted ? 'INVERSEE' : 'NORMALE'}
         </span>
       </div>
       <p style={{
@@ -95,9 +95,9 @@ window.SpreadChart = ({ data, colors, isDark }) => {
         color: colors.textMuted,
         gap: '8px'
       }}>
-        <span>Aucune donnée historique disponible</span>
+        <span>Aucune donnee historique disponible</span>
         <span style={{ fontSize: '11px' }}>
-          Les données seront collectées automatiquement chaque jour
+          Les donnees seront collectees automatiquement chaque jour
         </span>
       </div>
     );

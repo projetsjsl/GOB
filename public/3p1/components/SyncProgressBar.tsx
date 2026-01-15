@@ -31,7 +31,7 @@ export const SyncProgressBar: React.FC<SyncProgressBarProps> = ({
             Synchronisation en cours
           </div>
           <div className="text-xs text-gray-600">
-            {current} / {total} tickers traités
+            {current} / {total} tickers traites
           </div>
         </div>
       </div>
@@ -44,14 +44,14 @@ export const SyncProgressBar: React.FC<SyncProgressBarProps> = ({
         />
       </div>
 
-      {/* Barres de succès/erreur */}
+      {/* Barres de succes/erreur */}
       {(successCount > 0 || errorCount > 0) && (
         <div className="flex gap-1 h-1.5 mb-2">
           {successCount > 0 && (
             <div
               className="bg-green-500 transition-all duration-300"
               style={{ width: `${successPercentage}%` }}
-              title={`${successCount} réussies`}
+              title={`${successCount} reussies`}
             />
           )}
           {errorCount > 0 && (

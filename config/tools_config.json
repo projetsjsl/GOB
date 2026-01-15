@@ -3,7 +3,7 @@
     {
       "id": "fmp-quote",
       "name": "FMP Stock Quote",
-      "description": "Prix et quotes en temps réel via FMP (300 calls/min, plan Starter)",
+      "description": "Prix et quotes en temps reel via FMP (300 calls/min, plan Starter)",
       "category": "financial_data",
       "priority": 1,
       "enabled": true,
@@ -21,12 +21,12 @@
       },
       "fallback_tools": ["polygon-stock-price", "yahoo-finance"],
       "usage_context": ["price", "quote", "stock", "ticker", "prix", "cours"],
-      "keywords": ["price", "quote", "stock", "ticker", "prix", "cours", "real-time", "temps réel", "cotation"]
+      "keywords": ["price", "quote", "stock", "ticker", "prix", "cours", "real-time", "temps reel", "cotation"]
     },
     {
       "id": "polygon-stock-price",
       "name": "Polygon Stock Price",
-      "description": "Récupère les prix en temps réel des actions via Polygon.io (fallback)",
+      "description": "Recupere les prix en temps reel des actions via Polygon.io (fallback)",
       "category": "financial_data",
       "priority": 2,
       "enabled": true,
@@ -44,12 +44,12 @@
       },
       "fallback_tools": ["yahoo-finance"],
       "usage_context": ["price", "quote", "stock", "ticker", "prix", "cours"],
-      "keywords": ["price", "quote", "stock", "ticker", "prix", "cours", "real-time", "temps réel"]
+      "keywords": ["price", "quote", "stock", "ticker", "prix", "cours", "real-time", "temps reel"]
     },
     {
       "id": "fmp-fundamentals",
       "name": "FMP Fundamentals",
-      "description": "Données fondamentales des entreprises via Financial Modeling Prep",
+      "description": "Donnees fondamentales des entreprises via Financial Modeling Prep",
       "category": "financial_data",
       "priority": 3,
       "enabled": true,
@@ -89,13 +89,13 @@
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": [],
-      "usage_context": ["ratios", "financial", "metrics", "ratios", "financier", "métriques", "valuation"],
+      "usage_context": ["ratios", "financial", "metrics", "ratios", "financier", "metriques", "valuation"],
       "keywords": ["ratios", "pe", "pb", "roe", "roa", "debt", "equity", "current ratio", "valorisation", "valuation"]
     },
     {
       "id": "fmp-key-metrics",
       "name": "FMP Key Metrics",
-      "description": "Métriques clés d'entreprise (Revenue, Net Income, EPS, Free Cash Flow, Market Cap) - Plan Starter",
+      "description": "Metriques cles d'entreprise (Revenue, Net Income, EPS, Free Cash Flow, Market Cap) - Plan Starter",
       "category": "financial_data",
       "priority": 5,
       "enabled": true,
@@ -112,8 +112,8 @@
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": ["fmp-fundamentals"],
-      "usage_context": ["metrics", "revenue", "earnings", "cash flow", "market cap", "métriques", "revenus", "bénéfices"],
-      "keywords": ["metrics", "revenue", "earnings", "eps", "cash flow", "market cap", "métriques", "revenus", "bénéfices"]
+      "usage_context": ["metrics", "revenue", "earnings", "cash flow", "market cap", "metriques", "revenus", "benefices"],
+      "keywords": ["metrics", "revenue", "earnings", "eps", "cash flow", "market cap", "metriques", "revenus", "benefices"]
     },
     {
       "id": "fmp-ratings",
@@ -135,13 +135,13 @@
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": [],
-      "usage_context": ["ratings", "grade", "consensus", "note", "évaluation"],
-      "keywords": ["ratings", "grade", "consensus", "note", "évaluation", "recommendation"]
+      "usage_context": ["ratings", "grade", "consensus", "note", "evaluation"],
+      "keywords": ["ratings", "grade", "consensus", "note", "evaluation", "recommendation"]
     },
     {
       "id": "fmp-ticker-news",
       "name": "FMP Ticker News",
-      "description": "Actualités spécifiques à un ticker via FMP - Plan Starter",
+      "description": "Actualites specifiques a un ticker via FMP - Plan Starter",
       "category": "news",
       "priority": 7,
       "enabled": true,
@@ -158,13 +158,13 @@
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": ["finnhub-news"],
-      "usage_context": ["news", "actualités", "ticker news", "company news", "nouvelles entreprise"],
-      "keywords": ["news", "actualités", "ticker", "company", "entreprise", "nouvelles", "information"]
+      "usage_context": ["news", "actualites", "ticker news", "company news", "nouvelles entreprise"],
+      "keywords": ["news", "actualites", "ticker", "company", "entreprise", "nouvelles", "information"]
     },
     {
       "id": "calculator",
       "name": "Financial Calculator",
-      "description": "Calculs financiers (ratios, valorisation, métriques)",
+      "description": "Calculs financiers (ratios, valorisation, metriques)",
       "category": "calculation",
       "priority": 8,
       "enabled": true,
@@ -220,7 +220,7 @@
     {
       "id": "finnhub-news",
       "name": "Finnhub News",
-      "description": "Actualités financières en temps réel via Finnhub (fallback)",
+      "description": "Actualites financieres en temps reel via Finnhub (fallback)",
       "category": "news",
       "priority": 11,
       "enabled": true,
@@ -228,7 +228,7 @@
         "ticker": {
           "type": "string",
           "required": false,
-          "description": "Symbole de l'action (optionnel pour news générales)"
+          "description": "Symbole de l'action (optionnel pour news generales)"
         }
       },
       "implementation": {
@@ -237,8 +237,8 @@
         "api_key_env": "FINNHUB_API_KEY"
       },
       "fallback_tools": [],
-      "usage_context": ["news", "actualités", "information", "market", "marché"],
-      "keywords": ["news", "actualités", "information", "market", "marché", "breaking", "urgent", "urgent"]
+      "usage_context": ["news", "actualites", "information", "market", "marche"],
+      "keywords": ["news", "actualites", "information", "market", "marche", "breaking", "urgent", "urgent"]
     },
     {
       "id": "supabase-watchlist",
@@ -260,7 +260,7 @@
     {
       "id": "team-tickers",
       "name": "Team Tickers",
-      "description": "Lecture des tickers d'équipe depuis Supabase",
+      "description": "Lecture des tickers d'equipe depuis Supabase",
       "category": "data_source",
       "priority": 13,
       "enabled": true,
@@ -271,13 +271,13 @@
         "table": "team_tickers"
       },
       "fallback_tools": [],
-      "usage_context": ["team", "tickers", "équipe", "liste", "stocks"],
-      "keywords": ["team", "tickers", "équipe", "liste", "stocks", "actions", "portfolio"]
+      "usage_context": ["team", "tickers", "equipe", "liste", "stocks"],
+      "keywords": ["team", "tickers", "equipe", "liste", "stocks", "actions", "portfolio"]
     },
     {
       "id": "economic-calendar",
       "name": "Economic Calendar",
-      "description": "Calendrier économique et événements macro (FMP Starter)",
+      "description": "Calendrier economique et evenements macro (FMP Starter)",
       "category": "macro_data",
       "priority": 14,
       "enabled": true,
@@ -285,7 +285,7 @@
         "date": {
           "type": "string",
           "required": false,
-          "description": "Date au format YYYY-MM-DD (défaut: aujourd'hui)"
+          "description": "Date au format YYYY-MM-DD (defaut: aujourd'hui)"
         }
       },
       "implementation": {
@@ -294,13 +294,13 @@
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": [],
-      "usage_context": ["economic", "calendar", "macro", "économique", "calendrier"],
-      "keywords": ["economic", "calendar", "macro", "économique", "calendrier", "events", "événements"]
+      "usage_context": ["economic", "calendar", "macro", "economique", "calendrier"],
+      "keywords": ["economic", "calendar", "macro", "economique", "calendrier", "events", "evenements"]
     },
     {
       "id": "earnings-calendar",
       "name": "Earnings Calendar",
-      "description": "Calendrier des résultats d'entreprises (FMP Starter)",
+      "description": "Calendrier des resultats d'entreprises (FMP Starter)",
       "category": "earnings",
       "priority": 15,
       "enabled": true,
@@ -308,7 +308,7 @@
         "date": {
           "type": "string",
           "required": false,
-          "description": "Date au format YYYY-MM-DD (défaut: aujourd'hui)"
+          "description": "Date au format YYYY-MM-DD (defaut: aujourd'hui)"
         }
       },
       "implementation": {
@@ -317,8 +317,8 @@
         "api_key_env": "FMP_API_KEY"
       },
       "fallback_tools": [],
-      "usage_context": ["earnings", "results", "résultats", "bénéfices"],
-      "keywords": ["earnings", "results", "résultats", "bénéfices", "quarterly", "trimestriel"]
+      "usage_context": ["earnings", "results", "resultats", "benefices"],
+      "keywords": ["earnings", "results", "resultats", "benefices", "quarterly", "trimestriel"]
     },
     {
       "id": "analyst-recommendations",
@@ -346,7 +346,7 @@
     {
       "id": "yahoo-finance",
       "name": "Yahoo Finance",
-      "description": "Données Yahoo Finance (fallback général)",
+      "description": "Donnees Yahoo Finance (fallback general)",
       "category": "financial_data",
       "priority": 17,
       "enabled": true,
@@ -363,13 +363,13 @@
         "endpoint": "https://finance.yahoo.com/quote/{ticker}"
       },
       "fallback_tools": [],
-      "usage_context": ["fallback", "backup", "general", "général"],
-      "keywords": ["fallback", "backup", "general", "général", "yahoo", "finance"]
+      "usage_context": ["fallback", "backup", "general", "general"],
+      "keywords": ["fallback", "backup", "general", "general", "yahoo", "finance"]
     },
     {
       "id": "stock-screener",
       "name": "Stock Screener",
-      "description": "Recherche intelligente d'actions selon critères spécifiques (large cap, sous-évaluées, dividendes, etc.)",
+      "description": "Recherche intelligente d'actions selon criteres specifiques (large cap, sous-evaluees, dividendes, etc.)",
       "category": "screening",
       "priority": 1,
       "enabled": true,
@@ -377,13 +377,13 @@
         "criteria": {
           "type": "string",
           "required": true,
-          "description": "Critères de recherche (ex: 'large cap sous-évaluées', 'dividendes élevés')"
+          "description": "Criteres de recherche (ex: 'large cap sous-evaluees', 'dividendes eleves')"
         },
         "limit": {
           "type": "number",
           "required": false,
           "default": 10,
-          "description": "Nombre de résultats à retourner"
+          "description": "Nombre de resultats a retourner"
         },
         "market_cap": {
           "type": "string",
@@ -394,7 +394,7 @@
         "sector": {
           "type": "string",
           "required": false,
-          "description": "Secteur spécifique (Technology, Healthcare, etc.)"
+          "description": "Secteur specifique (Technology, Healthcare, etc.)"
         }
       },
       "implementation": {
@@ -403,13 +403,13 @@
         "api_key_env": ["PERPLEXITY_API_KEY", "FMP_API_KEY"]
       },
       "fallback_tools": [],
-      "usage_context": ["screening", "recherche", "trouve", "cherche", "liste", "recommande", "suggère", "identifie", "top", "meilleurs"],
-      "keywords": ["screening", "screener", "recherche", "trouve", "cherche", "liste", "recommande", "suggère", "identifie", "top", "meilleurs", "sous-évalué", "undervalued", "dividende", "croissance", "growth", "value", "large cap", "mid cap", "small cap"]
+      "usage_context": ["screening", "recherche", "trouve", "cherche", "liste", "recommande", "suggere", "identifie", "top", "meilleurs"],
+      "keywords": ["screening", "screener", "recherche", "trouve", "cherche", "liste", "recommande", "suggere", "identifie", "top", "meilleurs", "sous-evalue", "undervalued", "dividende", "croissance", "growth", "value", "large cap", "mid cap", "small cap"]
     },
     {
       "id": "rsi-screener",
       "name": "RSI Screener",
-      "description": "Identifie les opportunités RSI extrêmes (survente: RSI(14)≤20 ET RSI(5)≤5, surachat: RSI(14)≥80 ET RSI(5)≥95) sur marchés internationaux (US, CA, EU)",
+      "description": "Identifie les opportunites RSI extremes (survente: RSI(14)<=20 ET RSI(5)<=5, surachat: RSI(14)>=80 ET RSI(5)>=95) sur marches internationaux (US, CA, EU)",
       "category": "screening",
       "priority": 2,
       "enabled": true,
@@ -425,13 +425,13 @@
           "type": "array",
           "required": false,
           "default": ["US"],
-          "description": "Marchés à scanner: US, CA, UK, FR, DE, EU"
+          "description": "Marches a scanner: US, CA, UK, FR, DE, EU"
         },
         "limit": {
           "type": "number",
           "required": false,
           "default": 20,
-          "description": "Nombre max de résultats par catégorie"
+          "description": "Nombre max de resultats par categorie"
         },
         "market_cap": {
           "type": "string",
@@ -448,13 +448,13 @@
         "api_key_env": ["FMP_API_KEY", "TWELVE_DATA_API_KEY"]
       },
       "fallback_tools": [],
-      "usage_context": ["rsi", "survente", "surachat", "oversold", "overbought", "extrême", "extreme", "indicateur", "technique", "opportunité"],
-      "keywords": ["rsi", "survente", "surachat", "oversold", "overbought", "extrême", "extreme", "indicateur", "technique", "technical", "momentum", "opportunité", "opportunity", "trading", "swing"]
+      "usage_context": ["rsi", "survente", "surachat", "oversold", "overbought", "extreme", "extreme", "indicateur", "technique", "opportunite"],
+      "keywords": ["rsi", "survente", "surachat", "oversold", "overbought", "extreme", "extreme", "indicateur", "technique", "technical", "momentum", "opportunite", "opportunity", "trading", "swing"]
     },
     {
       "id": "treasury-rates",
       "name": "Treasury Rates",
-      "description": "Courbe des taux obligataires US et Canada avec spreads, indicateurs de récession (10Y-2Y), et graphique TradingView",
+      "description": "Courbe des taux obligataires US et Canada avec spreads, indicateurs de recession (10Y-2Y), et graphique TradingView",
       "category": "macro_data",
       "priority": 3,
       "enabled": true,
@@ -464,7 +464,7 @@
           "required": false,
           "enum": ["US", "CA", "both"],
           "default": "both",
-          "description": "Pays: US (États-Unis), CA (Canada), both (les deux)"
+          "description": "Pays: US (Etats-Unis), CA (Canada), both (les deux)"
         }
       },
       "implementation": {
@@ -473,8 +473,8 @@
         "api_key_env": ["FRED_API_KEY", "FMP_API_KEY"]
       },
       "fallback_tools": [],
-      "usage_context": ["taux", "obligations", "courbe", "yield", "treasury", "spread", "récession", "inversion"],
-      "keywords": ["taux", "obligations", "courbe", "yield", "treasury", "bonds", "spread", "10Y-2Y", "récession", "recession", "inversion", "fed", "boc", "banque centrale", "taux directeur", "policy rate"]
+      "usage_context": ["taux", "obligations", "courbe", "yield", "treasury", "spread", "recession", "inversion"],
+      "keywords": ["taux", "obligations", "courbe", "yield", "treasury", "bonds", "spread", "10Y-2Y", "recession", "recession", "inversion", "fed", "boc", "banque centrale", "taux directeur", "policy rate"]
     }
   ],
   "config": {

@@ -1,9 +1,9 @@
 /**
- * API endpoint pour gérer les destinataires email depuis Supabase
+ * API endpoint pour gerer les destinataires email depuis Supabase
  * 
- * GET : Récupère la liste des destinataires
+ * GET : Recupere la liste des destinataires
  * POST : Ajoute un nouveau destinataire
- * PUT : Met à jour un destinataire existant
+ * PUT : Met a jour un destinataire existant
  * DELETE : Supprime un destinataire
  */
 
@@ -12,7 +12,7 @@ async function getSupabaseClient() {
     const { createClient } = await import('@supabase/supabase-js');
     
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error('Supabase non configuré');
+      throw new Error('Supabase non configure');
     }
 
     return createClient(
@@ -20,13 +20,13 @@ async function getSupabaseClient() {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
   } catch (error) {
-    console.error('❌ Erreur création client Supabase:', error);
+    console.error(' Erreur creation client Supabase:', error);
     throw error;
   }
 }
 
 /**
- * Récupère les adresses email actives pour un type de briefing
+ * Recupere les adresses email actives pour un type de briefing
  */
 export async function getActiveRecipients(briefingType = 'custom') {
   try {
@@ -50,19 +50,19 @@ export async function getActiveRecipients(briefingType = 'custom') {
       .eq(column, true);
     
     if (error) {
-      console.error('❌ Erreur récupération destinataires:', error);
+      console.error(' Erreur recuperation destinataires:', error);
       return ['projetsjsl@gmail.com']; // Fallback
     }
     
     return data?.map(r => r.email) || ['projetsjsl@gmail.com'];
   } catch (error) {
-    console.error('❌ Erreur getActiveRecipients:', error);
+    console.error(' Erreur getActiveRecipients:', error);
     return ['projetsjsl@gmail.com'];
   }
 }
 
 /**
- * Récupère l'adresse email pour les previews
+ * Recupere l'adresse email pour les previews
  */
 export async function getPreviewEmail() {
   try {
@@ -77,8 +77,8 @@ export async function getPreviewEmail() {
       .single();
     
     if (error || !data) {
-      console.error('❌ Erreur récupération email preview:', error);
-      // Fallback: essayer de récupérer depuis config si Supabase échoue
+      console.error(' Erreur recuperation email preview:', error);
+      // Fallback: essayer de recuperer depuis config si Supabase echoue
       try {
         const { readFileSync } = await import('fs');
         const { join, dirname } = await import('path');
@@ -95,7 +95,7 @@ export async function getPreviewEmail() {
     
     return data.email;
   } catch (error) {
-    console.error('❌ Erreur getPreviewEmail:', error);
+    console.error(' Erreur getPreviewEmail:', error);
     return 'projetsjsl@gmail.com';
   }
 }
@@ -114,7 +114,7 @@ export default async function handler(req, res) {
     const supabase = await getSupabaseClient();
 
     if (req.method === 'GET') {
-      // Récupérer tous les destinataires
+      // Recuperer tous les destinataires
       const { data, error } = await supabase
         .from('email_recipients')
         .select('*')
@@ -124,7 +124,7 @@ export default async function handler(req, res) {
         throw new Error(`Erreur Supabase: ${error.message}`);
       }
 
-      // Récupérer l'email de preview
+      // Recuperer l'email de preview
       const { data: previewData } = await supabase
         .from('email_recipients')
         .select('email')
@@ -169,7 +169,7 @@ export default async function handler(req, res) {
         if (error.code === '23505') { // Unique violation
           return res.status(409).json({
             success: false,
-            error: 'Cet email existe déjà'
+            error: 'Cet email existe deja'
           });
         }
         throw new Error(`Erreur Supabase: ${error.message}`);
@@ -177,18 +177,18 @@ export default async function handler(req, res) {
 
       return res.status(201).json({
         success: true,
-        message: 'Destinataire ajouté avec succès',
+        message: 'Destinataire ajoute avec succes',
         recipient: data
       });
 
     } else if (req.method === 'PUT') {
-      // Mettre à jour un destinataire
+      // Mettre a jour un destinataire
       const { id, email, label, morning, midday, evening, custom, is_preview, active } = req.body;
 
       if (!id) {
         return res.status(400).json({
           success: false,
-          error: 'ID requis pour la mise à jour'
+          error: 'ID requis pour la mise a jour'
         });
       }
 
@@ -215,7 +215,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: 'Destinataire mis à jour avec succès',
+        message: 'Destinataire mis a jour avec succes',
         recipient: data
       });
 
@@ -241,7 +241,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: 'Destinataire supprimé avec succès'
+        message: 'Destinataire supprime avec succes'
       });
     }
 
@@ -251,7 +251,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur API email-recipients:', error);
+    console.error(' Erreur API email-recipients:', error);
     return res.status(500).json({
       success: false,
       error: error.message

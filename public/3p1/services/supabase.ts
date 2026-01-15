@@ -18,7 +18,7 @@ function getSupabaseConfig() {
     const envScript = document.querySelector('script[src*="env-config"]');
     if (envScript) {
       // Script exists, wait a bit for it to execute
-      console.log('📋 env-config.js script found in DOM');
+      console.log(' env-config.js script found in DOM');
     }
   }
   
@@ -51,7 +51,7 @@ export function getSupabaseClient(): SupabaseClient | null {
   const url = config.url || SUPABASE_URL;
   
   if (!key) {
-    console.warn('⚠️ Supabase anon key not configured. Real-time sync disabled.');
+    console.warn(' Supabase anon key not configured. Real-time sync disabled.');
     console.warn('   Make sure env-config.js is loaded before this script.');
     console.warn('   Current window.SUPABASE_ANON_KEY:', typeof window !== 'undefined' ? window.SUPABASE_ANON_KEY : 'N/A');
     console.warn('   Current window.ENV_CONFIG:', typeof window !== 'undefined' ? window.ENV_CONFIG : 'N/A');
@@ -66,10 +66,10 @@ export function getSupabaseClient(): SupabaseClient | null {
         }
       }
     });
-    console.log('✅ Supabase client initialized for 3p1');
+    console.log(' Supabase client initialized for 3p1');
     return supabaseInstance;
   } catch (error) {
-    console.error('❌ Failed to initialize Supabase client:', error);
+    console.error(' Failed to initialize Supabase client:', error);
     return null;
   }
 }

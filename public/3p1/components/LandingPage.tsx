@@ -26,19 +26,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           </div>
 
           {/* Headline */}
-          {/* BUG #3P1-1 FIX: Ajout de whitespace-nowrap pour éviter la troncature avec espaces */}
+          {/* BUG #3P1-1 FIX: Ajout de whitespace-nowrap pour eviter la troncature avec espaces */}
           <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
-            Analyse Financière
+            Analyse Financiere
             <br />
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
-              Propulsée par l'IA
+              Propulsee par l'IA
             </span>
           </h1>
 
           {/* Subheadline */}
-          {/* BUG #3P1-1 FIX: Ajout de wordBreak normal pour éviter la troncature */}
+          {/* BUG #3P1-1 FIX: Ajout de wordBreak normal pour eviter la troncature */}
           <p className="text-xl md:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
-            Prenez des décisions d'investissement éclairées avec notre plateforme professionnelle d'analyse de valorisation
+            Prenez des decisions d'investissement eclairees avec notre plateforme professionnelle d'analyse de valorisation
           </p>
 
           {/* CTA Button */}
@@ -57,7 +57,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           {/* BUG #3P1-1 FIX: Ajout de wordBreak normal */}
           <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-12" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
-            Comment ça fonctionne
+            Comment ca fonctionne
           </h2>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -80,9 +80,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <div className="absolute -top-4 -left-4 w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
                 2
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 mt-2">Analysez les données</h3>
+              <h3 className="text-xl font-bold text-white mb-3 mt-2">Analysez les donnees</h3>
               <p className="text-slate-400">
-                Explorez les métriques financières, ratios et tendances historiques
+                Explorez les metriques financieres, ratios et tendances historiques
               </p>
             </div>
           </div>
@@ -93,9 +93,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <div className="absolute -top-4 -left-4 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
                 3
               </div>
-              <h3 className="text-xl font-bold text-white mb-3 mt-2">Prenez vos décisions</h3>
+              <h3 className="text-xl font-bold text-white mb-3 mt-2">Prenez vos decisions</h3>
               <p className="text-slate-400">
-                Utilisez les valorisations calculées pour guider vos investissements
+                Utilisez les valorisations calculees pour guider vos investissements
               </p>
             </div>
           </div>
@@ -107,10 +107,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center">
           {/* BUG #3P1-1 FIX: Ajout de wordBreak normal */}
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
-            Prêt à commencer votre analyse?
+            Pret a commencer votre analyse?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto" style={{ wordBreak: 'normal', overflowWrap: 'normal' }}>
-            Accédez instantanément à notre plateforme d'analyse professionnelle
+            Accedez instantanement a notre plateforme d'analyse professionnelle
           </p>
           <button
             onClick={onGetStarted}
@@ -126,7 +126,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       {/* Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 border-t border-slate-800">
         <p className="text-center text-slate-500 text-sm">
-          © 2025 <span className="font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">JLab 3p1</span> - Plateforme d'analyse financière professionnelle
+           2025 <span className="font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">JLab 3p1</span> - Plateforme d'analyse financiere professionnelle
         </p>
       </div>
     </div>

@@ -8,7 +8,7 @@ export const EmmaChatInterface = () => {
     <div class="emma-chat-container">
       <!-- Sidebar gauche -->
       <div class="emma-sidebar">
-        <!-- Profil Analyse Financière -->
+        <!-- Profil Analyse Financiere -->
         <div class="emma-profile-section">
           <div class="emma-profile-icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -16,18 +16,18 @@ export const EmmaChatInterface = () => {
             </svg>
           </div>
           <div class="emma-profile-info">
-            <h3>Analyse Financière</h3>
+            <h3>Analyse Financiere</h3>
             <p>Affaires</p>
           </div>
         </div>
 
-        <!-- Spécialités -->
+        <!-- Specialites -->
         <div class="emma-specialties-section">
-          <h4>Spécialités</h4>
+          <h4>Specialites</h4>
           <div class="emma-specialties-tags">
-            <div class="emma-tag active">Analyse financière</div>
+            <div class="emma-tag active">Analyse financiere</div>
             <div class="emma-tag">Investissements</div>
-            <div class="emma-tag">Évaluation</div>
+            <div class="emma-tag">Evaluation</div>
             <div class="emma-tag">Rapports</div>
           </div>
         </div>
@@ -51,7 +51,7 @@ export const EmmaChatInterface = () => {
               <span>Votre style</span>
               <select class="emma-select">
                 <option value="standard">Standard</option>
-                <option value="detailed">Détaillé</option>
+                <option value="detailed">Detaille</option>
                 <option value="concise">Concis</option>
               </select>
             </div>
@@ -60,9 +60,9 @@ export const EmmaChatInterface = () => {
               <div class="emma-option-bullet"></div>
               <span>Votre niveau</span>
               <select class="emma-select">
-                <option value="beginner">Débutant</option>
-                <option value="intermediate" selected>Intermédiaire</option>
-                <option value="advanced">Avancé</option>
+                <option value="beginner">Debutant</option>
+                <option value="intermediate" selected>Intermediaire</option>
+                <option value="advanced">Avance</option>
               </select>
             </div>
             
@@ -111,7 +111,7 @@ export const EmmaChatInterface = () => {
           
           <div class="emma-title">
             <h2>Emma - Consultations Gratuites</h2>
-            <p>Analyse Financière</p>
+            <p>Analyse Financiere</p>
           </div>
           
           <button class="emma-send-button">
@@ -129,12 +129,12 @@ export const EmmaChatInterface = () => {
               <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiM2MzY2RjEiLz4KPHBhdGggZD0iTTEwIDEwSDIyVjIySDEwVjEwWiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTEyIDEySDIwVjIwSDEyVjEyWiIgZmlsbD0iIzYzNjZGMTIiLz4KPC9zdmc+" alt="Emma" />
             </div>
             <div class="emma-message-content">
-              <p>Bonjour, je suis Emma, assistante virtuelle en analyse financière. Je peux vous aider avec l'analyse et l'évaluation financière. Quel est votre défi financier ?</p>
+              <p>Bonjour, je suis Emma, assistante virtuelle en analyse financiere. Je peux vous aider avec l'analyse et l'evaluation financiere. Quel est votre defi financier ?</p>
               <div class="emma-reminder">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M1 21H23L12 2L1 21ZM13 18H11V16H13V18ZM13 14H11V10H13V14Z" fill="#EF4444"/>
                 </svg>
-                <span>Rappel : Pour des conseils personnalisés, consultez toujours un expert qualifié du domaine.</span>
+                <span>Rappel : Pour des conseils personnalises, consultez toujours un expert qualifie du domaine.</span>
               </div>
               <p>Comment puis-je vous aider ?</p>
             </div>
@@ -143,7 +143,7 @@ export const EmmaChatInterface = () => {
 
         <!-- Zone de saisie -->
         <div class="emma-input-container">
-          <input type="text" class="emma-input" placeholder="Posez votre question à Emma..." />
+          <input type="text" class="emma-input" placeholder="Posez votre question a Emma..." />
           <button class="emma-send-input">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z" fill="currentColor"/>
@@ -155,24 +155,24 @@ export const EmmaChatInterface = () => {
   `;
 };
 
-// Composant d'éditeur de prompt
+// Composant d'editeur de prompt
 export const EmmaPromptEditor = () => {
   return `
     <div class="emma-prompt-editor">
       <div class="emma-editor-header">
-        <h3>Éditeur de Prompt Emma</h3>
+        <h3>Editeur de Prompt Emma</h3>
         <div class="emma-editor-actions">
-          <button class="emma-btn emma-btn-secondary" id="emma-reset-prompt">Réinitialiser</button>
+          <button class="emma-btn emma-btn-secondary" id="emma-reset-prompt">Reinitialiser</button>
           <button class="emma-btn emma-btn-primary" id="emma-save-prompt">Sauvegarder</button>
         </div>
       </div>
       
       <div class="emma-editor-content">
-        <label for="emma-prompt-textarea">Prompt personnalisé :</label>
+        <label for="emma-prompt-textarea">Prompt personnalise :</label>
         <textarea 
           id="emma-prompt-textarea" 
           class="emma-prompt-textarea"
-          placeholder="Saisissez votre prompt personnalisé pour Emma..."
+          placeholder="Saisissez votre prompt personnalise pour Emma..."
           rows="15"
         ></textarea>
         
@@ -180,7 +180,7 @@ export const EmmaPromptEditor = () => {
           <p><strong>Variables disponibles :</strong></p>
           <ul>
             <li><code>{userMessage}</code> - Message de l'utilisateur</li>
-            <li><code>{dashboardData}</code> - Données du dashboard</li>
+            <li><code>{dashboardData}</code> - Donnees du dashboard</li>
             <li><code>{currentTime}</code> - Heure actuelle</li>
           </ul>
         </div>
@@ -197,19 +197,19 @@ export const EmmaGeminiConfig = () => {
         <h3>Configuration Gemini</h3>
         <div class="emma-connection-status" id="emma-connection-status">
           <span class="emma-status-indicator"></span>
-          <span class="emma-status-text">Non connecté</span>
+          <span class="emma-status-text">Non connecte</span>
         </div>
       </div>
       
       <div class="emma-config-content">
         <div class="emma-api-key-section">
-          <label for="emma-api-key">Clé API Gemini :</label>
+          <label for="emma-api-key">Cle API Gemini :</label>
           <div class="emma-api-key-input">
             <input 
               type="password" 
               id="emma-api-key" 
               class="emma-input"
-              placeholder="Saisissez votre clé API Gemini..."
+              placeholder="Saisissez votre cle API Gemini..."
             />
             <button class="emma-btn emma-btn-secondary" id="emma-toggle-api-key">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -221,16 +221,16 @@ export const EmmaGeminiConfig = () => {
         
         <div class="emma-config-actions">
           <button class="emma-btn emma-btn-primary" id="emma-test-connection">Tester la connexion</button>
-          <button class="emma-btn emma-btn-danger" id="emma-clear-api-key">Effacer la clé</button>
+          <button class="emma-btn emma-btn-danger" id="emma-clear-api-key">Effacer la cle</button>
         </div>
         
         <div class="emma-config-info">
-          <p><strong>Comment obtenir une clé API Gemini :</strong></p>
+          <p><strong>Comment obtenir une cle API Gemini :</strong></p>
           <ol>
             <li>Allez sur <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
             <li>Connectez-vous avec votre compte Google</li>
-            <li>Créez une nouvelle clé API</li>
-            <li>Copiez et collez la clé ci-dessus</li>
+            <li>Creez une nouvelle cle API</li>
+            <li>Copiez et collez la cle ci-dessus</li>
           </ol>
         </div>
       </div>

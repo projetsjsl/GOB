@@ -58,25 +58,25 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
     const cleanText = (value: string | null | undefined) => {
         if (!value) return '';
         return value
-            .replace(/Ã©/g, 'é')
-            .replace(/Ã¨/g, 'è')
-            .replace(/Ã /g, 'à')
-            .replace(/Ã§/g, 'ç')
-            .replace(/Ã´/g, 'ô')
-            .replace(/Ã¢/g, 'â')
-            .replace(/Ã®/g, 'î')
-            .replace(/Ã¯/g, 'ï')
-            .replace(/Ã¹/g, 'ù')
-            .replace(/Ã»/g, 'û')
-            .replace(/Ã«/g, 'ë')
-            .replace(/Ã¤/g, 'ä')
-            .replace(/Ã¶/g, 'ö')
-            .replace(/Ã¼/g, 'ü')
-            .replace(/â€™/g, "'")
-            .replace(/â€œ/g, '“')
-            .replace(/â€�/g, '”')
-            .replace(/â€“/g, '–')
-            .replace(/â€”/g, '—');
+            .replace(/A/g, 'e')
+            .replace(/A /g, 'e')
+            .replace(/A /g, 'a')
+            .replace(/A/g, 'c')
+            .replace(/A /g, 'o')
+            .replace(/A/g, 'a')
+            .replace(/A/g, 'i')
+            .replace(/A /g, 'i')
+            .replace(/A1/g, 'u')
+            .replace(/A"/g, 'u')
+            .replace(/A"/g, 'e')
+            .replace(/A/g, 'a')
+            .replace(/A/g, 'o')
+            .replace(/A14/g, 'u')
+            .replace(/aEURTM/g, "'")
+            .replace(/aEUR/g, '"')
+            .replace(/aEUR/g, '"')
+            .replace(/aEUR"/g, '-')
+            .replace(/aEUR"/g, '-');
     };
 
     const getGradeColor = (grade?: string | number) => {
@@ -95,12 +95,12 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="📈" size={24} className="mr-2 inline-block" />
+                        <Icon emoji="" size={24} className="mr-2 inline-block" />
                         Analyses Seeking Alpha
                     </h2>
                     </div>
 
-                    {/* Fiche détaillée du titre sélectionné */}
+                    {/* Fiche detaillee du titre selectionne */}
                     {selectedStock && (
                         <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                             <div className="flex justify-between items-start mb-4">
@@ -109,11 +109,11 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                     onClick={() => handleSelectStock(null)}
                                     className="text-blue-400 hover:text-blue-300"
                                 >
-                                    ✕ Fermer
+                                     Fermer
                                 </button>
                             </div>
                             
-                            {/* Fiche détaillée comme dans les images */}
+                            {/* Fiche detaillee comme dans les images */}
                             {(() => {
                                 const claudeData = seekingAlphaStockData.stocks?.[selectedStock];
                                 const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === selectedStock);
@@ -135,18 +135,18 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                         onClick={() => handleSelectStock(null)}
                                                         className="text-white hover:text-gray-200 text-xl"
                                                     >
-                                                        ✕
+                                                        
                                                     </button>
                                                 </div>
                                             </div>
 
                                             {/* Contenu principal */}
                                             <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
-                                                {/* Métriques Clés */}
+                                                {/* Metriques Cles */}
                                                 <div>
                                                     <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                                                         <div className="w-1 h-6 bg-green-600 mr-3"></div>
-                                                        Métriques Clés
+                                                        Metriques Cles
                                                     </h4>
                                                     <div className="grid grid-cols-3 gap-4">
                                                         <div className="bg-gray-50 rounded-lg p-4">
@@ -170,7 +170,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                             <div className="text-green-600 font-bold text-lg">{claudeData?.metrics?.dividendYield || 'N/A'}</div>
                                                         </div>
                                                         <div className="bg-gray-50 rounded-lg p-4">
-                                                            <div className="text-gray-600 text-sm">Fréquence</div>
+                                                            <div className="text-gray-600 text-sm">Frequence</div>
                                                             <div className="text-gray-800 font-bold text-lg">{claudeData?.metrics?.dividendFrequency || 'N/A'}</div>
                                                         </div>
                                                         <div className="bg-gray-50 rounded-lg p-4">
@@ -245,7 +245,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                 {claudeData?.strengths && (
                                                     <div className="bg-green-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-green-800 mb-4 flex items-center">
-                                                            <span className="mr-2">✅</span>
+                                                            <span className="mr-2"></span>
                                                             Points Positifs
                                                         </h4>
                                                         <div className="space-y-3">
@@ -258,12 +258,12 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                     </div>
                                                 )}
 
-                                                {/* Préoccupations */}
+                                                {/* Preoccupations */}
                                                 {claudeData?.concerns && claudeData.concerns[0] !== "Analyse en attente" && (
                                                     <div className="bg-red-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-red-800 mb-4 flex items-center">
-                                                            <span className="mr-2">⚠️</span>
-                                                            Préoccupations
+                                                            <span className="mr-2"></span>
+                                                            Preoccupations
                                                         </h4>
                                                         <div className="space-y-3">
                                                             {claudeData.concerns.map((concern, index) => (
@@ -281,7 +281,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                  !claudeData?.finalConclusion?.recommendation?.includes('En attente') && (
                                                     <div className="bg-blue-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-blue-800 mb-4 flex items-center">
-                                                            <span className="mr-2">💡</span>
+                                                            <span className="mr-2"></span>
                                                             Recommandation
                                                         </h4>
                                                         <div className="text-blue-700 leading-relaxed">
@@ -290,25 +290,25 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                     </div>
                                                 )}
                                                 
-                                                {/* Message si données en attente */}
+                                                {/* Message si donnees en attente */}
                                                 {(!parsedData || Object.keys(parsedData).length < 5) && 
                                                  claudeData?.metrics?.marketCap === 'En attente d\'analyse' && (
                                                     <div className="bg-yellow-50 rounded-lg p-6 border-2 border-yellow-200">
                                                         <h4 className="text-lg font-bold text-yellow-800 mb-3 flex items-center">
-                                                            <span className="mr-2">⏳</span>
-                                                            Données en cours de traitement
+                                                            <span className="mr-2"></span>
+                                                            Donnees en cours de traitement
                                                         </h4>
                                                         <div className="text-yellow-700 leading-relaxed space-y-2">
-                                                            <p>Les données brutes ont été collectées avec succès, mais l'analyse détaillée n'est pas encore disponible.</p>
-                                                            <p className="font-semibold">Pour obtenir l'analyse complète :</p>
+                                                            <p>Les donnees brutes ont ete collectees avec succes, mais l'analyse detaillee n'est pas encore disponible.</p>
+                                                            <p className="font-semibold">Pour obtenir l'analyse complete :</p>
                                                             <ol className="list-decimal pl-5 space-y-1">
-                                                                <li>Configurez la clé API Claude dans l'onglet Admin-JSLAI</li>
-                                                                <li>Cliquez sur "🤖 Analyser avec Claude" pour traiter les données</li>
-                                                                <li>Les métriques détaillées seront extraites et affichées ici</li>
+                                                                <li>Configurez la cle API Claude dans l'onglet Admin-JSLAI</li>
+                                                                <li>Cliquez sur " Analyser avec Claude" pour traiter les donnees</li>
+                                                                <li>Les metriques detaillees seront extraites et affichees ici</li>
                                                             </ol>
                                                             <div className="mt-4 p-3 bg-blue-50 rounded border border-blue-200">
                                                                 <p className="text-sm text-blue-800">
-                                                                    💡 <strong>Astuce :</strong> Les données parsées automatiquement sont affichées ci-dessus. 
+                                                                     <strong>Astuce :</strong> Les donnees parsees automatiquement sont affichees ci-dessus. 
                                                                     Pour une analyse plus approfondie avec insights IA, utilisez l'API Claude.
                                                                 </p>
                                                             </div>
@@ -325,7 +325,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                             rel="noopener noreferrer"
                                                             className="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                                         >
-                                                            Lire l'analyse complète sur Seeking Alpha →
+                                                            Lire l'analyse complete sur Seeking Alpha →
                                                         </a>
                                                     </div>
                                                 )}
@@ -338,13 +338,13 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                         </div>
                     )}
 
-                    {/* Message si aucune donnée et aucun ticker */}
+                    {/* Message si aucune donnee et aucun ticker */}
                     {(!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length === 0 && (
                         <div className={`backdrop-blur-sm rounded-lg p-8 border transition-colors duration-300 ${
                             isDarkMode ? 'bg-yellow-900/20 border-yellow-700' : 'bg-yellow-50 border-yellow-300'
                         }`}>
                             <div className="text-center">
-                                <div className="text-5xl mb-4"><Icon emoji="📊" size={48} /></div>
+                                <div className="text-5xl mb-4"><Icon emoji="" size={48} /></div>
                                 <h3 className={`text-xl font-bold mb-3 ${isDarkMode ? 'text-yellow-200' : 'text-yellow-800'}`}>
                                     Aucun ticker disponible
                                 </h3>
@@ -355,7 +355,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                     onClick={() => setActiveTab('stocks-news')}
                                     className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                 >
-                                    Aller à Titres & Nouvelles →
+                                    Aller a Titres & Nouvelles →
                                 </button>
                             </div>
                         </div>
@@ -368,8 +368,8 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                 const claudeData = seekingAlphaStockData.stocks?.[stock.ticker];
                                 const parsedData = stock.parsedData;
 
-                                // Afficher la carte même sans données complètes
-                                // mais vérifier qu'il y a au moins un ticker
+                                // Afficher la carte meme sans donnees completes
+                                // mais verifier qu'il y a au moins un ticker
                                 if (!stock.ticker) return null;
                                 
                                 return (
@@ -382,18 +382,18 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                     className="px-3 py-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-xs rounded-lg transition-all duration-300 shadow-lg"
                                                     title="Comparaison avec les peers"
                                                 >
-                                                    🔍 Peers
+                                                     Peers
                                                 </button>
                                                 <button
                                                     onClick={() => handleSelectStock(stock.ticker)}
                                                     className="text-blue-400 hover:text-blue-300 text-sm"
                                                 >
-                                                    Voir détail
+                                                    Voir detail
                                                 </button>
                                             </div>
                                         </div>
                                         
-                                        {/* Métriques principales */}
+                                        {/* Metriques principales */}
                                         <div className="space-y-3 mb-4">
                                             {claudeData?.metrics?.marketCap && (
                                                 <div className="flex justify-between">
@@ -443,7 +443,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                     rel="noopener noreferrer"
                                                     className="text-blue-300 hover:text-blue-200 text-sm"
                                                 >
-                                                    Lire l'analyse complète →
+                                                    Lire l'analyse complete →
                                                 </a>
                                             </div>
                                         )}
@@ -453,16 +453,16 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                         </div>
                     )}
 
-                    {/* Liste des tickers disponibles si aucune donnée Seeking Alpha */}
+                    {/* Liste des tickers disponibles si aucune donnee Seeking Alpha */}
                     {!selectedStock && (!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length > 0 && (
                         <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                📊 Tickers disponibles ({tickers.length})
+                                 Tickers disponibles ({tickers.length})
                             </h3>
                             <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                Cliquez sur un ticker pour voir ses détails ou lancez le scraper pour collecter les données Seeking Alpha.
+                                Cliquez sur un ticker pour voir ses details ou lancez le scraper pour collecter les donnees Seeking Alpha.
                             </p>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                                 {tickers.map((ticker) => (
@@ -494,7 +494,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                     {!selectedStock && (!seekingAlphaData.stocks || seekingAlphaData.stocks.length === 0) && tickers.length === 0 && (
                         <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                             <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <Icon emoji="📋" size={24} />
+                                <Icon emoji="" size={24} />
                                 Analyses Seeking Alpha
                             </h3>
                             <div className="text-center py-8">
@@ -503,17 +503,17 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                     onClick={() => setActiveTab('stocks-news')}
                                     className="px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                 >
-                                    Aller à Titres & Nouvelles →
+                                    Aller a Titres & Nouvelles →
                                 </button>
                             </div>
                         </div>
                     )}
 
-                    {/* Affichage en liste avec données */}
+                    {/* Affichage en liste avec donnees */}
                     {!selectedStock && seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
                         <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                             <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                                <Icon emoji="📋" size={24} />
+                                <Icon emoji="" size={24} />
                                 Analyses Seeking Alpha
                             </h3>
                             <div className="space-y-4">
@@ -535,18 +535,18 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                         className="px-3 py-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white text-xs rounded-lg transition-all duration-300 shadow-lg"
                                                         title="Comparaison avec les peers"
                                                     >
-                                                        🔍 Peers
+                                                         Peers
                                                     </button>
                                                     <button
                                                         onClick={() => handleSelectStock(ticker)}
                                                         className="text-blue-600 hover:text-blue-700 text-sm"
                                                     >
-                                                        Voir détail
+                                                        Voir detail
                                                     </button>
                                                 </div>
                                             </div>
                                             
-                                            {/* Métriques principales */}
+                                            {/* Metriques principales */}
                                             <div className="grid grid-cols-2 gap-4 mb-3">
                                                 {claudeData?.metrics?.marketCap && (
                                                     <div>
@@ -592,7 +592,7 @@ export const SeekingAlphaTab: React.FC<TabProps> = (props) => {
                                                         rel="noopener noreferrer"
                                                         className="text-blue-600 hover:text-blue-700 text-sm"
                                                     >
-                                                        Lire l'analyse complète sur Seeking Alpha →
+                                                        Lire l'analyse complete sur Seeking Alpha →
                                                     </a>
                                                 </div>
                                             )}

@@ -62,7 +62,7 @@ export const logger = {
     success: (...args) => {
         if (isDevelopment()) {
             console.log(
-                '%c✅ SUCCESS',
+                '%c SUCCESS',
                 'color: #10b981; font-weight: bold',
                 ...args
             );
@@ -78,7 +78,7 @@ export const logger = {
             const result = fn();
             const end = performance.now();
             console.log(
-                `%c⚡ PERF: ${label}`,
+                `%c PERF: ${label}`,
                 'color: #f59e0b; font-weight: bold',
                 `${(end - start).toFixed(2)}ms`
             );

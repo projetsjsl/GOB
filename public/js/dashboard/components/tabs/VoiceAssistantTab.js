@@ -135,7 +135,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
 
         } catch (error) {
             console.error('Error calling Gemini:', error);
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Désolé, une erreur est survenue lors de la communication avec Gemini.' }]);
+            setMessages(prev => [...prev, { role: 'assistant', content: 'Desole, une erreur est survenue lors de la communication avec Gemini.' }]);
         } finally {
             setIsLoading(false);
         }
@@ -147,7 +147,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
         if (!apiKey || apiKey === 'YOUR_GEMINI_API_KEY') {
             // Mock response if no key
             await new Promise(resolve => setTimeout(resolve, 1000));
-            return `Je suis en mode démo car la clé API Gemini n'est pas configurée. Vous avez dit : "${prompt}"`;
+            return `Je suis en mode demo car la cle API Gemini n'est pas configuree. Vous avez dit : "${prompt}"`;
         }
 
         try {
@@ -205,7 +205,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
         const apiKey = tavusConfig.apiKey || (window.ENV_CONFIG?.TAVUS_API_KEY);
 
         if (!apiKey || apiKey === 'YOUR_TAVUS_API_KEY') {
-            console.log('Alert suppressed:', 'Veuillez configurer votre clé API Tavus dans emma-config.js');
+            console.log('Alert suppressed:', 'Veuillez configurer votre cle API Tavus dans emma-config.js');
             return;
         }
 
@@ -255,7 +255,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
         } catch (error) {
             console.error('Error connecting to Tavus:', error);
             setTavusStatus('disconnected');
-            console.log('Alert suppressed:', 'Erreur lors de la connexion à Tavus. Vérifiez votre configuration.');
+            console.log('Alert suppressed:', 'Erreur lors de la connexion a Tavus. Verifiez votre configuration.');
         }
     };
 
@@ -305,7 +305,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                             
                             <h3 className="text-3xl font-bold text-white mb-2 tracking-tight">Emma Live</h3>
                             <p className="text-gray-400 mb-8 max-w-md mx-auto text-lg font-light">
-                                <span className="text-emerald-400 font-medium">IA Conversationnelle</span> synchronisée en temps réel.
+                                <span className="text-emerald-400 font-medium">IA Conversationnelle</span> synchronisee en temps reel.
                             </p>
                             
                             <button 
@@ -322,7 +322,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                                     ) : (
                                         <>
                                             <i className="iconoir-play-circle text-xl text-blue-600 group-hover:scale-110 transition-transform"></i>
-                                            <span>Démarrer la Session</span>
+                                            <span>Demarrer la Session</span>
                                         </>
                                     )}
                                 </span>
@@ -330,7 +330,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                             </button>
                             
                             <div className="mt-8 flex justify-center gap-4 text-xs text-gray-500 font-mono">
-                                <span className="flex items-center gap-1"><i className="iconoir-check-circle text-green-500"></i> Vidéo HD</span>
+                                <span className="flex items-center gap-1"><i className="iconoir-check-circle text-green-500"></i> Video HD</span>
                                 <span className="flex items-center gap-1"><i className="iconoir-check-circle text-green-500"></i> Audio Spatial</span>
                                 <span className="flex items-center gap-1"><i className="iconoir-check-circle text-green-500"></i> Latence Faible</span>
                             </div>
@@ -360,13 +360,13 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                         <div className="relative">
                             <div className="absolute -inset-1 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full blur opacity-40"></div>
                             <div className={`relative w-10 h-10 rounded-full flex items-center justify-center text-white shadow-inner ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                                <span className="text-xl">🎙️</span>
+                                <span className="text-xl"></span>
                             </div>
                         </div>
                         <div>
                             <h3 className={`font-bold text-sm leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Transcript Live</h3>
                             <p className={`text-[10px] font-medium tracking-wide uppercase ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
-                                {isRecording ? '• Écoute en cours' : '• En attente'}
+                                {isRecording ? '- Ecoute en cours' : '- En attente'}
                             </p>
                         </div>
                     </div>
@@ -375,7 +375,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                         className={`p-2.5 rounded-xl transition-all duration-200 group ${
                             darkMode ? 'hover:bg-gray-800 text-gray-400 hover:text-white' : 'hover:bg-gray-100 text-gray-500 hover:text-gray-900'
                         }`}
-                        title="Paramètres Audio"
+                        title="Parametres Audio"
                     >
                         <i className="iconoir-settings text-xl group-hover:rotate-90 transition-transform duration-500"></i>
                     </button>
@@ -407,7 +407,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                         
                         {language === 'fr-CA' && (
                             <div className="flex items-center justify-between">
-                                <span className={`text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Accent Québécois</span>
+                                <span className={`text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Accent Quebecois</span>
                                 <button
                                     onClick={() => setUseAccent(!useAccent)}
                                     className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${useAccent ? 'bg-emerald-500' : 'bg-gray-600'}`}
@@ -418,7 +418,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                         )}
 
                         <div className="flex items-center justify-between">
-                            <span className={`text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Réponses Vocales</span>
+                            <span className={`text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Reponses Vocales</span>
                             <button
                                 onClick={() => setIsTtsEnabled(!isTtsEnabled)}
                                 className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${isTtsEnabled ? 'bg-blue-500' : 'bg-gray-600'}`}
@@ -496,7 +496,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                                 ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/40 scale-110'
                                 : (darkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')
                                 }`}
-                                title={isRecording ? "Arrêter l'enregistrement" : "Démarrer l'enregistrement"}
+                                title={isRecording ? "Arreter l'enregistrement" : "Demarrer l'enregistrement"}
                         >
                             <i className={isRecording ? "iconoir-mic-speaking" : "iconoir-microphone"}></i>
                         </button>
@@ -506,7 +506,7 @@ const VoiceAssistantTab = ({ isDarkMode, activeTab, setActiveTab }) => {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                            placeholder={isRecording ? "Je vous écoute..." : "Écrivez votre message..."}
+                            placeholder={isRecording ? "Je vous ecoute..." : "Ecrivez votre message..."}
                             disabled={isRecording}
                             className={`flex-1 bg-transparent px-2 py-2 focus:outline-none text-sm ${darkMode
                                 ? 'text-white placeholder-gray-500'

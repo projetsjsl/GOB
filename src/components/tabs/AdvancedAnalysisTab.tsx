@@ -29,11 +29,11 @@ const loadAdvancedAnalysisTab = async (): Promise<void> => {
     script.src = scriptUrl;
     script.async = false; // Ensure proper loading order
     script.onload = () => {
-      console.log("✅ AdvancedAnalysisTab loaded");
+      console.log(" AdvancedAnalysisTab loaded");
       resolve();
     };
     script.onerror = (error) => {
-      console.error("❌ Failed to load AdvancedAnalysisTab:", error);
+      console.error(" Failed to load AdvancedAnalysisTab:", error);
       reject(error);
     };
     document.head.appendChild(script);

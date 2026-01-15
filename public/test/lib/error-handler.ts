@@ -1,5 +1,5 @@
 /**
- * Gestionnaire d'erreurs centralisé pour CurveWatch
+ * Gestionnaire d'erreurs centralise pour CurveWatch
  */
 
 import { logger } from "./logger"
@@ -17,7 +17,7 @@ export class CurveWatchError extends Error {
 }
 
 /**
- * Gère les erreurs de manière centralisée
+ * Gere les erreurs de maniere centralisee
  */
 export function handleError(error: unknown, context?: string): CurveWatchError {
   let curveError: CurveWatchError

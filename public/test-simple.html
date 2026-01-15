@@ -20,7 +20,7 @@
                 window.module = { exports: window.exports };
             }
 
-            // 🔥 FIX: Add require() polyfill for react-grid-layout
+            //  FIX: Add require() polyfill for react-grid-layout
             if (typeof window.require === 'undefined') {
                 window.require = function(moduleName) {
                     // Return window globals for known modules

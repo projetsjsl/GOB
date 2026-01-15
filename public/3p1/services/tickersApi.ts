@@ -7,19 +7,19 @@ export interface SupabaseTicker {
   ticker: string;
   company_name?: string;
   sector?: string;
-  // Nouveaux champs possibles côté DB/API (migration source -> category)
+  // Nouveaux champs possibles cote DB/API (migration source -> category)
   category?: 'team' | 'watchlist' | 'both' | 'manual';
   categories?: string[];
   source: 'team' | 'watchlist' | 'both' | 'manual';
   is_active: boolean;
   priority?: number;
-  // Métriques ValueLine (Source: ValueLine au 3 décembre 2025)
-  security_rank?: string; // Financial Strength (Cote de sécurité)
+  // Metriques ValueLine (Source: ValueLine au 3 decembre 2025)
+  security_rank?: string; // Financial Strength (Cote de securite)
   earnings_predictability?: string;
-  price_growth_persistence?: string; // Price Growth Persistence (note numérique 5-100)
+  price_growth_persistence?: string; // Price Growth Persistence (note numerique 5-100)
   price_stability?: string;
-  beta?: number; // Beta (volatilité relative au marché) - Source: API FMP
-  valueline_updated_at?: string; // Date de mise à jour ValueLine
+  beta?: number; // Beta (volatilite relative au marche) - Source: API FMP
+  valueline_updated_at?: string; // Date de mise a jour ValueLine
   // Corridor ValueLine (pour Phase 3 - Validation)
   valueline_proj_low_return?: number; // Proj Low TTL Return
   valueline_proj_high_return?: number; // Proj High TTL Return
@@ -37,21 +37,21 @@ export interface LoadTickersResult {
 /**
  * Charge tous les tickers actifs depuis Supabase
  * Utilise l'API admin qui retourne tous les champs incluant 'source'
- * ✅ FIX: Fallback sur API publique si admin échoue
+ *  FIX: Fallback sur API publique si admin echoue
  * 
  * @returns Promise avec la liste des tickers et leur source
  */
 export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> => {
   try {
-    // ✅ DÉTECTION LOCALHOST: Si on est en localhost et que les APIs échouent, utiliser Supabase directement
+    //  DETECTION LOCALHOST: Si on est en localhost et que les APIs echouent, utiliser Supabase directement
     const isLocalhost = typeof window !== 'undefined' && (
       window.location.hostname === 'localhost' || 
       window.location.hostname === '127.0.0.1' ||
       window.location.hostname === '0.0.0.0'
     );
 
-    // ✅ ESSAI 1: Charger TOUS les team tickers explicitement (sans limite de priority)
-    // Cela garantit que les 25 team tickers sont toujours chargés, même avec priority basse
+    //  ESSAI 1: Charger TOUS les team tickers explicitement (sans limite de priority)
+    // Cela garantit que les 25 team tickers sont toujours charges, meme avec priority basse
     let teamTickersResponse = await fetch('/api/admin/tickers?is_active=true&source=team&limit=1000&order_by=ticker&order_direction=asc');
     let bothTickersResponse = await fetch('/api/admin/tickers?is_active=true&source=both&limit=1000&order_by=ticker&order_direction=asc');
     
@@ -71,14 +71,14 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
       }
     }
     
-    // ✅ ESSAI 2: Charger tous les autres tickers (limit 1000 pour éviter surcharge)
+    //  ESSAI 2: Charger tous les autres tickers (limit 1000 pour eviter surcharge)
     let response = await fetch('/api/admin/tickers?is_active=true&limit=1000');
     let result: any = null;
 
     if (response.ok) {
       result = await response.json();
       if (result.success && result.tickers && result.tickers.length > 0) {
-        // Normaliser `source` (compatibilité source vs category/categories)
+        // Normaliser `source` (compatibilite source vs category/categories)
         const tickers = (result.tickers || []).map((ticker: any) => {
           if (ticker.source) return ticker;
 
@@ -103,7 +103,7 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
           return { ...ticker, source: 'manual' as const };
         });
 
-        // ✅ FUSIONNER: Ajouter les team tickers (éviter doublons)
+        //  FUSIONNER: Ajouter les team tickers (eviter doublons)
         const tickerSymbols = new Set(tickers.map((t: any) => t.ticker.toUpperCase()));
         const normalizedTeamTickers = allTeamTickers.map((ticker: any) => {
           if (ticker.source) return ticker;
@@ -117,7 +117,7 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
           return { ...ticker, source: 'manual' };
         });
         
-        // Ajouter les team tickers qui ne sont pas déjà dans la liste
+        // Ajouter les team tickers qui ne sont pas deja dans la liste
         normalizedTeamTickers.forEach((teamTicker: any) => {
           const symbol = teamTicker.ticker.toUpperCase();
           if (!tickerSymbols.has(symbol)) {
@@ -132,7 +132,7 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
           }
         });
 
-        // ✅ Compter uniquement les team tickers uniques (source='team' ou 'both')
+        //  Compter uniquement les team tickers uniques (source='team' ou 'both')
         const uniqueTeamTickers = new Set<string>();
         tickers.forEach((t: any) => {
           if (t.source === 'team' || t.source === 'both') {
@@ -140,7 +140,7 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
           }
         });
         
-        console.log(`✅ ${tickers.length} tickers chargés depuis /api/admin/tickers (dont ${uniqueTeamTickers.size} team tickers uniques)`);
+        console.log(` ${tickers.length} tickers charges depuis /api/admin/tickers (dont ${uniqueTeamTickers.size} team tickers uniques)`);
         return {
           success: true,
           tickers
@@ -148,8 +148,8 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
       }
     }
 
-    // ✅ ESSAI 2: Fallback sur API publique team-tickers
-    console.warn('⚠️ API admin/tickers échouée, tentative avec /api/team-tickers');
+    //  ESSAI 2: Fallback sur API publique team-tickers
+    console.warn(' API admin/tickers echouee, tentative avec /api/team-tickers');
     response = await fetch('/api/team-tickers?limit=1000');
     
     if (response.ok) {
@@ -162,7 +162,7 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
           return { ...ticker, source };
         });
         
-        console.log(`✅ ${tickers.length} tickers chargés depuis /api/team-tickers (fallback)`);
+        console.log(` ${tickers.length} tickers charges depuis /api/team-tickers (fallback)`);
         return {
           success: true,
           tickers
@@ -170,8 +170,8 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
       }
     }
 
-    // ✅ ESSAI 3: Fallback sur tickers-config
-    console.warn('⚠️ API team-tickers échouée, tentative avec /api/tickers-config');
+    //  ESSAI 3: Fallback sur tickers-config
+    console.warn(' API team-tickers echouee, tentative avec /api/tickers-config');
     response = await fetch('/api/tickers-config');
     
     if (response.ok) {
@@ -192,7 +192,7 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
         
         if (result.watchlist_tickers && Array.isArray(result.watchlist_tickers)) {
           result.watchlist_tickers.forEach((ticker: string) => {
-            // Éviter les doublons
+            // Eviter les doublons
             if (!allTickers.find(t => t.ticker === ticker.toUpperCase())) {
               allTickers.push({
                 ticker: ticker.toUpperCase(),
@@ -204,7 +204,7 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
         }
         
         if (allTickers.length > 0) {
-          console.log(`✅ ${allTickers.length} tickers chargés depuis /api/tickers-config (fallback)`);
+          console.log(` ${allTickers.length} tickers charges depuis /api/tickers-config (fallback)`);
           return {
             success: true,
             tickers: allTickers
@@ -213,9 +213,9 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
       }
     }
 
-    // ✅ ESSAI 4: Si on est en localhost et que toutes les APIs ont échoué, essayer Supabase directement
+    //  ESSAI 4: Si on est en localhost et que toutes les APIs ont echoue, essayer Supabase directement
     if (isLocalhost) {
-      console.log('🔄 Localhost détecté - Tentative chargement direct depuis Supabase...');
+      console.log(' Localhost detecte - Tentative chargement direct depuis Supabase...');
       try {
         const { getSupabaseClient } = await import('./supabase');
         const supabase = getSupabaseClient();
@@ -241,7 +241,7 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
               beta: t.beta
             }));
             
-            console.log(`✅ ${normalizedTickers.length} tickers chargés directement depuis Supabase (localhost)`);
+            console.log(` ${normalizedTickers.length} tickers charges directement depuis Supabase (localhost)`);
             return {
               success: true,
               tickers: normalizedTickers
@@ -249,15 +249,15 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
           }
         }
       } catch (supabaseDirectError) {
-        console.warn('⚠️ Erreur chargement direct Supabase:', supabaseDirectError);
+        console.warn(' Erreur chargement direct Supabase:', supabaseDirectError);
       }
     }
 
-    // ❌ TOUS LES ESSAIS ONT ÉCHOUÉ
+    //  TOUS LES ESSAIS ONT ECHOUE
     throw new Error('Aucune API disponible pour charger les tickers');
 
   } catch (error: any) {
-    console.error('❌ Erreur chargement tickers Supabase:', error);
+    console.error(' Erreur chargement tickers Supabase:', error);
     return {
       success: false,
       tickers: [],
@@ -270,18 +270,18 @@ export const loadAllTickersFromSupabase = async (): Promise<LoadTickersResult> =
  * Mappe le champ source de Supabase vers isWatchlist pour Finance Pro
  * 
  * @param source - Le champ source depuis Supabase ('team', 'watchlist', 'both', 'manual')
- * @returns true si watchlist (icône œil), false si portefeuille (icône étoile), null si normal (pas d'icône)
+ * @returns true si watchlist (icone il), false si portefeuille (icone etoile), null si normal (pas d'icone)
  * 
- * ⚠️ IMPORTANT: 
- * - source='team' → false (⭐ Portefeuille)
- * - source='both' → false (⭐ Portefeuille) - car "both" = portefeuille ET watchlist, donc priorité portefeuille
- * - source='watchlist' → true (👁️ Watchlist)
- * - source='manual' ou null/undefined → null (tickers normaux, pas d'icône)
+ *  IMPORTANT: 
+ * - source='team' -> false ( Portefeuille)
+ * - source='both' -> false ( Portefeuille) - car "both" = portefeuille ET watchlist, donc priorite portefeuille
+ * - source='watchlist' -> true ( Watchlist)
+ * - source='manual' ou null/undefined -> null (tickers normaux, pas d'icone)
  */
 export const mapSourceToIsWatchlist = (source: string | null | undefined): boolean | null => {
-  if (!source || source === 'manual') return null; // Tickers normaux, pas d'icône
-  if (source === 'team' || source === 'both') return false; // ⭐ Portefeuille (both = portefeuille + watchlist, priorité portefeuille)
-  if (source === 'watchlist') return true; // 👁️ Watchlist
-  return null; // Par défaut, tickers normaux
+  if (!source || source === 'manual') return null; // Tickers normaux, pas d'icone
+  if (source === 'team' || source === 'both') return false; //  Portefeuille (both = portefeuille + watchlist, priorite portefeuille)
+  if (source === 'watchlist') return true; //  Watchlist
+  return null; // Par defaut, tickers normaux
 };
 

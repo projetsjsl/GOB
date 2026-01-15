@@ -27,8 +27,8 @@ export function MaturitySelector({ selectedMaturities, onMaturitiesChange }: Mat
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-foreground">Maturités</CardTitle>
-            <CardDescription className="text-muted-foreground">Sélectionnez les maturités à afficher</CardDescription>
+            <CardTitle className="text-foreground">Maturites</CardTitle>
+            <CardDescription className="text-muted-foreground">Selectionnez les maturites a afficher</CardDescription>
           </div>
           <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
             {selectedMaturities.length}/{MATURITIES.length}
@@ -52,7 +52,7 @@ export function MaturitySelector({ selectedMaturities, onMaturitiesChange }: Mat
 
         <div className="flex gap-2 pt-2 border-t border-border">
           <Button variant="ghost" size="sm" onClick={selectAll} className="text-xs flex-1">
-            Tout Sélectionner
+            Tout Selectionner
           </Button>
           <Button variant="ghost" size="sm" onClick={clearAll} className="text-xs flex-1">
             Effacer

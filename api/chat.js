@@ -1,11 +1,11 @@
 /**
- * API Chat Centralisée - Point d'entrée unifié multi-canal
+ * API Chat Centralisee - Point d'entree unifie multi-canal
  *
- * Route toutes les requêtes des différents canaux (web, email, SMS, messenger)
+ * Route toutes les requetes des differents canaux (web, email, SMS, messenger)
  * vers le function calling router Emma existant (emma-agent.js)
  *
  * Architecture:
- * Canal → /api/chat → User Manager → Conversation Manager → emma-agent → Response → Channel Adapter
+ * Canal -> /api/chat -> User Manager -> Conversation Manager -> emma-agent -> Response -> Channel Adapter
  */
 
 import { applyCors } from './_middleware/emma-cors.js';
@@ -28,31 +28,31 @@ async function fetchPerplexityMarketNews() {
     return null;
   }
 
-  const prompt = `Agis comme un GESTIONNAIRE DE PORTEFEUILLE SENIOR à Wall Street.
-Rédige un briefing "REVUE DE MARCHÉ" concis et professionnel pour tes clients VIP.
+  const prompt = `Agis comme un GESTIONNAIRE DE PORTEFEUILLE SENIOR a Wall Street.
+Redige un briefing "REVUE DE MARCHE" concis et professionnel pour tes clients VIP.
 
 STRUCTURE OBLIGATOIRE DU BRIEFING:
 
-1. 🇺🇸 ÉTATS-UNIS (S&P 500, NASDAQ, DOW)
-• [Mouvement majeur des indices en % si dispo]
-• [Actualité #1 la plus critique qui bouge le marché] (Source: [Nom], [URL])
-• [Actualité #2 secteur Tech/Finance] (Source: [Nom], [URL])
-• [Actualité #3 autre secteur clé] (Source: [Nom], [URL])
+1.  ETATS-UNIS (S&P 500, NASDAQ, DOW)
+- [Mouvement majeur des indices en % si dispo]
+- [Actualite #1 la plus critique qui bouge le marche] (Source: [Nom], [URL])
+- [Actualite #2 secteur Tech/Finance] (Source: [Nom], [URL])
+- [Actualite #3 autre secteur cle] (Source: [Nom], [URL])
 
-2. 🇨🇦 CANADA (TSX, CAD/USD)
-• [Actualité #1 Énergie/Banques/Mines] (Source: [Nom], [URL])
-• [Actualité #2 Économie] (Source: [Nom], [URL])
+2.  CANADA (TSX, CAD/USD)
+- [Actualite #1 Energie/Banques/Mines] (Source: [Nom], [URL])
+- [Actualite #2 Economie] (Source: [Nom], [URL])
 
-3. 🇪🇺 EUROPE & MONDE
-• [Actualité #1 majeure] (Source: [Nom], [URL])
-• [Actualité #2 majeure] (Source: [Nom], [URL])
+3.  EUROPE & MONDE
+- [Actualite #1 majeure] (Source: [Nom], [URL])
+- [Actualite #2 majeure] (Source: [Nom], [URL])
 
-RÈGLES STRICTES:
+REGLES STRICTES:
 - INCLURE LES URLS pour chaque point (c'est CRITIQUE).
 - Ton professionnel, direct, pas de blabla.
 - Focus sur ce qui fait bouger les prix MAINTENANT.
-- Pas d'introduction "Voici le résumé...". Commence direct par la section 1.
-- SI AUCUNE NEWS MAJEURE: Dis "Marchés calmes" pour la section.`;
+- Pas d'introduction "Voici le resume...". Commence direct par la section 1.
+- SI AUCUNE NEWS MAJEURE: Dis "Marches calmes" pour la section.`;
 
   try {
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -80,7 +80,7 @@ RÈGLES STRICTES:
     
     if (content) {
       console.log('[Chat API] Perplexity returned market news successfully');
-      return `📰 ACTUALITÉS DU JOUR\n${content}\n`;
+      return ` ACTUALITES DU JOUR\n${content}\n`;
     }
     return null;
   } catch (error) {
@@ -90,44 +90,44 @@ RÈGLES STRICTES:
 }
 
 /**
- * Valide qu'une réponse est complète selon le type d'analyse
+ * Valide qu'une reponse est complete selon le type d'analyse
  * 
- * @param {string} response - La réponse à valider
+ * @param {string} response - La reponse a valider
  * @param {string} analysisType - Type d'analyse (comprehensive_analysis, fundamentals, etc.)
- * @param {object} intentData - Données d'intention (forcedIntent)
- * @returns {boolean} true si la réponse est complète, false sinon
+ * @param {object} intentData - Donnees d'intention (forcedIntent)
+ * @returns {boolean} true si la reponse est complete, false sinon
  */
 function validateResponseCompleteness(response, analysisType, intentData) {
   const intent = intentData?.intent || analysisType;
   
-  // Pour comprehensive_analysis, vérifier présence des sections obligatoires
+  // Pour comprehensive_analysis, verifier presence des sections obligatoires
   if (intent === 'comprehensive_analysis') {
-    // 🚨 12 sections UNIFIÉES (tolérance: max 2 sections manquantes)
+    //  12 sections UNIFIEES (tolerance: max 2 sections manquantes)
     const requiredSections = [
       'VUE D\'ENSEMBLE',   // Section 1 (ou "OVERVIEW")
       'VALORISATION',      // Section 2
       'FONDAMENTAUX',      // Section 3
       'CROISSANCE',        // Section 4
       'MOAT',              // Section 5
-      'VALEUR INTRINSÈQUE',// Section 6 (ou "DCF", "FAIR VALUE")
-      'RÉSULTATS',         // Section 7 (ou "EARNINGS", "Q1/Q2/Q3/Q4")
+      'VALEUR INTRINSEQUE',// Section 6 (ou "DCF", "FAIR VALUE")
+      'RESULTATS',         // Section 7 (ou "EARNINGS", "Q1/Q2/Q3/Q4")
       'MACRO',             // Section 8 (ou "FED", "INFLATION")
       'DIVIDENDE',         // Section 9 (ou "N/A")
       'RISQUES',           // Section 10
-      'NEWS',              // Section 11 (ou "CATALYSTS", "ACTUALITÉS")
+      'NEWS',              // Section 11 (ou "CATALYSTS", "ACTUALITES")
       'RECOMMANDATION'     // Section 12 (ou "RECO", "AVIS")
     ];
 
     const responseUpper = response.toUpperCase();
 
-    // Vérification flexible avec alternatives
+    // Verification flexible avec alternatives
     const checkSection = (section) => {
       const alternatives = {
-        'VUE D\'ENSEMBLE': ['VUE D\'ENSEMBLE', 'OVERVIEW', 'APERÇU'],
-        'VALEUR INTRINSÈQUE': ['VALEUR INTRINSÈQUE', 'DCF', 'FAIR VALUE', 'VALEUR'],
-        'RÉSULTATS': ['RÉSULTATS', 'EARNINGS', 'Q1', 'Q2', 'Q3', 'Q4', 'TRIMESTRE'],
-        'MACRO': ['MACRO', 'FED', 'INFLATION', 'TAUX', 'ÉCONOMIQUE'],
-        'NEWS': ['NEWS', 'CATALYSTS', 'ACTUALITÉS', 'CATALYST'],
+        'VUE D\'ENSEMBLE': ['VUE D\'ENSEMBLE', 'OVERVIEW', 'APERCU'],
+        'VALEUR INTRINSEQUE': ['VALEUR INTRINSEQUE', 'DCF', 'FAIR VALUE', 'VALEUR'],
+        'RESULTATS': ['RESULTATS', 'EARNINGS', 'Q1', 'Q2', 'Q3', 'Q4', 'TRIMESTRE'],
+        'MACRO': ['MACRO', 'FED', 'INFLATION', 'TAUX', 'ECONOMIQUE'],
+        'NEWS': ['NEWS', 'CATALYSTS', 'ACTUALITES', 'CATALYST'],
         'RECOMMANDATION': ['RECOMMANDATION', 'RECO', 'AVIS', 'BUY', 'SELL', 'HOLD', 'ACHAT', 'VENDRE', 'CONSERVER']
       };
 
@@ -137,7 +137,7 @@ function validateResponseCompleteness(response, analysisType, intentData) {
 
     const missingSections = requiredSections.filter(section => !checkSection(section));
 
-    // Tolérance: Max 2 sections manquantes, min 800 mots (SMS) ou 1200 mots (Web)
+    // Tolerance: Max 2 sections manquantes, min 800 mots (SMS) ou 1200 mots (Web)
     const wordCount = response.split(/\s+/).length;
     const charCount = response.length;
     const isSMS = charCount < 4000;
@@ -145,11 +145,11 @@ function validateResponseCompleteness(response, analysisType, intentData) {
     const isComplete = missingSections.length <= 2 && wordCount >= minWords;
 
     if (!isComplete) {
-      console.warn(`⚠️ [Validation] Analyse INCOMPLÈTE - Sections manquantes (${missingSections.length}/12): ${missingSections.join(', ')}, Mots: ${wordCount}/${minWords}, Mode: ${isSMS ? 'SMS' : 'Web'}`);
+      console.warn(` [Validation] Analyse INCOMPLETE - Sections manquantes (${missingSections.length}/12): ${missingSections.join(', ')}, Mots: ${wordCount}/${minWords}, Mode: ${isSMS ? 'SMS' : 'Web'}`);
     } else if (missingSections.length > 0) {
-      console.log(`✓ [Validation] Analyse acceptée avec ${missingSections.length} sections manquantes: ${missingSections.join(', ')}, Mots: ${wordCount}`);
+      console.log(` [Validation] Analyse acceptee avec ${missingSections.length} sections manquantes: ${missingSections.join(', ')}, Mots: ${wordCount}`);
     } else {
-      console.log(`✅ [Validation] Analyse COMPLÈTE - 12 sections présentes, Mots: ${wordCount}, Mode: ${isSMS ? 'SMS' : 'Web'}`);
+      console.log(` [Validation] Analyse COMPLETE - 12 sections presentes, Mots: ${wordCount}, Mode: ${isSMS ? 'SMS' : 'Web'}`);
     }
 
     return isComplete;
@@ -193,7 +193,7 @@ export default async function handler(req, res) {
   const startTime = Date.now();
 
   try {
-    // 1. VALIDATION DES PARAMÈTRES
+    // 1. VALIDATION DES PARAMETRES
     const { message, userId, channel, conversationId, metadata } = req.body;
 
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -218,15 +218,15 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`[Chat API] Requête reçue - Canal: ${channel}, User: ${userId}, Message: "${message.substring(0, 50)}..."`);
+    console.log(`[Chat API] Requete recue - Canal: ${channel}, User: ${userId}, Message: "${message.substring(0, 50)}..."`);
 
     // 2. GESTION UTILISATEUR
     let userProfile;
     try {
-      // Enrichir les métadonnées avec le nom si c'est un contact connu (SMS)
+      // Enrichir les metadonnees avec le nom si c'est un contact connu (SMS)
       if (channel === 'sms') {
         const userName = getNameFromPhone(userId);
-        if (userName !== userId) { // Si un nom a été trouvé
+        if (userName !== userId) { // Si un nom a ete trouve
           metadata.name = userName;
           console.log(`[Chat API] Contact connu: ${userName}`);
         }
@@ -261,7 +261,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3.5 DEMANDER LE NOM SI NUMÉRO INCONNU (SMS uniquement)
+    // 3.5 DEMANDER LE NOM SI NUMERO INCONNU (SMS uniquement)
     if (channel === 'sms') {
       const isKnownInContacts = isKnownContact(userId);
       const hasName = userProfile.name && userProfile.name !== userId;
@@ -269,7 +269,7 @@ export default async function handler(req, res) {
 
       // CAS 1: Utilisateur en train de donner son nom
       if (awaitingName) {
-        console.log(`[Chat API] Réception du nom de l'utilisateur`);
+        console.log(`[Chat API] Reception du nom de l'utilisateur`);
 
         // Extraire le nom (prendre le message comme nom, nettoyer)
         const userName = message.trim().split(/\s+/)[0]; // Premier mot
@@ -279,21 +279,21 @@ export default async function handler(req, res) {
             name: userName,
             metadata: { ...userProfile.metadata, awaiting_name: false, has_been_introduced: true }
           });
-          console.log(`[Chat API] Nom enregistré: ${userName}`);
+          console.log(`[Chat API] Nom enregistre: ${userName}`);
 
-          // Réponse de bienvenue (Avec commandes explicites)
-          const welcomeResponse = `👩🏻 Enchanté ${userName} ! 👋
+          // Reponse de bienvenue (Avec commandes explicites)
+          const welcomeResponse = ` Enchante ${userName} ! 
 
-Je suis Emma, ton assistante IA financière propulsée par JSLAI 🚀
+Je suis Emma, ton assistante IA financiere propulsee par JSLAI 
 
-Je peux t'aider sur 3 commandes spécifiques:
+Je peux t'aider sur 3 commandes specifiques:
 
-📊 Analyses → ANALYSE [TICKER]
-💰 Prix → PRIX [TICKER]
-📰 News → NEWS [TICKER]
+ Analyses -> ANALYSE [TICKER]
+ Prix -> PRIX [TICKER]
+ News -> NEWS [TICKER]
 Ex: "ANALYSE AAPL" ou "PRIX TSLA"
 
-Pour arrêter: réponds STOP`;
+Pour arreter: reponds STOP`;
 
           // Sauvegarder dans la conversation
           await saveConversationTurn(conversation.id, message, welcomeResponse, {
@@ -312,13 +312,13 @@ Pour arrêter: réponds STOP`;
         }
       }
 
-      // CAS 2: Numéro inconnu sans nom - demander le nom SAUF si requête financière
+      // CAS 2: Numero inconnu sans nom - demander le nom SAUF si requete financiere
       if (!isKnownInContacts && !hasName && !awaitingName) {
-        // ✅ FIX: Détecter si c'est une requête financière (ANALYSE, PRIX, NEWS, etc.)
-        // Si oui, traiter la requête d'abord, demander le nom après
+        //  FIX: Detecter si c'est une requete financiere (ANALYSE, PRIX, NEWS, etc.)
+        // Si oui, traiter la requete d'abord, demander le nom apres
         const messageUpper = message.trim().toUpperCase();
         const financialKeywords = [
-          'ANALYSE', 'ANALYZE', 'PRIX', 'PRICE', 'NEWS', 'ACTUALITES', 'ACTUALITÉS',
+          'ANALYSE', 'ANALYZE', 'PRIX', 'PRICE', 'NEWS', 'ACTUALITES', 'ACTUALITES',
           'ACHETER', 'BUY', 'VENDRE', 'SELL', 'SKILLS', 'AIDE', 'HELP'
         ];
         
@@ -326,25 +326,25 @@ Pour arrêter: réponds STOP`;
           messageUpper.includes(keyword) || messageUpper.startsWith(keyword + ' ')
         );
         
-        // Détecter aussi les tickers (mots en majuscules de 1-5 lettres)
+        // Detecter aussi les tickers (mots en majuscules de 1-5 lettres)
         const tickerPattern = /^[A-Z]{1,5}(\s|$)/;
         const hasTicker = tickerPattern.test(messageUpper) || messageUpper.match(/[A-Z]{2,5}/);
         
-        // ✨ NOUVEAU: TOP NEWS (Market Overview)
+        //  NOUVEAU: TOP NEWS (Market Overview)
         if (messageUpper.startsWith('TOP') && (messageUpper.includes('NEWS') || messageUpper.includes('TITRES'))) {
            isFinancialRequest = true;
         }
 
         if (!isFinancialRequest && !hasTicker) {
-          // Ce n'est pas une requête financière → demander le nom
-          console.log(`[Chat API] Numéro inconnu détecté, demande du nom (message non-financier)`);
+          // Ce n'est pas une requete financiere -> demander le nom
+          console.log(`[Chat API] Numero inconnu detecte, demande du nom (message non-financier)`);
 
           try {
             await updateUserProfile(userProfile.id, {
               metadata: { ...userProfile.metadata, awaiting_name: true }
             });
 
-            const askNameResponse = "Bonjour ! 👋\n\nAvant de commencer, pourrais-tu me dire ton prénom ? Ça me permettra de personnaliser nos échanges.";
+            const askNameResponse = "Bonjour ! \n\nAvant de commencer, pourrais-tu me dire ton prenom ? Ca me permettra de personnaliser nos echanges.";
 
             // Sauvegarder dans la conversation
             await saveConversationTurn(conversation.id, message, askNameResponse, {
@@ -362,9 +362,9 @@ Pour arrêter: réponds STOP`;
             // Continuer normalement en cas d'erreur
           }
         } else {
-          // Requête financière détectée → traiter la requête, demander le nom après
-          console.log(`[Chat API] Numéro inconnu mais requête financière détectée, traitement de la requête d'abord`);
-          // Continuer le flux normal pour traiter la requête
+          // Requete financiere detectee -> traiter la requete, demander le nom apres
+          console.log(`[Chat API] Numero inconnu mais requete financiere detectee, traitement de la requete d'abord`);
+          // Continuer le flux normal pour traiter la requete
         }
       }
     }
@@ -373,11 +373,11 @@ Pour arrêter: réponds STOP`;
     if (channel === 'sms') {
       const messageUpper = message.trim().toUpperCase();
       
-      // Récupérer les commandes autorisées depuis la config (avec fallback)
+      // Recuperer les commandes autorisees depuis la config (avec fallback)
       const allowedCommands = await configManager.get('routing', 'sms_allowed_commands', [
         'ANALYSE', 'ANALYZE', 
         'PRIX', 'PRICE', 'COURS', 'QUOTE',
-        'NEWS', 'ACTUALITES', 'ACTUALITÉS', 'INFOS',
+        'NEWS', 'ACTUALITES', 'ACTUALITES', 'INFOS',
         'SKILLS', 'AIDE', 'HELP', 'COMMANDES',
         'SALUT', 'BONJOUR', 'HELLO', 'HI', 'COUCOU', 'TEST'
       ]);
@@ -387,8 +387,8 @@ Pour arrêter: réponds STOP`;
       const isShortReply = message.length < 10 && (['OUI', 'NON', 'YES', 'NO', 'OK'].includes(messageUpper) || /^\d+$/.test(messageUpper));
 
       if (!startsWithCommand && !isTickerOnly && !isShortReply) {
-        console.log(`[Chat API] 🛡️ SMS Guardrail: Message rejeté "${message}"`);
-        const guardrailResponse = `⚠️ Commande non reconnue.\n\nCommandes disponibles :\n\n📊 ANALYSE [TICKER]\n💰 PRIX [TICKER]\n📰 NEWS [TICKER]\n❓ AIDE\n\nEx: "Analyse MSFT"`;
+        console.log(`[Chat API]  SMS Guardrail: Message rejete "${message}"`);
+        const guardrailResponse = ` Commande non reconnue.\n\nCommandes disponibles :\n\n ANALYSE [TICKER]\n PRIX [TICKER]\n NEWS [TICKER]\n AIDE\n\nEx: "Analyse MSFT"`;
         
         await saveConversationTurn(conversation.id, message, guardrailResponse, {
           type: 'guardrail_rejection',
@@ -403,27 +403,27 @@ Pour arrêter: réponds STOP`;
       }
     }
 
-    // 4. RÉCUPÉRER HISTORIQUE (pour contexte Emma)
+    // 4. RECUPERER HISTORIQUE (pour contexte Emma)
     let conversationHistory = [];
     try {
       conversationHistory = await getConversationHistory(conversation.id, 10); // 10 derniers messages
       console.log(`[Chat API] Historique: ${conversationHistory.length} messages`);
     } catch (error) {
-      console.error('[Chat API] Erreur récupération historique:', error);
+      console.error('[Chat API] Erreur recuperation historique:', error);
       // Non-bloquant, on continue sans historique
     }
 
-    // 4.5. RÉCUPÉRER LA WATCHLIST - CONDITIONNEL (optimisation performance)
+    // 4.5. RECUPERER LA WATCHLIST - CONDITIONNEL (optimisation performance)
     // NOTE: Ces listes sont des FAVORIS/RACCOURCIS uniquement.
-    // Emma a accès à MILLIERS de tickers mondiaux via APIs (FMP, Polygon, etc.)
+    // Emma a acces a MILLIERS de tickers mondiaux via APIs (FMP, Polygon, etc.)
     let userWatchlist = [];
     let teamTickers = [];
     
-    // Déclarer forcedIntent qui sera initialisé plus tard (ligne 581+)
+    // Declarer forcedIntent qui sera initialise plus tard (ligne 581+)
     let forcedIntent = null;
 
     // SIMPLIFICATION: Charger toujours (optimisation conditionnelle causait trop d'erreurs)
-    // L'impact performance est minime (~300ms) comparé à la stabilité
+    // L'impact performance est minime (~300ms) compare a la stabilite
     try {
       console.log('[Chat API] Loading watchlist/team_tickers');
       
@@ -434,7 +434,7 @@ Pour arrêter: réponds STOP`;
           process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
-        // Charger watchlist et team_tickers depuis la table unifiée tickers
+        // Charger watchlist et team_tickers depuis la table unifiee tickers
         // Utilise maintenant la colonne 'category' au lieu de 'source'
         const [watchlistResult, teamTickersResult] = await Promise.all([
           // Watchlist: category='watchlist' ou 'both' OU 'watchlist' IN categories
@@ -459,7 +459,7 @@ Pour arrêter: réponds STOP`;
           userWatchlist = watchlistResult.data.map(item => item.ticker);
           console.log(`[Chat API] Watchlist: ${userWatchlist.length} tickers`);
         } else if (watchlistResult.error && watchlistResult.error.code !== 'PGRST116') {
-          console.log(`[Chat API] Watchlist non trouvée ou vide pour user ${userProfile.id}`);
+          console.log(`[Chat API] Watchlist non trouvee ou vide pour user ${userProfile.id}`);
         }
 
         // Traiter team_tickers
@@ -467,7 +467,7 @@ Pour arrêter: réponds STOP`;
           teamTickers = teamTickersResult.data.map(item => item.ticker);
           console.log(`[Chat API] Team tickers: ${teamTickers.length} tickers`);
         } else {
-          // Fallback hardcodé
+          // Fallback hardcode
           teamTickers = [
             'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
             'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
@@ -487,57 +487,57 @@ Pour arrêter: réponds STOP`;
       console.error('[Chat API] Erreur chargement listes (non-bloquant):', error.message);
     }
 
-    // 5. DÉTECTER SI EMMA DOIT SE PRÉSENTER
+    // 5. DETECTER SI EMMA DOIT SE PRESENTER
     const isFirstMessage = conversationHistory.length === 0;
     const isTestEmma = message.toLowerCase().includes('test emma');
     const hasBeenIntroduced = userProfile.metadata?.has_been_introduced === true;
 
-    // ✅ FIX BUG 3: Détecter les salutations pour forcer présentation Emma
+    //  FIX BUG 3: Detecter les salutations pour forcer presentation Emma
     const messageLower = message.toLowerCase().trim();
-    const greetingKeywords = ['bonjour', 'salut', 'hello', 'hi', 'bonsoir', 'hey', 'coucou', 'good morning', 'bonne journée'];
+    const greetingKeywords = ['bonjour', 'salut', 'hello', 'hi', 'bonsoir', 'hey', 'coucou', 'good morning', 'bonne journee'];
     const isGreeting = greetingKeywords.some(kw => messageLower === kw || messageLower.startsWith(kw + ' ') || messageLower.startsWith(kw + '!'));
 
     const shouldIntroduce = (!hasBeenIntroduced && isFirstMessage) || isTestEmma || isGreeting;
 
     if (shouldIntroduce) {
-      console.log(`[Chat API] Emma va se présenter (first=${isFirstMessage}, test=${isTestEmma}, greeting=${isGreeting}, introduced=${hasBeenIntroduced})`);
+      console.log(`[Chat API] Emma va se presenter (first=${isFirstMessage}, test=${isTestEmma}, greeting=${isGreeting}, introduced=${hasBeenIntroduced})`);
 
-      // Marquer que Emma s'est présentée (sauf si c'est juste "Test Emma")
+      // Marquer que Emma s'est presentee (sauf si c'est juste "Test Emma")
       if (!hasBeenIntroduced && !isTestEmma) {
         try {
           await updateUserProfile(userProfile.id, {
             metadata: { ...userProfile.metadata, has_been_introduced: true }
           });
-          console.log(`[Chat API] Flag has_been_introduced défini pour user ${userProfile.id}`);
+          console.log(`[Chat API] Flag has_been_introduced defini pour user ${userProfile.id}`);
         } catch (error) {
-          console.error('[Chat API] Erreur mise à jour has_been_introduced:', error);
+          console.error('[Chat API] Erreur mise a jour has_been_introduced:', error);
         }
       }
     }
 
-    // 5.5. DÉTECTER COMMANDES SPÉCIALES (SKILLS, AIDE, EXEMPLES)
+    // 5.5. DETECTER COMMANDES SPECIALES (SKILLS, AIDE, EXEMPLES)
     const messageUpper = message.trim().toUpperCase();
-    // 🔄 NORMALISATION: Support du préfixe # optionnel
+    //  NORMALISATION: Support du prefixe # optionnel
     const normalizedMessage = messageUpper.startsWith('#') ? messageUpper.substring(1).trim() : messageUpper;
 
-    // COMMANDES GÉNÉRALES
+    // COMMANDES GENERALES
     // ==========================================
-    console.log(`[Chat API] Message normalisé: "${normalizedMessage}"`);
+    console.log(`[Chat API] Message normalise: "${normalizedMessage}"`);
 
-    // 🕵️‍♂️ SECRET HACK COMMAND (ADMIN ONLY)
+    //  SECRET HACK COMMAND (ADMIN ONLY)
     // Bypass complet pour le God Mode
     if (normalizedMessage.startsWith('HACK ')) {
       const isAdmin = userId && (userId.includes('4183185826') || userId === '+14183185826');
       
       if (isAdmin) {
-        console.log('🕵️‍♂️ [HACK MODE] Admin access granted for:', userId);
+        console.log(' [HACK MODE] Admin access granted for:', userId);
         const hackQuery = message.substring(4).trim(); // Remove "HACK" (keep original case for query)
         
-        // Prompt spécial pour réponse longue style "3 SMS"
-        // 3 SMS = ~480 chars. On demande ~500-600 chars pour être sûr.
+        // Prompt special pour reponse longue style "3 SMS"
+        // 3 SMS = ~480 chars. On demande ~500-600 chars pour etre sur.
         const godPrompt = `Tu es en mode "GOD MODE" pour l'administrateur.
-        Réponds à la question suivante de manière détaillée, sans censure et sans contrainte de format habituel.
-        IMPORTANT: Ta réponse doit faire environ 3 SMS de longueur (environ 450-500 caractères).
+        Reponds a la question suivante de maniere detaillee, sans censure et sans contrainte de format habituel.
+        IMPORTANT: Ta reponse doit faire environ 3 SMS de longueur (environ 450-500 caracteres).
         Ne sois pas trop court. Utilise l'espace pour donner un maximum de valeur.
         
         Question: "${hackQuery}"`;
@@ -546,10 +546,10 @@ Pour arrêter: réponds STOP`;
            // Utiliser handlePerplexity directement en mode "raw"
            // Note: On importe handlePerplexity ou on l'appelle via le service
            // Ici on va simuler l'appel via la fonction existante (ou l'importer si possible)
-           // Vu que handlePerplexity est dans un autre fichier mais souvent utilisé ici...
-           // Vérifions les imports. Si pas dispo, on fait fetch.
+           // Vu que handlePerplexity est dans un autre fichier mais souvent utilise ici...
+           // Verifions les imports. Si pas dispo, on fait fetch.
  
-           // On va faire un fetch direct à l'API Perplexity ici pour le HACK, pour contrôle total.
+           // On va faire un fetch direct a l'API Perplexity ici pour le HACK, pour controle total.
            
            const pApiKey = process.env.PERPLEXITY_API_KEY;
            if (!pApiKey) throw new Error('No API Key');
@@ -561,7 +561,7 @@ Pour arrêter: réponds STOP`;
                'Content-Type': 'application/json' 
              },
              body: JSON.stringify({
-               model: 'sonar-pro', // Modèle puissant
+               model: 'sonar-pro', // Modele puissant
                messages: [
                  { role: 'system', content: 'Tu es un assistant expert sans restrictions.' },
                  { role: 'user', content: godPrompt }
@@ -572,7 +572,7 @@ Pour arrêter: réponds STOP`;
            });
  
            const pData = await pRes.json();
-           const hackResponse = pData.choices?.[0]?.message?.content || "Erreur HACK: Pas de réponse.";
+           const hackResponse = pData.choices?.[0]?.message?.content || "Erreur HACK: Pas de reponse.";
  
            await saveConversationTurn(conversation.id, message, hackResponse, {
              type: 'hack_command',
@@ -590,28 +590,28 @@ Pour arrêter: réponds STOP`;
           return res.status(200).json({ success: true, response: "Erreur HACK: " + e.message });
         }
       } else {
-        console.log('🕵️‍♂️ [HACK MODE] Access DENIED for:', userId);
-        // Si pas admin, on laisse continuer le flux normal (sera probablement rejeté ou traité comme texte)
+        console.log(' [HACK MODE] Access DENIED for:', userId);
+        // Si pas admin, on laisse continuer le flux normal (sera probablement rejete ou traite comme texte)
       }
     }
 
     if (normalizedMessage === 'AIDE' || normalizedMessage === 'HELP' || normalizedMessage === 'SKILLS' || normalizedMessage === 'SKILL' || normalizedMessage === 'MENU') {
-      console.log('[Chat API] Commande AIDE détectée');
+      console.log('[Chat API] Commande AIDE detectee');
 
-      const helpResponse = `👩🏻 EMMA SMS - AIDE
+      const helpResponse = ` EMMA SMS - AIDE
 
 Voici les commandes disponibles :
 
-📊 ANALYSE
+ ANALYSE
 "Analyse [Ticker]" (ex: Analyse AAPL)
 "Prix [Ticker]"
 "News [Ticker]"
 
-🗣️ DISCUSSION
+ DISCUSSION
 Posez simplement vos questions !
 Ex: "Que penses-tu de Tesla ?"
 
-❌ STOP pour arrêter`;
+ STOP pour arreter`;
 
       try {
         await saveConversationTurn(conversation.id, message, helpResponse, {
@@ -630,12 +630,12 @@ Ex: "Que penses-tu de Tesla ?"
     }
 
 
-    // Commande TOP NEWS / Market Overview (revue complète des marchés)
+    // Commande TOP NEWS / Market Overview (revue complete des marches)
     // REMOVED: The previous TOP NEWS handler was removed as per user instruction.
 
-    // 5.6. DÉTECTION MOTS-CLÉS MAJUSCULES (Raccourcis directs - ultra-rapide)
-    // Ces mots-clés forcent une intention spécifique sans analyse NLP
-    // forcedIntent déjà déclaré ligne 205
+    // 5.6. DETECTION MOTS-CLES MAJUSCULES (Raccourcis directs - ultra-rapide)
+    // Ces mots-cles forcent une intention specifique sans analyse NLP
+    // forcedIntent deja declare ligne 205
     let extractedTickers = [];
 
     // Helper functions delegating to centralized TickerExtractor utility
@@ -648,63 +648,63 @@ Ex: "Que penses-tu de Tesla ?"
     };
 
     /**
-     * ════════════════════════════════════════════════════════════════════════════
-     * 📋 COMMANDES RAPIDES EMMA - Référence complète
-     * ════════════════════════════════════════════════════════════════════════════
-     * Le préfixe # est OPTIONNEL mais recommandé pour faciliter l'identification.
+     * 
+     *  COMMANDES RAPIDES EMMA - Reference complete
+     * 
+     * Le prefixe # est OPTIONNEL mais recommande pour faciliter l'identification.
      * Toutes les commandes fonctionnent avec ou sans #.
      *
-     * 📊 ANALYSES:
-     *   #ANALYSE [TICKER]     → Analyse complète 12 sections (ex: #ANALYSE AAPL)
-     *   #FONDAMENTAUX [TICKER]→ Focus fondamentaux (ROE, marges, ratios)
-     *   #TECHNIQUE [TICKER]   → Analyse technique (RSI, MACD, supports)
-     *   #COMPARER [T1] [T2]   → Comparaison tête-à-tête
+     *  ANALYSES:
+     *   #ANALYSE [TICKER]     -> Analyse complete 12 sections (ex: #ANALYSE AAPL)
+     *   #FONDAMENTAUX [TICKER]-> Focus fondamentaux (ROE, marges, ratios)
+     *   #TECHNIQUE [TICKER]   -> Analyse technique (RSI, MACD, supports)
+     *   #COMPARER [T1] [T2]   -> Comparaison tete-a-tete
      *
-     * 💰 DONNÉES:
-     *   #PRIX [TICKER]        → Prix actuel et variation
-     *   #RATIOS [TICKER]      → Ratios de valorisation (P/E, P/B, etc.)
-     *   #CROISSANCE [TICKER]  → Métriques de croissance (CAGR, etc.)
+     *  DONNEES:
+     *   #PRIX [TICKER]        -> Prix actuel et variation
+     *   #RATIOS [TICKER]      -> Ratios de valorisation (P/E, P/B, etc.)
+     *   #CROISSANCE [TICKER]  -> Metriques de croissance (CAGR, etc.)
      *
-     * 📈 INDICATEURS TECHNIQUES:
-     *   #RSI [TICKER]         → RSI avec niveaux
-     *   #MACD [TICKER]        → MACD avec signal
-     *   #MOYENNES [TICKER]    → Moyennes mobiles (SMA/EMA)
+     *  INDICATEURS TECHNIQUES:
+     *   #RSI [TICKER]         -> RSI avec niveaux
+     *   #MACD [TICKER]        -> MACD avec signal
+     *   #MOYENNES [TICKER]    -> Moyennes mobiles (SMA/EMA)
      *
-     * 📰 ACTUALITÉS:
-     *   #NEWS [TICKER]        → Dernières actualités
-     *   #ACTUALITES [TICKER]  → Alias pour NEWS
+     *  ACTUALITES:
+     *   #NEWS [TICKER]        -> Dernieres actualites
+     *   #ACTUALITES [TICKER]  -> Alias pour NEWS
      *
-     * 📅 CALENDRIERS:
-     *   #RESULTATS [TICKER]   → Prochains/derniers earnings
-     *   #RESULTATS            → Calendrier général earnings
-     *   #CALENDRIER           → Calendrier économique
+     *  CALENDRIERS:
+     *   #RESULTATS [TICKER]   -> Prochains/derniers earnings
+     *   #RESULTATS            -> Calendrier general earnings
+     *   #CALENDRIER           -> Calendrier economique
      *
-     * 📋 WATCHLIST:
-     *   #LISTE                → Afficher ma watchlist
-     *   #AJOUTER [TICKER]     → Ajouter un ticker
-     *   #RETIRER [TICKER]     → Retirer un ticker
+     *  WATCHLIST:
+     *   #LISTE                -> Afficher ma watchlist
+     *   #AJOUTER [TICKER]     -> Ajouter un ticker
+     *   #RETIRER [TICKER]     -> Retirer un ticker
      *
-     * 🌍 MARCHÉ:
-     *   #INDICES              → Indices majeurs (S&P, NASDAQ, etc.)
-     *   #MARCHE               → Vue d'ensemble du marché
-     *   #SECTEUR [NOM]        → Analyse sectorielle
+     *  MARCHE:
+     *   #INDICES              -> Indices majeurs (S&P, NASDAQ, etc.)
+     *   #MARCHE               -> Vue d'ensemble du marche
+     *   #SECTEUR [NOM]        -> Analyse sectorielle
      *
-     * 💡 RECOMMANDATIONS:
-     *   #ACHETER [TICKER]     → Analyse d'achat potentiel
-     *   #VENDRE [TICKER]      → Analyse de vente potentielle
+     *  RECOMMANDATIONS:
+     *   #ACHETER [TICKER]     -> Analyse d'achat potentiel
+     *   #VENDRE [TICKER]      -> Analyse de vente potentielle
      *
-     * 🏛️ ÉCONOMIE:
-     *   #FED                  → Politique monétaire Fed
-     *   #INFLATION            → Analyse inflation
-     *   #TAUX                 → Taux d'intérêt et courbes
+     *  ECONOMIE:
+     *   #FED                  -> Politique monetaire Fed
+     *   #INFLATION            -> Analyse inflation
+     *   #TAUX                 -> Taux d'interet et courbes
      *
-     * ❓ AIDE:
-     *   #SKILLS               → Liste des compétences d'Emma
-     *   #AIDE                 → Guide d'utilisation
-     * ════════════════════════════════════════════════════════════════════════════
+     *  AIDE:
+     *   #SKILLS               -> Liste des competences d'Emma
+     *   #AIDE                 -> Guide d'utilisation
+     * 
      */
 
-    // ANALYSES (normalizedMessage déjà défini ligne 407 avec support # optionnel)
+    // ANALYSES (normalizedMessage deja defini ligne 407 avec support # optionnel)
     if (normalizedMessage.startsWith('ANALYSE ')) {
       const ticker = extractTickerFromCommand(normalizedMessage, 'ANALYSE');
       if (ticker) {
@@ -727,7 +727,7 @@ Ex: "Que penses-tu de Tesla ?"
       }
     }
 
-    // PRIX & DONNÉES
+    // PRIX & DONNEES
     else if (normalizedMessage.startsWith('PRIX ')) {
       const ticker = extractTickerFromCommand(normalizedMessage, 'PRIX');
       if (ticker) {
@@ -763,7 +763,7 @@ Ex: "Que penses-tu de Tesla ?"
       }
     }
 
-    // ACTUALITÉS
+    // ACTUALITES
     else if (normalizedMessage.startsWith('NEWS ') || normalizedMessage.startsWith('ACTUALITES ')) {
       const keyword = normalizedMessage.startsWith('NEWS') ? 'NEWS' : 'ACTUALITES';
       const ticker = extractTickerFromCommand(normalizedMessage, keyword);
@@ -775,13 +775,13 @@ Ex: "Que penses-tu de Tesla ?"
     // CALENDRIERS
     else if (normalizedMessage.startsWith('RESULTATS')) {
       if (normalizedMessage.includes(' ')) {
-        // "RESULTATS AAPL" → earnings pour ticker spécifique
+        // "RESULTATS AAPL" -> earnings pour ticker specifique
         const ticker = extractTickerFromCommand(normalizedMessage, 'RESULTATS');
         if (ticker) {
           forcedIntent = { intent: 'earnings', tickers: [ticker], confidence: 1.0, method: 'keyword_shortcut' };
         }
       } else {
-        // "RESULTATS" seul → earnings calendar général
+        // "RESULTATS" seul -> earnings calendar general
         forcedIntent = { intent: 'earnings', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
       }
     } else if (normalizedMessage.includes('CALENDRIER')) {
@@ -804,7 +804,7 @@ Ex: "Que penses-tu de Tesla ?"
       }
     }
 
-    // MARCHÉ
+    // MARCHE
     else if (normalizedMessage === 'INDICES') {
       forcedIntent = { intent: 'market_overview', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
     }
@@ -822,22 +822,22 @@ Ex: "Que penses-tu de Tesla ?"
       }
     }
 
-    // ÉCONOMIE
+    // ECONOMIE
     else if (normalizedMessage.includes('INFLATION') || normalizedMessage.includes('FED') || normalizedMessage.includes('TAUX')) {
       forcedIntent = { intent: 'economic_analysis', tickers: [], confidence: 1.0, method: 'keyword_shortcut' };
     }
 
-    // Si forced intent détecté, logger et utiliser directement
+    // Si forced intent detecte, logger et utiliser directement
     if (forcedIntent) {
-      console.log(`[Chat API] 🎯 Mot-clé majuscule détecté: ${forcedIntent.intent} (${forcedIntent.tickers.join(', ') || 'aucun ticker'})`);
+      console.log(`[Chat API]  Mot-cle majuscule detecte: ${forcedIntent.intent} (${forcedIntent.tickers.join(', ') || 'aucun ticker'})`);
     }
 
-    // 6. PRÉPARER LE CONTEXTE POUR EMMA-AGENT
+    // 6. PREPARER LE CONTEXTE POUR EMMA-AGENT
     // Combiner watchlist + team tickers (union sans doublons)
     const allTickers = [...new Set([...userWatchlist, ...teamTickers])];
 
-    // 6.5. ✅ VALIDATION YTD - Éviter les hallucinations de Perplexity
-    // Enrichir les données de stock avec validation YTD
+    // 6.5.  VALIDATION YTD - Eviter les hallucinations de Perplexity
+    // Enrichir les donnees de stock avec validation YTD
     let validatedStockData = metadata?.stockData || {};
     try {
       if (Object.keys(validatedStockData).length > 0) {
@@ -847,46 +847,46 @@ Ex: "Que penses-tu de Tesla ?"
         for (const ticker in validatedStockData) {
           const stock = validatedStockData[ticker];
           if (stock && typeof stock === 'object') {
-            // Valider YTD cohérence
+            // Valider YTD coherence
             const validation = validateYTDData(stock);
             
             if (!validation.valid) {
-              console.warn(`⚠️ [Chat API] YTD invalide pour ${ticker}:`, validation.issues);
+              console.warn(` [Chat API] YTD invalide pour ${ticker}:`, validation.issues);
             }
             
-            // Enrichir avec métadonnées de source (marque les données FMP vs Perplexity)
+            // Enrichir avec metadonnees de source (marque les donnees FMP vs Perplexity)
             validatedStockData[ticker] = enrichStockDataWithSources(stock, 'fmp');
           }
         }
         
-        console.log(`[Chat API] ✅ Validation YTD complétée`);
+        console.log(`[Chat API]  Validation YTD completee`);
       }
     } catch (error) {
-      console.warn(`[Chat API] ⚠️ Erreur validation YTD (non-bloquant):`, error.message);
-      // Non-bloquant, continuer avec les données originales
+      console.warn(`[Chat API]  Erreur validation YTD (non-bloquant):`, error.message);
+      // Non-bloquant, continuer avec les donnees originales
     }
 
     const emmaContext = {
       output_mode: channel === 'email' ? 'ticker_note' : 'chat', // Email = format long, autres = chat
       user_name: userProfile.name || null, // Nom de l'utilisateur pour personnalisation
       user_channel: channel, // Canal de communication
-      should_introduce: shouldIntroduce, // Emma doit se présenter
-      tickers: metadata?.tickers || (forcedIntent?.tickers.length > 0 ? forcedIntent.tickers : allTickers), // Utiliser forced tickers si présent
+      should_introduce: shouldIntroduce, // Emma doit se presenter
+      tickers: metadata?.tickers || (forcedIntent?.tickers.length > 0 ? forcedIntent.tickers : allTickers), // Utiliser forced tickers si present
       user_watchlist: userWatchlist, // Watchlist personnelle de l'utilisateur
-      team_tickers: teamTickers, // Tickers d'équipe partagés
+      team_tickers: teamTickers, // Tickers d'equipe partages
       all_tickers: allTickers, // Union watchlist + team (sans doublons)
-      stockData: validatedStockData, // Utiliser données VALIDÉES au lieu de metadata?.stockData
+      stockData: validatedStockData, // Utiliser donnees VALIDEES au lieu de metadata?.stockData
       newsData: metadata?.newsData || [],
       apiStatus: metadata?.apiStatus || {},
       conversationHistory: formatHistoryForEmma(conversationHistory),
-      forced_intent: forcedIntent // Passer le forced intent à Emma Agent
+      forced_intent: forcedIntent // Passer le forced intent a Emma Agent
     };
 
-    // 6.7. 💾 CACHE INTELLIGENT (2H) - DÉSACTIVÉ
-    // Le cache de 2h a été désactivé pour que chaque demande soit régénérée
-    console.log(`[Chat API] 🔄 CACHE DÉSACTIVÉ - Chaque demande sera régénérée`);
+    // 6.7.  CACHE INTELLIGENT (2H) - DESACTIVE
+    // Le cache de 2h a ete desactive pour que chaque demande soit regeneree
+    console.log(`[Chat API]  CACHE DESACTIVE - Chaque demande sera regeneree`);
     
-    // Générer clé de cache basée sur ticker + type d'analyse + canal (pour référence uniquement)
+    // Generer cle de cache basee sur ticker + type d'analyse + canal (pour reference uniquement)
     const primaryTicker = (forcedIntent?.tickers && forcedIntent.tickers.length > 0) 
       ? forcedIntent.tickers[0] 
       : (metadata?.tickers && metadata.tickers.length > 0 ? metadata.tickers[0] : null);
@@ -894,11 +894,11 @@ Ex: "Que penses-tu de Tesla ?"
     const analysisType = forcedIntent?.intent || 'general';
     const isSimulation = req.body.simulate === true; // Flag pour mode simulation
     
-    // CACHE DÉSACTIVÉ - Ne plus vérifier ni utiliser le cache
+    // CACHE DESACTIVE - Ne plus verifier ni utiliser le cache
     // let cacheKey = null;
     // let cachedData = null;
     
-    // CODE CACHE COMMENTÉ - Désactivé pour régénération systématique
+    // CODE CACHE COMMENTE - Desactive pour regeneration systematique
     /*
     if (primaryTicker && !isSimulation) {
       cacheKey = generateCacheKey(primaryTicker, analysisType, channel);
@@ -906,16 +906,16 @@ Ex: "Que penses-tu de Tesla ?"
       
       if (cachedData) {
         const cacheAge = Math.round((Date.now() - cachedData.created_at) / 1000 / 60);
-        console.log(`[Chat API] 💾 ✅ CACHE HIT - Âge: ${cacheAge} min, Hits: ${cachedData.hit_count}`);
+        console.log(`[Chat API]   CACHE HIT - Age: ${cacheAge} min, Hits: ${cachedData.hit_count}`);
         
-        // Adapter la réponse cachée pour le canal
+        // Adapter la reponse cachee pour le canal
         let adaptedCachedResponse;
         try {
-          // ✅ adaptForChannel peut retourner une Promise pour email (async)
+          //  adaptForChannel peut retourner une Promise pour email (async)
           const adaptedResult = adaptForChannel(cachedData.response, channel, emmaContext);
           adaptedCachedResponse = adaptedResult instanceof Promise ? await adaptedResult : adaptedResult;
         } catch (error) {
-          console.error('[Chat API] Erreur adaptation réponse cachée:', error);
+          console.error('[Chat API] Erreur adaptation reponse cachee:', error);
           adaptedCachedResponse = cachedData.response;
         }
         
@@ -937,7 +937,7 @@ Ex: "Que penses-tu de Tesla ?"
           console.error('[Chat API] Erreur sauvegarde conversation (cache):', error);
         }
         
-        // Retourner réponse cachée
+        // Retourner reponse cachee
         const duration = Date.now() - startTime;
         return res.status(200).json({
           success: true,
@@ -950,23 +950,23 @@ Ex: "Que penses-tu de Tesla ?"
           conversationId: conversation.id
         });
       } else {
-        console.log(`[Chat API] 💾 ❌ CACHE MISS - Génération nouvelle réponse`);
+        console.log(`[Chat API]   CACHE MISS - Generation nouvelle reponse`);
       }
     } else if (isSimulation) {
-      console.log(`[Chat API] 🧪 MODE SIMULATION - Cache désactivé`);
+      console.log(`[Chat API]  MODE SIMULATION - Cache desactive`);
     }
     */
 
     // 7. APPELER EMMA-AGENT (Function Calling Router existant) OU SMS V2 ORCHESTRATOR
     let emmaResponse;
 
-    // 🚀 FEATURE FLAG: SMS V2 Complete System (28 intents)
+    //  FEATURE FLAG: SMS V2 Complete System (28 intents)
     const USE_SMS_V2_COMPLETE = process.env.USE_SMS_ORCHESTRATOR_V2_COMPLETE === 'true';
 
     if (channel === 'sms' && USE_SMS_V2_COMPLETE) {
-      // ⭐ NOUVEAU: SMS V2 Orchestrator (28 intents, LLM formatter only)
+      //  NOUVEAU: SMS V2 Orchestrator (28 intents, LLM formatter only)
       try {
-        console.log('[Chat API] 🚀 Appel SMS V2 Orchestrator (28 intents)...');
+        console.log('[Chat API]  Appel SMS V2 Orchestrator (28 intents)...');
 
         const { processSMS } = await import('../lib/sms/sms-orchestrator-complete.cjs');
         const trimmedMessage = message.trim();
@@ -977,7 +977,7 @@ Ex: "Que penses-tu de Tesla ?"
           previousSources: metadata?.previousSources || [],
         });
 
-        // Adapter format de réponse pour compatibilité avec le reste du code
+        // Adapter format de reponse pour compatibilite avec le reste du code
         emmaResponse = {
           success: true,
           response: smsResult.response,
@@ -997,10 +997,10 @@ Ex: "Que penses-tu de Tesla ?"
           }
         };
 
-        console.log(`[Chat API] ✅ SMS V2 response - Intent: ${emmaResponse.intent}, Latency: ${emmaResponse.execution_time_ms}ms`);
+        console.log(`[Chat API]  SMS V2 response - Intent: ${emmaResponse.intent}, Latency: ${emmaResponse.execution_time_ms}ms`);
 
       } catch (error) {
-        console.error('[Chat API] ❌ Erreur SMS V2 Orchestrator:', error);
+        console.error('[Chat API]  Erreur SMS V2 Orchestrator:', error);
         return res.status(500).json({
           success: false,
           error: 'Failed to process SMS with v2 system',
@@ -1008,11 +1008,11 @@ Ex: "Que penses-tu de Tesla ?"
         });
       }
     } else {
-      // ✅ INCHANGÉ: Web, Email, Messenger, SMS (si flag=false)
+      //  INCHANGE: Web, Email, Messenger, SMS (si flag=false)
       try {
         console.log(`[Chat API] Appel emma-agent (canal: ${channel})...`);
 
-        // Simuler appel interne à emma-agent
+        // Simuler appel interne a emma-agent
         // En production, on importe et appelle la fonction directement
         const emmaAgentModule = await import('./emma-agent.js');
         const emmaRequest = {
@@ -1035,9 +1035,9 @@ Ex: "Que penses-tu de Tesla ?"
           setHeader: () => {}
         };
 
-        // ⏱️ TIMEOUT INTELLIGENT : SMS=60s, Email=90s, Web/Messenger=75s
+        //  TIMEOUT INTELLIGENT : SMS=60s, Email=90s, Web/Messenger=75s
         const timeoutMs = channel === 'sms' ? 60000 : channel === 'email' ? 90000 : 75000;
-        console.log(`[Chat API] ⏱️ Timeout configuré: ${timeoutMs}ms pour canal ${channel}`);
+        console.log(`[Chat API]  Timeout configure: ${timeoutMs}ms pour canal ${channel}`);
 
         // Call emma-agent avec timeout
         const timeoutPromise = new Promise((_, reject) =>
@@ -1055,9 +1055,9 @@ Ex: "Que penses-tu de Tesla ?"
         }
 
         emmaResponse = emmaResponseData;
-        console.log(`[Chat API] Emma response reçue - Model: ${emmaResponse.model}, Tools: ${emmaResponse.tools_used?.length || 0}`);
+        console.log(`[Chat API] Emma response recue - Model: ${emmaResponse.model}, Tools: ${emmaResponse.tools_used?.length || 0}`);
 
-        // ✅ VALIDATION: Vérifier la complétude de la réponse pour comprehensive_analysis
+        //  VALIDATION: Verifier la completude de la reponse pour comprehensive_analysis
         if (forcedIntent?.intent === 'comprehensive_analysis') {
           const isComplete = validateResponseCompleteness(
             emmaResponse.response,
@@ -1066,12 +1066,12 @@ Ex: "Que penses-tu de Tesla ?"
           );
 
           if (!isComplete) {
-            console.error(`❌ [Validation] RÉPONSE INCOMPLÈTE détectée pour comprehensive_analysis`);
-            console.error(`   → Longueur: ${emmaResponse.response.length} chars`);
-            console.error(`   → Mots: ${emmaResponse.response.split(/\s+/).length}`);
-            console.error(`   → Model: ${emmaResponse.model}`);
-            console.error(`   → Le prompt comprehensive_analysis n'a pas été suivi correctement`);
-            // Note: On laisse passer la réponse mais on log l'erreur pour diagnostic
+            console.error(` [Validation] REPONSE INCOMPLETE detectee pour comprehensive_analysis`);
+            console.error(`   -> Longueur: ${emmaResponse.response.length} chars`);
+            console.error(`   -> Mots: ${emmaResponse.response.split(/\s+/).length}`);
+            console.error(`   -> Model: ${emmaResponse.model}`);
+            console.error(`   -> Le prompt comprehensive_analysis n'a pas ete suivi correctement`);
+            // Note: On laisse passer la reponse mais on log l'erreur pour diagnostic
           }
         }
 
@@ -1085,39 +1085,39 @@ Ex: "Que penses-tu de Tesla ?"
       }
     }
 
-    // 8. ADAPTER LA RÉPONSE POUR LE CANAL
+    // 8. ADAPTER LA REPONSE POUR LE CANAL
     let adaptedResponse;
     try {
-      console.log(`[Chat API] 🔧 AVANT adaptation - Channel: ${channel}, Longueur: ${emmaResponse.response.length} chars`);
-      console.log(`[Chat API] 🔧 Premiers 200 chars AVANT: ${emmaResponse.response.substring(0, 200)}`);
+      console.log(`[Chat API]  AVANT adaptation - Channel: ${channel}, Longueur: ${emmaResponse.response.length} chars`);
+      console.log(`[Chat API]  Premiers 200 chars AVANT: ${emmaResponse.response.substring(0, 200)}`);
       
       // Passer le contexte + citations pour SMS (liens TradingView + sources amicales)
-      // ✅ Ajouter tickers pour emails (logos d'entreprises)
+      //  Ajouter tickers pour emails (logos d'entreprises)
       const adaptContext = {
         ...emmaContext,
-        citations: emmaResponse.response.citations || [],  // 📰 Ajouter citations pour formatage amical
-        tickers: emmaResponse.metadata?.intent?.tickers || emmaContext.tickers || []  // 🏢 Tickers pour logos emails
+        citations: emmaResponse.response.citations || [],  //  Ajouter citations pour formatage amical
+        tickers: emmaResponse.metadata?.intent?.tickers || emmaContext.tickers || []  //  Tickers pour logos emails
       };
       
-      // ✅ adaptForChannel peut retourner une Promise pour email (async)
+      //  adaptForChannel peut retourner une Promise pour email (async)
       const adaptedResult = adaptForChannel(emmaResponse.response, channel, adaptContext);
       adaptedResponse = adaptedResult instanceof Promise ? await adaptedResult : adaptedResult;
       
-      console.log(`[Chat API] ✅ APRÈS adaptation - Channel: ${channel}, Longueur: ${adaptedResponse.length} chars`);
-      console.log(`[Chat API] ✅ Premiers 200 chars APRÈS: ${adaptedResponse.substring(0, 200)}`);
-      console.log(`[Chat API] ✅ Contient emojis numérotés: ${/[0-9]️⃣/.test(adaptedResponse)}`);
+      console.log(`[Chat API]  APRES adaptation - Channel: ${channel}, Longueur: ${adaptedResponse.length} chars`);
+      console.log(`[Chat API]  Premiers 200 chars APRES: ${adaptedResponse.substring(0, 200)}`);
+      console.log(`[Chat API]  Contient emojis numerotes: ${/[0-9]/.test(adaptedResponse)}`);
     } catch (error) {
-      console.error('[Chat API] ❌ Erreur adaptation canal:', error);
-      adaptedResponse = emmaResponse.response; // Fallback: réponse brute
+      console.error('[Chat API]  Erreur adaptation canal:', error);
+      adaptedResponse = emmaResponse.response; // Fallback: reponse brute
     }
 
-    // 8.5. 💾 SAUVEGARDER DANS LE CACHE (si applicable)
-    // CACHE DÉSACTIVÉ - Ne plus sauvegarder dans le cache
-    // Chaque demande sera régénérée sans mise en cache
+    // 8.5.  SAUVEGARDER DANS LE CACHE (si applicable)
+    // CACHE DESACTIVE - Ne plus sauvegarder dans le cache
+    // Chaque demande sera regeneree sans mise en cache
     /*
     if (cacheKey && primaryTicker && !isSimulation) {
       try {
-        // ✅ NOUVEAU: Valider complétude avant mise en cache
+        //  NOUVEAU: Valider completude avant mise en cache
         const isComplete = validateResponseCompleteness(
           emmaResponse.response, 
           analysisType, 
@@ -1125,9 +1125,9 @@ Ex: "Que penses-tu de Tesla ?"
         );
         
         if (!isComplete) {
-          console.warn(`⚠️ [Cache] Réponse incomplète détectée, pas de mise en cache`);
-          console.warn(`⚠️ [Cache] Longueur: ${emmaResponse.response.length} chars, Type: ${analysisType}`);
-          // Ne pas mettre en cache les réponses incomplètes
+          console.warn(` [Cache] Reponse incomplete detectee, pas de mise en cache`);
+          console.warn(` [Cache] Longueur: ${emmaResponse.response.length} chars, Type: ${analysisType}`);
+          // Ne pas mettre en cache les reponses incompletes
         } else {
           await setCachedResponse(cacheKey, emmaResponse.response, {
             ticker: primaryTicker,
@@ -1138,10 +1138,10 @@ Ex: "Que penses-tu de Tesla ?"
             tools_used: emmaResponse.tools_used,
             confidence: emmaResponse.confidence
           });
-          console.log('[Chat API] 💾 ✅ Réponse complète sauvegardée dans le cache (expire: 2h)');
+          console.log('[Chat API]   Reponse complete sauvegardee dans le cache (expire: 2h)');
         }
       } catch (error) {
-        console.error('[Chat API] ⚠️ Erreur sauvegarde cache (non-bloquant):', error);
+        console.error('[Chat API]  Erreur sauvegarde cache (non-bloquant):', error);
         // Non-bloquant, on continue
       }
     }
@@ -1152,7 +1152,7 @@ Ex: "Que penses-tu de Tesla ?"
       await saveConversationTurn(
         conversation.id,
         message,
-        emmaResponse.response, // Sauvegarder la réponse originale (pas adaptée)
+        emmaResponse.response, // Sauvegarder la reponse originale (pas adaptee)
         {
           model: emmaResponse.model,
           toolsUsed: emmaResponse.tools_used,
@@ -1161,18 +1161,18 @@ Ex: "Que penses-tu de Tesla ?"
           channel: channel
         }
       );
-      console.log('[Chat API] Conversation sauvegardée');
+      console.log('[Chat API] Conversation sauvegardee');
     } catch (error) {
       console.error('[Chat API] Erreur sauvegarde conversation:', error);
       // Non-bloquant, on continue
     }
 
-    // 10. RÉPONSE FINALE
+    // 10. REPONSE FINALE
     const executionTime = Date.now() - startTime;
 
     return res.status(200).json({
       success: true,
-      response: adaptedResponse, // Réponse adaptée au canal
+      response: adaptedResponse, // Reponse adaptee au canal
       conversationId: conversation.id,
       metadata: {
         user_id: userProfile.id,
@@ -1195,7 +1195,7 @@ Ex: "Que penses-tu de Tesla ?"
     });
 
   } catch (error) {
-    console.error('[Chat API] Erreur générale:', error);
+    console.error('[Chat API] Erreur generale:', error);
 
     return res.status(500).json({
       success: false,
@@ -1207,7 +1207,7 @@ Ex: "Que penses-tu de Tesla ?"
 }
 
 /**
- * Exemple de requête:
+ * Exemple de requete:
  *
  * POST /api/chat
  * {
@@ -1222,7 +1222,7 @@ Ex: "Que penses-tu de Tesla ?"
  * Response:
  * {
  *   "success": true,
- *   "response": "Apple (AAPL) se négocie à 150.25$ (+2.3%)...",
+ *   "response": "Apple (AAPL) se negocie a 150.25$ (+2.3%)...",
  *   "conversationId": "uuid-1234",
  *   "metadata": {
  *     "llmUsed": "perplexity",

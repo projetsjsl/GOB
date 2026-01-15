@@ -19,7 +19,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ data, onClose }) => {
           </div>
           <div>
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              Analyse Stratégique
+              Analyse Strategique
               {data.isLoading && <span className="text-xs font-normal text-indigo-400 animate-pulse">(Gemini 2.5 Flash + Search...)</span>}
             </h3>
             <p className="text-xs text-slate-400 uppercase tracking-wider">{data.symbol ? `Sujet : ${data.symbol}` : 'Analyse en cours'}</p>
@@ -52,7 +52,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ data, onClose }) => {
       
       {!data.isLoading && (
         <div className="px-4 py-2 bg-slate-900/50 border-t border-slate-700/50 text-[10px] text-slate-500 flex justify-between">
-            <span>Généré par Gemini 2.5 Flash + Google Search</span>
+            <span>Genere par Gemini 2.5 Flash + Google Search</span>
             <span>{data.timestamp.toLocaleTimeString()}</span>
         </div>
       )}

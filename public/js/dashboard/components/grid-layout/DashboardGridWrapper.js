@@ -1,7 +1,7 @@
 /**
  * DashboardGridWrapper.js
  * 
- * Transforme le dashboard principal en système de grid layout modulaire (God Mode)
+ * Transforme le dashboard principal en systeme de grid layout modulaire (God Mode)
  * Convertit tous les tabs en widgets configurables et redimensionnables
  */
 
@@ -75,20 +75,20 @@
     // Max concurrent heavy widgets to prevent memory overload
     const MAX_CONCURRENT_HEAVY_WIDGETS = 2;
 
-    // Mapping complet des tabs vers widgets avec tailles par défaut
+    // Mapping complet des tabs vers widgets avec tailles par defaut
     const TAB_TO_WIDGET_MAP = {
         // ADMIN
         'admin-config': { component: 'EmmaConfigTab', label: 'Config Emma', icon: 'Settings', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
-        'admin-settings': { component: 'PlusTab', label: 'Paramètres', icon: 'Cog', defaultSize: { w: 6, h: 8 }, minSize: { w: 4, h: 6 } },
+        'admin-settings': { component: 'PlusTab', label: 'Parametres', icon: 'Cog', defaultSize: { w: 6, h: 8 }, minSize: { w: 4, h: 6 } },
         'admin-briefings': { component: 'EmailBriefingsTab', label: 'Briefings Email', icon: 'Mail', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         'admin-scraping': { component: 'ScrappingSATab', label: 'Scraping SA', icon: 'Scissors', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         'admin-fastgraphs': { component: 'FastGraphsTab', label: 'FastGraphs', icon: 'TrendingUp', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         'admin-jsla': { component: 'AdminJSLaiTab', label: 'Admin JSLAI', icon: 'Shield', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
 
-        // MARCHÉS - NOTE: marches-flex REMOVED (duplicate of marches-global, caused Chrome crash)
-        'marches-global': { component: 'MarketsEconomyTab', label: 'Marchés Globaux', icon: 'Globe', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 }, heavy: true },
+        // MARCHES - NOTE: marches-flex REMOVED (duplicate of marches-global, caused Chrome crash)
+        'marches-global': { component: 'MarketsEconomyTab', label: 'Marches Globaux', icon: 'Globe', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 }, heavy: true },
         // 'marches-flex' REMOVED - was duplicating MarketsEconomyTab causing ~15 TradingView widgets to load simultaneously
-        'marches-calendar': { component: 'EconomicCalendarTab', label: 'Calendrier Éco', icon: 'Calendar', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
+        'marches-calendar': { component: 'EconomicCalendarTab', label: 'Calendrier Eco', icon: 'Calendar', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         'marches-yield': { component: 'YieldCurveLiteTab', label: 'Courbe Taux', icon: 'TrendingUp', defaultSize: { w: 12, h: 8 }, minSize: { w: 6, h: 6 } },
         'marches-nouvelles': { component: 'NouvellesTab', label: 'Nouvelles', icon: 'Newspaper', defaultSize: { w: 12, h: 10 }, minSize: { w: 6, h: 6 } },
         
@@ -100,7 +100,7 @@
         
         // JLAB
         'jlab-terminal': { component: 'JLabTab', label: 'JLab Terminal', icon: 'Terminal', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
-        'jlab-advanced': { component: 'AdvancedAnalysisTab', label: 'Analyse Avancée', icon: 'Flask', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
+        'jlab-advanced': { component: 'AdvancedAnalysisTab', label: 'Analyse Avancee', icon: 'Flask', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
         'jlab-compare': { component: 'FinanceProPanel', label: 'Comparaison', icon: 'GitCompare', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, mode: 'compare' },
         'jlab-screener': { component: 'FinanceProPanel', label: 'Screener', icon: 'Search', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 }, mode: 'screener' },
         'jlab-fastgraphs': { component: 'FastGraphsTab', label: 'FastGraphs', icon: 'BarChart3', defaultSize: { w: 12, h: 12 }, minSize: { w: 8, h: 8 } },
@@ -170,12 +170,12 @@
                 if (prefs && prefs.layouts && prefs.layouts[scopeId]) {
                     const validLayout = sanitizeLayout(prefs.layouts[scopeId]);
                     if (validLayout.length > 0) {
-                        console.log(`✅ Layout chargé depuis Supabase: ${scopeId}`, { items: validLayout.length });
+                        console.log(` Layout charge depuis Supabase: ${scopeId}`, { items: validLayout.length });
                         return validLayout;
                     }
                 }
             } catch (e) {
-                console.warn(`⚠️ Erreur chargement Supabase pour ${scopeId}:`, e);
+                console.warn(` Erreur chargement Supabase pour ${scopeId}:`, e);
             }
         }
         
@@ -188,11 +188,11 @@
                 const parsed = JSON.parse(saved);
                 const validLayout = sanitizeLayout(parsed);
                 if (validLayout.length > 0) {
-                    console.log(`✅ Layout chargé depuis localStorage: ${key}`, { items: validLayout.length });
+                    console.log(` Layout charge depuis localStorage: ${key}`, { items: validLayout.length });
                     return validLayout;
                 }
             } catch (e) {
-                console.error(`❌ Erreur chargement layout depuis ${key}:`, e);
+                console.error(` Erreur chargement layout depuis ${key}:`, e);
             }
         }
         return null;
@@ -234,7 +234,7 @@
         return null;
     };
 
-    // Layout par défaut basé sur les tabs les plus utilisés
+    // Layout par defaut base sur les tabs les plus utilises
     const getDefaultLayout = (activeTabs = []) => {
         const defaultTabs = activeTabs.length > 0 ? activeTabs : [
             'titres-portfolio',    // Top left - Portfolio widget
@@ -278,7 +278,7 @@
                         // Small delay to show loading state before heavy render
                         setTimeout(() => {
                             setShouldRender(true);
-                            console.log(`🔄 LazyHeavyWidget: Auto-loaded ${widgetId} on scroll`);
+                            console.log(` LazyHeavyWidget: Auto-loaded ${widgetId} on scroll`);
                         }, delay);
                     }
                 },
@@ -303,7 +303,7 @@
             setIsLoading(true);
             setTimeout(() => {
                 setShouldRender(true);
-                console.log(`🔄 LazyHeavyWidget: User manually loaded ${widgetId}`);
+                console.log(` LazyHeavyWidget: User manually loaded ${widgetId}`);
             }, 300);
         };
 
@@ -407,14 +407,14 @@ class WidgetErrorBoundary extends React.Component {
         if (this.state.hasError) {
             return (
                 <div className="h-full flex flex-col items-center justify-center p-4 bg-red-900/10 border border-red-500/30 rounded-lg">
-                    <span className="text-red-500 text-6xl mb-2">⚠️</span>
+                    <span className="text-red-500 text-6xl mb-2"></span>
                     <h3 className="text-red-500 font-bold">Erreur Widget</h3>
                     <p className="text-xs text-red-400 text-center mt-2">{this.state.error?.message || "Erreur inconnue"}</p>
                     <button 
                         onClick={() => this.setState({ hasError: false })}
                         className="mt-4 px-3 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition-colors"
                     >
-                        Réessayer
+                        Reessayer
                     </button>
                 </div>
             );
@@ -432,13 +432,13 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                 ? 'bg-neutral-900/50 border-amber-500/30 text-amber-400' 
                 : 'bg-amber-50 border-amber-300 text-amber-700'
         }`}>
-            <span className="text-4xl mb-3">⚠️</span>
-            <h3 className="font-bold text-lg mb-2">Module non chargé</h3>
+            <span className="text-4xl mb-3"></span>
+            <h3 className="font-bold text-lg mb-2">Module non charge</h3>
             <p className="text-sm text-center opacity-75 mb-3">{componentName || 'Composant inconnu'}</p>
             <p className="text-xs text-center opacity-50">
                 {isFinanceProPanel 
                     ? 'Chargement en cours... (app-inline.js)' 
-                    : 'Vérifiez que le script est chargé dans beta-combined-dashboard.html'}
+                    : 'Verifiez que le script est charge dans beta-combined-dashboard.html'}
             </p>
             {isFinanceProPanel && (
                 <div className="mt-4 w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -455,7 +455,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
         activeTab,
         setActiveTab,
         activeSubTab,
-        // Tous les props nécessaires pour les composants
+        // Tous les props necessaires pour les composants
         tickers = [],
         stockData = {},
         newsData = [],
@@ -582,7 +582,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                     setLayoutConfigLoaded(true);
                 } catch (e) {
                     if (!isActive) return;
-                    console.warn('⚠️ Layout config not available, using local defaults');
+                    console.warn(' Layout config not available, using local defaults');
                     setLayoutConfigLoaded(true);
                 }
             };
@@ -612,7 +612,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                         })
                     });
                 } catch (e) {
-                    console.error('❌ Error saving dashboard layout config:', e);
+                    console.error(' Error saving dashboard layout config:', e);
                 }
             }, CONFIG_SAVE_DEBOUNCE_MS);
         }, []);
@@ -675,30 +675,30 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                         storageKey,
                         preferencesData
                     );
-                    console.log(`💾 Layout sauvegardé (Supabase/localStorage): ${scopeId}`, { items: sanitized.length });
+                    console.log(` Layout sauvegarde (Supabase/localStorage): ${scopeId}`, { items: sanitized.length });
                 } catch (e) {
-                    console.error('❌ Erreur sauvegarde via service:', e);
+                    console.error(' Erreur sauvegarde via service:', e);
                     // Fallback to localStorage
                     try {
                         localStorage.setItem(storageKey, JSON.stringify(sanitized));
                     } catch (e2) {
-                        console.error('❌ Erreur sauvegarde localStorage:', e2);
+                        console.error(' Erreur sauvegarde localStorage:', e2);
                     }
                 }
             } else {
                 // Fallback: localStorage only
                 try {
                     localStorage.setItem(storageKey, JSON.stringify(sanitized));
-                    console.log(`💾 Layout sauvegardé dans localStorage: ${storageKey}`, { items: sanitized.length });
+                    console.log(` Layout sauvegarde dans localStorage: ${storageKey}`, { items: sanitized.length });
                 } catch (e) {
-                    console.error('❌ Erreur sauvegarde localStorage:', e);
+                    console.error(' Erreur sauvegarde localStorage:', e);
                 }
             }
             
             // ONLY save to remote config if explicitly requested (e.g., "Sauv. Prod" button)
             // This prevents personal changes from affecting all users
             if (saveToRemote && isAdmin) {
-                console.log(`🌐 Layout sauvegardé dans config remote (GLOBAL): ${scopeId}`);
+                console.log(` Layout sauvegarde dans config remote (GLOBAL): ${scopeId}`);
                 updateLayoutConfig((config) => ({
                     ...config,
                     layouts: {
@@ -757,7 +757,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                 const fallbackKeys = getLayoutFallbackKeys(layoutScopeId, mainTab);
                 const fromStorage = await loadLayoutFromStorage(fallbackKeys, layoutScopeId);
                 if (isActive && fromStorage && fromStorage.length > 0) {
-                    console.log(`✅ Layout restauré depuis Supabase/localStorage pour scope: ${layoutScopeId}`);
+                    console.log(` Layout restaure depuis Supabase/localStorage pour scope: ${layoutScopeId}`);
                     setLayout(fromStorage);
                     return;
                 }
@@ -765,7 +765,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                 // Priority 2: Load from remote config (if admin and available)
                 const fromConfig = getLayoutFromConfig(layoutConfig, layoutScopeId, mainTab);
                 if (isActive && fromConfig && fromConfig.length > 0) {
-                    console.log(`✅ Layout restauré depuis config remote pour scope: ${layoutScopeId}`);
+                    console.log(` Layout restaure depuis config remote pour scope: ${layoutScopeId}`);
                     setLayout(fromConfig);
                     return;
                 }
@@ -777,7 +777,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
 
                 if (!isActive) return;
                 
-                console.log(`⚠️ Layout par défaut utilisé pour scope: ${layoutScopeId}`);
+                console.log(` Layout par defaut utilise pour scope: ${layoutScopeId}`);
                 setLayout(seedLayout);
 
                 // Save default layout to Supabase/localStorage (personal preference)
@@ -793,24 +793,24 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                 if (service.savePreferencesWithFallback) {
                     service.savePreferencesWithFallback('dashboard', storageKey, preferencesData)
                         .then(() => {
-                            console.log(`💾 Layout par défaut sauvegardé (Supabase/localStorage): ${storageKey}`);
+                            console.log(` Layout par defaut sauvegarde (Supabase/localStorage): ${storageKey}`);
                         })
                         .catch((e) => {
-                            console.error('❌ Erreur sauvegarde service:', e);
+                            console.error(' Erreur sauvegarde service:', e);
                             // Fallback localStorage
                             try {
                                 localStorage.setItem(storageKey, JSON.stringify(sanitizeLayout(seedLayout)));
                             } catch (e2) {
-                                console.error('❌ Erreur sauvegarde localStorage:', e2);
+                                console.error(' Erreur sauvegarde localStorage:', e2);
                             }
                         });
                 } else {
                     // Fallback localStorage only
                     try {
                         localStorage.setItem(storageKey, JSON.stringify(sanitizeLayout(seedLayout)));
-                        console.log(`💾 Layout par défaut sauvegardé dans localStorage: ${storageKey}`);
+                        console.log(` Layout par defaut sauvegarde dans localStorage: ${storageKey}`);
                     } catch (e) {
-                        console.error('❌ Erreur sauvegarde localStorage:', e);
+                        console.error(' Erreur sauvegarde localStorage:', e);
                     }
                 }
             };
@@ -825,7 +825,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
         useEffect(() => {
             setLayout(currentLayout => {
                 if (!currentLayout || currentLayout.length === 0) {
-                    console.warn('⚠️ Layout vide détecté, recréation du layout par défaut');
+                    console.warn(' Layout vide detecte, recreation du layout par defaut');
                     return loadSavedPreset(STORAGE_KEY_DEFAULT) || getDefaultLayout();
                 }
                 // Check for duplicates
@@ -836,7 +836,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                     return true;
                 });
                 if (uniqueLayout.length !== currentLayout.length) {
-                    console.warn(`⚠️ Doublons supprimés (${currentLayout.length} -> ${uniqueLayout.length})`);
+                    console.warn(` Doublons supprimes (${currentLayout.length} -> ${uniqueLayout.length})`);
                     persistLayoutForScope(layoutScopeId, uniqueLayout);
                     return uniqueLayout;
                 }
@@ -844,20 +844,20 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
             });
         }, []); // Empty deps - run once on mount only
 
-        // Synchroniser le layout avec mainTab : ajouter les widgets par défaut si nécessaire
+        // Synchroniser le layout avec mainTab : ajouter les widgets par defaut si necessaire
         useEffect(() => {
             if (layoutScopeMode === 'global') {
                 return;
             }
             if (!mainTab) {
-                console.log('[DashboardGridWrapper] ⏸️ Synchronisation layout/mainTab ignorée: mainTab vide');
+                console.log('[DashboardGridWrapper]  Synchronisation layout/mainTab ignoree: mainTab vide');
                 return;
             }
             
-            // Utiliser la fonction setLayout avec une fonction pour éviter les dépendances
+            // Utiliser la fonction setLayout avec une fonction pour eviter les dependances
             setLayout(currentLayout => {
                 if (!currentLayout || currentLayout.length === 0) {
-                    console.log('[DashboardGridWrapper] ⏸️ Layout vide, synchronisation ignorée');
+                    console.log('[DashboardGridWrapper]  Layout vide, synchronisation ignoree');
                     return currentLayout;
                 }
                 
@@ -876,9 +876,9 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                 
                 const existingIds = currentLayout.filter(item => validIds.includes(item.i)).map(item => item.i);
                 
-                // Si aucun widget du mainTab n'existe dans le layout, ajouter les widgets par défaut
+                // Si aucun widget du mainTab n'existe dans le layout, ajouter les widgets par defaut
                 if (existingIds.length === 0 && validIds.length > 0) {
-                    console.log('[DashboardGridWrapper] ➕ Ajout des widgets par défaut pour mainTab:', mainTab);
+                    console.log('[DashboardGridWrapper]  Ajout des widgets par defaut pour mainTab:', mainTab);
                     const newItems = validIds.map((id, idx) => {
                         const config = TAB_TO_WIDGET_MAP[id] || {};
                         const defaultSize = config.defaultSize || { w: 6, h: 8 };
@@ -897,7 +897,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                     // Ajouter les nouveaux widgets au layout existant (garder les autres widgets)
                     const updatedLayout = [...currentLayout, ...newItems];
                     persistLayoutForScopeRef.current(layoutScopeId, updatedLayout);
-                    console.log('[DashboardGridWrapper] ✅ Layout mis à jour avec', newItems.length, 'nouveaux widgets');
+                    console.log('[DashboardGridWrapper]  Layout mis a jour avec', newItems.length, 'nouveaux widgets');
                     return updatedLayout;
                 }
                 
@@ -937,7 +937,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
         }, [isEditing, layoutScopeId, persistLayoutForScope]);
         
         // Save current layout as a specific preset
-        // ⚠️ IMPORTANT: This function saves to REMOTE CONFIG (affects all users)
+        //  IMPORTANT: This function saves to REMOTE CONFIG (affects all users)
         // This is intentional - presets are global templates, not personal preferences
         const saveAsPreset = useCallback((presetName) => {
              const key = presetName === 'default' ? STORAGE_KEY_DEFAULT : 
@@ -955,9 +955,9 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                  }));
                  // Also save locally for quick access
                  localStorage.setItem(key, JSON.stringify(sanitized));
-                 console.log(`🌐 Preset "${presetName}" sauvegardé dans config remote (GLOBAL)`);
-                 if (window.showToast) window.showToast(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}" (GLOBAL)`, 'success');
-                 else alert(`Layout sauvegardé comme "${presetName === 'default' ? 'Production' : 'Développeur'}" (GLOBAL)`);
+                 console.log(` Preset "${presetName}" sauvegarde dans config remote (GLOBAL)`);
+                 if (window.showToast) window.showToast(`Layout sauvegarde comme "${presetName === 'default' ? 'Production' : 'Developpeur'}" (GLOBAL)`, 'success');
+                 else alert(`Layout sauvegarde comme "${presetName === 'default' ? 'Production' : 'Developpeur'}" (GLOBAL)`);
              }
         }, [layout, updateLayoutConfig]);
 
@@ -984,7 +984,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                 }
             }
 
-            // Vérifier si le widget existe déjà
+            // Verifier si le widget existe deja
             if (targetLayout.some(item => item.i === tabId)) {
                 if (hiddenWidgetSet.has(tabId)) {
                     persistHiddenWidgets(hiddenWidgets.filter(id => id !== tabId));
@@ -1013,8 +1013,8 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                 persistHiddenWidgets(hiddenWidgets.filter(id => id !== tabId));
             }
 
-            if (window.showToast) window.showToast('Widget ajouté dans la section courante', 'success');
-            else console.log('[DashboardGridWrapper] Widget ajouté dans la section courante');
+            if (window.showToast) window.showToast('Widget ajoute dans la section courante', 'success');
+            else console.log('[DashboardGridWrapper] Widget ajoute dans la section courante');
         }, [layout, layoutConfig, layoutScopeId, mainTab, persistLayoutForScope, hiddenWidgetSet, hiddenWidgets, persistHiddenWidgets]);
 
         // Supprimer un widget
@@ -1278,13 +1278,13 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
 
     // Filter layout to show ALL widgets for current main tab, or single widget if activeSubTab is set
     const filteredLayout = useMemo(() => {
-        // Si activeSubTab est défini, afficher uniquement ce widget
+        // Si activeSubTab est defini, afficher uniquement ce widget
         if (activeSubTab && TAB_TO_WIDGET_MAP[activeSubTab]) {
             const existingItem = layout.find(item => item.i === activeSubTab);
             if (existingItem) {
                 return [existingItem];
             }
-            // Si le widget n'existe pas dans le layout, le créer avec des dimensions par défaut
+            // Si le widget n'existe pas dans le layout, le creer avec des dimensions par defaut
             const config = TAB_TO_WIDGET_MAP[activeSubTab] || {};
             const defaultSize = config.defaultSize || { w: 12, h: 10 };
             const minSize = config.minSize || { w: 6, h: 6 };
@@ -1299,7 +1299,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
             }];
         }
         
-        // Sinon, afficher tous les widgets du mainTab (comportement par défaut)
+        // Sinon, afficher tous les widgets du mainTab (comportement par defaut)
         const validIds = layoutScopeMode === 'global'
             ? Object.keys(TAB_TO_WIDGET_MAP)
             : getWidgetIdsForMainTab(mainTab);
@@ -1381,11 +1381,11 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
         return { lg: lgLayout, md: mdLayout, sm: smLayout, xs: xsLayout, xxs: xxsLayout };
     }, [filteredLayout]);
 
-        // ⚠️ IMPORTANT: All hooks must be called before any early returns (React Rules of Hooks)
+        //  IMPORTANT: All hooks must be called before any early returns (React Rules of Hooks)
         // Log only on initial mount for performance
         useEffect(() => {
             if (ResponsiveGridLayout) {
-                console.log('🔍 DashboardGridWrapper - Montage initial:', {
+                console.log(' DashboardGridWrapper - Montage initial:', {
                     layoutLength: layout?.length || 0,
                     ResponsiveGridLayoutAvailable: true
                 });
@@ -1397,13 +1397,13 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
             // Only log once to prevent console spam
             if (!_loggedRGLError) {
                 _loggedRGLError = true;
-                console.error('❌ ResponsiveGridLayout non disponible');
+                console.error(' ResponsiveGridLayout non disponible');
             }
             return (
                 <div className={`p-6 ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
                     <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
-                        <p className="font-medium">⚠️ React-Grid-Layout en cours de chargement...</p>
-                        <p className="text-sm mt-1">Vérifiez que le CDN est chargé dans beta-combined-dashboard.html</p>
+                        <p className="font-medium"> React-Grid-Layout en cours de chargement...</p>
+                        <p className="text-sm mt-1">Verifiez que le CDN est charge dans beta-combined-dashboard.html</p>
                     </div>
                 </div>
             );
@@ -1411,7 +1411,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
 
         return (
             <div className={`min-h-screen ${isDarkMode ? 'bg-black' : 'bg-white'}`}>
-                {/* Barre de contrôle */}
+                {/* Barre de controle */}
                 <div className={`sticky top-0 z-40 flex items-center justify-between p-4 border-b ${isDarkMode ? 'bg-neutral-900 border-neutral-700' : 'bg-white border-gray-200'}`}>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
@@ -1440,7 +1440,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                                                 ? 'bg-blue-600 hover:bg-blue-500 text-white' 
                                                 : 'bg-blue-500 hover:bg-blue-600 text-white'
                                         }`}
-                                        title="Sauvegarder comme layout de Production (Par défaut)"
+                                        title="Sauvegarder comme layout de Production (Par defaut)"
                                     >
                                         <window.LucideIcon name="Save" className="w-3.5 h-3.5" />
                                         Sauv. Prod
@@ -1452,7 +1452,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                                                 ? 'bg-purple-600 hover:bg-purple-500 text-white' 
                                                 : 'bg-purple-500 hover:bg-purple-600 text-white'
                                         }`}
-                                        title="Sauvegarder comme layout Développeur"
+                                        title="Sauvegarder comme layout Developpeur"
                                     >
                                         <window.LucideIcon name="Code" className="w-3.5 h-3.5" />
                                         Sauv. Dev
@@ -1471,11 +1471,11 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                                     defaultValue=""
                                 >
                                     <option value="" disabled>Charger un preset...</option>
-                                    <option value="default">🏠 Production (Défaut)</option>
-                                    <option value="developer">👨‍💻 Développeur</option>
-                                    <option value="trading">📈 Trading</option>
-                                    <option value="research">🔬 Recherche</option>
-                                    <option value="minimal">⚡ Minimal</option>
+                                    <option value="default"> Production (Defaut)</option>
+                                    <option value="developer"> Developpeur</option>
+                                    <option value="trading"> Trading</option>
+                                    <option value="research"> Recherche</option>
+                                    <option value="minimal"> Minimal</option>
                                 </select>
                             </>
                         )}
@@ -1512,7 +1512,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                                         ? 'bg-neutral-700 text-gray-300 border border-neutral-600'
                                         : 'bg-white text-gray-700 border border-gray-300'
                                 }`}
-                                title="Portée du layout (global pour tous)"
+                                title="Portee du layout (global pour tous)"
                             >
                                 <option value="primary">Scope: Principal</option>
                                 <option value="secondary">Scope: Secondaire</option>
@@ -1563,7 +1563,7 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                                         ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                                         : 'bg-red-100 text-red-600 hover:bg-red-200'
                                 }`}
-                                title="Réinitialiser au layout de Production par défaut"
+                                title="Reinitialiser au layout de Production par defaut"
                             >
                                 <window.LucideIcon name="RotateCcw" className="w-4 h-4" />
                                 Reset
@@ -1577,8 +1577,8 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                     {!layout || layout.length === 0 ? (
                         <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
                             <div className={`p-4 rounded-lg text-center ${isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-700'}`}>
-                                <p className="font-medium mb-2">⏳ Initialisation du layout...</p>
-                                <p className="text-sm mb-4">Création des widgets par défaut...</p>
+                                <p className="font-medium mb-2"> Initialisation du layout...</p>
+                                <p className="text-sm mb-4">Creation des widgets par defaut...</p>
                                 <button
                                     onClick={() => {
                                         const defaultLayout = getDefaultLayout();
@@ -1591,13 +1591,13 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                                             : 'bg-emerald-500 hover:bg-emerald-600 text-white'
                                     }`}
                                 >
-                                    Créer Layout par Défaut
+                                    Creer Layout par Defaut
                                 </button>
                             </div>
                         </div>
                     ) : !filteredLayout?.length ? (
                         <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-neutral-900' : 'bg-gray-100'}`}>
-                            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Aucun widget à afficher</p>
+                            <p className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>Aucun widget a afficher</p>
                         </div>
                     ) : (
                         <ResponsiveGridLayout
@@ -1622,12 +1622,12 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                     )}
                 </div>
 
-                {/* Dock pour ajouter des widgets (en mode édition) */}
+                {/* Dock pour ajouter des widgets (en mode edition) */}
                 {isEditing && (
                     <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl flex gap-4 shadow-2xl z-50 max-w-4xl overflow-x-auto ${isDarkMode ? 'bg-neutral-800/90 backdrop-blur border border-neutral-700' : 'bg-white/90 backdrop-blur border border-gray-200'}`}>
                         {dockWidgetEntries.length === 0 ? (
                             <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                Tous les widgets disponibles sont déjà dans la grille.
+                                Tous les widgets disponibles sont deja dans la grille.
                             </span>
                         ) : (
                             dockWidgetEntries.map(([tabId, config]) => {
@@ -1663,10 +1663,10 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                     </div>
                 )}
 
-                {/* Message mode édition */}
+                {/* Message mode edition */}
                 {isEditing && (
                     <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full shadow-lg bg-emerald-500 text-white z-40`}>
-                        <span className="text-sm font-medium">🔧 Mode édition - Glissez et redimensionnez les widgets</span>
+                        <span className="text-sm font-medium"> Mode edition - Glissez et redimensionnez les widgets</span>
                     </div>
                 )}
             </div>
@@ -1676,5 +1676,5 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
     // Export component to window
     window.DashboardGridWrapper = DashboardGridWrapper;
 
-    console.log('✅ DashboardGridWrapper chargé');
+    console.log(' DashboardGridWrapper charge');
 })();

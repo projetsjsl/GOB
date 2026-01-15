@@ -49,7 +49,7 @@
         if (next) {
             _tvWidgetLoading = true;
             _tvLoadedCount++;
-            console.log(`📊 Loading TradingView widget #${_tvLoadedCount}: ${next.name}`);
+            console.log(` Loading TradingView widget #${_tvLoadedCount}: ${next.name}`);
             next.callback();
             setTimeout(() => {
                 _tvWidgetLoading = false;
@@ -73,8 +73,8 @@
     // LAZY WIDGET WRAPPER
     // =====================================================
     // NOTE: No longer accepts isDarkMode prop - uses theme system
-    // TECH #1 FIX: Wrapper avec ErrorBoundary pour protéger contre les erreurs
-    // Get ErrorBoundary from window (loaded from ErrorBoundary.js) - déclaré une seule fois
+    // TECH #1 FIX: Wrapper avec ErrorBoundary pour proteger contre les erreurs
+    // Get ErrorBoundary from window (loaded from ErrorBoundary.js) - declare une seule fois
     const WidgetErrorBoundary = window.WidgetErrorBoundary || (({ children }) => children);
     
     const LazyTVWidget = ({ children, name, height = 400 }) => {
@@ -107,7 +107,7 @@
                 // Check if we've exceeded max auto-load limit
                 if (_tvLoadedCount >= MAX_AUTO_LOAD_WIDGETS) {
                     setRequiresClick(true);
-                    console.log(`📊 Widget "${name}" requires click to load (limit reached)`);
+                    console.log(` Widget "${name}" requires click to load (limit reached)`);
                 } else {
                     setIsQueued(true);
                     queueWidgetLoad(name, () => {
@@ -125,7 +125,7 @@
             });
         };
 
-        // TECH #1 FIX: Wrapper avec ErrorBoundary (WidgetErrorBoundary déjà déclaré en haut du composant)
+        // TECH #1 FIX: Wrapper avec ErrorBoundary (WidgetErrorBoundary deja declare en haut du composant)
         return (
             <WidgetErrorBoundary widgetName={name} isDarkMode={!light}>
                 <div ref={containerRef} style={{ height: height, width: '100%' }}>
@@ -136,7 +136,7 @@
                                     <div className={`w-12 h-12 mx-auto rounded-lg ${light ? 'bg-gray-200' : 'bg-neutral-700'}`}></div>
                                 </div>
                                 <p className={`text-sm ${light ? 'text-gray-600' : 'text-gray-400'}`}>
-                                    {isQueued ? '⏳ Chargement...' : requiresClick ? '📊 Widget disponible' : '📊 Widget TradingView'}
+                                    {isQueued ? ' Chargement...' : requiresClick ? ' Widget disponible' : ' Widget TradingView'}
                                 </p>
                                 <p className={`text-xs mt-1 ${light ? 'text-gray-400' : 'text-gray-500'}`}>
                                     {name}
@@ -160,7 +160,7 @@
     // =====================================================
     // 1. MARKET OVERVIEW WIDGET
     // =====================================================
-    // TECH #1 FIX: Wrapper avec ErrorBoundary (WidgetErrorBoundary déjà déclaré plus haut)
+    // TECH #1 FIX: Wrapper avec ErrorBoundary (WidgetErrorBoundary deja declare plus haut)
     const MarketOverviewWidget = ({ height = 450 }) => {
         const containerRef = useRef(null);
 
@@ -548,25 +548,7 @@
                     {
                         name: 'Futures',
                         symbols: [
-                            { name: 'CMCMARKETS:GOLD', displayName: 'Gold' },
-                            { name: 'PYTH:WTI3!', displayName: 'WTI Crude Oil' }
-                        ]
-                    },
-                    {
-                        name: 'Bonds US',
-                        symbols: [
-                            { name: 'TVC:US02Y', displayName: 'US 2Y' },
-                            { name: 'TVC:US05Y', displayName: 'US 5Y' },
-                            { name: 'TVC:US10Y', displayName: 'US 10Y' },
-                            { name: 'TVC:US30Y', displayName: 'US 30Y' }
-                        ]
-                    },
-                    {
-                        name: 'Bonds CAN',
-                        symbols: [
-                            { name: 'TVC:CA02Y', displayName: 'CAN 2Y' },
-                            { name: 'TVC:CA05Y', displayName: 'CAN 5Y' },
-                            { name: 'TVC:CA10Y', displayName: 'CAN 10Y' }
+                            { name: 'CMCMARKETS:GOLD', displayName: 'Gold' }
                         ]
                     },
                     {
@@ -751,7 +733,7 @@
         resetWidgetQueue,
         queueWidgetLoad,
 
-        // ===== MARCHÉS (Global Market Perspective) =====
+        // ===== MARCHES (Global Market Perspective) =====
         // Use these in MarketsEconomyTab for global market views
         MarketOverviewWidget,      // Indices, Forex, Crypto overview with tabs
         MarketQuotesWidget,        // Multi-group quotes (indices, bonds, forex)
@@ -796,5 +778,5 @@
         'TechnicalAnalysisWidget'
     ];
 
-    console.log('✅ TradingViewWidgets.js loaded - 15 widgets (6 Marchés + 8 Titres + 1 Ticker)');
+    console.log(' TradingViewWidgets.js loaded - 15 widgets (6 Marches + 8 Titres + 1 Ticker)');
 })();

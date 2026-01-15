@@ -8,7 +8,7 @@ const { useState, useEffect, useRef, useCallback } = React;
 const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
     // Prefer global cache function from app-inline.js
     if (window.fetchYieldCurveWithCache) {
-        console.log('🔗 YieldCurveTab.js using GLOBAL cache function');
+        console.log(' YieldCurveTab.js using GLOBAL cache function');
         return window.fetchYieldCurveWithCache(country, { forceRefresh });
     }
 
@@ -24,7 +24,7 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
             blockedCount: 0,
             lastReset: Date.now()
         };
-        console.log('🚀 YieldCurveTab.js initialized GLOBAL cache (with rate limiting)');
+        console.log(' YieldCurveTab.js initialized GLOBAL cache (with rate limiting)');
     }
 
     const global = window.__yieldCurveGlobalCache;
@@ -34,7 +34,7 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
     // Track calls
     global.callCount++;
     if (global.callCount > 10) {
-        console.warn(`⚠️ YieldCurveTab.js: ${global.callCount} calls (${global.blockedCount} blocked)`);
+        console.warn(` YieldCurveTab.js: ${global.callCount} calls (${global.blockedCount} blocked)`);
     }
     if (now - global.lastReset > 60000) {
         global.callCount = 0;
@@ -49,12 +49,12 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
         global.blockedCount++;
         const cached = global.cache.get(cacheKey);
         if (cached) {
-            console.log(`🛑 YieldCurveTab.js RATE LIMITED (${cacheKey}) - returning cached`);
+            console.log(` YieldCurveTab.js RATE LIMITED (${cacheKey}) - returning cached`);
             return cached.data;
         }
         const inflightReq = global.inflight.get(cacheKey);
         if (inflightReq) {
-            console.log(`🛑 YieldCurveTab.js RATE LIMITED (${cacheKey}) - joining inflight`);
+            console.log(` YieldCurveTab.js RATE LIMITED (${cacheKey}) - joining inflight`);
             return inflightReq;
         }
     }
@@ -62,21 +62,21 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
     if (!forceRefresh) {
         const cached = global.cache.get(cacheKey);
         if (cached && now - cached.cachedAt < global.TTL_MS) {
-            console.log(`✅ YieldCurveTab.js GLOBAL Cache HIT (${cacheKey})`);
+            console.log(` YieldCurveTab.js GLOBAL Cache HIT (${cacheKey})`);
             return cached.data;
         }
     }
 
     const existing = global.inflight.get(cacheKey);
     if (existing) {
-        console.log(`🔄 YieldCurveTab.js Request DEDUPLICATED (${cacheKey})`);
+        console.log(` YieldCurveTab.js Request DEDUPLICATED (${cacheKey})`);
         return existing;
     }
 
     // Update last fetch time BEFORE making request
     global.lastFetchTime.set(cacheKey, now);
 
-    console.log(`🌐 YieldCurveTab.js GLOBAL Cache MISS (${cacheKey})`);
+    console.log(` YieldCurveTab.js GLOBAL Cache MISS (${cacheKey})`);
 
     const url = `/api/yield-curve?country=${encodeURIComponent(country)}`;
     const request = (window.fetchJsonSafe
@@ -87,7 +87,7 @@ const fetchYieldCurveData = async (country, { forceRefresh = false } = {}) => {
         }))
         .then((data) => {
             if (!data || data.success === false) {
-                throw new Error(data?.error || 'Réponse API invalide');
+                throw new Error(data?.error || 'Reponse API invalide');
             }
             global.cache.set(cacheKey, { data, cachedAt: Date.now() });
             return data;
@@ -125,7 +125,7 @@ const SpreadChart = ({ usRates, caRates, darkMode }) => {
 
         const ctx = canvasRef.current.getContext('2d');
         
-        // Couleurs dynamiques selon positif/négatif
+        // Couleurs dynamiques selon positif/negatif
         const bgColors = spreads.map(v => v >= 0 ? 'rgba(59, 130, 246, 0.6)' : 'rgba(239, 68, 68, 0.6)');
         const borderColors = spreads.map(v => v >= 0 ? '#3b82f6' : '#ef4444');
 
@@ -212,9 +212,9 @@ const YieldCurveTab = () => {
     // S'assurer que isDarkMode est accessible
     const darkMode = window.BetaCombinedDashboard?.isDarkMode ?? true;
 
-    const formatRate = (value) => (value === null || value === undefined ? '—' : Number(value).toFixed(2));
+    const formatRate = (value) => (value === null || value === undefined ? '-' : Number(value).toFixed(2));
     
-    // Récupérer les données de la yield curve
+    // Recuperer les donnees de la yield curve
     const fetchYieldCurve = useCallback(async (forceRefresh = false) => {
         setLoading(true);
         setError(null);
@@ -223,7 +223,7 @@ const YieldCurveTab = () => {
             setYieldData(data);
             setLoading(false);
         } catch (err) {
-            console.error('❌ Erreur yield curve:', err);
+            console.error(' Erreur yield curve:', err);
             setError(err instanceof Error ? err.message : String(err));
             setLoading(false);
         }
@@ -245,7 +245,7 @@ const YieldCurveTab = () => {
         const datasets = [];
         if (yieldData.data?.us) {
             datasets.push({
-                label: '🇺🇸 US Treasury (Actuel)',
+                label: ' US Treasury (Actuel)',
                 data: maturityOrder.map(m => getRate(yieldData.data.us, m)),
                 borderColor: '#60a5fa',
                 backgroundColor: 'rgba(96, 165, 250, 0.1)',
@@ -254,7 +254,7 @@ const YieldCurveTab = () => {
                 pointRadius: 4,
             });
             datasets.push({
-                label: '🇺🇸 US Treasury (M-1)',
+                label: ' US Treasury (M-1)',
                 data: maturityOrder.map(m => getPrevRate(yieldData.data.us, m)),
                 borderColor: '#60a5fa',
                 borderWidth: 2,
@@ -266,7 +266,7 @@ const YieldCurveTab = () => {
         }
         if (yieldData.data?.canada) {
             datasets.push({
-                label: '🇨🇦 Canada Bonds (Actuel)',
+                label: ' Canada Bonds (Actuel)',
                 data: maturityOrder.map(m => getRate(yieldData.data.canada, m)),
                 borderColor: '#f87171',
                 backgroundColor: 'rgba(248, 113, 113, 0.1)',
@@ -298,7 +298,7 @@ const YieldCurveTab = () => {
 
 
 
-    // BUG #3 FIX: Empty state si erreur ou pas de données
+    // BUG #3 FIX: Empty state si erreur ou pas de donnees
     if (error && !yieldData) {
         return (
             <div className={`flex flex-col items-center justify-center min-h-[500px] p-8 rounded-xl border-2 transition-colors duration-300 ${
@@ -306,12 +306,12 @@ const YieldCurveTab = () => {
                     ? 'bg-gray-800/50 border-dashed border-gray-700'
                     : 'bg-gray-50 border-dashed border-gray-300'
             }`}>
-                <div className="text-6xl mb-4 opacity-60">📈</div>
+                <div className="text-6xl mb-4 opacity-60"></div>
                 <h3 className={`text-xl font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                     Impossible de charger la courbe des taux
                 </h3>
                 <p className={`text-sm text-center max-w-md mb-6 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    {error || 'Une erreur est survenue lors du chargement des données de la courbe des taux.'}
+                    {error || 'Une erreur est survenue lors du chargement des donnees de la courbe des taux.'}
                 </p>
                 <button
                     onClick={() => fetchYieldCurve(true)}
@@ -321,7 +321,7 @@ const YieldCurveTab = () => {
                             : 'bg-blue-500 hover:bg-blue-600 text-white'
                     }`}
                 >
-                    Réessayer
+                    Reessayer
                 </button>
             </div>
         );
@@ -349,7 +349,7 @@ const YieldCurveTab = () => {
                 <div>
                     <h2 className="text-2xl font-bold flex items-center gap-2">
                         <LucideIcon name="TrendingUp" className="w-6 h-6 text-blue-500" />
-                        Courbe des Taux <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded ml-2">MARCHÉS</span>
+                        Courbe des Taux <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded ml-2">MARCHES</span>
                     </h2>
                 </div>
                 <div className="flex gap-2">
@@ -406,14 +406,14 @@ const YieldCurveTab = () => {
 
                 <div className="space-y-6">
                     <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/50">
-                        <h3 className="text-sm font-bold uppercase mb-4 text-neutral-400">Tableau des Maturités</h3>
+                        <h3 className="text-sm font-bold uppercase mb-4 text-neutral-400">Tableau des Maturites</h3>
                         <div className="max-h-[400px] overflow-y-auto">
                             <table className="w-full text-xs">
                                 <thead className="sticky top-0 bg-neutral-950">
                                     <tr className="text-neutral-500 border-b border-neutral-800">
                                         <th className="text-left py-2">EXP</th>
                                         <th className="text-right py-2">US%</th>
-                                        <th className="text-right py-2">1M Δ</th>
+                                        <th className="text-right py-2">1M </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -441,7 +441,7 @@ const YieldCurveTab = () => {
             {/* Official Links */}
             <div className="p-6 rounded-xl border border-dashed border-neutral-800">
                 <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-4 flex items-center gap-2">
-                    <LucideIcon name="Shield" className="w-3 h-3" /> Sources de Référence
+                    <LucideIcon name="Shield" className="w-3 h-3" /> Sources de Reference
                 </h3>
                 <div className="flex flex-wrap gap-x-8 gap-y-4">
                     <a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve" target="_blank" rel="noopener noreferrer" className="text-xs text-neutral-400 hover:text-blue-400 transition-colors flex items-center gap-2">

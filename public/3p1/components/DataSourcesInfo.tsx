@@ -8,7 +8,7 @@ export const DataSourcesInfo: React.FC = () => {
                 <div className="flex items-start gap-3">
                     <InformationCircleIcon className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
                     <h3 className="text-lg font-bold text-gray-800">
-                        📊 Sources des Données et Méthodologie de Calcul
+                         Sources des Donnees et Methodologie de Calcul
                     </h3>
                 </div>
                 <a
@@ -24,64 +24,64 @@ export const DataSourcesInfo: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Données Historiques */}
+                {/* Donnees Historiques */}
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                     <h4 className="font-bold text-green-700 mb-2 flex items-center gap-2">
                         <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-                        Données Officielles (Vert)
+                        Donnees Officielles (Vert)
                     </h4>
                     <ul className="text-sm text-gray-700 space-y-1.5">
                         <li><strong>Source :</strong> Financial Modeling Prep (FMP) API</li>
-                        <li><strong>BPA (EPS) :</strong> Bénéfice net par action (données annuelles auditées)</li>
-                        <li><strong>CFA (Cash Flow) :</strong> Flux de trésorerie opérationnel par action</li>
+                        <li><strong>BPA (EPS) :</strong> Benefice net par action (donnees annuelles auditees)</li>
+                        <li><strong>CFA (Cash Flow) :</strong> Flux de tresorerie operationnel par action</li>
                         <li><strong>BV (Book Value) :</strong> Valeur comptable par action</li>
-                        <li><strong>DIV (Dividende) :</strong> Somme des dividendes versés par année fiscale</li>
-                        <li><strong>Prix Haut/Bas :</strong> Prix maximum et minimum observés durant l'année</li>
+                        <li><strong>DIV (Dividende) :</strong> Somme des dividendes verses par annee fiscale</li>
+                        <li><strong>Prix Haut/Bas :</strong> Prix maximum et minimum observes durant l'annee</li>
                     </ul>
                 </div>
 
-                {/* Projections et Hypothèses */}
+                {/* Projections et Hypotheses */}
                 <div className="bg-white p-4 rounded-lg shadow-sm">
                     <h4 className="font-bold text-orange-700 mb-2 flex items-center gap-2">
                         <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
-                        Projections Basées sur Hypothèses (Orange)
+                        Projections Basees sur Hypotheses (Orange)
                     </h4>
                     <ul className="text-sm text-gray-700 space-y-1.5">
-                        <li><strong>Taux de Croissance :</strong> CAGR calculé sur l'historique disponible (plafonné à 0-20%)</li>
+                        <li><strong>Taux de Croissance :</strong> CAGR calcule sur l'historique disponible (plafonne a 0-20%)</li>
                         <li><strong>Ratios Cibles :</strong> Moyenne historique des ratios P/E, P/CF, P/BV (filtrage des valeurs aberrantes)</li>
                         <li><strong>Rendement Cible :</strong> Moyenne historique du rendement en dividendes</li>
-                        <li><strong>Valeurs Projetées (5 ans) :</strong> Calculées avec la formule : <code className="bg-gray-100 px-1 rounded">Valeur × (1 + Taux)^5</code></li>
-                        <li><strong>Prix Cible :</strong> Valeur projetée × Ratio cible (ex: EPS projeté × P/E cible)</li>
+                        <li><strong>Valeurs Projetees (5 ans) :</strong> Calculees avec la formule : <code className="bg-gray-100 px-1 rounded">Valeur x (1 + Taux)^5</code></li>
+                        <li><strong>Prix Cible :</strong> Valeur projetee x Ratio cible (ex: EPS projete x P/E cible)</li>
                     </ul>
                 </div>
             </div>
 
-            {/* Formules Clés */}
+            {/* Formules Cles */}
             <div className="bg-white p-4 rounded-lg shadow-sm mt-4">
-                <h4 className="font-bold text-indigo-700 mb-2">🧮 Formules de Calcul</h4>
+                <h4 className="font-bold text-indigo-700 mb-2"> Formules de Calcul</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-700">
                     <div>
-                        <strong>CAGR (Taux de Croissance Annuel Composé) :</strong>
+                        <strong>CAGR (Taux de Croissance Annuel Compose) :</strong>
                         <code className="block bg-gray-100 p-2 rounded mt-1 text-xs">
-                            ((Valeur Finale / Valeur Initiale)^(1/Années)) - 1
+                            ((Valeur Finale / Valeur Initiale)^(1/Annees)) - 1
                         </code>
                     </div>
                     <div>
-                        <strong>Prix Cible (Méthode P/E) :</strong>
+                        <strong>Prix Cible (Methode P/E) :</strong>
                         <code className="block bg-gray-100 p-2 rounded mt-1 text-xs">
-                            BPA Projeté (An 5) × P/E Cible
+                            BPA Projete (An 5) x P/E Cible
                         </code>
                     </div>
                     <div>
-                        <strong>Prix Cible (Méthode Dividende) :</strong>
+                        <strong>Prix Cible (Methode Dividende) :</strong>
                         <code className="block bg-gray-100 p-2 rounded mt-1 text-xs">
-                            Dividende Projeté (An 5) / (Rendement Cible / 100)
+                            Dividende Projete (An 5) / (Rendement Cible / 100)
                         </code>
                     </div>
                     <div>
                         <strong>Rendement Potentiel Total :</strong>
                         <code className="block bg-gray-100 p-2 rounded mt-1 text-xs">
-                            ((Prix Cible Moyen / Prix Actuel) - 1) × 100
+                            ((Prix Cible Moyen / Prix Actuel) - 1) x 100
                         </code>
                     </div>
                 </div>
@@ -90,9 +90,9 @@ export const DataSourcesInfo: React.FC = () => {
             {/* Avertissement */}
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-4">
                 <p className="text-xs text-yellow-800">
-                    <strong>⚠️ Avertissement :</strong> Les projections sont basées sur des hypothèses et l'historique.
-                    Elles ne constituent pas une garantie de performance future. Les données en <span className="text-orange-600 font-semibold">orange</span> sont
-                    des estimations calculées automatiquement et doivent être ajustées selon votre analyse personnelle.
+                    <strong> Avertissement :</strong> Les projections sont basees sur des hypotheses et l'historique.
+                    Elles ne constituent pas une garantie de performance future. Les donnees en <span className="text-orange-600 font-semibold">orange</span> sont
+                    des estimations calculees automatiquement et doivent etre ajustees selon votre analyse personnelle.
                 </p>
             </div>
         </div>

@@ -1,4 +1,4 @@
-// emma-ai.js - Logique complète du chatbot Emma IA
+// emma-ai.js - Logique complete du chatbot Emma IA
 
 class EmmaAI {
     constructor() {
@@ -45,13 +45,13 @@ class EmmaAI {
     }
 
     showWelcomeMessage() {
-        const welcomeMsg = `Bonjour! 👋 Je suis Emma, votre assistante IA. Je suis ici pour vous aider avec:
+        const welcomeMsg = `Bonjour!  Je suis Emma, votre assistante IA. Je suis ici pour vous aider avec:
 
-📋 **Les champs du formulaire** - Explications détaillées
-⚙️ **Les fonctionnalités** - Comment utiliser l'app
-🔍 **Conseils pragmatiques** - Sans jugement, toujours!
+ **Les champs du formulaire** - Explications detaillees
+ **Les fonctionnalites** - Comment utiliser l'app
+ **Conseils pragmatiques** - Sans jugement, toujours!
 
-**N'hésitez pas à poser vos questions!** Que voulez-vous savoir?`;
+**N'hesitez pas a poser vos questions!** Que voulez-vous savoir?`;
 
         this.addMessage(welcomeMsg, 'emma');
     }
@@ -76,7 +76,7 @@ class EmmaAI {
         // Afficher l'indicateur de typing
         this.showTypingIndicator();
 
-        // Simuler délai réseau et répondre
+        // Simuler delai reseau et repondre
         // Utiliser requestAnimationFrame pour s'assurer que l'UI a update
         requestAnimationFrame(() => {
             setTimeout(() => {
@@ -92,7 +92,7 @@ class EmmaAI {
                     });
                 } catch (e) {
                     console.error("Emma Error:", e);
-                    this.addMessage("Désolée, j'ai eu un petit problème technique. Pouvez-vous répéter?", 'emma');
+                    this.addMessage("Desolee, j'ai eu un petit probleme technique. Pouvez-vous repeter?", 'emma');
                 }
             }, 800 + Math.random() * 400);
         });
@@ -104,7 +104,7 @@ class EmmaAI {
 
         const avatar = document.createElement('div');
         avatar.className = `emma-avatar ${sender}`;
-        avatar.textContent = sender === 'emma' ? '🤖' : '👤';
+        avatar.textContent = sender === 'emma' ? '' : '';
 
         const bubble = document.createElement('div');
         bubble.className = `emma-bubble ${sender}`;
@@ -134,7 +134,7 @@ class EmmaAI {
 
         const avatar = document.createElement('div');
         avatar.className = 'emma-avatar emma';
-        avatar.textContent = '🤖';
+        avatar.textContent = '';
 
         const bubble = document.createElement('div');
         bubble.className = 'emma-bubble emma';
@@ -162,208 +162,208 @@ class EmmaAI {
         // Base de connaissances pour Emma
         const knowledgeBase = {
             // Questions sur les CHAMPS
-            'prénom|nom|email|telephone|adresse': `**Informations d'Identité** 📋
+            'prenom|nom|email|telephone|adresse': `**Informations d'Identite** 
 
 Ces champs permettent de **collecter les informations de base du client**:
 
-- **Prénom & Nom**: Identité complète du client
-- **Email**: Contact électronique principal
-- **Téléphone**: Contact direct client
+- **Prenom & Nom**: Identite complete du client
+- **Email**: Contact electronique principal
+- **Telephone**: Contact direct client
 - **Adresse**: Localisation domicile
-- **Ville, Province, Code Postal**: Complètent l'adresse
+- **Ville, Province, Code Postal**: Completent l'adresse
 
-**💡 Conseil:** Assurez-vous que le client fournisse des coordonnées actualisées pour un suivi facile.`,
+** Conseil:** Assurez-vous que le client fournisse des coordonnees actualisees pour un suivi facile.`,
 
-            'état civil|date de naissance|nas|enfants|emploi|conjoint': `**Situation Personnelle** 👨‍👩‍👧
+            'etat civil|date de naissance|nas|enfants|emploi|conjoint': `**Situation Personnelle** 
 
 Cette section capture le **contexte personnel et professionnel**:
 
-- **État Civil**: Marié, Célibataire, etc. → Impact sur planification
-- **Date de Naissance**: Pour calcul âge, retraite
-- **NAS**: Numéro Assurance Sociale → Identification client
-- **Enfants à Charge**: Augmente les besoins financiers
-- **Employeur & Poste**: Stabilité revenu, horizon carrière
+- **Etat Civil**: Marie, Celibataire, etc. -> Impact sur planification
+- **Date de Naissance**: Pour calcul age, retraite
+- **NAS**: Numero Assurance Sociale -> Identification client
+- **Enfants a Charge**: Augmente les besoins financiers
+- **Employeur & Poste**: Stabilite revenu, horizon carriere
 - **Conjoint**: Revenus familiaux totaux
 
-**💡 Conseil:** Plus l'info est précise, meilleure sera la recommandation de placement!`,
+** Conseil:** Plus l'info est precise, meilleure sera la recommandation de placement!`,
 
-            'revenu|actif|immobilier|liquide|horizon|tolerance|risque|reer': `**Situation Financière** 💰
+            'revenu|actif|immobilier|liquide|horizon|tolerance|risque|reer': `**Situation Financiere** 
 
-Les éléments CRITIQUES pour les recommandations:
+Les elements CRITIQUES pour les recommandations:
 
-- **Revenu Annuel**: Capacité d'épargne et d'investissement
-- **Actifs Immobiliers**: Patrimoine en propriété
-- **Actifs Liquides**: Disponibilités immédiates
+- **Revenu Annuel**: Capacite d'epargne et d'investissement
+- **Actifs Immobiliers**: Patrimoine en propriete
+- **Actifs Liquides**: Disponibilites immediates
 - **Horizon de Placement**: 
-  - Court terme (< 3 ans) → Conservateur
-  - Long terme (10+ ans) → Croissance possible
-- **Tolérance au Risque**: Aversion ou appétit client
+  - Court terme (< 3 ans) -> Conservateur
+  - Long terme (10+ ans) -> Croissance possible
+- **Tolerance au Risque**: Aversion ou appetit client
 - **REER**: Planification retraite
 
-**⚠️ Important:** Ces infos déterminent votre stratégie de placement. Soyez rigoureux!`,
+** Important:** Ces infos determinent votre strategie de placement. Soyez rigoureux!`,
 
-            'export|excel|pdf|telecharger': `**Exports Disponibles** 📤
+            'export|excel|pdf|telecharger': `**Exports Disponibles** 
 
-Une fois le formulaire complété, vous avez 3 options:
+Une fois le formulaire complete, vous avez 3 options:
 
-1. **📊 Exporter Excel**
+1. ** Exporter Excel**
    - Format: CSV (compatible Excel, Sheets)
    - Nom fichier: \`client_[NOM]_[DATE].csv\`
-   - À utiliser: Pour archivage, analyses
+   - A utiliser: Pour archivage, analyses
    - Avantage: Facilement manipulable
 
-2. **📄 Exporter PDF**
-   - Format: Texte formaté signable
+2. ** Exporter PDF**
+   - Format: Texte formate signable
    - Inclut: Tous les champs + zone signature
-   - À utiliser: Pour dossier client officiel
-   - Avantage: Prêt à archiver légalement
+   - A utiliser: Pour dossier client officiel
+   - Avantage: Pret a archiver legalement
 
-3. **💾 Nouveau Dossier**
-   - Réinitialise le formulaire
-   - Prêt pour prochain client
-   - Auto-sauvegarde précédent
+3. ** Nouveau Dossier**
+   - Reinitialise le formulaire
+   - Pret pour prochain client
+   - Auto-sauvegarde precedent
 
-**💡 Conseil:** Exportez en Excel pour analyses, en PDF pour archives legales.`,
+** Conseil:** Exportez en Excel pour analyses, en PDF pour archives legales.`,
 
-            'admin|parametre|champ|template|utilisateur': `**Panneau Admin** 🔧
+            'admin|parametre|champ|template|utilisateur': `**Panneau Admin** 
 
-Si vous êtes **administrateur**, vous pouvez:
+Si vous etes **administrateur**, vous pouvez:
 
-1. **👥 Gestion Utilisateurs**
-   - Créer comptes pour adjointes
-   - Assigner rôles (Admin/User)
-   - Gérer accès
+1. ** Gestion Utilisateurs**
+   - Creer comptes pour adjointes
+   - Assigner roles (Admin/User)
+   - Gerer acces
 
-2. **📝 Paramétrer Champs**
+2. ** Parametrer Champs**
    - Ajouter/supprimer champs
-   - Changer libellés
-   - Définir requis/optionnel
+   - Changer libelles
+   - Definir requis/optionnel
    - Modifier l'ordre
 
-3. **📋 Templates Export**
+3. ** Templates Export**
    - Config colonnes Excel
    - Personnaliser PDF
    - Ajouter sections
 
-4. **📁 Dossiers Clients**
-   - Voir tous les clients collectés
-   - Vérifier données
-   - Supprimer si nécessaire
+4. ** Dossiers Clients**
+   - Voir tous les clients collectes
+   - Verifier donnees
+   - Supprimer si necessaire
 
-5. **📤 Import/Export**
+5. ** Import/Export**
    - Sauvegarder configuration
    - Restaurer settings
    - Exporter en ZIP
 
-**💡 Conseil:** Le panel Admin est votre centre de contrôle total!`,
+** Conseil:** Le panel Admin est votre centre de controle total!`,
 
-            'sauvegarder|auto-save|donnees|perdre': `**Sauvegarde Automatique** 💾
+            'sauvegarder|auto-save|donnees|perdre': `**Sauvegarde Automatique** 
 
-**Bonne nouvelle:** Toutes vos données sont sauvegardées AUTOMATIQUEMENT!
+**Bonne nouvelle:** Toutes vos donnees sont sauvegardees AUTOMATIQUEMENT!
 
-- **Quand?** À chaque modification du formulaire
-- **Où?** Localement dans votre navigateur
-- **Indicateur?** Voyez 💾 en bas à droite
-- **Si refresh?** Données récupérées auto
+- **Quand?** A chaque modification du formulaire
+- **Ou?** Localement dans votre navigateur
+- **Indicateur?** Voyez  en bas a droite
+- **Si refresh?** Donnees recuperees auto
 
-**Sécurité:**
-✅ Pas de risque perte données
-✅ Formulaire persistent même si fermeture
-✅ Historique conservé
+**Securite:**
+ Pas de risque perte donnees
+ Formulaire persistent meme si fermeture
+ Historique conserve
 
-**⚠️ Attention:**
-- Données en local à votre machine
-- Changement navigateur = nouvelles données
-- Synchronisation multi-device? À intégrer avec API future
+** Attention:**
+- Donnees en local a votre machine
+- Changement navigateur = nouvelles donnees
+- Synchronisation multi-device? A integrer avec API future
 
-**💡 Conseil:** N'hésitez pas à rafraîchir - vos données sont sûres!`,
+** Conseil:** N'hesitez pas a rafraichir - vos donnees sont sures!`,
 
-            'login|connexion|authentification|mot de passe': `**Authentification** 🔐
+            'login|connexion|authentification|mot de passe': `**Authentification** 
 
-Pour accéder à l'application:
+Pour acceder a l'application:
 
-**Deux rôles disponibles:**
+**Deux roles disponibles:**
 
-1. **👤 Adjointe (User)**
-   - Accès: Formulaire de collecte
+1. ** Adjointe (User)**
+   - Acces: Formulaire de collecte
    - Permissions: Remplir et exporter
    - Identifiant demo: \`user / user123\`
 
-2. **🔧 Admin**
-   - Accès: Dashboard + tous les outils
-   - Permissions: Paramétrer tout
+2. ** Admin**
+   - Acces: Dashboard + tous les outils
+   - Permissions: Parametrer tout
    - Identifiant demo: \`admin / admin123\`
 
 **Processus:**
 1. Ouvrez page login
 2. Entrez utilisateur + mot de passe
 3. Cliquez "Se Connecter"
-4. Redirection automatique selon rôle
+4. Redirection automatique selon role
 
-**💡 Conseil:** L'admin peut créer des comptes pour chaque adjointe. Pas de partage de comptes!`,
+** Conseil:** L'admin peut creer des comptes pour chaque adjointe. Pas de partage de comptes!`,
 
-            'probleme|erreur|ne fonctionne pas|bug': `**Troubleshooting** 🔧
+            'probleme|erreur|ne fonctionne pas|bug': `**Troubleshooting** 
 
 **Impossible de se connecter?**
-- Vérifiez utilisateur/mot de passe
+- Verifiez utilisateur/mot de passe
 - Console (F12) > Application > localStorage
 - Essayez: Ctrl+Shift+Delete pour clear cache
 
-**Données ne se sauvegardent pas?**
-- Vérifiez localStorage activé (F12)
-- Mode privé/incognito = pas de persistance
-- Essayez navigateur différent
+**Donnees ne se sauvegardent pas?**
+- Verifiez localStorage active (F12)
+- Mode prive/incognito = pas de persistance
+- Essayez navigateur different
 
 **Export ne fonctionne pas?**
-- Vérifiez permissions téléchargement
+- Verifiez permissions telechargement
 - Blocker popup? Autorisez
 - Essayez Chrome
 
 **Formulaire lent?**
-- Normal en local (léger délai acceptable)
-- Vérifiez ressources navigateur
+- Normal en local (leger delai acceptable)
+- Verifiez ressources navigateur
 - Fermez autres onglets
 
-**💡 Conseil:** Ouvrez console (F12) pour voir logs détaillés.`,
+** Conseil:** Ouvrez console (F12) pour voir logs detailles.`,
 
-            'comment|utiliser|faire|etapes': `**Guide d'Utilisation** 📖
+            'comment|utiliser|faire|etapes': `**Guide d'Utilisation** 
 
-**4 Étapes Simples:**
+**4 Etapes Simples:**
 
-**Étape 1️⃣ : Identité**
-- Entrez prénom, nom, email, téléphone
-- Adresse complète
-- Enregistre auto ✓
+**Etape 1 : Identite**
+- Entrez prenom, nom, email, telephone
+- Adresse complete
+- Enregistre auto 
 
-**Étape 2️⃣ : Situation**
-- État civil, date naissance
+**Etape 2 : Situation**
+- Etat civil, date naissance
 - Info emploi
-- Infos conjoint si marié
+- Infos conjoint si marie
 
-**Étape 3️⃣ : Finances**
+**Etape 3 : Finances**
 - Revenus annuels
 - Patrimoine
 - Profil risque
 - Infos REER/Comptable
 
-**Étape 4️⃣ : Export**
-- Vérifiez récapitulatif
+**Etape 4 : Export**
+- Verifiez recapitulatif
 - Choisissez format (Excel/PDF)
-- Téléchargez
-- Nouveau client? Réinitialisez!
+- Telechargez
+- Nouveau client? Reinitialisez!
 
-**💡 Conseil:** Pas de rush! Remplissez à votre rythme, tout est sauvegardé.`,
+** Conseil:** Pas de rush! Remplissez a votre rythme, tout est sauvegarde.`,
 
-            'quoi|pourquoi|c\'est quoi|explain': `**À Propos du Collecteur** ℹ️
+            'quoi|pourquoi|c\'est quoi|explain': `**A Propos du Collecteur** i
 
 **Qu'est-ce que c'est?**
-Une application web pour **collecter systématiquement les données de clients** en processus d'onboarding financier.
+Une application web pour **collecter systematiquement les donnees de clients** en processus d'onboarding financier.
 
 **Pourquoi?**
-- ✅ Standardiser la collecte
-- ✅ Ne rien oublier
-- ✅ Exports automatiques
-- ✅ Gestion centralisée
+-  Standardiser la collecte
+-  Ne rien oublier
+-  Exports automatiques
+-  Gestion centralisee
 
 **Pour qui?**
 - Gestionnaires de patrimoine
@@ -372,71 +372,71 @@ Une application web pour **collecter systématiquement les données de clients**
 - Cabinets conseil
 
 **Avantages:**
-- 🚀 Rapide à mettre en place
-- 🎯 Aucune configuration requise
-- 💾 Données sécurisées localement
-- 📊 Exports Excel/PDF
-- 👥 Multi-utilisateurs
+-  Rapide a mettre en place
+-  Aucune configuration requise
+-  Donnees securisees localement
+-  Exports Excel/PDF
+-  Multi-utilisateurs
 
-**💡 Conseil:** C'est fait pour pragmatisme et efficacité. Pas de complexité inutile!`,
+** Conseil:** C'est fait pour pragmatisme et efficacite. Pas de complexite inutile!`,
 
-            'palette|couleur|design|theme': `**Design & Couleurs** 🎨
+            'palette|couleur|design|theme': `**Design & Couleurs** 
 
-**Palette Utilisée:**
+**Palette Utilisee:**
 
 - **Teal (#208C8E)**: Couleur primaire, professionnelle
 - **Teal Clair (#32B8C6)**: Accents, hover
 - **Orange (#E67F61)**: Secondaire, chaleur
-- **Vert (#15804D)**: Succès, validation
-- **Crème (#FFFBF5)**: Fond, convivialité
-- **Charcoal (#1F2121)**: Texte, lisibilité
+- **Vert (#15804D)**: Succes, validation
+- **Creme (#FFFBF5)**: Fond, convivialite
+- **Charcoal (#1F2121)**: Texte, lisibilite
 
 **Approche Design:**
-✅ Moderne mais pas tendance
-✅ Accessible et lisible
-✅ Responsive (desktop/mobile)
-✅ Ultra-pragmatique
+ Moderne mais pas tendance
+ Accessible et lisible
+ Responsive (desktop/mobile)
+ Ultra-pragmatique
 
-**💡 Conseil:** Si vous voulez personnaliser, c'est facile - contactez admin!`,
+** Conseil:** Si vous voulez personnaliser, c'est facile - contactez admin!`,
 
-            'securite|donnees|prive|confidentiel': `**Sécurité des Données** 🔐
+            'securite|donnees|prive|confidentiel': `**Securite des Donnees** 
 
-**Modèle Actuel (Développement):**
-- Données en localStorage navigateur
-- Une seule machine = une base de données
+**Modele Actuel (Developpement):**
+- Donnees en localStorage navigateur
+- Une seule machine = une base de donnees
 - Mots de passe en clair (dev mode)
 
 **Avantages:**
-✅ Aucune donnée en cloud
-✅ Données restent en local
-✅ Contrôle complet
-✅ Pas de risque hack externe
+ Aucune donnee en cloud
+ Donnees restent en local
+ Controle complet
+ Pas de risque hack externe
 
 **Limitations:**
-⚠️ Changement navigateur = nouvelles données
-⚠️ Pas de sync multi-device
-⚠️ Pas de backup automatique cloud
+ Changement navigateur = nouvelles donnees
+ Pas de sync multi-device
+ Pas de backup automatique cloud
 
 **Pour Production:**
-- Intégrer Backend API sécurisé
+- Integrer Backend API securise
 - Crypter mots de passe (bcrypt)
 - HTTPS obligatoire
 - Database professionnelle
 - Audit trail complet
 
-**💡 Conseil:** Pour usage confidentiel, backup votre data régulièrement!`,
+** Conseil:** Pour usage confidentiel, backup votre data regulierement!`,
 
-            'default': `**Désolée!** 😅 Je n'ai pas compris votre question.
+            'default': `**Desolee!**  Je n'ai pas compris votre question.
 
 Je peux vous aider avec:
-- 📋 **Champs du formulaire** (identité, situation, finances)
-- 📊 **Exports** (Excel, PDF)
-- 🔧 **Admin** (paramètres, utilisateurs)
-- 💾 **Sauvegarde** (auto-save, données)
-- 🔐 **Sécurité** (authentification)
-- 📖 **Utilisation** (comment faire)
+-  **Champs du formulaire** (identite, situation, finances)
+-  **Exports** (Excel, PDF)
+-  **Admin** (parametres, utilisateurs)
+-  **Sauvegarde** (auto-save, donnees)
+-  **Securite** (authentification)
+-  **Utilisation** (comment faire)
 
-**Essayez de reformuler ou posez une question plus spécifique!**`
+**Essayez de reformuler ou posez une question plus specifique!**`
         };
 
         // Chercher la meilleure correspondance
@@ -461,11 +461,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Charger Emma dans toutes les pages
     const emma = new EmmaAI();
 
-    // Emma peut être initialisée sur index.html, app.html, admin.html
+    // Emma peut etre initialisee sur index.html, app.html, admin.html
     // Elle fonctionne partout!
 });
 
-// Fonction pour intégrer Emma facilement dans les autres pages
+// Fonction pour integrer Emma facilement dans les autres pages
 function initEmmaAI() {
     if (!window.emmaInstance) {
         window.emmaInstance = new EmmaAI();

@@ -100,7 +100,7 @@ export function cubicSplineInterpolation(points: YieldDataPoint[], targetDays: n
 
 // Nelson-Siegel model
 export function nelsonSiegelInterpolation(points: YieldDataPoint[], targetDays: number[]): InterpolatedPoint[] {
-  // Estimate Nelson-Siegel parameters: y(t) = β0 + β1*exp(-t/τ) + β2*(t/τ)*exp(-t/τ)
+  // Estimate Nelson-Siegel parameters: y(t) = 0 + 1*exp(-t/) + 2*(t/)*exp(-t/)
   // Using simplified parameter estimation
   const sorted = [...points].sort((a, b) => a.days - b.days)
 

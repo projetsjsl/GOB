@@ -1,7 +1,7 @@
 /**
  * Auto Expand Initializer v2.0
  * 
- * Ajoute automatiquement des boutons d'expansion fullscreen à TOUTES les sections,
+ * Ajoute automatiquement des boutons d'expansion fullscreen a TOUTES les sections,
  * divs, tableaux, composants et widgets du dashboard.
  */
 
@@ -13,7 +13,7 @@
     }
     window.__autoExpandInit = true;
 
-    // Configuration étendue des sélecteurs pour TOUS les types d'éléments
+    // Configuration etendue des selecteurs pour TOUS les types d'elements
     const EXPANDABLE_SELECTORS = [
         // Sections avec bordures
         '.border.rounded-lg',
@@ -48,7 +48,7 @@
         '[class*="table-wrapper"]',
         'div:has(> table)',
         
-        // Sections spécifiques
+        // Sections specifiques
         '[class*="section"]',
         '[class*="module"]',
         '[class*="block"]',
@@ -66,15 +66,15 @@
         '[class*="p-5"]',
         '[class*="p-6"]',
         
-        // Éléments avec shadow
+        // Elements avec shadow
         '[class*="shadow"]'
     ];
 
-    // Taille minimum pour considérer un élément comme expandable
+    // Taille minimum pour considerer un element comme expandable
     const MIN_WIDTH = 150;
     const MIN_HEIGHT = 80;
 
-    // Classes/éléments à exclure
+    // Classes/elements a exclure
     const EXCLUDE_PATTERNS = [
         'expand-btn', 'modal', 'tooltip', 'dropdown', 'menu', 'popup',
         'nav', 'header', 'footer', 'sidebar', 'button', 'btn', 'input',
@@ -82,26 +82,26 @@
         'fullscreen-modal', 'fullscreen-content', 'backdrop'
     ];
 
-    // Vérifier si un élément doit avoir un bouton d'expansion
+    // Verifier si un element doit avoir un bouton d'expansion
     function shouldBeExpandable(element) {
-        // Ignorer les éléments sans taille
+        // Ignorer les elements sans taille
         const rect = element.getBoundingClientRect();
         if (rect.width < MIN_WIDTH || rect.height < MIN_HEIGHT) return false;
 
-        // Ignorer les éléments cachés
+        // Ignorer les elements caches
         const style = window.getComputedStyle(element);
         if (style.display === 'none' || style.visibility === 'hidden') return false;
 
-        // Vérifier les exclusions
+        // Verifier les exclusions
         const classList = element.className || '';
         const classStr = typeof classList === 'string' ? classList : classList.toString();
         if (EXCLUDE_PATTERNS.some(p => classStr.toLowerCase().includes(p))) return false;
 
-        // Exclure les éléments déjà traités
+        // Exclure les elements deja traites
         if (element.dataset.expandable === 'true') return false;
         if (element.querySelector('.expand-btn')) return false;
 
-        // Exclure si un parent proche a déjà le bouton
+        // Exclure si un parent proche a deja le bouton
         let parent = element.parentElement;
         let depth = 0;
         while (parent && depth < 3) {
@@ -113,7 +113,7 @@
         return true;
     }
 
-    // Créer le bouton d'expansion
+    // Creer le bouton d'expansion
     function createExpandButton() {
         const btn = document.createElement('button');
         btn.className = 'expand-btn';
@@ -122,11 +122,11 @@
                 <path d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
             </svg>
         `;
-        btn.title = 'Agrandir en plein écran (ESC pour fermer)';
+        btn.title = 'Agrandir en plein ecran (ESC pour fermer)';
         return btn;
     }
 
-    // Extraire un titre depuis l'élément
+    // Extraire un titre depuis l'element
     function extractTitle(element) {
         // Chercher un titre dans les enfants
         const headings = element.querySelectorAll('h1, h2, h3, h4, h5, h6, [class*="title"], [class*="heading"]');
@@ -142,7 +142,7 @@
         return 'Vue agrandie';
     }
 
-    // Ouvrir en plein écran
+    // Ouvrir en plein ecran
     function openFullscreen(element) {
         const title = extractTitle(element);
         const isDark = document.body.classList.contains('dark') || 
@@ -212,7 +212,7 @@
         requestAnimationFrame(() => modal.classList.add('open'));
     }
 
-    // Appliquer les boutons d'expansion à tous les éléments
+    // Appliquer les boutons d'expansion a tous les elements
     function applyExpandButtons() {
         let count = 0;
         
@@ -239,12 +239,12 @@
                     }
                 });
             } catch (e) {
-                // Ignorer les erreurs de sélecteur invalide
+                // Ignorer les erreurs de selecteur invalide
             }
         });
         
         if (count > 0) {
-            void(`✅ Auto-Expand: ${count} boutons ajoutés`);
+            void(` Auto-Expand: ${count} boutons ajoutes`);
         }
     }
 
@@ -460,7 +460,7 @@
 
     // Initialisation
     function init() {
-        void('🚀 Auto-Expand v2.0: Initialisation...');
+        void(' Auto-Expand v2.0: Initialisation...');
         injectStyles();
         
         const runInit = () => {
@@ -476,13 +476,13 @@
             runInit();
         }
 
-        // Réappliquer régulièrement pour les contenus dynamiques
+        // Reappliquer regulierement pour les contenus dynamiques
         if (!window.__autoExpandIntervalId) {
             window.__autoExpandIntervalId = setInterval(applyExpandButtons, 8000);
         }
     }
 
-    // Exposer méthode de refresh manuel
+    // Exposer methode de refresh manuel
     window.refreshExpandButtons = applyExpandButtons;
     window.forceExpandAll = () => {
         document.querySelectorAll('[data-expandable]').forEach(el => {

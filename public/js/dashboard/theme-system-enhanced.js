@@ -1,14 +1,14 @@
 /**
  * Theme System Enhanced - Utilise le Design System
  * 
- * Version améliorée de theme-system.js qui utilise tokens.ts comme fallback
- * et génère les variables CSS via theme-adapter.ts
+ * Version amelioree de theme-system.js qui utilise tokens.ts comme fallback
+ * et genere les variables CSS via theme-adapter.ts
  * 
- * NOTE: Ce fichier sera progressivement intégré dans theme-system.js
+ * NOTE: Ce fichier sera progressivement integre dans theme-system.js
  */
 
 // Import des tokens du design system (via window si disponible)
-// En production, les tokens seront chargés depuis le build
+// En production, les tokens seront charges depuis le build
 const GOBDesignTokens = window.GOBDesignTokens || {
   colors: {
     primary: { default: '#6366f1', light: '#8b5cf6', dark: '#4f46e5' },
@@ -28,7 +28,7 @@ const GOBDesignTokens = window.GOBDesignTokens || {
 };
 
 /**
- * Génère les variables CSS pour un thème en utilisant les tokens comme fallback
+ * Genere les variables CSS pour un theme en utilisant les tokens comme fallback
  */
 function generateThemeCSSVariablesEnhanced(theme) {
   const variables = {};
@@ -63,8 +63,8 @@ function generateThemeCSSVariablesEnhanced(theme) {
 }
 
 /**
- * Applique un thème avec support du design system
- * Cette fonction peut être appelée depuis theme-system.js
+ * Applique un theme avec support du design system
+ * Cette fonction peut etre appelee depuis theme-system.js
  */
 function applyThemeWithDesignSystem(theme, themeId) {
   const root = document.documentElement;
@@ -75,7 +75,7 @@ function applyThemeWithDesignSystem(theme, themeId) {
     root.style.setProperty(key, value);
   });
   
-  // Appliquer les styles spécifiques du thème
+  // Appliquer les styles specifiques du theme
   if (theme.styles) {
     root.style.setProperty('--theme-header-bg', theme.styles.headerBg || '');
     root.style.setProperty('--theme-card-bg', theme.styles.cardBg || '');

@@ -39,12 +39,12 @@ const DansWatchlistTab = (props = {}) => {
     });
     const WATCHLIST_FILE = '/dans-watchlist.json'; // servi depuis /public
     
-    // Fonction pour exécuter le screener sur la watchlist
+    // Fonction pour executer le screener sur la watchlist
     const runWatchlistScreener = async () => {
         // Convertir les tickers en format attendu par le screener
         const watchlistStocks = watchlistTickers.map(ticker => ({
             symbol: ticker,
-            name: ticker // Le nom sera récupéré par l'API
+            name: ticker // Le nom sera recupere par l'API
         }));
         
         setLoadingScreener(true);
@@ -92,7 +92,7 @@ const DansWatchlistTab = (props = {}) => {
             }
             
             setScreenerResults(results);
-            void(`✅ Screener Watchlist: ${results.length} résultats trouvés sur ${watchlistStocks.length} titres`);
+            void(` Screener Watchlist: ${results.length} resultats trouves sur ${watchlistStocks.length} titres`);
         } catch (error) {
             console.error('Erreur screener:', error);
         } finally {
@@ -141,13 +141,13 @@ const DansWatchlistTab = (props = {}) => {
         return `${prefix}${n.toFixed(2)}${suffix}`;
     };
 
-    // État pour éviter le rechargement de la watchlist
+    // Etat pour eviter le rechargement de la watchlist
     const [watchlistLoaded, setWatchlistLoaded] = useState(false);
     const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-    // Charger la watchlist UNE SEULE FOIS au démarrage
+    // Charger la watchlist UNE SEULE FOIS au demarrage
     useEffect(() => {
-        if (watchlistLoaded) return; // Éviter les rechargements
+        if (watchlistLoaded) return; // Eviter les rechargements
         
         const loadInitialWatchlist = async () => {
             let tickers = [];
@@ -157,10 +157,10 @@ const DansWatchlistTab = (props = {}) => {
                 if (res.ok) {
                     const json = await res.json();
                     tickers = Array.isArray(json.tickers) ? json.tickers : [];
-                    void('✅ Watchlist chargée depuis Supabase:', tickers);
+                    void(' Watchlist chargee depuis Supabase:', tickers);
                 }
             } catch (e) {
-                void('⚠️ Supabase non disponible, utilisation du localStorage');
+                void(' Supabase non disponible, utilisation du localStorage');
             }
             
             if (!tickers.length) {
@@ -168,7 +168,7 @@ const DansWatchlistTab = (props = {}) => {
                 const savedWatchlist = localStorage.getItem('dans-watchlist');
                 if (savedWatchlist) {
                     tickers = JSON.parse(savedWatchlist);
-                    void('📦 Watchlist chargée depuis localStorage:', tickers);
+                    void(' Watchlist chargee depuis localStorage:', tickers);
                 }
             }
 
@@ -183,7 +183,7 @@ const DansWatchlistTab = (props = {}) => {
         };
         
         loadInitialWatchlist();
-    }, []); // Dépendance vide = une seule fois au montage
+    }, []); // Dependance vide = une seule fois au montage
 
     // Fallback: Individual ticker loading (used when batch fails)
     const loadWatchlistDataIndividual = async (tickers, dataObject) => {
@@ -202,7 +202,7 @@ const DansWatchlistTab = (props = {}) => {
         }
     };
 
-    // Charger les données pour les tickers de la watchlist (OPTIMIZED WITH BATCHING)
+    // Charger les donnees pour les tickers de la watchlist (OPTIMIZED WITH BATCHING)
     const loadWatchlistData = async (tickers, appendMode = false) => {
         if (tickers.length === 0) return;
 
@@ -212,14 +212,14 @@ const DansWatchlistTab = (props = {}) => {
         try {
             // BATCH OPTIMIZATION: Use batch endpoint for multiple tickers
             if (tickers.length > 1) {
-                void(`🚀 Batch loading ${tickers.length} tickers...`);
+                void(` Batch loading ${tickers.length} tickers...`);
                 const symbolsQuery = tickers.join(',');
                 const batchResponse = await fetch(`${API_BASE_URL}/api/marketdata/batch?symbols=${symbolsQuery}&endpoints=quote,fundamentals`);
 
                 if (batchResponse.ok) {
                     const batchData = await batchResponse.json();
-                    void(`✅ Batch loaded: ${batchData.metadata?.total_data_points || 'N/A'} data points`);
-                    void(`💰 API Calls Saved: ${batchData.metadata?.api_calls_saved || 'N/A'}`);
+                    void(` Batch loaded: ${batchData.metadata?.total_data_points || 'N/A'} data points`);
+                    void(` API Calls Saved: ${batchData.metadata?.api_calls_saved || 'N/A'}`);
 
                     // Process batch results
                     if (batchData.success && batchData.data) {
@@ -246,7 +246,7 @@ const DansWatchlistTab = (props = {}) => {
                         });
                     }
                 } else {
-                    console.warn('⚠️ Batch endpoint failed, falling back to individual requests');
+                    console.warn(' Batch endpoint failed, falling back to individual requests');
                     // Fallback to individual requests
                     await loadWatchlistDataIndividual(tickers, newData);
                 }
@@ -255,12 +255,12 @@ const DansWatchlistTab = (props = {}) => {
                 await loadWatchlistDataIndividual(tickers, newData);
             }
         } catch (error) {
-            console.error('❌ Batch loading error:', error);
+            console.error(' Batch loading error:', error);
             // Fallback to individual requests on error
             await loadWatchlistDataIndividual(tickers, newData);
         }
 
-        // Si appendMode, ajouter aux données existantes au lieu de remplacer
+        // Si appendMode, ajouter aux donnees existantes au lieu de remplacer
         if (appendMode) {
             setWatchlistStockData(prev => ({ ...prev, ...newData }));
         } else {
@@ -269,25 +269,25 @@ const DansWatchlistTab = (props = {}) => {
         setWatchlistLoading(false);
     };
 
-    // Ajouter un ticker à la watchlist
+    // Ajouter un ticker a la watchlist
     const addTickerToWatchlist = async () => {
         if (!newTicker.trim()) return;
         
         const ticker = newTicker.trim().toUpperCase();
         if (watchlistTickers.includes(ticker)) {
-            showMessage('Ce ticker est déjà dans la watchlist', 'warning');
+            showMessage('Ce ticker est deja dans la watchlist', 'warning');
             return;
         }
         
-        // 1. AFFICHAGE IMMÉDIAT : Ajouter le ticker à la liste TOUT DE SUITE
+        // 1. AFFICHAGE IMMEDIAT : Ajouter le ticker a la liste TOUT DE SUITE
         const updatedTickers = [...watchlistTickers, ticker];
         setWatchlistTickers(updatedTickers);
         localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
         setNewTicker('');
         // Message discret pour l'ajout
-        void(`✅ ${ticker} ajouté à la watchlist`);
+        void(` ${ticker} ajoute a la watchlist`);
         
-        // 2. Ajouter un placeholder avec état "loading" pour affichage immédiat
+        // 2. Ajouter un placeholder avec etat "loading" pour affichage immediat
         setWatchlistStockData(prev => ({
             ...prev,
             [ticker]: {
@@ -297,12 +297,12 @@ const DansWatchlistTab = (props = {}) => {
             }
         }));
         
-        // 3. ARRIÈRE-PLAN : Charger les vraies données (sans bloquer l'UI)
+        // 3. ARRIERE-PLAN : Charger les vraies donnees (sans bloquer l'UI)
         loadWatchlistData([ticker], true).catch(err => {
             console.error('Erreur chargement:', err);
         });
         
-        // 4. ARRIÈRE-PLAN : Sauvegarder sur Supabase (sans bloquer l'UI)
+        // 4. ARRIERE-PLAN : Sauvegarder sur Supabase (sans bloquer l'UI)
         saveWatchlistToSupabaseAuto(ticker, 'add').catch(err => {
             console.error('Erreur sauvegarde Supabase:', err);
         });
@@ -310,12 +310,12 @@ const DansWatchlistTab = (props = {}) => {
 
     // Supprimer un ticker de la watchlist
     const removeTickerFromWatchlist = async (ticker) => {
-        // 1. SUPPRESSION IMMÉDIATE : Retirer de la liste TOUT DE SUITE
+        // 1. SUPPRESSION IMMEDIATE : Retirer de la liste TOUT DE SUITE
         const updatedTickers = watchlistTickers.filter(t => t !== ticker);
         setWatchlistTickers(updatedTickers);
         localStorage.setItem('dans-watchlist', JSON.stringify(updatedTickers));
         
-        // 2. Supprimer les données du ticker immédiatement
+        // 2. Supprimer les donnees du ticker immediatement
         setWatchlistStockData(prev => {
             const newData = { ...prev };
             delete newData[ticker];
@@ -323,18 +323,18 @@ const DansWatchlistTab = (props = {}) => {
         });
         
         // Message discret pour la suppression
-        void(`✅ ${ticker} supprimé de la watchlist`);
+        void(` ${ticker} supprime de la watchlist`);
         
-        // 3. ARRIÈRE-PLAN : Sauvegarder sur Supabase (sans bloquer l'UI)
+        // 3. ARRIERE-PLAN : Sauvegarder sur Supabase (sans bloquer l'UI)
         saveWatchlistToSupabaseAuto(ticker, 'remove').catch(err => {
             console.error('Erreur sauvegarde Supabase:', err);
         });
     };
 
-    // Actualiser les données de la watchlist (silencieux)
+    // Actualiser les donnees de la watchlist (silencieux)
     const refreshWatchlist = async () => {
         await loadWatchlistData(watchlistTickers);
-        void('✅ Watchlist actualisée silencieusement');
+        void(' Watchlist actualisee silencieusement');
     };
 
     // Timer pour debounce de la sauvegarde Supabase
@@ -342,7 +342,7 @@ const DansWatchlistTab = (props = {}) => {
     
     // Sauvegarder automatiquement la watchlist sur Supabase (silencieux avec debounce)
     const saveWatchlistToSupabaseAuto = async (ticker, action) => {
-        // Annuler la sauvegarde précédente si elle est en attente
+        // Annuler la sauvegarde precedente si elle est en attente
         if (saveSupabaseTimer) {
             clearTimeout(saveSupabaseTimer);
         }
@@ -364,9 +364,9 @@ const DansWatchlistTab = (props = {}) => {
                 }
                 
                 const result = await response.json();
-                void(`✅ Supabase: ${result.message}`);
+                void(` Supabase: ${result.message}`);
             } catch (e) {
-                console.error('⚠️ Erreur sauvegarde Supabase:', e);
+                console.error(' Erreur sauvegarde Supabase:', e);
                 // Silencieux pour ne pas perturber l'UX
             }
         }, 500); // Debounce de 500ms (plus rapide que GitHub)
@@ -387,7 +387,7 @@ const DansWatchlistTab = (props = {}) => {
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             
             const result = await response.json();
-            void('✅ Watchlist sauvegardée sur Supabase');
+            void(' Watchlist sauvegardee sur Supabase');
         } catch (e) {
             console.error('Erreur sauvegarde Supabase watchlist:', e);
             showMessage('Erreur sauvegarde Supabase', 'error');
@@ -404,7 +404,7 @@ const DansWatchlistTab = (props = {}) => {
             setWatchlistTickers(tickers);
             localStorage.setItem('dans-watchlist', JSON.stringify(tickers));
             await loadWatchlistData(tickers);
-            void('✅ Watchlist chargée depuis Supabase');
+            void(' Watchlist chargee depuis Supabase');
         } catch (e) {
             console.error('Erreur chargement Supabase watchlist:', e);
             showMessage('Erreur chargement Supabase', 'error');
@@ -419,24 +419,24 @@ const DansWatchlistTab = (props = {}) => {
             // Supprimer le contenu existant
             widgetContainer.innerHTML = '';
 
-            // Créer les symboles formatés pour TradingView (EXCHANGE:TICKER)
-            // Par défaut, on assume que les tickers US sont sur NASDAQ ou NYSE
+            // Creer les symboles formates pour TradingView (EXCHANGE:TICKER)
+            // Par defaut, on assume que les tickers US sont sur NASDAQ ou NYSE
             const tvSymbols = watchlistTickers.map(ticker => {
-                // Détecter les tickers canadiens (qui se terminent souvent par .TO, .V, etc.)
+                // Detecter les tickers canadiens (qui se terminent souvent par .TO, .V, etc.)
                 if (ticker.includes('.TO') || ticker.includes('.V')) {
                     return { "proName": `TSX:${ticker.replace(/\.(TO|V)/, '')}`, "title": ticker };
                 }
-                // Par défaut, utiliser NASDAQ pour les tickers US
+                // Par defaut, utiliser NASDAQ pour les tickers US
                 return { "proName": `NASDAQ:${ticker}`, "title": ticker };
             });
 
-            // Créer le script TradingView
+            // Creer le script TradingView
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
             script.async = true;
             script.innerHTML = JSON.stringify({
-                "symbols": tvSymbols.slice(0, 20), // Limiter à 20 symboles pour performance
+                "symbols": tvSymbols.slice(0, 20), // Limiter a 20 symboles pour performance
                 "showSymbolLogo": true,
                 "isTransparent": isDarkMode,
                 "displayMode": "adaptive",
@@ -471,14 +471,14 @@ const DansWatchlistTab = (props = {}) => {
                 </div>
             )}
 
-            {/* Screener pour Dan's Watchlist - Identique à celui d'JLab */}
+            {/* Screener pour Dan's Watchlist - Identique a celui d'JLab */}
             {showScreener && (
                 <div className={`border rounded-lg p-3 transition-colors duration-300 ${
                     isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
                 }`}>
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                            <span className="text-xl">🔍</span>
+                            <span className="text-xl"></span>
                             <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 Screener - Dan's Watchlist
                             </h3>
@@ -488,11 +488,11 @@ const DansWatchlistTab = (props = {}) => {
                             onClick={() => setShowScreener(false)}
                             className={`p-1 rounded ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}`}
                         >
-                            <span className="text-gray-500">✕</span>
+                            <span className="text-gray-500"></span>
                         </button>
                     </div>
                     
-                    {/* Filtres - Mêmes que JLab */}
+                    {/* Filtres - Memes que JLab */}
                     <div className="grid grid-cols-5 gap-2 mb-3">
                         <div>
                             <label className="text-[9px] text-gray-500 mb-1 block">Market Cap Min (B$)</label>
@@ -561,7 +561,7 @@ const DansWatchlistTab = (props = {}) => {
                                 <option value="all">Tous</option>
                                 <option value="Technology">Technologie</option>
                                 <option value="Consumer Cyclical">Consommation</option>
-                                <option value="Healthcare">Santé</option>
+                                <option value="Healthcare">Sante</option>
                                 <option value="Financial">Finance</option>
                             </select>
                         </div>
@@ -576,14 +576,14 @@ const DansWatchlistTab = (props = {}) => {
                                 : 'bg-gray-800 hover:bg-gray-700 text-white'
                         }`}
                     >
-                        {loadingScreener ? '⏳ Analyse en cours...' : `🔍 Analyser ma Watchlist (${watchlistTickers.length} titres)`}
+                        {loadingScreener ? ' Analyse en cours...' : ` Analyser ma Watchlist (${watchlistTickers.length} titres)`}
                     </button>
                     
-                    {/* Résultats */}
+                    {/* Resultats */}
                     {screenerResults.length > 0 && (
                         <div className="mt-3">
                             <div className="text-xs text-gray-500 mb-2">
-                                {screenerResults.length} titre(s) correspondant aux critères
+                                {screenerResults.length} titre(s) correspondant aux criteres
                             </div>
                             <div className={`max-h-64 overflow-y-auto border rounded ${
                                 isDarkMode ? 'border-gray-700' : 'border-gray-300'
@@ -649,7 +649,7 @@ const DansWatchlistTab = (props = {}) => {
             <div className="flex justify-between items-center">
                 <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>👀 Dan's Watchlist</h2>
+                }`}> Dan's Watchlist</h2>
                 <div className="flex gap-2">
                     <button
                         onClick={() => setShowScreener(!showScreener)}
@@ -661,27 +661,27 @@ const DansWatchlistTab = (props = {}) => {
                                     : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
                         }`}
                     >
-                        {showScreener ? '✕ Fermer Screener' : '🔍 Ouvrir Screener'}
+                        {showScreener ? ' Fermer Screener' : ' Ouvrir Screener'}
                     </button>
                     <button
                         onClick={refreshWatchlist}
                         disabled={watchlistLoading || watchlistTickers.length === 0}
                         className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 disabled:opacity-50 transition-colors"
                     >
-                        {watchlistLoading ? 'Actualisation...' : '🔄 Actualiser'}
+                        {watchlistLoading ? 'Actualisation...' : ' Actualiser'}
                     </button>
                     <button
                         onClick={emmaPopulateWatchlist}
                         disabled={watchlistLoading}
                         className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2"
                     >
-                        <span>🤖</span>
+                        <span></span>
                         Emma Populate
                     </button>
                     <div className={`text-sm px-4 py-2 rounded ${
                         isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
                     }`}>
-                        {!initialLoadComplete ? '⏳ Chargement initial...' : '🚀 Supabase + Arrière-plan silencieux'}
+                        {!initialLoadComplete ? ' Chargement initial...' : ' Supabase + Arriere-plan silencieux'}
                     </div>
                 </div>
             </div>
@@ -694,7 +694,7 @@ const DansWatchlistTab = (props = {}) => {
             }`}>
                 <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>➕ Ajouter un Ticker</h3>
+                }`}> Ajouter un Ticker</h3>
                 <div className="flex gap-2">
                     <input
                         type="text"
@@ -712,13 +712,13 @@ const DansWatchlistTab = (props = {}) => {
                         onClick={addTickerToWatchlist}
                         className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
                     >
-                        ➕ Ajouter
+                         Ajouter
                     </button>
                 </div>
                 <p className={`text-sm mt-2 transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                 }`}>
-                    💡 Ces tickers ne seront visibles que dans cette watchlist personnalisée
+                     Ces tickers ne seront visibles que dans cette watchlist personnalisee
                 </p>
             </div>
 
@@ -732,7 +732,7 @@ const DansWatchlistTab = (props = {}) => {
                     <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        📊 Tickers de la Watchlist ({watchlistTickers.length})
+                         Tickers de la Watchlist ({watchlistTickers.length})
                     </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -771,7 +771,7 @@ const DansWatchlistTab = (props = {}) => {
                                             }`}
                                             title="Supprimer de la watchlist"
                                         >
-                                            ✕
+                                            
                                         </button>
                                     </div>
                                     
@@ -839,14 +839,14 @@ const DansWatchlistTab = (props = {}) => {
                         ? 'bg-gray-900 border-gray-700' 
                         : 'bg-gray-50 border-gray-200'
                 } text-center`}>
-                    <div className="text-6xl mb-4">👀</div>
+                    <div className="text-6xl mb-4"></div>
                     <h3 className={`text-xl font-semibold mb-2 transition-colors duration-300 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>Watchlist Vide</h3>
                     <p className={`transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
                     }`}>
-                        Ajoutez des tickers pour commencer à suivre vos investissements personnalisés
+                        Ajoutez des tickers pour commencer a suivre vos investissements personnalises
                     </p>
                 </div>
             )}

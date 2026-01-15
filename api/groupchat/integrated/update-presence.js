@@ -1,5 +1,5 @@
 /**
- * API endpoint pour mettre à jour la présence d'un utilisateur
+ * API endpoint pour mettre a jour la presence d'un utilisateur
  * POST /api/groupchat/integrated/update-presence
  */
 
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
             roomId,
             userId,
             userDisplayName,
-            userIcon = '🧠',
+            userIcon = '',
             isOnline = true
         } = req.body;
 
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
             process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
-        // Mettre à jour ou créer la présence
+        // Mettre a jour ou creer la presence
         const { data: participant, error: presenceError } = await supabase
             .from('group_chat_participants')
             .upsert([{
@@ -56,10 +56,10 @@ export default async function handler(req, res) {
             .single();
 
         if (presenceError) {
-            console.error('Erreur mise à jour présence:', presenceError);
+            console.error('Erreur mise a jour presence:', presenceError);
             return res.status(500).json({
                 success: false,
-                error: 'Erreur mise à jour présence',
+                error: 'Erreur mise a jour presence',
                 details: presenceError.message
             });
         }

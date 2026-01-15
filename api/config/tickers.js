@@ -1,5 +1,5 @@
 /**
- * API Endpoint pour récupérer les tickers (équipe et watchlist)
+ * API Endpoint pour recuperer les tickers (equipe et watchlist)
  */
 
 export default async function handler(req, res) {
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         let result = {};
 
         if (!list || list === 'team') {
-            // Récupérer les tickers d'équipe depuis la table unifiée `tickers` avec source='team' ou 'both'
+            // Recuperer les tickers d'equipe depuis la table unifiee `tickers` avec source='team' ou 'both'
                 const teamResponse = await fetch(
                     `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(category.eq.team,category.eq.both)&order=priority.desc,ticker.asc`,
                 {
@@ -47,8 +47,8 @@ export default async function handler(req, res) {
                 result.team_count = teamData.length;
                 result.team_source = 'supabase';
             } else {
-                console.warn(`⚠️ Team tickers Supabase error: ${teamResponse.status}`);
-                // Fallback vers liste hardcodée
+                console.warn(` Team tickers Supabase error: ${teamResponse.status}`);
+                // Fallback vers liste hardcodee
                 result.team_tickers = [
                     'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
                     'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
@@ -60,8 +60,8 @@ export default async function handler(req, res) {
         }
 
         if (!list || list === 'watchlist') {
-            // Récupérer les tickers de watchlist depuis la table unifiée `tickers` avec source='watchlist' ou 'both'
-            // Note: user_id est NULL pour les watchlists globales, ou spécifique pour les watchlists utilisateur
+            // Recuperer les tickers de watchlist depuis la table unifiee `tickers` avec source='watchlist' ou 'both'
+            // Note: user_id est NULL pour les watchlists globales, ou specifique pour les watchlists utilisateur
                 const watchlistResponse = await fetch(
                     `${supabaseUrl}/rest/v1/tickers?select=ticker&is_active=eq.true&or=(category.eq.watchlist,category.eq.both)&order=ticker.asc`,
                 {
@@ -80,8 +80,8 @@ export default async function handler(req, res) {
                 result.watchlist_count = watchlistData.length;
                 result.watchlist_source = 'supabase';
             } else {
-                console.warn(`⚠️ Watchlist Supabase error: ${watchlistResponse.status}`);
-                // Fallback vers liste hardcodée
+                console.warn(` Watchlist Supabase error: ${watchlistResponse.status}`);
+                // Fallback vers liste hardcodee
                 result.watchlist_tickers = [
                     'GOOGL', 'T', 'BNS', 'TD', 'BCE', 'CNR', 'CSCO', 'CVS', 'DEO', 'MDT',
                     'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
@@ -98,7 +98,7 @@ export default async function handler(req, res) {
         return res.status(200).json(result);
 
     } catch (error) {
-        console.error('❌ Tickers API Error:', error);
+        console.error(' Tickers API Error:', error);
         return res.status(500).json({
             success: false,
             error: error.message,

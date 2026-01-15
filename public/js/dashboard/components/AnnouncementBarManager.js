@@ -1,6 +1,6 @@
 /**
- * Gestionnaire de barres d'annonces - Permet d'activer/désactiver et personnaliser les barres
- * Basé sur les exemples de l'article Elfsight
+ * Gestionnaire de barres d'annonces - Permet d'activer/desactiver et personnaliser les barres
+ * Base sur les exemples de l'article Elfsight
  */
 
 const { useState, useEffect } = React;
@@ -17,7 +17,7 @@ const AnnouncementBarManager = ({ isDarkMode = true }) => {
             console.warn('Erreur chargement config barres:', e);
         }
         
-        // Configuration par défaut
+        // Configuration par defaut
         return {
             'news-top': { enabled: true, type: 'news', section: 'top', design: 'default' },
             'update-top': { enabled: false, type: 'update', section: 'top', design: 'default' },
@@ -46,14 +46,14 @@ const AnnouncementBarManager = ({ isDarkMode = true }) => {
                 if (data && data.config && data.config.value) {
                     const dbConfig = data.config.value;
                     setBars(prev => {
-                        // Fusionner en gardant les états locaux si nécessaire, 
-                        // mais ici on veut surtout que l'admin dicte l'état enabled/disabled
-                        // On merge pour ne pas perdre des clés qui n'existeraient pas en DB (backward compat)
+                        // Fusionner en gardant les etats locaux si necessaire, 
+                        // mais ici on veut surtout que l'admin dicte l'etat enabled/disabled
+                        // On merge pour ne pas perdre des cles qui n'existeraient pas en DB (backward compat)
                         const merged = { ...prev, ...dbConfig };
                         
-                        // Si le contenu a changé, on met à jour
+                        // Si le contenu a change, on met a jour
                         if (JSON.stringify(prev) !== JSON.stringify(merged)) {
-                            void('🔄 Config Announcement Bars mise à jour depuis Supabase');
+                            void(' Config Announcement Bars mise a jour depuis Supabase');
                             return merged;
                         }
                         return prev;
@@ -100,7 +100,7 @@ const AnnouncementBarManager = ({ isDarkMode = true }) => {
                         isDarkMode={isDarkMode}
                         config={{ design: config.design, zIndex: 1000 + Object.keys(bars).indexOf(key) }}
                         onClose={() => {
-                            // Réinitialiser le localStorage pour permettre de réafficher
+                            // Reinitialiser le localStorage pour permettre de reafficher
                             const dismissedKey = `announcement-${config.type}-${config.section}-dismissed`;
                             localStorage.removeItem(dismissedKey);
                         }}

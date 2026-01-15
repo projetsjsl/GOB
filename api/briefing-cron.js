@@ -1,6 +1,6 @@
 // ============================================================================
 // API Endpoint: Briefing Cron
-// Déclenchement automatisé des briefings Emma En Direct 3x/jour
+// Declenchement automatise des briefings Emma En Direct 3x/jour
 // ============================================================================
 
 export default async function handler(req, res) {
@@ -14,40 +14,40 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST' && req.method !== 'GET') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Methode non autorisee' });
   }
 
   try {
-    // Test de santé simple pour le diagnostic (sans authentification)
+    // Test de sante simple pour le diagnostic (sans authentification)
     if (req.method === 'GET' && !req.query.type) {
       return res.status(200).json({ 
         status: 'healthy',
-        message: 'Briefing Cron API opérationnel',
+        message: 'Briefing Cron API operationnel',
         timestamp: new Date().toISOString()
       });
     }
 
-    // Vérifier authentification (CRON_SECRET) pour les vraies opérations
+    // Verifier authentification (CRON_SECRET) pour les vraies operations
     const authHeader = req.headers['authorization'];
     const expectedAuth = `Bearer ${process.env.CRON_SECRET}`;
     
     if (!process.env.CRON_SECRET) {
-      console.error('CRON_SECRET non configuré');
+      console.error('CRON_SECRET non configure');
       return res.status(500).json({ 
         success: false,
-        error: 'Configuration serveur incomplète' 
+        error: 'Configuration serveur incomplete' 
       });
     }
     
     if (authHeader !== expectedAuth) {
-      console.error('Tentative d\'accès non autorisée au cron:', authHeader);
+      console.error('Tentative d\'acces non autorisee au cron:', authHeader);
       return res.status(401).json({ 
         success: false,
-        error: 'Non autorisé' 
+        error: 'Non autorise' 
       });
     }
 
-    // Récupérer le type de briefing
+    // Recuperer le type de briefing
     const { type } = req.method === 'GET' ? req.query : req.body;
     
     if (!type || !['morning', 'midday', 'evening'].includes(type)) {
@@ -57,9 +57,9 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`🤖 Cron déclenchement: ${type} briefing - ${new Date().toISOString()}`);
+    console.log(` Cron declenchement: ${type} briefing - ${new Date().toISOString()}`);
 
-    // Générer le briefing automatiquement
+    // Generer le briefing automatiquement
     const result = await generateAndSendBriefing(type);
     
     return res.status(200).json({
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
 }
 
 // ============================================================================
-// FONCTION DE GÉNÉRATION ET ENVOI AUTOMATIQUE VIA EMMA
+// FONCTION DE GENERATION ET ENVOI AUTOMATIQUE VIA EMMA
 // ============================================================================
 
 async function generateAndSendBriefing(type) {
@@ -88,10 +88,10 @@ async function generateAndSendBriefing(type) {
   const logs = [];
   
   try {
-    logs.push({ step: 'START', message: `Début génération ${type} via Emma`, timestamp: new Date().toISOString() });
+    logs.push({ step: 'START', message: `Debut generation ${type} via Emma`, timestamp: new Date().toISOString() });
     
-    // 1. Générer le briefing via Emma Agent
-    logs.push({ step: 'EMMA_GENERATION', message: 'Génération briefing via Emma', timestamp: new Date().toISOString() });
+    // 1. Generer le briefing via Emma Agent
+    logs.push({ step: 'EMMA_GENERATION', message: 'Generation briefing via Emma', timestamp: new Date().toISOString() });
     const emmaResponse = await fetch(`${process.env.VERCEL_URL || 'http://localhost:3000'}/api/emma-briefing?type=${type}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
@@ -102,7 +102,7 @@ async function generateAndSendBriefing(type) {
     }
     
     const emmaData = await emmaResponse.json();
-    logs.push({ step: 'EMMA_GENERATION', message: 'Briefing généré par Emma', data: { success: emmaData.success, tools_used: emmaData.metadata?.tools_used }, timestamp: new Date().toISOString() });
+    logs.push({ step: 'EMMA_GENERATION', message: 'Briefing genere par Emma', data: { success: emmaData.success, tools_used: emmaData.metadata?.tools_used }, timestamp: new Date().toISOString() });
     
     if (!emmaData.success) {
       throw new Error(`Emma briefing failed: ${emmaData.error}`);
@@ -115,16 +115,16 @@ async function generateAndSendBriefing(type) {
       const emailResult = await sendEmailViaResend(emmaData.content, type);
       
       if (emailResult.success) {
-        logs.push({ step: 'EMAIL_SEND', message: 'Email envoyé avec succès', data: { messageId: emailResult.messageId }, timestamp: new Date().toISOString() });
+        logs.push({ step: 'EMAIL_SEND', message: 'Email envoye avec succes', data: { messageId: emailResult.messageId }, timestamp: new Date().toISOString() });
       } else {
         logs.push({ step: 'EMAIL_SEND', message: 'Erreur envoi email', data: { error: emailResult.error }, timestamp: new Date().toISOString() });
       }
     } else {
-      logs.push({ step: 'EMAIL_SEND', message: 'Email non configuré (RESEND_API_KEY ou RESEND_TO_EMAIL manquant)', timestamp: new Date().toISOString() });
+      logs.push({ step: 'EMAIL_SEND', message: 'Email non configure (RESEND_API_KEY ou RESEND_TO_EMAIL manquant)', timestamp: new Date().toISOString() });
     }
     
     const duration = Date.now() - startTime;
-    logs.push({ step: 'COMPLETE', message: `Briefing ${type} généré et envoyé avec succès`, duration: `${duration}ms`, timestamp: new Date().toISOString() });
+    logs.push({ step: 'COMPLETE', message: `Briefing ${type} genere et envoye avec succes`, duration: `${duration}ms`, timestamp: new Date().toISOString() });
     
     return {
       success: true,
@@ -140,7 +140,7 @@ async function generateAndSendBriefing(type) {
     };
     
   } catch (error) {
-    console.error(`Erreur génération ${type}:`, error);
+    console.error(`Erreur generation ${type}:`, error);
     logs.push({ step: 'ERROR', message: error.message, timestamp: new Date().toISOString() });
     
     return {
@@ -178,7 +178,7 @@ async function sendEmailViaResend(htmlContent, type) {
     };
     
   } catch (error) {
-    console.error('❌ Resend email error:', error);
+    console.error(' Resend email error:', error);
     return {
       success: false,
       error: error.message
@@ -189,9 +189,9 @@ async function sendEmailViaResend(htmlContent, type) {
 function getSubjectForType(type) {
   const date = new Date().toLocaleDateString('fr-FR');
   switch (type) {
-    case 'morning': return `📊 Emma En Direct · Matin - ${date}`;
-    case 'midday': return `⚡ Emma En Direct · Midi - ${date}`;
-    case 'evening': return `🌙 Emma En Direct · Soir - ${date}`;
+    case 'morning': return ` Emma En Direct  Matin - ${date}`;
+    case 'midday': return ` Emma En Direct  Midi - ${date}`;
+    case 'evening': return ` Emma En Direct  Soir - ${date}`;
     default: return `Emma En Direct - ${date}`;
   }
 }

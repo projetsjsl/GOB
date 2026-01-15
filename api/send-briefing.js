@@ -1,5 +1,5 @@
 /**
- * API Send Briefing - Envoie immédiatement un briefing par email
+ * API Send Briefing - Envoie immediatement un briefing par email
  *
  * Usage:
  * POST /api/send-briefing
@@ -9,7 +9,7 @@
  *   custom_prompt: 'texte'  // Optionnel
  * }
  *
- * Utilisé par emma-config.html pour tester l'envoi immédiat
+ * Utilise par emma-config.html pour tester l'envoi immediat
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -20,7 +20,7 @@ const supabase = createClient(
 );
 
 /**
- * Génère le briefing via /api/briefing
+ * Genere le briefing via /api/briefing
  */
 async function generateBriefing(type, customPrompt) {
   try {
@@ -45,7 +45,7 @@ async function generateBriefing(type, customPrompt) {
 
     return await response.json();
   } catch (error) {
-    console.error('❌ Erreur génération briefing:', error);
+    console.error(' Erreur generation briefing:', error);
     throw error;
   }
 }
@@ -80,7 +80,7 @@ async function sendEmail(to, name, subject, htmlContent) {
 
     return await response.json();
   } catch (error) {
-    console.error(`❌ Erreur envoi email à ${to}:`, error);
+    console.error(` Erreur envoi email a ${to}:`, error);
     throw error;
   }
 }
@@ -109,9 +109,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'prompt_id is required' });
     }
 
-    console.log(`📧 Envoi immédiat du briefing: ${prompt_id}`);
+    console.log(` Envoi immediat du briefing: ${prompt_id}`);
 
-    // 1. RÉCUPÉRER LA CONFIGURATION (si recipients non fournis)
+    // 1. RECUPERER LA CONFIGURATION (si recipients non fournis)
     let recipients = providedRecipients;
     let briefingType = 'custom';
 
@@ -142,16 +142,16 @@ export default async function handler(req, res) {
       briefingType = keyParts[keyParts.length - 1] || 'custom';
     }
 
-    // 2. GÉNÉRER LE BRIEFING
+    // 2. GENERER LE BRIEFING
     const briefing = await generateBriefing(briefingType, custom_prompt);
 
     if (!briefing.success) {
       throw new Error(`Failed to generate briefing: ${briefing.error}`);
     }
 
-    console.log(`✅ Briefing généré: ${briefing.subject}`);
+    console.log(` Briefing genere: ${briefing.subject}`);
 
-    // 3. ENVOYER À TOUS LES DESTINATAIRES ACTIFS
+    // 3. ENVOYER A TOUS LES DESTINATAIRES ACTIFS
     const results = [];
     const errors = [];
 
@@ -173,7 +173,7 @@ export default async function handler(req, res) {
           resend_id: emailResult.id
         });
 
-        console.log(`✅ Email envoyé à ${recipient.email} (${emailResult.id})`);
+        console.log(` Email envoye a ${recipient.email} (${emailResult.id})`);
       } catch (error) {
         errors.push({
           email: recipient.email,
@@ -182,17 +182,17 @@ export default async function handler(req, res) {
           error: error.message
         });
 
-        console.error(`❌ Échec envoi à ${recipient.email}:`, error.message);
+        console.error(` Echec envoi a ${recipient.email}:`, error.message);
       }
     }
 
-    // 4. RETOURNER LE RÉSULTAT
+    // 4. RETOURNER LE RESULTAT
     const success = results.length > 0;
     const response = {
       success,
       message: success
-        ? `Briefing envoyé à ${results.length}/${recipients.length} destinataire(s)`
-        : 'Échec de tous les envois',
+        ? `Briefing envoye a ${results.length}/${recipients.length} destinataire(s)`
+        : 'Echec de tous les envois',
       sent_count: results.length,
       failed_count: errors.length,
       total_recipients: recipients.length,
@@ -208,7 +208,7 @@ export default async function handler(req, res) {
     return res.status(success ? 200 : 500).json(response);
 
   } catch (error) {
-    console.error('❌ Erreur send-briefing:', error);
+    console.error(' Erreur send-briefing:', error);
     return res.status(500).json({
       success: false,
       error: error.message,

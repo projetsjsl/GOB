@@ -54,7 +54,7 @@ export const useKeyboardShortcuts = ({
       return;
     }
 
-    // Ctrl/Cmd + Shift + D : Ouvrir dialog de synchronisation avec critères
+    // Ctrl/Cmd + Shift + D : Ouvrir dialog de synchronisation avec criteres
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
       e.preventDefault();
       onOpenSyncDialog?.();

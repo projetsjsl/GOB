@@ -1,14 +1,14 @@
 /**
- * API Endpoint pour se connecter à FastGraphs.com via Playwright Core + Browserbase
+ * API Endpoint pour se connecter a FastGraphs.com via Playwright Core + Browserbase
  * 
- * Ce endpoint exécute un workflow automatisé robuste qui:
- * 1. Crée une session Browserbase
+ * Ce endpoint execute un workflow automatise robuste qui:
+ * 1. Cree une session Browserbase
  * 2. Se connecte via Playwright (CDP)
- * 3. Exécute les actions de login de manière fiable
+ * 3. Execute les actions de login de maniere fiable
  */
 
 
-// Note: On utilise l'import dynamique pour éviter les crashs au démarrage si playwright-core a des soucis de dépendances
+// Note: On utilise l'import dynamique pour eviter les crashs au demarrage si playwright-core a des soucis de dependances
 // import { chromium } from 'playwright-core'; 
 
 export default async function handler(req, res) {
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'GET' && req.method !== 'POST') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Methode non autorisee' });
   }
 
   let browser = null;
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         throw new Error(`Module Playwright manquant ou incompatible: ${importError.message}`);
     }
 
-    // 1. Récupération des paramètres
+    // 1. Recuperation des parametres
     let email, password;
     try {
       if (req.method === 'POST') {
@@ -67,8 +67,8 @@ export default async function handler(req, res) {
       throw new Error('Configuration Browserbase manquante (API_KEY ou PROJECT_ID)');
     }
 
-    // 2. Création de la session Browserbase
-    console.log('Création de la session Browserbase...');
+    // 2. Creation de la session Browserbase
+    console.log('Creation de la session Browserbase...');
     const sessionResponse = await fetch('https://www.browserbase.com/v1/sessions', {
       method: 'POST',
       headers: {
@@ -85,7 +85,7 @@ export default async function handler(req, res) {
 
     if (!sessionResponse.ok) {
         const errText = await sessionResponse.text();
-        throw new Error(`Erreur création session Browserbase: ${errText}`);
+        throw new Error(`Erreur creation session Browserbase: ${errText}`);
     }
 
         // Secure JSON parsing
@@ -101,7 +101,7 @@ export default async function handler(req, res) {
     const sessionUrl = `https://www.browserbase.com/sessions/${sessionId}`; 
     const connectUrl = sessionData.connectUrl; 
 
-    console.log(`Session créée: ${sessionId}`);
+    console.log(`Session creee: ${sessionId}`);
     automationSteps.push({ step: 'session_created', success: true, message: `Session ID: ${sessionId}` });
 
     // 3. Connexion Playwright via CDP
@@ -110,14 +110,14 @@ export default async function handler(req, res) {
     const defaultContext = browser.contexts()[0];
     const page = defaultContext.pages()[0];
 
-    // 4. Exécution du Login Workflow
+    // 4. Execution du Login Workflow
     console.log('Navigation vers FastGraphs...');
     await page.goto('https://www.fastgraphs.com/', { waitUntil: 'domcontentloaded', timeout: 30000 });
     automationSteps.push({ step: 'navigate', success: true });
 
     // Clic sur Log In
     console.log('Recherche du bouton Log In...');
-    // Sélecteurs robustes pour le bouton login
+    // Selecteurs robustes pour le bouton login
     const loginSelectors = [
         'a[href*="login"]',
         'button:has-text("Log In")',
@@ -142,7 +142,7 @@ export default async function handler(req, res) {
              await page.getByText('Log In', { exact: false }).first().click();
              loginClicked = true;
         } catch (e) {
-             automationSteps.push({ step: 'click_login', success: false, message: 'Bouton non trouvé' });
+             automationSteps.push({ step: 'click_login', success: false, message: 'Bouton non trouve' });
              // Ne pas throw ici, on laisse l'utilisateur voir la page
              // throw new Error('Impossible de trouver le bouton Log In');
         }
@@ -152,7 +152,7 @@ export default async function handler(req, res) {
         automationSteps.push({ step: 'click_login', success: true });
     }
 
-    // Remplissage du formulaire (si credentials présents)
+    // Remplissage du formulaire (si credentials presents)
     if (hasCredentials && loginClicked) {
         console.log('Tentative de remplissage des identifiants...');
         try {
@@ -190,21 +190,21 @@ export default async function handler(req, res) {
         }
     }
 
-    console.log('Workflow terminé.');
+    console.log('Workflow termine.');
 
-    // Récupérer le HTML de la page finale pour debug
+    // Recuperer le HTML de la page finale pour debug
     let finalHtml = '';
     try {
         finalHtml = await page.content();
     } catch (e) {
-        console.warn('Impossible de récupérer le HTML final:', e.message);
+        console.warn('Impossible de recuperer le HTML final:', e.message);
     }
 
     // Note: On ne ferme PAS le browser pour laisser la session active pour l'utilisateur
     // await browser.close(); 
-    // Au lieu de ça, on se déconnecte juste du CDP côté serveur
+    // Au lieu de ca, on se deconnecte juste du CDP cote serveur
     try {
-        await browser.close(); // close() sur connectOverCDP ferme la *connexion*, pas forcément le browser distant si keepAlive=true
+        await browser.close(); // close() sur connectOverCDP ferme la *connexion*, pas forcement le browser distant si keepAlive=true
     } catch(e) {
         console.warn('Erreur fermeture connexion CDP:', e);
     }
@@ -226,7 +226,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Erreur API FastGraphs:', error);
     
-    // Nettoyage si crash (si browser défini)
+    // Nettoyage si crash (si browser defini)
     if (browser) {
         try { await browser.close(); } catch(e) {}
     }

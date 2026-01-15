@@ -1,15 +1,15 @@
 # Architecture et Documentation - 3P1 Application
 
-## 📋 Vue d'ensemble
+##  Vue d'ensemble
 
-Application d'analyse fondamentale pour la gestion de portefeuille avec synchronisation temps réel via Supabase.
+Application d'analyse fondamentale pour la gestion de portefeuille avec synchronisation temps reel via Supabase.
 
-## 🏗️ Structure des fichiers principaux
+##  Structure des fichiers principaux
 
 ### `App.tsx` - Composant principal
-**Responsabilités :**
-- Gestion de l'état global (library, activeId, etc.)
-- Synchronisation avec Supabase (temps réel + périodique)
+**Responsabilites :**
+- Gestion de l'etat global (library, activeId, etc.)
+- Synchronisation avec Supabase (temps reel + periodique)
 - Chargement et sauvegarde des profils
 - Gestion des snapshots et historique
 - Orchestration des composants enfants
@@ -18,94 +18,94 @@ Application d'analyse fondamentale pour la gestion de portefeuille avec synchron
 1. **Synchronisation Supabase** (`handleSyncFromSupabase`)
    - Charge les tickers depuis Supabase
    - Filtre par capitalisation minimale (2B USD)
-   - Crée des profils "squelettes" pour affichage immédiat
-   - Charge les données FMP en arrière-plan
-   - Gère les erreurs par batch avec résumé
+   - Cree des profils "squelettes" pour affichage immediat
+   - Charge les donnees FMP en arriere-plan
+   - Gere les erreurs par batch avec resume
 
 2. **Synchronisation en masse** (`handleBulkSyncAllTickers`)
    - Traite tous les tickers par batch (5 par batch)
-   - Gère pause/stop via `abortSync` ref
+   - Gere pause/stop via `abortSync` ref
    - Affiche une barre de progression
-   - Collecte les erreurs pour résumé final
+   - Collecte les erreurs pour resume final
 
-3. **Synchronisation temps réel** (`useRealtimeSync`)
-   - Écoute les changements Supabase (INSERT/UPDATE/DELETE)
+3. **Synchronisation temps reel** (`useRealtimeSync`)
+   - Ecoute les changements Supabase (INSERT/UPDATE/DELETE)
    - Force rechargement complet sur INSERT/DELETE
-   - Met à jour les métriques ValueLine sur UPDATE
-   - Synchronisation périodique toutes les 2 minutes (fallback)
+   - Met a jour les metriques ValueLine sur UPDATE
+   - Synchronisation periodique toutes les 2 minutes (fallback)
 
-4. **Mapping source → isWatchlist**
-   - `source='team'` → `isWatchlist=false` → ⭐ Portefeuille
-   - `source='watchlist'` ou `'both'` → `isWatchlist=true` → 👁️ Watchlist
-   - `source='manual'` ou `null/undefined` → `isWatchlist=null` → Pas d'icône (tickers normaux)
+4. **Mapping source -> isWatchlist**
+   - `source='team'` -> `isWatchlist=false` ->  Portefeuille
+   - `source='watchlist'` ou `'both'` -> `isWatchlist=true` ->  Watchlist
+   - `source='manual'` ou `null/undefined` -> `isWatchlist=null` -> Pas d'icone (tickers normaux)
 
-### `components/Sidebar.tsx` - Barre latérale
-**Responsabilités :**
+### `components/Sidebar.tsx` - Barre laterale
+**Responsabilites :**
 - Affichage de la liste des tickers
 - Filtrage et tri
 - Gestion des actions (ajout, suppression, duplication)
 - Toggle watchlist/portefeuille
 
-**Fonctionnalités clés :**
-- **Filtres avancés** : Pays, Bourse, Capitalisation
-- **Tri** : Alphabétique, Date, Recommandation, Secteur
-- **Cache de recommandations** : Optimise les recalculs coûteux
+**Fonctionnalites cles :**
+- **Filtres avances** : Pays, Bourse, Capitalisation
+- **Tri** : Alphabetique, Date, Recommandation, Secteur
+- **Cache de recommandations** : Optimise les recalculs couteux
 - **Collapse/Expand** : Section filtres collapsible
-- **Double-clic logo** : Toggle mode admin (fonction cachée)
+- **Double-clic logo** : Toggle mode admin (fonction cachee)
 
 ### `services/tickersApi.ts` - API Tickers
-**Responsabilités :**
+**Responsabilites :**
 - Chargement des tickers depuis Supabase
-- Fallback sur plusieurs APIs si admin échoue
+- Fallback sur plusieurs APIs si admin echoue
 - Normalisation du champ `source`
-- Mapping `source` → `isWatchlist`
+- Mapping `source` -> `isWatchlist`
 
-**Stratégie de fallback :**
-1. `/api/admin/tickers` (priorité)
+**Strategie de fallback :**
+1. `/api/admin/tickers` (priorite)
 2. `/api/team-tickers` (fallback 1)
 3. `/api/tickers-config` (fallback 2)
 
 ### `services/financeApi.ts` - API Finance
-**Responsabilités :**
+**Responsabilites :**
 - Proxy vers FMP API
 - Gestion des erreurs 404
-- Parsing et normalisation des données
+- Parsing et normalisation des donnees
 
-## 🔄 Flux de données
+##  Flux de donnees
 
 ### Chargement initial
 ```
 1. App.tsx charge depuis localStorage
-2. Si vide → loadTickersFromSupabase()
-3. Création de profils "squelettes" (affichage immédiat)
-4. Chargement FMP en arrière-plan (batch)
-5. Mise à jour des profils avec données complètes
+2. Si vide -> loadTickersFromSupabase()
+3. Creation de profils "squelettes" (affichage immediat)
+4. Chargement FMP en arriere-plan (batch)
+5. Mise a jour des profils avec donnees completes
 ```
 
-### Synchronisation temps réel
+### Synchronisation temps reel
 ```
-1. useRealtimeSync écoute Supabase
-2. INSERT/DELETE → Force rechargement complet
-3. UPDATE → Met à jour métriques ValueLine
-4. Synchronisation périodique (2 min) comme fallback
-```
-
-### Mapping source → isWatchlist
-```
-Supabase (source) → mapSourceToIsWatchlist() → isWatchlist
-- 'team' → false → ⭐ Portefeuille
-- 'watchlist'/'both' → true → 👁️ Watchlist
-- 'manual'/null → null → Pas d'icône
+1. useRealtimeSync ecoute Supabase
+2. INSERT/DELETE -> Force rechargement complet
+3. UPDATE -> Met a jour metriques ValueLine
+4. Synchronisation periodique (2 min) comme fallback
 ```
 
-## ⚠️ Points d'attention
+### Mapping source -> isWatchlist
+```
+Supabase (source) -> mapSourceToIsWatchlist() -> isWatchlist
+- 'team' -> false ->  Portefeuille
+- 'watchlist'/'both' -> true ->  Watchlist
+- 'manual'/null -> null -> Pas d'icone
+```
 
-### 1. Ordre de déclaration
-**Problème :** Variables utilisées dans `useState` initializers avant définition
-**Solution :** Toujours définir les constantes AVANT `useState`
+##  Points d'attention
 
-### 2. Références globales
-**Problème :** Composants non exposés globalement pour Babel inline
+### 1. Ordre de declaration
+**Probleme :** Variables utilisees dans `useState` initializers avant definition
+**Solution :** Toujours definir les constantes AVANT `useState`
+
+### 2. References globales
+**Probleme :** Composants non exposes globalement pour Babel inline
 **Solution :** `window.ComponentName = ComponentName`
 
 ### 3. Z-index hierarchy
@@ -115,14 +115,14 @@ Supabase (source) → mapSourceToIsWatchlist() → isWatchlist
 - Background : 0
 
 ### 4. Environment variables
-**Problème :** `import.meta.env` non disponible en Babel inline
-**Solution :** Fallback multi-méthode (window.importMetaEnv → meta tag → API)
+**Probleme :** `import.meta.env` non disponible en Babel inline
+**Solution :** Fallback multi-methode (window.importMetaEnv -> meta tag -> API)
 
 ### 5. Gestion des erreurs batch
-**Problème :** Trop de logs individuels polluent la console
-**Solution :** Collecte des erreurs par type + résumé groupé
+**Probleme :** Trop de logs individuels polluent la console
+**Solution :** Collecte des erreurs par type + resume groupe
 
-## 🎯 Fonctions cachées
+##  Fonctions cachees
 
 ### Toggle Admin (Double-clic logo)
 - **Localisation :** `components/Sidebar.tsx` ligne 70-90
@@ -130,34 +130,34 @@ Supabase (source) → mapSourceToIsWatchlist() → isWatchlist
 - **Effet :** Toggle `isAdmin` + localStorage `3p1-admin`
 - **Indicateur :** Logo jaune + ShieldCheck icon
 
-## 📊 Performance
+##  Performance
 
 ### Optimisations
 1. **Lazy loading** : KPIDashboard, AdminDashboard
-2. **Cache recommandations** : Map avec limite 1000 entrées
+2. **Cache recommandations** : Map avec limite 1000 entrees
 3. **Batch processing** : 5 tickers par batch (FMP sync)
-4. **Skeleton profiles** : Affichage immédiat sans attendre FMP
-5. **useMemo** : Filtrage et tri optimisés
+4. **Skeleton profiles** : Affichage immediat sans attendre FMP
+5. **useMemo** : Filtrage et tri optimises
 
 ### Limitations
-- Batch size FMP : 5 tickers (éviter timeouts)
-- Cache recommandations : Max 1000 entrées
-- Synchronisation périodique : 2 minutes
+- Batch size FMP : 5 tickers (eviter timeouts)
+- Cache recommandations : Max 1000 entrees
+- Synchronisation periodique : 2 minutes
 
-## 🔐 Sécurité
+##  Securite
 
 ### Mode Admin
 - Activation : Double-clic logo OU URL `?admin=true` OU localStorage
 - Persistance : localStorage `3p1-admin`
-- Vérification : sessionStorage `gob-user` (role admin)
+- Verification : sessionStorage `gob-user` (role admin)
 
-## 📝 Notes importantes
+##  Notes importantes
 
 ### isWatchlist
 - Type : `boolean | null | undefined`
-- `false` = Portefeuille (⭐)
-- `true` = Watchlist (👁️)
-- `null/undefined` = Normal (pas d'icône)
+- `false` = Portefeuille ()
+- `true` = Watchlist ()
+- `null/undefined` = Normal (pas d'icone)
 
 ### source (Supabase)
 - `'team'` = Team tickers (25 environ)
@@ -167,26 +167,26 @@ Supabase (source) → mapSourceToIsWatchlist() → isWatchlist
 
 ### Capitalisation minimale
 - Filtre : 2 milliards USD minimum
-- Appliqué lors de `handleSyncFromSupabase`
-- Vérifié aussi depuis FMP data
+- Applique lors de `handleSyncFromSupabase`
+- Verifie aussi depuis FMP data
 
-## 🐛 Debugging
+##  Debugging
 
 ### Console logs importants
-- `🚀 3p1 App v2.1.0` : Version de l'app
-- `📡 [tickers] Subscription status` : Statut realtime
-- `✅ X tickers chargés` : Chargement réussi
-- `📊 Résumé synchronisation` : Résumé erreurs batch
+- ` 3p1 App v2.1.0` : Version de l'app
+- ` [tickers] Subscription status` : Statut realtime
+- ` X tickers charges` : Chargement reussi
+- ` Resume synchronisation` : Resume erreurs batch
 
-### Vérifications courantes
+### Verifications courantes
 1. `localStorage.getItem('3p1-admin')` : Mode admin actif ?
-2. `sessionStorage.getItem('gob-user')` : Utilisateur connecté ?
+2. `sessionStorage.getItem('gob-user')` : Utilisateur connecte ?
 3. `supabaseTickersCacheRef.current` : Cache valide ?
-4. `hasLoadedTickersRef.current` : Tickers chargés ?
+4. `hasLoadedTickersRef.current` : Tickers charges ?
 
-## 📚 Références
+##  References
 
-- `docs/REPERTOIRE_COMPLET_ERREURS.md` : Erreurs documentées (32+)
+- `docs/REPERTOIRE_COMPLET_ERREURS.md` : Erreurs documentees (32+)
 - `docs/INDEX.md` : Index documentation
 - `docs/api/DOCUMENTATION_APIs.md` : Documentation APIs
 - `CLAUDE.md` : Guide principal projet

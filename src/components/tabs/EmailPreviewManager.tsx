@@ -14,7 +14,7 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                 const [showPreview, setShowPreview] = useState(false);
                 const [customPrompt, setCustomPrompt] = useState('');
 
-                // Générer un preview de briefing
+                // Generer un preview de briefing
                 const generatePreview = async () => {
                     setLoading(true);
                     setShowPreview(false);
@@ -24,7 +24,7 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                         let body = null;
 
                         if (previewType === 'custom' && customPrompt) {
-                            // Pour custom, utiliser POST avec le prompt personnalisé
+                            // Pour custom, utiliser POST avec le prompt personnalise
                             method = 'POST';
                             body = JSON.stringify({
                                 type: 'custom',
@@ -55,11 +55,11 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                             });
                             setShowPreview(true);
                         } else {
-                            alert('❌ Erreur: ' + (result.error || 'Impossible de générer le briefing'));
+                            alert(' Erreur: ' + (result.error || 'Impossible de generer le briefing'));
                         }
                     } catch (error) {
-                        console.error('Erreur génération preview:', error);
-                        alert('❌ Erreur lors de la génération: ' + error.message);
+                        console.error('Erreur generation preview:', error);
+                        alert(' Erreur lors de la generation: ' + error.message);
                     } finally {
                         setLoading(false);
                     }
@@ -68,12 +68,12 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                 // Envoyer un email de test
                 const sendTestEmail = async () => {
                     if (!previewData) {
-                        alert('❌ Aucun preview généré. Générez d\'abord un preview.');
+                        alert(' Aucun preview genere. Generez d\'abord un preview.');
                         return;
                     }
 
                     try {
-                        // Récupérer l'email de preview
+                        // Recuperer l'email de preview
                         const recipientsResponse = await fetch('/api/email-recipients');
                         const recipientsResult = await recipientsResponse.json();
                         const previewEmail = recipientsResult.preview_email || 'projetsjsl@gmail.com';
@@ -92,26 +92,26 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
 
                         const result = await response.json();
                         if (result.success) {
-                            alert(`✅ Email de test envoyé à ${previewEmail} !`);
+                            alert(` Email de test envoye a ${previewEmail} !`);
                         } else {
-                            alert('❌ Erreur: ' + (result.error || 'Impossible d\'envoyer l\'email'));
+                            alert(' Erreur: ' + (result.error || 'Impossible d\'envoyer l\'email'));
                         }
                     } catch (error) {
                         console.error('Erreur envoi test:', error);
-                        alert('❌ Erreur lors de l\'envoi: ' + error.message);
+                        alert(' Erreur lors de l\'envoi: ' + error.message);
                     }
                 };
 
                 const briefingTypes = [
-                    { id: 'morning', label: '🌅 Matin', icon: '🌅' },
-                    { id: 'midday', label: '☀️ Midi', icon: '☀️' },
-                    { id: 'evening', label: '🌙 Soir', icon: '🌙' },
-                    { id: 'custom', label: '📝 Personnalisé', icon: '📝' }
+                    { id: 'morning', label: ' Matin', icon: '' },
+                    { id: 'midday', label: ' Midi', icon: '' },
+                    { id: 'evening', label: ' Soir', icon: '' },
+                    { id: 'custom', label: ' Personnalise', icon: '' }
                 ];
 
                 return (
                     <div className="space-y-4">
-                        {/* Sélection du type */}
+                        {/* Selection du type */}
                         <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-900 border-gray-600' : 'bg-gray-50 border-gray-200'
                         }`}>
@@ -142,13 +142,13 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                                 ))}
                             </div>
 
-                            {/* Prompt personnalisé */}
+                            {/* Prompt personnalise */}
                             {previewType === 'custom' && (
                                 <div className="mt-4">
                                     <label className={`text-sm font-semibold mb-2 block transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        Prompt Personnalisé
+                                        Prompt Personnalise
                                     </label>
                                     <textarea
                                         value={customPrompt}
@@ -159,12 +159,12 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                                                 ? 'bg-gray-900 border-gray-600 text-white placeholder-gray-500'
                                                 : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'
                                         } focus:ring-2 focus:ring-purple-500 focus:border-transparent`}
-                                        placeholder="Entrez votre prompt personnalisé ici..."
+                                        placeholder="Entrez votre prompt personnalise ici..."
                                     />
                                 </div>
                             )}
 
-                            {/* Bouton Générer */}
+                            {/* Bouton Generer */}
                             <div className="mt-4">
                                 <button
                                     onClick={generatePreview}
@@ -175,7 +175,7 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                                             : 'bg-purple-600 hover:bg-purple-700 text-white'
                                     }`}
                                 >
-                                    {loading ? '⏳ Génération en cours...' : '🚀 Générer le Preview'}
+                                    {loading ? ' Generation en cours...' : ' Generer le Preview'}
                                 </button>
                             </div>
                         </div>
@@ -185,14 +185,14 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                             <div className={`p-4 rounded-lg border-2 transition-colors duration-300 ${
                                 isDarkMode ? 'bg-gray-900 border-purple-500' : 'bg-white border-purple-300'
                             }`}>
-                                {/* Métadonnées */}
+                                {/* Metadonnees */}
                                 <div className={`mb-4 p-3 rounded-lg transition-colors duration-300 ${
                                     isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
                                 }`}>
                                     <h4 className={`text-sm font-semibold mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        📊 Métadonnées
+                                         Metadonnees
                                     </h4>
                                     <div className="grid grid-cols-2 gap-2 text-xs">
                                         <div>
@@ -214,7 +214,7 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                                         <div>
                                             <span className={`font-medium transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>Modèle:</span>
+                                            }`}>Modele:</span>
                                             <span className={`ml-2 transition-colors duration-300 ${
                                                 isDarkMode ? 'text-gray-300' : 'text-gray-900'
                                             }`}>{previewData.metadata?.emma_model || 'perplexity'}</span>
@@ -239,7 +239,7 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                                     <h4 className={`text-sm font-semibold mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                        📧 Aperçu de l'Email
+                                         Apercu de l'Email
                                     </h4>
                                     <div className={`rounded-lg border-2 overflow-hidden transition-colors duration-300 ${
                                         isDarkMode ? 'border-gray-700' : 'border-gray-300'
@@ -264,7 +264,7 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                                         onClick={sendTestEmail}
                                         className="flex-1 px-6 py-2 rounded-lg font-medium bg-green-600 hover:bg-green-700 text-white transition-colors duration-300"
                                     >
-                                        📧 Envoyer un Email de Test
+                                         Envoyer un Email de Test
                                     </button>
                                     <button
                                         onClick={() => {
@@ -275,17 +275,17 @@ export const EmailPreviewManager: React.FC<TabProps> = (props) => {
                                         }}
                                         className="px-6 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300"
                                     >
-                                        🔗 Ouvrir dans un Nouvel Onglet
+                                         Ouvrir dans un Nouvel Onglet
                                     </button>
                                     <button
                                         onClick={() => {
                                             // Copier le HTML dans le presse-papier
                                             navigator.clipboard.writeText(previewData.html_content);
-                                            alert('✅ HTML copié dans le presse-papier !');
+                                            alert(' HTML copie dans le presse-papier !');
                                         }}
                                         className="px-6 py-2 rounded-lg font-medium bg-gray-600 hover:bg-gray-700 text-white transition-colors duration-300"
                                     >
-                                        📋 Copier le HTML
+                                         Copier le HTML
                                     </button>
                                 </div>
                             </div>

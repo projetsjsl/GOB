@@ -1,5 +1,5 @@
 /**
- * API Endpoint pour générer les emails Emma En Direct
+ * API Endpoint pour generer les emails Emma En Direct
  */
 
 import fs from 'fs';
@@ -28,15 +28,15 @@ export default async function handler(req, res) {
             });
         }
         
-        // ═══════════════════════════════════════════════════════════
-        // CONVERSION FRANÇAIS → ANGLAIS (pour compatibilité)
-        // ═══════════════════════════════════════════════════════════
+        // 
+        // CONVERSION FRANCAIS -> ANGLAIS (pour compatibilite)
+        // 
         const typeMapping = {
-          // Français → Anglais
+          // Francais -> Anglais
           'matin': 'morning',
           'midi': 'midday',
           'soir': 'evening',
-          // Anglais (compatibilité)
+          // Anglais (compatibilite)
           'morning': 'morning',
           'midday': 'midday',
           'evening': 'evening',
@@ -51,12 +51,12 @@ export default async function handler(req, res) {
             });
         }
 
-        console.log(`📧 Generating ${normalizedType} briefing (${type})...`);
+        console.log(` Generating ${normalizedType} briefing (${type})...`);
 
         // 1. Charger la configuration du prompt
         const promptConfig = await loadPromptConfig(normalizedType);
         
-        // 2. Préparer le contexte pour Emma
+        // 2. Preparer le contexte pour Emma
         const context = {
             briefing_type: normalizedType,
             current_time: new Date().toISOString(),
@@ -72,13 +72,13 @@ export default async function handler(req, res) {
             tools_priority: promptConfig.tools_priority
         };
 
-        // 3. Appeler Emma Agent pour générer le contenu
+        // 3. Appeler Emma Agent pour generer le contenu
         const emmaResponse = await callEmmaAgent(promptConfig.prompt, context);
         
         if (!emmaResponse.success) {
             console.error('[Emma Briefing] Erreur Emma Agent:', emmaResponse.error);
             
-            // ✅ FIX: Distinguer les types d'erreurs pour codes HTTP appropriés
+            //  FIX: Distinguer les types d'erreurs pour codes HTTP appropries
             let statusCode = 500;
             let errorType = 'Failed to generate briefing content';
             
@@ -99,15 +99,15 @@ export default async function handler(req, res) {
                 type: normalizedType,
                 details: emmaResponse.error,
                 suggestion: statusCode === 401
-                    ? 'Vérifiez les clés API (Perplexity, Gemini, FMP) dans Vercel'
+                    ? 'Verifiez les cles API (Perplexity, Gemini, FMP) dans Vercel'
                     : statusCode === 429
-                    ? 'Limite de requêtes atteinte. Réessayez plus tard.'
-                    : 'Vérifiez la configuration des prompts et des APIs externes (Perplexity, FMP, etc.)',
+                    ? 'Limite de requetes atteinte. Reessayez plus tard.'
+                    : 'Verifiez la configuration des prompts et des APIs externes (Perplexity, FMP, etc.)',
                 timestamp: new Date().toISOString()
             });
         }
 
-        // 4. Générer le HTML de l'email
+        // 4. Generer le HTML de l'email
         const emailHtml = generateEmailHtml(emmaResponse.response, promptConfig, context);
 
         // 5. Enregistrer dans l'historique
@@ -127,7 +127,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('❌ Emma Briefing API Error:', error);
+        console.error(' Emma Briefing API Error:', error);
         return res.status(500).json({
             success: false,
             error: error.message,
@@ -147,7 +147,7 @@ async function loadPromptConfig(type) {
         
         return configData[type];
     } catch (error) {
-        console.error('❌ Failed to load prompt config:', error);
+        console.error(' Failed to load prompt config:', error);
         throw new Error('Failed to load briefing configuration');
     }
 }
@@ -171,38 +171,38 @@ async function callEmmaAgent(prompt, context) {
 
         return await response.json();
     } catch (error) {
-        console.error('❌ Emma Agent call failed:', error);
+        console.error(' Emma Agent call failed:', error);
         throw new Error('Failed to generate briefing content');
     }
 }
 
 /**
- * ════════════════════════════════════════════════════════════════════════════
- * BONNES PRATIQUES HTML EMAIL (compatibilité Outlook, Gmail, Apple Mail)
- * ════════════════════════════════════════════════════════════════════════════
  * 
- * ✅ UTILISER:
+ * BONNES PRATIQUES HTML EMAIL (compatibilite Outlook, Gmail, Apple Mail)
+ * 
+ * 
+ *  UTILISER:
  * - Tables avec role="presentation" pour le layout
  * - Attributs: cellpadding="0" cellspacing="0" border="0"
  * - Styles 100% inline (pas de <style> dans <head>)
- * - Couleurs hexadécimales complètes (#FFFFFF, pas #FFF)
+ * - Couleurs hexadecimales completes (#FFFFFF, pas #FFF)
  * - Font stack: Arial, Helvetica, sans-serif
  * - Width explicites sur tables (max 600px)
  * - Padding au lieu de margin
  * 
- * ❌ NE PAS UTILISER:
+ *  NE PAS UTILISER:
  * - <div> pour structure principale
  * - Flexbox, Grid, CSS moderne
  * - linear-gradient, box-shadow
  * - border-radius > 4px (Outlook l'ignore)
  * - Classes CSS ou <style> block
  * - margin (utiliser padding)
- * ════════════════════════════════════════════════════════════════════════════
+ * 
  */
 function generateEmailHtml(content, promptConfig, context) {
     const subject = promptConfig.email_config.subject_template.replace('{date}', context.date);
     const formattedContent = formatContentForHtml(content);
-    const disclaimerText = promptConfig.config?.disclaimer_text || 'Les informations fournies sont à des fins éducatives uniquement et ne constituent pas des conseils financiers personnalisés.';
+    const disclaimerText = promptConfig.config?.disclaimer_text || 'Les informations fournies sont a des fins educatives uniquement et ne constituent pas des conseils financiers personnalises.';
     
     return `<!DOCTYPE html>
 <html lang="fr">
@@ -254,7 +254,7 @@ function generateEmailHtml(content, promptConfig, context) {
                                 <!-- Signature -->
                                 <tr>
                                     <td style="font-size: 14px; font-style: italic; color: #007bff; font-family: Arial, Helvetica, sans-serif; text-align: center; padding-bottom: 15px;">
-                                        — Emma, votre assistante financière intelligente
+                                        - Emma, votre assistante financiere intelligente
                                     </td>
                                 </tr>
                                 <!-- Disclaimer -->
@@ -293,7 +293,7 @@ async function saveBriefingHistory(type, content, emmaResponse) {
         const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!supabaseUrl || !supabaseKey) {
-            console.warn('⚠️ Supabase not configured, skipping history save');
+            console.warn(' Supabase not configured, skipping history save');
             return;
         }
 
@@ -314,11 +314,11 @@ async function saveBriefingHistory(type, content, emmaResponse) {
         });
 
         if (!response.ok) {
-            console.error('❌ Failed to save briefing history:', response.status);
+            console.error(' Failed to save briefing history:', response.status);
         } else {
-            console.log('✅ Briefing history saved successfully');
+            console.log(' Briefing history saved successfully');
         }
     } catch (error) {
-        console.error('❌ Error saving briefing history:', error);
+        console.error(' Error saving briefing history:', error);
     }
 }

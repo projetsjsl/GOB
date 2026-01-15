@@ -1,8 +1,8 @@
 /**
  * GOB Design System - CSS Variables
  * 
- * Variables CSS générées depuis src/design-system/tokens.ts
- * Utilisées pour thèmes dynamiques et styles cohérents
+ * Variables CSS generees depuis src/design-system/tokens.ts
+ * Utilisees pour themes dynamiques et styles coherents
  */
 
 :root {
@@ -12,7 +12,7 @@
   --gob-primary-dark: #4f46e5;
   --gob-secondary: #7c3aed;
   
-  /* Couleurs d'état */
+  /* Couleurs d'etat */
   --gob-success: #10b981;
   --gob-danger: #ef4444;
   --gob-warning: #f59e0b;

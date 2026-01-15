@@ -1,10 +1,10 @@
 // ============================================================================
 // GEMINI TOOLS API - Emma En Direct
-// API intermédiaire pour exécuter les fonctions Perplexity et Yahoo Finance
+// API intermediaire pour executer les fonctions Perplexity et Yahoo Finance
 // ============================================================================
 //
-// 🛡️  GUARDRAILS : Cette API est utilisée par le chatbot Emma
-// ⚠️  Ne pas modifier sans test complet
+//   GUARDRAILS : Cette API est utilisee par le chatbot Emma
+//   Ne pas modifier sans test complet
 // ============================================================================
 
 export default async function handler(req, res) {
@@ -18,14 +18,14 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ error: 'Methode non autorisee' });
   }
 
   try {
     const { tool, params } = req.body;
 
     if (!tool) {
-      return res.status(400).json({ error: 'Paramètre "tool" requis' });
+      return res.status(400).json({ error: 'Parametre "tool" requis' });
     }
 
     const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://gobapps.com';
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
       case 'searchPerplexity': {
         const { query, recency = 'day' } = params || {};
         if (!query) {
-          return res.status(400).json({ error: 'Paramètre "query" requis' });
+          return res.status(400).json({ error: 'Parametre "query" requis' });
         }
 
         const response = await fetch(`${baseUrl}/api/ai-services`, {
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
       case 'getYahooFinanceData': {
         const { type } = params || {};
         if (!type) {
-          return res.status(400).json({ error: 'Paramètre "type" requis' });
+          return res.status(400).json({ error: 'Parametre "type" requis' });
         }
 
         const response = await fetch(`${baseUrl}/api/ai-services`, {
@@ -104,7 +104,7 @@ export default async function handler(req, res) {
       case 'getYahooStockQuote': {
         const { symbol } = params || {};
         if (!symbol) {
-          return res.status(400).json({ error: 'Paramètre "symbol" requis' });
+          return res.status(400).json({ error: 'Parametre "symbol" requis' });
         }
 
         const response = await fetch(`${baseUrl}/api/marketdata?endpoint=quote&symbol=${encodeURIComponent(symbol)}&source=yahoo`);

@@ -3,44 +3,44 @@
  * Contains all shared utility functions used across the dashboard
  */
 
-// Fonction pour nettoyer l'encodage des caractères
+// Fonction pour nettoyer l'encodage des caracteres
 const cleanText = (text) => {
     if (!text) return '';
     return text
-        .replace(/Ã©/g, 'é')
-        .replace(/Ã¨/g, 'è')
-        .replace(/Ã /g, 'à')
-        .replace(/Ã§/g, 'ç')
-        .replace(/Ã´/g, 'ô')
-        .replace(/Ã¢/g, 'â')
-        .replace(/Ã®/g, 'î')
-        .replace(/Ã¯/g, 'ï')
-        .replace(/Ã¹/g, 'ù')
-        .replace(/Ã»/g, 'û')
-        .replace(/Ã«/g, 'ë')
-        .replace(/Ã¤/g, 'ä')
-        .replace(/Ã¶/g, 'ö')
-        .replace(/Ã¼/g, 'ü')
-        .replace(/â€™/g, "'")
-        .replace(/â€œ/g, '"')
-        .replace(/â€/g, '"')
-        .replace(/â€"/g, '–')
-        .replace(/â€"/g, '—');
+        .replace(/A/g, 'e')
+        .replace(/A /g, 'e')
+        .replace(/A /g, 'a')
+        .replace(/A/g, 'c')
+        .replace(/A /g, 'o')
+        .replace(/A/g, 'a')
+        .replace(/A/g, 'i')
+        .replace(/A /g, 'i')
+        .replace(/A1/g, 'u')
+        .replace(/A"/g, 'u')
+        .replace(/A"/g, 'e')
+        .replace(/A/g, 'a')
+        .replace(/A/g, 'o')
+        .replace(/A14/g, 'u')
+        .replace(/aEURTM/g, "'")
+        .replace(/aEUR/g, '"')
+        .replace(/aEUR/g, '"')
+        .replace(/aEUR"/g, '-')
+        .replace(/aEUR"/g, '-');
 };
 
-// Fonction pour déterminer l'icône et la couleur d'une nouvelle
+// Fonction pour determiner l'icone et la couleur d'une nouvelle
 const getNewsIcon = (title, description, sentiment) => {
     const text = ((title || '') + ' ' + (description || '')).toLowerCase();
 
-    // Catégories avec mots-clés (français et anglais)
+    // Categories avec mots-cles (francais et anglais)
     const categories = {
         earnings: {
-            keywords: ['earnings', 'résultats', 'profit', 'bénéfice', 'trimestre', 'quarterly', 'revenue', 'chiffre d\'affaires'],
+            keywords: ['earnings', 'resultats', 'profit', 'benefice', 'trimestre', 'quarterly', 'revenue', 'chiffre d\'affaires'],
             icon: 'DollarSign',
             color: 'text-green-500'
         },
         merger: {
-            keywords: ['merger', 'acquisition', 'fusionner', 'racheter', 'acquérir', 'deal', 'accord'],
+            keywords: ['merger', 'acquisition', 'fusionner', 'racheter', 'acquerir', 'deal', 'accord'],
             icon: 'Briefcase',
             color: 'text-purple-500'
         },
@@ -55,42 +55,42 @@ const getNewsIcon = (title, description, sentiment) => {
             color: 'text-red-500'
         },
         regulation: {
-            keywords: ['régulation', 'regulation', 'law', 'loi', 'sec', 'fda', 'gouvernement', 'government'],
+            keywords: ['regulation', 'regulation', 'law', 'loi', 'sec', 'fda', 'gouvernement', 'government'],
             icon: 'Shield',
             color: 'text-blue-500'
         },
         target: {
-            keywords: ['target', 'objectif', 'forecast', 'prévision', 'outlook', 'guidance'],
+            keywords: ['target', 'objectif', 'forecast', 'prevision', 'outlook', 'guidance'],
             icon: 'Target',
             color: 'text-indigo-500'
         },
         market: {
-            keywords: ['market', 'marché', 'index', 'indice', 's&p', 'dow', 'nasdaq', 'bourse'],
+            keywords: ['market', 'marche', 'index', 'indice', 's&p', 'dow', 'nasdaq', 'bourse'],
             icon: 'BarChart3',
             color: 'text-blue-500'
         }
     };
 
-    // Vérifier chaque catégorie
+    // Verifier chaque categorie
     for (const [key, category] of Object.entries(categories)) {
         if (category.keywords.some(keyword => text.includes(keyword))) {
             return { icon: category.icon, color: category.color };
         }
     }
 
-    // Par défaut: icône basée sur le sentiment
-    if (sentiment === 'positive' || text.includes('positif') || text.includes('success') || text.includes('succès')) {
+    // Par defaut: icone basee sur le sentiment
+    if (sentiment === 'positive' || text.includes('positif') || text.includes('success') || text.includes('succes')) {
         return { icon: 'TrendingUp', color: 'text-green-500' };
     }
-    if (sentiment === 'negative' || text.includes('négatif') || text.includes('risk') || text.includes('risque')) {
+    if (sentiment === 'negative' || text.includes('negatif') || text.includes('risk') || text.includes('risque')) {
         return { icon: 'TrendingDown', color: 'text-red-500' };
     }
 
-    // Fallback: icône de journal
+    // Fallback: icone de journal
     return { icon: 'Newspaper', color: 'text-gray-500' };
 };
 
-// Fonction pour évaluer la crédibilité d'une source de nouvelles
+// Fonction pour evaluer la credibilite d'une source de nouvelles
 const getSourceCredibility = (sourceName) => {
     if (!sourceName) return 0;
 
@@ -104,11 +104,11 @@ const getSourceCredibility = (sourceName) => {
     const tier2 = ['cnbc', 'marketwatch', 'barron', 'forbes', 'economist', 'la presse', 'les affaires'];
     if (tier2.some(s => source.includes(s))) return 85;
 
-    // Tier 3: Sources établies (79-70)
+    // Tier 3: Sources etablies (79-70)
     const tier3 = ['yahoo finance', 'seeking alpha', 'business insider', 'benzinga', 'investopedia'];
     if (tier3.some(s => source.includes(s))) return 75;
 
-    // Tier 4: Agrégateurs et PR (69-60)
+    // Tier 4: Agregateurs et PR (69-60)
     const tier4 = ['pr newswire', 'business wire', 'globe newswire', 'accesswire', 'fmp', 'finnhub'];
     if (tier4.some(s => source.includes(s))) return 65;
 
@@ -116,55 +116,55 @@ const getSourceCredibility = (sourceName) => {
     return 50;
 };
 
-// Fonction pour trier les nouvelles par crédibilité puis par date
+// Fonction pour trier les nouvelles par credibilite puis par date
 const sortNewsByCredibility = (newsArray) => {
     return [...newsArray].sort((a, b) => {
-        // 1. Trier par crédibilité de la source
+        // 1. Trier par credibilite de la source
         const credibilityA = getSourceCredibility(a.source?.name);
         const credibilityB = getSourceCredibility(b.source?.name);
 
         if (credibilityB !== credibilityA) {
-            return credibilityB - credibilityA; // Descendant (plus crédible en premier)
+            return credibilityB - credibilityA; // Descendant (plus credible en premier)
         }
 
-        // 2. Si même crédibilité, trier par date (plus récent en premier)
+        // 2. Si meme credibilite, trier par date (plus recent en premier)
         const dateA = new Date(a.publishedAt || a.publishedDate || 0);
         const dateB = new Date(b.publishedAt || b.publishedDate || 0);
         return dateB - dateA;
     });
 };
 
-// Fonction pour détecter si un article est en français
+// Fonction pour detecter si un article est en francais
 const isFrenchArticle = (article) => {
     if (!article) return false;
 
     const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
     const sourceName = (article.source?.name || '').toLowerCase();
 
-    // Sources françaises connues
+    // Sources francaises connues
     const frenchSources = ['la presse', 'les affaires', 'radio-canada', 'ici', 'le devoir', 'le journal', 'reuters fr', 'bloomberg fr'];
     if (frenchSources.some(source => sourceName.includes(source))) {
         return true;
     }
 
-    // Mots-clés français communs dans les articles financiers
+    // Mots-cles francais communs dans les articles financiers
     const frenchKeywords = [
-        'à', 'de', 'et', 'pour', 'dans', 'avec', 'sur', 'plus', 'après', 'annonce',
-        'hausse', 'baisse', 'résultats', 'bourse', 'marché', 'économie', 'entreprise',
-        'société', 'actionnaire', 'bénéfice', 'chiffre', 'trimestre', 'milliards', 'millions'
+        'a', 'de', 'et', 'pour', 'dans', 'avec', 'sur', 'plus', 'apres', 'annonce',
+        'hausse', 'baisse', 'resultats', 'bourse', 'marche', 'economie', 'entreprise',
+        'societe', 'actionnaire', 'benefice', 'chiffre', 'trimestre', 'milliards', 'millions'
     ];
 
-    // Compter combien de mots-clés français sont présents
+    // Compter combien de mots-cles francais sont presents
     const frenchWordCount = frenchKeywords.filter(keyword => text.includes(keyword)).length;
 
-    // Si 3+ mots-clés français, considérer comme article français
+    // Si 3+ mots-cles francais, considerer comme article francais
     return frenchWordCount >= 3;
 };
 
-// Fonction pour extraire le logo depuis les données de scraping
+// Fonction pour extraire le logo depuis les donnees de scraping
 const getCompanyLogo = (ticker, seekingAlphaData) => {
     try {
-        // Chercher dans les données de scraping
+        // Chercher dans les donnees de scraping
         const seekingAlphaItem = seekingAlphaData.stocks?.find(s => s.ticker === ticker);
         if (seekingAlphaItem?.raw_text) {
             // Extraire le logo depuis le JSON dans raw_text
@@ -174,7 +174,7 @@ const getCompanyLogo = (ticker, seekingAlphaData) => {
             }
         }
         
-        // Fallback vers des logos par défaut
+        // Fallback vers des logos par defaut
         const defaultLogos = {
             // Tickers US
             'GOOGL': 'https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/GOOGL.svg',
@@ -230,7 +230,7 @@ const getUserLoginId = (githubUser) => {
             return user.username || user.display_name || githubUser?.login || githubUser?.name || 'toi';
         }
     } catch (e) {
-        console.warn('Erreur récupération utilisateur:', e);
+        console.warn('Erreur recuperation utilisateur:', e);
     }
     return githubUser?.login || githubUser?.name || 'toi';
 };
@@ -238,7 +238,7 @@ const getUserLoginId = (githubUser) => {
 // Fonction pour obtenir la couleur d'une grade
 const getGradeColor = (grade) => {
     if (!grade) return 'bg-gray-100 text-gray-600';
-    // Convertir en chaîne si ce n'est pas déjà le cas
+    // Convertir en chaine si ce n'est pas deja le cas
     const gradeStr = String(grade);
     if (!gradeStr || gradeStr.length === 0) return 'bg-gray-100 text-gray-600';
     const letter = gradeStr.charAt(0).toUpperCase();
@@ -250,12 +250,12 @@ const getGradeColor = (grade) => {
     return 'bg-gray-100 text-gray-600';
 };
 
-// Parser les données brutes de Seeking Alpha
+// Parser les donnees brutes de Seeking Alpha
 const parseSeekingAlphaRawText = (rawText) => {
     if (!rawText) return null;
     
     try {
-        // Extraire les données du texte brut
+        // Extraire les donnees du texte brut
         const data = {};
         
         // Prix actuel
@@ -340,7 +340,7 @@ const formatNumber = (num, prefix = '', suffix = '') => {
     return `${prefix}${formattedNum}${suffix}`;
 };
 
-// Fonction pour obtenir l'icône d'un onglet
+// Fonction pour obtenir l'icone d'un onglet
 const getTabIcon = (tabId) => {
     const iconMap = {
         'stocks-news': 'Newspaper',

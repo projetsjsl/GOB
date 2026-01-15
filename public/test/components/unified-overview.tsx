@@ -34,7 +34,7 @@ export const UnifiedOverview: FC<UnifiedOverviewProps> = ({
   const formatPolicyRate = (rate: any) => {
     const numRate = Number(rate)
     if (isNaN(numRate) || numRate === null || numRate === undefined) {
-      return { main: "—", bp: "—", decimal: "—" }
+      return { main: "-", bp: "-", decimal: "-" }
     }
     return {
       main: numRate.toFixed(3),
@@ -89,10 +89,10 @@ export const UnifiedOverview: FC<UnifiedOverviewProps> = ({
           {/* Title spanning both countries */}
           <div className="mb-4 pb-3 border-b border-border/30">
             <h2 className="text-lg font-bold text-foreground flex items-center gap-3">
-              <span>🇺🇸</span>
-              <span className="text-blue-400">États-Unis</span>
+              <span></span>
+              <span className="text-blue-400">Etats-Unis</span>
               <span className="mx-2 text-border/50">|</span>
-              <span>🇨🇦</span>
+              <span></span>
               <span className="text-red-400">Canada</span>
             </h2>
           </div>
@@ -120,7 +120,7 @@ export const UnifiedOverview: FC<UnifiedOverviewProps> = ({
 
           {/* Yield Curve Maturities - Interleaved US/CA */}
           <div className="space-y-2">
-            <div className="text-xs font-semibold text-foreground/60 uppercase">Courbes de Rendement par Maturité</div>
+            <div className="text-xs font-semibold text-foreground/60 uppercase">Courbes de Rendement par Maturite</div>
             <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5">
               {maturities.map((maturity) => {
                 const usYield = getYield(usData, maturity)
@@ -133,20 +133,20 @@ export const UnifiedOverview: FC<UnifiedOverviewProps> = ({
                     {/* US Yield */}
                     <div className="rounded-md bg-blue-500/5 border border-blue-500/10 p-1.5 text-center">
                       <div className="text-sm font-bold text-blue-400">
-                        {usYield ? (usYield.yield || 0).toFixed(2) : "—"}%
+                        {usYield ? (usYield.yield || 0).toFixed(2) : "-"}%
                       </div>
                       <div className="text-xs text-blue-300/60">
-                        {usYield ? formatMetric(usYield.yield * 100) : "—"} bp
+                        {usYield ? formatMetric(usYield.yield * 100) : "-"} bp
                       </div>
                     </div>
 
                     {/* Canada Yield */}
                     <div className="rounded-md bg-red-500/5 border border-red-500/10 p-1.5 text-center">
                       <div className="text-sm font-bold text-red-400">
-                        {caYield ? (caYield.yield || 0).toFixed(2) : "—"}%
+                        {caYield ? (caYield.yield || 0).toFixed(2) : "-"}%
                       </div>
                       <div className="text-xs text-red-300/60">
-                        {caYield ? formatMetric(caYield.yield * 100) : "—"} bp
+                        {caYield ? formatMetric(caYield.yield * 100) : "-"} bp
                       </div>
                     </div>
                   </div>
@@ -160,11 +160,11 @@ export const UnifiedOverview: FC<UnifiedOverviewProps> = ({
             <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-2">
               <div className="text-xs text-foreground/60 font-semibold">Pente 2Y-10Y (US)</div>
               <div className="text-lg font-bold text-blue-400">
-                {slopes.us_2_10 !== null ? slopes.us_2_10.toFixed(1) : "—"} bp
+                {slopes.us_2_10 !== null ? slopes.us_2_10.toFixed(1) : "-"} bp
               </div>
             </div>
             <div className="rounded-lg bg-green-500/10 border border-green-500/20 p-2">
-              <div className="text-xs text-foreground/60 font-semibold">Écart 10Y US-CA</div>
+              <div className="text-xs text-foreground/60 font-semibold">Ecart 10Y US-CA</div>
               <div className="text-lg font-bold text-green-400">
                 {((usData.find((d: any) => d.maturity === "10Y")?.yield || 0) -
                   (caData.find((d: any) => d.maturity === "10Y")?.yield || 0)) *
@@ -184,7 +184,7 @@ export const UnifiedOverview: FC<UnifiedOverviewProps> = ({
             <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-2">
               <div className="text-xs text-foreground/60 font-semibold">Pente 3M-10Y (US)</div>
               <div className="text-lg font-bold text-blue-400">
-                {slopes.us_3m_10 !== null ? slopes.us_3m_10.toFixed(1) : "—"} bp
+                {slopes.us_3m_10 !== null ? slopes.us_3m_10.toFixed(1) : "-"} bp
               </div>
             </div>
           </div>
@@ -192,7 +192,7 @@ export const UnifiedOverview: FC<UnifiedOverviewProps> = ({
           {/* Footer Info */}
           <div className="mt-4 pt-3 border-t border-border/30 text-xs text-foreground/50 space-y-1">
             <div>
-              <strong>Format d'affichage:</strong> % | bp (points de base) | décimal
+              <strong>Format d'affichage:</strong> % | bp (points de base) | decimal
             </div>
             <div>
               <strong>Sources:</strong> FRED (Federal Reserve) | Banque du Canada (VALET)

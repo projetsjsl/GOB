@@ -4,32 +4,32 @@
 
 class EmmaGeminiService {
   constructor() {
-    // Priorité : Variable d'environnement Vercel > localStorage
+    // Priorite : Variable d'environnement Vercel > localStorage
     this.apiKey = '';
     this.baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
     this.isConnected = false;
     this.initializeApiKey();
   }
 
-  // Initialiser la clé API de manière asynchrone
+  // Initialiser la cle API de maniere asynchrone
   async initializeApiKey() {
     this.apiKey = await this.getApiKey();
   }
 
-  // Obtenir la clé API (Vercel env var en priorité)
+  // Obtenir la cle API (Vercel env var en priorite)
   async getApiKey() {
     // En production sur Vercel, utiliser la variable d'environnement
     if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
       return await this.getVercelApiKey();
     }
-    // En développement ou si pas sur Vercel, utiliser localStorage
+    // En developpement ou si pas sur Vercel, utiliser localStorage
     return localStorage.getItem('gemini-api-key') || '';
   }
 
-  // Obtenir la clé API depuis Vercel (via une API route)
+  // Obtenir la cle API depuis Vercel (via une API route)
   async getVercelApiKey() {
     try {
-      // Appeler une API route qui retourne la clé (sécurisé côté serveur)
+      // Appeler une API route qui retourne la cle (securise cote serveur)
       const response = await fetch('/api/gemini-key');
       if (response.ok) {
         const data = await response.json();
@@ -41,7 +41,7 @@ class EmmaGeminiService {
     return localStorage.getItem('gemini-api-key') || '';
   }
 
-  // Sauvegarder la clé API
+  // Sauvegarder la cle API
   saveApiKey(apiKey) {
     this.apiKey = apiKey;
     localStorage.setItem('gemini-api-key', apiKey);
@@ -52,7 +52,7 @@ class EmmaGeminiService {
   // Tester la connexion
   async testConnection() {
     if (!this.apiKey) {
-      throw new Error('Clé API Gemini non configurée');
+      throw new Error('Cle API Gemini non configuree');
     }
 
     try {
@@ -64,7 +64,7 @@ class EmmaGeminiService {
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: 'Test de connexion - réponds simplement "OK"'
+              text: 'Test de connexion - reponds simplement "OK"'
             }]
           }]
         })
@@ -83,20 +83,20 @@ class EmmaGeminiService {
     }
   }
 
-  // Générer une réponse avec le prompt personnalisé
+  // Generer une reponse avec le prompt personnalise
   async generateResponse(userMessage, customPrompt = null) {
-    // S'assurer que la clé API est chargée
+    // S'assurer que la cle API est chargee
     if (!this.apiKey) {
       this.apiKey = await this.getApiKey();
     }
     
     if (!this.apiKey) {
-      throw new Error('Clé API Gemini non configurée');
+      throw new Error('Cle API Gemini non configuree');
     }
 
-    // Charger le prompt personnalisé ou utiliser celui par défaut
+    // Charger le prompt personnalise ou utiliser celui par defaut
     const prompt = customPrompt || localStorage.getItem('emma-financial-prompt') || 
-      `Tu es Emma, une assistante virtuelle spécialisée en analyse financière. Réponds de manière professionnelle et utile.`;
+      `Tu es Emma, une assistante virtuelle specialisee en analyse financiere. Reponds de maniere professionnelle et utile.`;
 
     const fullPrompt = `${prompt}\n\nQuestion de l'utilisateur: ${userMessage}`;
 
@@ -113,10 +113,10 @@ class EmmaGeminiService {
             }]
           }],
           generationConfig: {
-            temperature: 0.3, // Réduit pour analyses financières plus précises et cohérentes
-            topK: 20, // Réduit pour plus de précision dans le vocabulaire financier
-            topP: 0.8, // Réduit pour plus de cohérence dans les analyses
-            maxOutputTokens: 4096, // Maintenu pour analyses détaillées
+            temperature: 0.3, // Reduit pour analyses financieres plus precises et coherentes
+            topK: 20, // Reduit pour plus de precision dans le vocabulaire financier
+            topP: 0.8, // Reduit pour plus de coherence dans les analyses
+            maxOutputTokens: 4096, // Maintenu pour analyses detaillees
             candidateCount: 1,
             stopSequences: []
           }
@@ -132,7 +132,7 @@ class EmmaGeminiService {
       if (data.candidates && data.candidates[0] && data.candidates[0].content) {
         return data.candidates[0].content.parts[0].text;
       } else {
-        throw new Error('Réponse invalide de l\'API');
+        throw new Error('Reponse invalide de l\'API');
       }
     } catch (error) {
       console.error('Erreur Gemini:', error);
@@ -140,11 +140,11 @@ class EmmaGeminiService {
     }
   }
 
-  // Générer une réponse via backend Function Calling
+  // Generer une reponse via backend Function Calling
   async generateResponseViaBackend(userMessage, history = [], customPrompt = null, cfg = {}) {
     const { temperature = 0.3, maxTokens = 4096 } = cfg;
     const systemPrompt = customPrompt || localStorage.getItem('emma-financial-prompt') ||
-      `Tu es Emma, une assistante virtuelle spécialisée en analyse financière. Réponds de manière professionnelle et utile.`;
+      `Tu es Emma, une assistante virtuelle specialisee en analyse financiere. Reponds de maniere professionnelle et utile.`;
 
     const payload = {
       messages: [
@@ -164,7 +164,7 @@ class EmmaGeminiService {
     if (!r.ok) throw new Error(`Erreur API backend: ${r.status}`);
     const d = await r.json();
     if (d?.response) return d.response;
-    throw new Error('Réponse backend invalide');
+    throw new Error('Reponse backend invalide');
   }
 
   // Obtenir le statut de connexion
@@ -175,7 +175,7 @@ class EmmaGeminiService {
     };
   }
 
-  // Effacer la clé API
+  // Effacer la cle API
   clearApiKey() {
     this.apiKey = '';
     this.isConnected = false;

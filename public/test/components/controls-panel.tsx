@@ -36,8 +36,8 @@ export function ControlsPanel({
   return (
     <Card className="bg-background border-border">
       <CardHeader>
-        <CardTitle className="text-foreground">Contrôles</CardTitle>
-        <CardDescription className="text-muted-foreground">Sélectionnez les données et les pays</CardDescription>
+        <CardTitle className="text-foreground">Controles</CardTitle>
+        <CardDescription className="text-muted-foreground">Selectionnez les donnees et les pays</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {onCountriesChange && (
@@ -51,7 +51,7 @@ export function ControlsPanel({
                   onCheckedChange={(checked) => handleCountryToggle("US", checked as boolean)}
                 />
                 <Label htmlFor="country-us" className="text-sm font-normal cursor-pointer">
-                  Trésor des États-Unis
+                  Tresor des Etats-Unis
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
@@ -94,15 +94,15 @@ export function ControlsPanel({
 
         <Button onClick={onRefresh} className="w-full" variant="secondary">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Actualiser les Données
+          Actualiser les Donnees
         </Button>
 
         <div className="pt-4 border-t border-border bg-blue-950 bg-opacity-30 rounded-lg p-3 space-y-2">
           <div className="flex items-start gap-2">
             <Info className="h-4 w-4 text-blue-400 mt-0.5 flex-shrink-0" />
             <div className="text-xs text-blue-200">
-              <p className="font-semibold mb-1">Données Officielles Directes</p>
-              <p>Points de marché réels: 3M, 6M, 1Y, 2Y, 3Y, 5Y, 7Y, 10Y, 20Y, 30Y</p>
+              <p className="font-semibold mb-1">Donnees Officielles Directes</p>
+              <p>Points de marche reels: 3M, 6M, 1Y, 2Y, 3Y, 5Y, 7Y, 10Y, 20Y, 30Y</p>
               <p>Courbe lisse: Interpolation Cubic Spline</p>
             </div>
           </div>

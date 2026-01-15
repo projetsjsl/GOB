@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // API CLIENT - Centralise tous les appels API
-// ═══════════════════════════════════════════════════════════════
+// 
 
 export const API_BASE = '/api/admin/emma-config';
 export const DESIGN_API = '/api/email-design';
@@ -13,7 +13,7 @@ export async function loadAllConfigs() {
     const data = await response.json();
 
     if (!data.config) {
-        throw new Error('Pas de données de configuration');
+        throw new Error('Pas de donnees de configuration');
     }
 
     return data.config;
@@ -141,7 +141,7 @@ export async function fetchFormattedPreview(text, channel, briefingType = 'morni
 }
 
 /**
- * Envoie un briefing immédiatement
+ * Envoie un briefing immediatement
  */
 export async function sendBriefingNow(promptId, recipients, customPrompt) {
     const response = await fetch('/api/send-briefing', {

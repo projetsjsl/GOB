@@ -1,10 +1,10 @@
 /**
- * API endpoint pour accéder à ChatGPT via l'API OpenAI officielle
+ * API endpoint pour acceder a ChatGPT via l'API OpenAI officielle
  * 
- * ⚠️ LIMITATION: L'API OpenAI ne permet PAS d'accéder aux chats de groupe partagés
- * Cette API crée une nouvelle conversation, pas une connexion au chat de groupe existant
+ *  LIMITATION: L'API OpenAI ne permet PAS d'acceder aux chats de groupe partages
+ * Cette API cree une nouvelle conversation, pas une connexion au chat de groupe existant
  * 
- * Alternative: Utiliser cette API pour créer un chat intégré dans le dashboard
+ * Alternative: Utiliser cette API pour creer un chat integre dans le dashboard
  */
 
 export default async function handler(req, res) {
@@ -36,8 +36,8 @@ export default async function handler(req, res) {
         if (!openaiApiKey) {
             return res.status(503).json({
                 success: false,
-                error: 'OPENAI_API_KEY non configurée',
-                message: 'Configurez OPENAI_API_KEY dans Vercel pour utiliser cette fonctionnalité'
+                error: 'OPENAI_API_KEY non configuree',
+                message: 'Configurez OPENAI_API_KEY dans Vercel pour utiliser cette fonctionnalite'
             });
         }
 
@@ -66,7 +66,7 @@ export default async function handler(req, res) {
                 'Authorization': `Bearer ${openaiApiKey}`
             },
             body: JSON.stringify({
-                model: 'gpt-4o', // ou 'gpt-3.5-turbo' pour économiser
+                model: 'gpt-4o', // ou 'gpt-3.5-turbo' pour economiser
                 messages: messages,
                 temperature: 0.7,
                 max_tokens: 2000
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
         if (!data.choices || !data.choices[0] || !data.choices[0].message) {
             return res.status(500).json({
                 success: false,
-                error: 'Réponse invalide de l\'API OpenAI'
+                error: 'Reponse invalide de l\'API OpenAI'
             });
         }
 
@@ -98,7 +98,7 @@ export default async function handler(req, res) {
             model: data.model,
             usage: data.usage,
             conversationId: conversationId || null,
-            note: '⚠️ Cette conversation est indépendante du chat de groupe ChatGPT partagé'
+            note: ' Cette conversation est independante du chat de groupe ChatGPT partage'
         });
 
     } catch (error) {

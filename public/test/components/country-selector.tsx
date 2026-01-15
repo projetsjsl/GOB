@@ -3,12 +3,12 @@ import type { Country } from "@/lib/fred-api"
 import { Check } from "lucide-react"
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  US: "🇺🇸",
-  CA: "🇨🇦",
+  US: "",
+  CA: "",
 }
 
 const COUNTRY_LABELS: Record<string, string> = {
-  US: "États-Unis",
+  US: "Etats-Unis",
   CA: "Canada",
 }
 
@@ -31,7 +31,7 @@ export function CountrySelector({ selectedCountries, onCountriesChange }: Countr
   return (
     <div className="flex flex-col gap-3 p-3 bg-card border border-border rounded-lg">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-xs font-bold uppercase text-muted-foreground">Sélection Pays</span>
+        <span className="text-xs font-bold uppercase text-muted-foreground">Selection Pays</span>
       </div>
       <div className="space-y-2">
         {(["US", "CA"] as Country[]).map((country) => {

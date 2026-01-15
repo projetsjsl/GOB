@@ -44,7 +44,7 @@ class KeyboardShortcutManager {
   }
 
   /**
-   * Désenregistrer un raccourci
+   * Desenregistrer un raccourci
    */
   unregister(key: string, modifiers?: { ctrl?: boolean; shift?: boolean; alt?: boolean; meta?: boolean }): void {
     const id = this.generateId(key, modifiers)
@@ -52,7 +52,7 @@ class KeyboardShortcutManager {
   }
 
   /**
-   * Gérer la pression de touche
+   * Gerer la pression de touche
    */
   private handleKeyDown(event: KeyboardEvent): void {
     if (!this.enabled) return
@@ -71,7 +71,7 @@ class KeyboardShortcutManager {
   }
 
   /**
-   * Activer/désactiver les raccourcis
+   * Activer/desactiver les raccourcis
    */
   setEnabled(enabled: boolean): void {
     this.enabled = enabled
@@ -85,7 +85,7 @@ class KeyboardShortcutManager {
   }
 
   /**
-   * Générer un ID unique pour un raccourci
+   * Generer un ID unique pour un raccourci
    */
   private generateId(
     key: string,
@@ -102,10 +102,10 @@ class KeyboardShortcutManager {
 
 export const keyboardShortcutManager = new KeyboardShortcutManager()
 
-// Raccourcis prédéfinis
+// Raccourcis predefinis
 export const PREDEFINED_SHORTCUTS = {
-  REFRESH_DATA: { key: "r", ctrl: true, description: "Rafraîchir les données" },
-  TOGGLE_THEME: { key: "t", ctrl: true, shift: true, description: "Basculer le thème" },
+  REFRESH_DATA: { key: "r", ctrl: true, description: "Rafraichir les donnees" },
+  TOGGLE_THEME: { key: "t", ctrl: true, shift: true, description: "Basculer le theme" },
   FOCUS_SEARCH: { key: "/", description: "Focus la recherche" },
   ESCAPE: { key: "Escape", description: "Fermer les modales" },
 }

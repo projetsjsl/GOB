@@ -113,7 +113,7 @@ export const UnifiedSettingsPanel: React.FC<UnifiedSettingsPanelProps> = ({
     };
 
     const handleReset = () => {
-        if (confirm('Réinitialiser toutes les configurations aux valeurs par défaut ?')) {
+        if (confirm('Reinitialiser toutes les configurations aux valeurs par defaut ?')) {
             setGuardrailConfig(DEFAULT_CONFIG);
             setValidationSettings(getDefaultValidationSettings());
             setHasChanges(true);
@@ -132,7 +132,7 @@ export const UnifiedSettingsPanel: React.FC<UnifiedSettingsPanelProps> = ({
                             <Cog6ToothIcon className="w-5 h-5 text-white" />
                         </div>
                         <div className="min-w-0">
-                            <h3 className="text-lg font-bold text-gray-900 truncate">Configuration Complète 3p1</h3>
+                            <h3 className="text-lg font-bold text-gray-900 truncate">Configuration Complete 3p1</h3>
                             <p className="text-xs text-gray-600 mt-0.5 truncate">
                                 Guardrails, Validation, Ajustements
                             </p>
@@ -148,7 +148,7 @@ export const UnifiedSettingsPanel: React.FC<UnifiedSettingsPanelProps> = ({
                         {saveStatus === 'saved' && (
                             <div className="flex items-center gap-2 text-green-600 text-sm">
                                 <CheckCircleIconSolid className="w-5 h-5" />
-                                <span>Sauvegardé</span>
+                                <span>Sauvegarde</span>
                             </div>
                         )}
                         {saveStatus === 'error' && (
@@ -170,9 +170,9 @@ export const UnifiedSettingsPanel: React.FC<UnifiedSettingsPanelProps> = ({
                 {/* Tabs */}
                 <div className="flex border-b border-gray-200 overflow-x-auto bg-gray-50 px-4 flex-shrink-0">
                     {[
-                        { id: 'overview' as TabType, label: '📊 Vue d\'ensemble', icon: '📊' },
-                        { id: 'guardrails' as TabType, label: '🛡️ Guardrails', icon: '🛡️' },
-                        { id: 'validation' as TabType, label: '✅ Validation & Cohérence', icon: '✅' }
+                        { id: 'overview' as TabType, label: ' Vue d\'ensemble', icon: '' },
+                        { id: 'guardrails' as TabType, label: ' Guardrails', icon: '' },
+                        { id: 'validation' as TabType, label: ' Validation & Coherence', icon: '' }
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -226,7 +226,7 @@ export const UnifiedSettingsPanel: React.FC<UnifiedSettingsPanelProps> = ({
                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors bg-white border border-gray-300 rounded-lg hover:bg-red-50"
                     >
                         <ArrowPathIcon className="w-4 h-4" />
-                        Réinitialiser tout
+                        Reinitialiser tout
                     </button>
                     <div className="flex gap-3">
                         <button
@@ -257,24 +257,24 @@ const OverviewTab: React.FC<{
     return (
         <div className="space-y-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h4 className="font-bold text-lg text-blue-900 mb-3">📋 Configuration Actuelle</h4>
+                <h4 className="font-bold text-lg text-blue-900 mb-3"> Configuration Actuelle</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <h5 className="font-semibold text-blue-800 mb-2">🛡️ Guardrails (LocalStorage)</h5>
+                        <h5 className="font-semibold text-blue-800 mb-2"> Guardrails (LocalStorage)</h5>
                         <div className="text-sm text-blue-700 space-y-1">
-                            <p>• Croissance: {guardrailConfig.growth.min}% à {guardrailConfig.growth.max}%</p>
-                            <p>• P/E: {guardrailConfig.ratios.pe.min}x à {guardrailConfig.ratios.pe.max}x</p>
-                            <p>• P/CF: {guardrailConfig.ratios.pcf.min}x à {guardrailConfig.ratios.pcf.max}x</p>
-                            <p>• Multiplicateur max: {guardrailConfig.projections.maxReasonableTargetMultiplier}x</p>
+                            <p>- Croissance: {guardrailConfig.growth.min}% a {guardrailConfig.growth.max}%</p>
+                            <p>- P/E: {guardrailConfig.ratios.pe.min}x a {guardrailConfig.ratios.pe.max}x</p>
+                            <p>- P/CF: {guardrailConfig.ratios.pcf.min}x a {guardrailConfig.ratios.pcf.max}x</p>
+                            <p>- Multiplicateur max: {guardrailConfig.projections.maxReasonableTargetMultiplier}x</p>
                         </div>
                     </div>
                     <div>
-                        <h5 className="font-semibold text-green-800 mb-2">✅ Validation (Supabase)</h5>
+                        <h5 className="font-semibold text-green-800 mb-2"> Validation (Supabase)</h5>
                         <div className="text-sm text-green-700 space-y-1">
-                            <p>• Croissance: {validationSettings.growth_min}% à {validationSettings.growth_max}%</p>
-                            <p>• P/E: {validationSettings.target_pe_min}x à {validationSettings.target_pe_max}x</p>
-                            <p>• P/CF: {validationSettings.target_pcf_min}x à {validationSettings.target_pcf_max}x</p>
-                            <p>• Sanitisation auto: {validationSettings.auto_sanitize_on_save ? '✅' : '❌'}</p>
+                            <p>- Croissance: {validationSettings.growth_min}% a {validationSettings.growth_max}%</p>
+                            <p>- P/E: {validationSettings.target_pe_min}x a {validationSettings.target_pe_max}x</p>
+                            <p>- P/CF: {validationSettings.target_pcf_min}x a {validationSettings.target_pcf_max}x</p>
+                            <p>- Sanitisation auto: {validationSettings.auto_sanitize_on_save ? '' : ''}</p>
                         </div>
                     </div>
                 </div>
@@ -284,10 +284,10 @@ const OverviewTab: React.FC<{
                 <div className="flex items-start gap-3">
                     <InformationCircleIcon className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-yellow-800">
-                        <p className="font-medium mb-1">💡 Note importante</p>
-                        <p>Les <strong>Guardrails</strong> sont stockés dans localStorage (navigateur) et contrôlent les limites d'affichage.</p>
-                        <p className="mt-2">Les <strong>Paramètres de Validation</strong> sont stockés dans Supabase et contrôlent la sanitisation automatique des données.</p>
-                        <p className="mt-2">Les deux sont nécessaires pour une protection complète contre les valeurs aberrantes.</p>
+                        <p className="font-medium mb-1"> Note importante</p>
+                        <p>Les <strong>Guardrails</strong> sont stockes dans localStorage (navigateur) et controlent les limites d'affichage.</p>
+                        <p className="mt-2">Les <strong>Parametres de Validation</strong> sont stockes dans Supabase et controlent la sanitisation automatique des donnees.</p>
+                        <p className="mt-2">Les deux sont necessaires pour une protection complete contre les valeurs aberrantes.</p>
                     </div>
                 </div>
             </div>
@@ -330,7 +330,7 @@ const GuardrailsTab: React.FC<{
                     <InformationCircleIcon className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
                         <p className="font-medium mb-1">Guardrails - Limites d'Affichage</p>
-                        <p>Ces limites contrôlent ce qui est affiché dans l'interface et les calculs de projections.</p>
+                        <p>Ces limites controlent ce qui est affiche dans l'interface et les calculs de projections.</p>
                     </div>
                 </div>
             </div>
@@ -403,7 +403,7 @@ const GuardrailsTab: React.FC<{
     );
 };
 
-// Validation Tab - Configuration de validation (existant, simplifié)
+// Validation Tab - Configuration de validation (existant, simplifie)
 const ValidationTab: React.FC<{
     settings: ValidationSettings;
     onUpdate: (settings: ValidationSettings) => void;
@@ -422,7 +422,7 @@ const ValidationTab: React.FC<{
                     <InformationCircleIcon className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-green-800">
                         <p className="font-medium mb-1">Validation & Sanitisation Automatique</p>
-                        <p>Ces paramètres sont sauvegardés dans Supabase et contrôlent la sanitisation automatique des données lors du chargement, de la sauvegarde et de la synchronisation.</p>
+                        <p>Ces parametres sont sauvegardes dans Supabase et controlent la sanitisation automatique des donnees lors du chargement, de la sauvegarde et de la synchronisation.</p>
                     </div>
                 </div>
             </div>
@@ -533,34 +533,34 @@ const ValidationTab: React.FC<{
             </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-5">
-                <h4 className="font-semibold text-gray-800 mb-4">Précisions (décimales)</h4>
+                <h4 className="font-semibold text-gray-800 mb-4">Precisions (decimales)</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <NumberInput
-                        label="Précision Croissance"
+                        label="Precision Croissance"
                         value={settings.growth_precision}
                         onChange={(v) => updateSetting('growth_precision', Math.max(0, Math.min(4, Math.round(v))))}
                         min={0}
                         max={4}
                         step={1}
-                        help="Nombre de décimales pour les taux de croissance"
+                        help="Nombre de decimales pour les taux de croissance"
                     />
                     <NumberInput
-                        label="Précision Ratios"
+                        label="Precision Ratios"
                         value={settings.ratio_precision}
                         onChange={(v) => updateSetting('ratio_precision', Math.max(0, Math.min(4, Math.round(v))))}
                         min={0}
                         max={4}
                         step={1}
-                        help="Nombre de décimales pour les ratios (P/E, P/CF, etc.)"
+                        help="Nombre de decimales pour les ratios (P/E, P/CF, etc.)"
                     />
                     <NumberInput
-                        label="Précision Yield"
+                        label="Precision Yield"
                         value={settings.yield_precision}
                         onChange={(v) => updateSetting('yield_precision', Math.max(0, Math.min(4, Math.round(v))))}
                         min={0}
                         max={4}
                         step={1}
-                        help="Nombre de décimales pour le rendement"
+                        help="Nombre de decimales pour le rendement"
                     />
                 </div>
             </div>
@@ -574,7 +574,7 @@ const ValidationTab: React.FC<{
                         onChange={(v) => updateSetting('price_min_threshold', Math.max(0.01, v))}
                         min={0.01}
                         step={0.01}
-                        help="Prix minimum accepté pour une action"
+                        help="Prix minimum accepte pour une action"
                     />
                     <NumberInput
                         label="Prix Maximum ($)"
@@ -582,7 +582,7 @@ const ValidationTab: React.FC<{
                         onChange={(v) => updateSetting('price_max_threshold', Math.max(settings.price_min_threshold, v))}
                         min={settings.price_min_threshold}
                         step={1}
-                        help="Prix maximum accepté pour une action"
+                        help="Prix maximum accepte pour une action"
                     />
                 </div>
             </div>
@@ -610,16 +610,16 @@ const ValidationTab: React.FC<{
             </div>
 
             <div className="space-y-4">
-                <h4 className="font-semibold text-gray-800">Cohérence FMP/Supabase</h4>
+                <h4 className="font-semibold text-gray-800">Coherence FMP/Supabase</h4>
                 <ToggleSwitch
-                    label="Forcer la cohérence FMP/Supabase"
-                    description="Rejette les données qui ne correspondent pas entre FMP et Supabase"
+                    label="Forcer la coherence FMP/Supabase"
+                    description="Rejette les donnees qui ne correspondent pas entre FMP et Supabase"
                     enabled={settings.enforce_fmp_supabase_consistency}
                     onChange={(enabled) => updateSetting('enforce_fmp_supabase_consistency', enabled)}
                 />
                 <ToggleSwitch
-                    label="Rejeter les données placeholder"
-                    description="Rejette les valeurs placeholder (0, -1, etc.) qui indiquent des données manquantes"
+                    label="Rejeter les donnees placeholder"
+                    description="Rejette les valeurs placeholder (0, -1, etc.) qui indiquent des donnees manquantes"
                     enabled={settings.reject_placeholder_data}
                     onChange={(enabled) => updateSetting('reject_placeholder_data', enabled)}
                 />
@@ -634,7 +634,7 @@ const ValidationTab: React.FC<{
     );
 };
 
-// Helper Components (réutilisés depuis ValidationSettingsPanel)
+// Helper Components (reutilises depuis ValidationSettingsPanel)
 const RangeSlider: React.FC<{
     label?: string;
     minLabel: string;

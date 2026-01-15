@@ -55,14 +55,14 @@ export const PromptManager: React.FC<TabProps> = (props) => {
             });
             const result = await response.json();
             if (result.success) {
-                alert(`✅ Prompt ${type} sauvegardé avec succès !`);
+                alert(` Prompt ${type} sauvegarde avec succes !`);
                 setEditingPrompt(null);
             } else {
-                alert(`❌ Erreur: ${result.error}`);
+                alert(` Erreur: ${result.error}`);
             }
         } catch (error) {
             console.error('Erreur sauvegarde prompt:', error);
-            alert(`❌ Erreur lors de la sauvegarde: ${error.message}`);
+            alert(` Erreur lors de la sauvegarde: ${error.message}`);
         } finally {
             setSaving({ ...saving, [type]: false });
         }
@@ -74,14 +74,14 @@ export const PromptManager: React.FC<TabProps> = (props) => {
     }, []);
 
     const promptTypes = [
-        { id: 'morning', label: '🌅 Matin', icon: '🌅' },
-        { id: 'midday', label: '☀️ Midi', icon: '☀️' },
-        { id: 'evening', label: '🌙 Soir', icon: '🌙' }
+        { id: 'morning', label: ' Matin', icon: '' },
+        { id: 'midday', label: ' Midi', icon: '' },
+        { id: 'evening', label: ' Soir', icon: '' }
     ];
 
     return (
         <div className="space-y-4">
-            {/* Tabs pour sélectionner le type de prompt */}
+            {/* Tabs pour selectionner le type de prompt */}
             <div className="flex gap-2 border-b border-gray-300 dark:border-gray-600">
                 {promptTypes.map(type => (
                     <button
@@ -148,7 +148,7 @@ export const PromptManager: React.FC<TabProps> = (props) => {
                                             ? 'bg-gray-800 border-gray-600 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'
                                     }`}
-                                    placeholder="Ex: énergique, professionnel"
+                                    placeholder="Ex: energique, professionnel"
                                 />
                             </div>
                             <div>
@@ -172,7 +172,7 @@ export const PromptManager: React.FC<TabProps> = (props) => {
                             </div>
                         </div>
 
-                        {/* Éditeur de prompt */}
+                        {/* Editeur de prompt */}
                         <div>
                             <label className={`text-xs font-semibold mb-2 block transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -206,13 +206,13 @@ export const PromptManager: React.FC<TabProps> = (props) => {
                                         : 'bg-purple-600 hover:bg-purple-700 text-white'
                                 }`}
                             >
-                                {saving[activeTab] ? '⏳ Sauvegarde...' : '💾 Sauvegarder'}
+                                {saving[activeTab] ? ' Sauvegarde...' : ' Sauvegarder'}
                             </button>
                             <button
                                 onClick={() => loadPrompts()}
                                 className="px-6 py-2 rounded-lg font-medium bg-gray-600 hover:bg-gray-700 text-white transition-colors duration-300"
                             >
-                                🔄 Recharger
+                                 Recharger
                             </button>
                         </div>
                     </div>
@@ -221,7 +221,7 @@ export const PromptManager: React.FC<TabProps> = (props) => {
                     <div className={`p-3 rounded-lg text-sm transition-colors duration-300 ${
                         isDarkMode ? 'bg-blue-900/20 text-blue-300' : 'bg-blue-50 text-blue-800'
                     }`}>
-                        💡 <strong>Note:</strong> Les modifications sont sauvegardées dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">config/briefing-prompts.json</code> et synchronisées automatiquement avec n8n lors de la prochaine exécution.
+                         <strong>Note:</strong> Les modifications sont sauvegardees dans <code className="px-1 py-0.5 rounded bg-gray-800 text-yellow-300">config/briefing-prompts.json</code> et synchronisees automatiquement avec n8n lors de la prochaine execution.
                     </div>
                 </div>
             )}

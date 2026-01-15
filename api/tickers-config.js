@@ -42,10 +42,10 @@ export default async function handler(req, res) {
                 if (teamResponse.ok) {
                     const teamData = await teamResponse.json();
                     teamTickers = teamData.map(item => item.ticker);
-                    console.log(`✅ Team tickers loaded: ${teamTickers.length}`);
+                    console.log(` Team tickers loaded: ${teamTickers.length}`);
                 }
             } catch (error) {
-                console.error('⚠️ Error loading team tickers:', error);
+                console.error(' Error loading team tickers:', error);
             }
 
             // Fetch watchlist tickers from unified tickers table
@@ -65,10 +65,10 @@ export default async function handler(req, res) {
                 if (watchlistResponse.ok) {
                     const watchlistData = await watchlistResponse.json();
                     watchlistTickers = watchlistData.map(item => item.ticker);
-                    console.log(`✅ Watchlist tickers loaded: ${watchlistTickers.length}`);
+                    console.log(` Watchlist tickers loaded: ${watchlistTickers.length}`);
                 }
             } catch (error) {
-                console.error('⚠️ Error loading watchlist tickers:', error);
+                console.error(' Error loading watchlist tickers:', error);
             }
         }
 
@@ -79,7 +79,7 @@ export default async function handler(req, res) {
                 'JNJ', 'JPM', 'LVMHF', 'MG', 'MFC', 'MU', 'NSRGY', 'NKE', 'NTR', 'PFE',
                 'TRP', 'UNH', 'UL', 'VZ', 'WFC'
             ];
-            console.log('📦 Using fallback team tickers');
+            console.log(' Using fallback team tickers');
         }
 
         return res.status(200).json({
@@ -90,7 +90,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('❌ Tickers Config API Error:', error);
+        console.error(' Tickers Config API Error:', error);
 
         // Return fallback data even on error
         return res.status(200).json({

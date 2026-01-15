@@ -1,6 +1,6 @@
 /**
- * TECH #1 FIX: Error Boundary réutilisable pour widgets TradingView et autres composants
- * Protège contre les erreurs JavaScript et affiche un fallback UI
+ * TECH #1 FIX: Error Boundary reutilisable pour widgets TradingView et autres composants
+ * Protege contre les erreurs JavaScript et affiche un fallback UI
  */
 
 // Error Boundary pour widgets individuels (TradingView, etc.)
@@ -54,7 +54,7 @@ const WidgetErrorBoundary = React.memo(class WidgetErrorBoundary extends React.C
                         ? 'bg-red-900/20 border-red-500/50 text-red-200' 
                         : 'bg-red-50 border-red-300 text-red-800'
                 }`}>
-                    <div className="text-5xl mb-4">⚠️</div>
+                    <div className="text-5xl mb-4"></div>
                     <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>
                         Erreur {widgetName}
                     </h3>
@@ -70,7 +70,7 @@ const WidgetErrorBoundary = React.memo(class WidgetErrorBoundary extends React.C
                                     : 'bg-red-500 hover:bg-red-600 text-white'
                             }`}
                         >
-                            Réessayer
+                            Reessayer
                         </button>
                         {this.props.onReload && (
                             <button 
@@ -88,7 +88,7 @@ const WidgetErrorBoundary = React.memo(class WidgetErrorBoundary extends React.C
                     {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
                         <details className={`mt-4 text-xs max-w-full overflow-auto ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                             <summary className="cursor-pointer hover:underline">
-                                Détails techniques
+                                Details techniques
                             </summary>
                             <pre className={`mt-2 p-3 rounded text-left whitespace-pre-wrap overflow-auto max-h-40 ${
                                 isDarkMode ? 'bg-gray-900 text-gray-300' : 'bg-gray-100 text-gray-800'

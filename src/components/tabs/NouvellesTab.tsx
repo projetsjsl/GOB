@@ -2,12 +2,12 @@
 import React, { useState, useEffect, memo, useRef, useMemo, useCallback } from 'react';
 import type { TabProps } from '../../types';
 
-// ✅ FIX: Move helper functions OUTSIDE component to prevent recreating them on every render
+//  FIX: Move helper functions OUTSIDE component to prevent recreating them on every render
 const isFrenchArticle = (article: any) => {
     const text = ((article.title || '') + ' ' + (article.description || '')).toLowerCase();
     const frenchIndicators = ['le ', 'la ', 'les ', 'un ', 'une ', 'des ', 'du ', 'de la ', 'au ', 'aux ',
         'est ', 'sont ', 'pour ', 'dans ', 'avec ', 'sur ', 'par ', 'qui ', 'que ',
-        'québec', 'montréal', 'canada', 'français', 'économie', 'marchés'];
+        'quebec', 'montreal', 'canada', 'francais', 'economie', 'marches'];
     return frenchIndicators.some(indicator => text.includes(indicator));
 };
 
@@ -72,11 +72,11 @@ const GroundNewsSection: React.FC<{ isDarkMode: boolean; LucideIcon: any }> = ({
                     </div>
                     <div className="text-left">
                         <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            🌍 Ground News
+                             Ground News
                         </h3>
                         <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Actualités avec analyse de biais médiatiques
-                            {hasCredentials && <span className="ml-2 text-green-500">● Connecté</span>}
+                            Actualites avec analyse de biais mediatiques
+                            {hasCredentials && <span className="ml-2 text-green-500"> Connecte</span>}
                         </p>
                     </div>
                 </div>
@@ -94,7 +94,7 @@ const GroundNewsSection: React.FC<{ isDarkMode: boolean; LucideIcon: any }> = ({
                         isDarkMode ? 'bg-blue-900/20 border border-blue-600/30' : 'bg-blue-50 border border-blue-200'
                     }`}>
                         <p className={`text-sm ${isDarkMode ? 'text-blue-200' : 'text-blue-800'}`}>
-                            <strong>Ground News</strong> compare les sources médiatiques et révèle les biais politiques dans la couverture d'actualité.
+                            <strong>Ground News</strong> compare les sources mediatiques et revele les biais politiques dans la couverture d'actualite.
                         </p>
                     </div>
 
@@ -153,16 +153,16 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         LucideIcon: LucideIconProp
     } = props;
 
-    // ✅ FREEZE FIX: Simple reference to newsData prop
+    //  FREEZE FIX: Simple reference to newsData prop
     const newsData = newsDataProp || [];
 
     const LucideIcon = LucideIconProp || (({ name, className = '' }) => (
         <span className={className}>{name}</span>
     ));
 
-    // ✅ FREEZE FIX: Defer rendering until component is mounted
+    //  FREEZE FIX: Defer rendering until component is mounted
     const [isMounted, setIsMounted] = useState(false);
-    // ✅ FREEZE FIX: Only load news when user explicitly requests it
+    //  FREEZE FIX: Only load news when user explicitly requests it
     const [userRequestedLoad, setUserRequestedLoad] = useState(false);
 
     useEffect(() => {
@@ -184,10 +184,10 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     const [isApproximateMatch, setIsApproximateMatch] = useState(false);
     const [isLoadingNews, setIsLoadingNews] = useState(false);
 
-    // ✅ FIX: Use ref to prevent multiple fetches and avoid dependency issues
+    //  FIX: Use ref to prevent multiple fetches and avoid dependency issues
     const hasFetchedRef = useRef(false);
 
-    // ✅ FREEZE FIX: Disabled auto-loading - user must click button to load news
+    //  FREEZE FIX: Disabled auto-loading - user must click button to load news
     // This prevents the freeze that was occurring on initial mount
     /*
     useEffect(() => {
@@ -201,8 +201,8 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     }, []);
     */
     
-    // BUG #1 FIX: Pagination et lazy loading pour éviter freeze
-    // ✅ FREEZE FIX: Reduced initial count from 20 to 10 to prevent heavy rendering
+    // BUG #1 FIX: Pagination et lazy loading pour eviter freeze
+    //  FREEZE FIX: Reduced initial count from 20 to 10 to prevent heavy rendering
     const [displayedCount, setDisplayedCount] = useState(10);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -211,11 +211,11 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
     // Listes de filtres
     const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
     const markets = ['US', 'Canada', 'Europe', 'Asie'];
-    const themes = ['Tech', 'Finance', 'Énergie', 'Santé', 'Crypto', 'IA'];
+    const themes = ['Tech', 'Finance', 'Energie', 'Sante', 'Crypto', 'IA'];
 
     // isFrenchArticle and matchesSource moved outside component to prevent recreation
 
-    // ✅ FREEZE FIX: Memoize helper functions used in render loop
+    //  FREEZE FIX: Memoize helper functions used in render loop
     const cleanText = useCallback((text: string) => {
         if (!text) return '';
         return text.replace(/\[.*?\]/g, '').trim();
@@ -257,9 +257,9 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         return 70;
     }, []);
 
-    // Fonction pour résumer avec Emma
+    // Fonction pour resumer avec Emma
     const summarizeWithEmma = (url: string, title: string) => {
-        const message = `Résume cet article: ${title}\n${url}`;
+        const message = `Resume cet article: ${title}\n${url}`;
         if (props.setPrefillMessage) {
             props.setPrefillMessage(message);
         }
@@ -268,9 +268,9 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         }
     };
 
-    // Filtrer les nouvelles - Optimisé avec useMemo pour éviter les re-renders inutiles et freezes
+    // Filtrer les nouvelles - Optimise avec useMemo pour eviter les re-renders inutiles et freezes
     const filteredNewsResult = useMemo(() => {
-        // ✅ FIX: Vérifier que newsData existe et est un tableau non vide
+        //  FIX: Verifier que newsData existe et est un tableau non vide
         if (!newsData || !Array.isArray(newsData) || newsData.length === 0) {
             return { filtered: [], isApproximate: false };
         }
@@ -278,12 +278,12 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         let filtered = newsData;
         let hasExactMatches = true;
 
-        // Appliquer le filtre français si activé
+        // Appliquer le filtre francais si active
         if (localFrenchOnly) {
             filtered = filtered.filter(article => isFrenchArticle(article));
         }
 
-        // Appliquer le filtre source avec détection flexible
+        // Appliquer le filtre source avec detection flexible
         if (selectedSource !== 'all') {
             const beforeFilter = filtered.length;
             filtered = filtered.filter(article =>
@@ -299,7 +299,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
             }
         }
 
-        // Appliquer le filtre marché
+        // Appliquer le filtre marche
         if (selectedMarket !== 'all') {
             const marketKeywords: Record<string, string[]> = {
                 'US': ['u.s.', 'united states', 'american', 'wall street', 'nasdaq', 'dow', 's&p', 'sp500', 'federal reserve', 'fed', 'sec', 'new york', 'nyse', 'us market', 'us economy'],
@@ -327,13 +327,13 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
             }
         }
 
-        // Appliquer le filtre thème
+        // Appliquer le filtre theme
         if (selectedTheme !== 'all') {
             const themeKeywords: Record<string, string[]> = {
                 'Tech': ['tech', 'technology', 'software', 'cloud', 'apple', 'google', 'microsoft', 'amazon', 'meta', 'tesla', 'nvidia', 'amd', 'intel', 'samsung', 'iphone', 'android', 'ai', 'artificial intelligence'],
                 'Finance': ['bank', 'banque', 'finance', 'financial', 'trading', 'investment', 'investor', 'credit', 'loan', 'mortgage', 'interest rate', 'fed', 'central bank', 'stock market', 'equity', 'bond'],
-                'Énergie': ['energy', 'oil', 'gas', 'petroleum', 'renewable', 'solar', 'wind', 'nuclear', 'exxon', 'chevron', 'bp', 'shell', 'crude', 'barrel', 'opec'],
-                'Santé': ['health', 'healthcare', 'pharma', 'pharmaceutical', 'medical', 'drug', 'medicine', 'vaccine', 'hospital', 'medicare', 'pfizer', 'moderna', 'johnson & johnson'],
+                'Energie': ['energy', 'oil', 'gas', 'petroleum', 'renewable', 'solar', 'wind', 'nuclear', 'exxon', 'chevron', 'bp', 'shell', 'crude', 'barrel', 'opec'],
+                'Sante': ['health', 'healthcare', 'pharma', 'pharmaceutical', 'medical', 'drug', 'medicine', 'vaccine', 'hospital', 'medicare', 'pfizer', 'moderna', 'johnson & johnson'],
                 'Crypto': ['crypto', 'cryptocurrency', 'bitcoin', 'btc', 'ethereum', 'eth', 'blockchain', 'coinbase', 'binance', 'crypto market', 'digital currency'],
                 'IA': ['ai', 'artificial intelligence', 'machine learning', 'deep learning', 'chatgpt', 'openai', 'nvidia', 'neural network', 'llm', 'large language model']
             };
@@ -346,8 +346,8 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                 const fallbackKeywords: Record<string, string[]> = {
                     'Tech': ['tech', 'technology'],
                     'Finance': ['finance', 'financial', 'bank'],
-                    'Énergie': ['energy', 'oil', 'gas'],
-                    'Santé': ['health', 'medical'],
+                    'Energie': ['energy', 'oil', 'gas'],
+                    'Sante': ['health', 'medical'],
                     'Crypto': ['crypto', 'bitcoin'],
                     'IA': ['ai', 'artificial intelligence']
                 };
@@ -359,24 +359,24 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
             }
         }
 
-        // Si toujours aucun résultat, afficher toutes les nouvelles
+        // Si toujours aucun resultat, afficher toutes les nouvelles
         if (filtered.length === 0 && newsData.length > 0) {
             filtered = newsData.slice(0, 20);
             hasExactMatches = false;
         }
 
         return { filtered, isApproximate: !hasExactMatches };
-    // ✅ FIX: Removed isFrenchArticle and matchesSource from deps - they're now stable outside component
+    //  FIX: Removed isFrenchArticle and matchesSource from deps - they're now stable outside component
     }, [newsData, localFrenchOnly, selectedSource, selectedMarket, selectedTheme]);
 
-    // Mettre à jour les states depuis le résultat mémorisé
-    // ✅ FREEZE FIX: Use React.startTransition to prevent blocking the main thread
+    // Mettre a jour les states depuis le resultat memorise
+    //  FREEZE FIX: Use React.startTransition to prevent blocking the main thread
     useEffect(() => {
         // Use startTransition to mark this as a non-urgent update
         const updateStates = () => {
             setLocalFilteredNews(filteredNewsResult.filtered);
             setIsApproximateMatch(filteredNewsResult.isApproximate);
-            // BUG #1 FIX: Réinitialiser le compteur d'affichage quand les filtres changent
+            // BUG #1 FIX: Reinitialiser le compteur d'affichage quand les filtres changent
             setDisplayedCount(ARTICLES_PER_PAGE);
         };
 
@@ -389,14 +389,14 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
 
     // BUG #1 FIX: Intersection Observer pour lazy loading automatique
     useEffect(() => {
-        const currentRef = loadMoreRef.current; // ✅ FIX: Store ref value before using in cleanup
+        const currentRef = loadMoreRef.current; //  FIX: Store ref value before using in cleanup
         if (!currentRef || displayedCount >= localFilteredNews.length) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting && !isLoadingMore) {
                     setIsLoadingMore(true);
-                    // Debounce: charger plus d'articles après un court délai
+                    // Debounce: charger plus d'articles apres un court delai
                     setTimeout(() => {
                         setDisplayedCount(prev => Math.min(prev + ARTICLES_PER_PAGE, localFilteredNews.length));
                         setIsLoadingMore(false);
@@ -409,21 +409,21 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         observer.observe(currentRef);
 
         return () => {
-            // ✅ FIX: Use stored ref value in cleanup instead of loadMoreRef.current
+            //  FIX: Use stored ref value in cleanup instead of loadMoreRef.current
             observer.unobserve(currentRef);
         };
     }, [displayedCount, localFilteredNews.length, isLoadingMore]);
 
-    // Articles à afficher (limités par pagination)
+    // Articles a afficher (limites par pagination)
     const displayedNews = localFilteredNews.slice(0, displayedCount);
     const hasMore = displayedCount < localFilteredNews.length;
 
     // Sub-tabs configuration
     const subTabs = [
         { id: 'all' as const, label: 'Toutes', icon: 'Newspaper' },
-        { id: 'french' as const, label: 'Français', icon: 'Languages' },
+        { id: 'french' as const, label: 'Francais', icon: 'Languages' },
         { id: 'by-source' as const, label: 'Par Source', icon: 'Building2' },
-        { id: 'by-market' as const, label: 'Par Marché', icon: 'Globe' },
+        { id: 'by-market' as const, label: 'Par Marche', icon: 'Globe' },
         { id: 'ground' as const, label: 'Ground News', icon: 'Globe' }
     ];
 
@@ -456,7 +456,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         }
     }, [activeSubTab]);
 
-    // ✅ FREEZE FIX: Show loading skeleton until component is mounted
+    //  FREEZE FIX: Show loading skeleton until component is mounted
     if (!isMounted) {
         return (
             <div className="space-y-6 animate-pulse">
@@ -467,13 +467,13 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
         );
     }
 
-    // ✅ FREEZE FIX: Show prompt to load news if not yet requested and no data
+    //  FREEZE FIX: Show prompt to load news if not yet requested and no data
     if (!userRequestedLoad && (!newsData || newsData.length === 0) && !loading && !isLoadingNews) {
         return (
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        📰 Nouvelles Financières
+                         Nouvelles Financieres
                     </h2>
                 </div>
                 <div className={`p-8 rounded-xl text-center ${
@@ -483,10 +483,10 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                 }`}>
                     <LucideIcon name="Newspaper" className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                     <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        Charger les actualités
+                        Charger les actualites
                     </h3>
                     <p className={`mb-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Cliquez sur le bouton ci-dessous pour charger les dernières actualités financières.
+                        Cliquez sur le bouton ci-dessous pour charger les dernieres actualites financieres.
                     </p>
                     <button
                         onClick={() => {
@@ -506,7 +506,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                 : 'bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/30'
                         }`}
                     >
-                        🔄 Charger les actualités
+                         Charger les actualites
                     </button>
                 </div>
             </div>
@@ -519,9 +519,9 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
             <div className="flex justify-between items-center">
                 <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>📰 Nouvelles Financières</h2>
+                }`}> Nouvelles Financieres</h2>
                 <div className="flex gap-2">
-                    {/* Toggle Français */}
+                    {/* Toggle Francais */}
                     <button
                         onClick={() => setLocalFrenchOnly(!localFrenchOnly)}
                         className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
@@ -532,7 +532,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                     : 'bg-gray-200 hover:bg-gray-300 text-gray-900')
                         }`}
                     >
-                        🇫🇷 Français {localFrenchOnly && '✓'}
+                         Francais {localFrenchOnly && ''}
                     </button>
                     <button
                         onClick={() => fetchNews && fetchNews()}
@@ -543,14 +543,14 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                 : 'bg-gray-700 hover:bg-gray-600 text-white'
                         }`}
                     >
-                        {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
+                        {loading ? ' Actualisation...' : ' Actualiser'}
                     </button>
                 </div>
             </div>
 
             {lastUpdate && (
                 <p className="text-gray-400 text-sm">
-                    Dernière mise à jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
+                    Derniere mise a jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
                 </p>
             )}
 
@@ -603,7 +603,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                             {localFilteredNews.length}
                         </div>
                         <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Articles filtrés
+                            Articles filtres
                         </div>
                     </div>
                     <LucideIcon name="Newspaper" className={`w-12 h-12 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`} />
@@ -618,13 +618,13 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                     : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
             }`}>
                 <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    🔍 Filtres
+                     Filtres
                 </h3>
 
                 {/* Filtre Source */}
                 <div className="mb-4">
                     <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        📰 Source
+                         Source
                     </label>
                     <div className="flex flex-wrap gap-2">
                         <button
@@ -653,10 +653,10 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                     </div>
                 </div>
 
-                {/* Filtre Marché */}
+                {/* Filtre Marche */}
                 <div className="mb-4">
                     <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        🌍 Marché
+                         Marche
                     </label>
                     <div className="flex flex-wrap gap-2">
                         <button
@@ -685,10 +685,10 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                     </div>
                 </div>
 
-                {/* Filtre Thème */}
+                {/* Filtre Theme */}
                 <div>
                     <label className={`text-sm font-semibold mb-2 block ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        🏷️ Thématique
+                         Thematique
                     </label>
                     <div className="flex flex-wrap gap-2">
                         <button
@@ -717,7 +717,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                     </div>
                 </div>
 
-                {/* Message informatif pour les résultats approximatifs */}
+                {/* Message informatif pour les resultats approximatifs */}
                 {isApproximateMatch && localFilteredNews.length > 0 && (
                     <div className={`mt-4 p-4 rounded-lg border-2 ${
                         isDarkMode
@@ -725,11 +725,11 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                             : 'bg-yellow-50 border-yellow-300 text-yellow-800'
                     }`}>
                         <div className="flex items-start gap-3">
-                            <span className="text-xl">💡</span>
+                            <span className="text-xl"></span>
                             <div>
-                                <p className="font-semibold mb-1">Résultats similaires affichés</p>
+                                <p className="font-semibold mb-1">Resultats similaires affiches</p>
                                 <p className="text-sm">
-                                    Aucun résultat exact trouvé pour les filtres sélectionnés. Nous affichons des articles similaires qui pourraient vous intéresser.
+                                    Aucun resultat exact trouve pour les filtres selectionnes. Nous affichons des articles similaires qui pourraient vous interesser.
                                 </p>
                             </div>
                         </div>
@@ -749,24 +749,24 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                 {(loading || isLoadingNews) ? (
                     <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                        <p className="text-lg font-semibold mb-2">Chargement des actualités...</p>
-                        <p className="text-sm">Récupération des dernières nouvelles financières</p>
+                        <p className="text-lg font-semibold mb-2">Chargement des actualites...</p>
+                        <p className="text-sm">Recuperation des dernieres nouvelles financieres</p>
                     </div>
                 ) : localFilteredNews.length === 0 ? (
                     <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         <LucideIcon name="AlertCircle" className="w-16 h-16 mx-auto mb-4 opacity-50" />
                         <p className="text-lg font-semibold mb-2">
                             {newsData.length === 0 
-                                ? 'Aucune nouvelle chargée'
+                                ? 'Aucune nouvelle chargee'
                                 : localFrenchOnly 
-                                    ? 'Aucun article en français trouvé' 
-                                    : 'Aucune nouvelle disponible après filtrage'}
+                                    ? 'Aucun article en francais trouve' 
+                                    : 'Aucune nouvelle disponible apres filtrage'}
                         </p>
                         <p className="text-sm mb-4">
                             {newsData.length === 0
-                                ? 'Les actualités sont en cours de chargement ou indisponibles'
+                                ? 'Les actualites sont en cours de chargement ou indisponibles'
                                 : localFrenchOnly
-                                    ? 'Essayez de désactiver le filtre français ou actualisez les données'
+                                    ? 'Essayez de desactiver le filtre francais ou actualisez les donnees'
                                     : 'Essayez de modifier les filtres ou cliquez sur Actualiser'}
                         </p>
                         {fetchNews && (
@@ -778,7 +778,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                         : 'bg-blue-500 hover:bg-blue-600 text-white'
                                 }`}
                             >
-                                🔄 Charger les actualités
+                                 Charger les actualites
                             </button>
                         )}
                     </div>
@@ -798,7 +798,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                 }`}
                             >
                                 <div className="flex items-start gap-4">
-                                    {/* Icône */}
+                                    {/* Icone */}
                                     <div className={`p-3 rounded-full transition-colors duration-300 ${
                                         isDarkMode ? 'bg-gray-700/50' : 'bg-gray-200/60'
                                     }`}>
@@ -836,9 +836,9 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                             {cleanText(article.description)}
                                         </p>
 
-                                        {/* Métadonnées */}
+                                        {/* Metadonnees */}
                                         <div className="flex items-center gap-4 flex-wrap">
-                                            {/* Source avec badge de crédibilité */}
+                                            {/* Source avec badge de credibilite */}
                                             <div className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors duration-300 ${
                                                 credibility >= 100
                                                     ? 'bg-purple-500/20 text-purple-500 border border-purple-500/30'
@@ -848,7 +848,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                                     ? 'bg-green-500/20 text-green-500 border border-green-500/30'
                                                     : (isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-200 text-gray-700')
                                             }`}>
-                                                {credibility >= 100 && <span className="text-xs">⭐</span>}
+                                                {credibility >= 100 && <span className="text-xs"></span>}
                                                 <span className="text-xs font-semibold">{article.source?.name || 'Source inconnue'}</span>
                                             </div>
 
@@ -857,14 +857,14 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                                 {new Date(article.publishedAt || article.publishedDate).toLocaleString('fr-FR')}
                                             </span>
 
-                                            {/* Badge français */}
+                                            {/* Badge francais */}
                                             {isFrenchArticle(article) && (
                                                 <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500 border border-blue-500/30">
-                                                    🇫🇷 FR
+                                                     FR
                                                 </span>
                                             )}
 
-                                            {/* Bouton Résumé avec Emma */}
+                                            {/* Bouton Resume avec Emma */}
                                             {article.url && (
                                                 <button
                                                     onClick={() => summarizeWithEmma(article.url, article.title)}
@@ -876,7 +876,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                                                 >
                                                     <span className="flex items-center gap-1">
                                                         <LucideIcon name="Brain" className="w-3 h-3" />
-                                                        Résumé avec Emma
+                                                        Resume avec Emma
                                                     </span>
                                                 </button>
                                             )}
@@ -919,7 +919,7 @@ export const NouvellesTab: React.FC<TabProps> = memo((props) => {
                         {/* Indicateur de fin */}
                         {!hasMore && localFilteredNews.length > 0 && (
                             <div className={`text-center py-4 text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                                Tous les articles ont été chargés ({localFilteredNews.length} articles)
+                                Tous les articles ont ete charges ({localFilteredNews.length} articles)
                             </div>
                         )}
                     </>

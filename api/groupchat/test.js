@@ -42,9 +42,9 @@ export default async function handler(req, res) {
             results.tests.push({ 
               name: 'Browserbase API', 
               status: 'fail', 
-              message: 'Unauthorized (401) - Vérifiez que votre clé API est valide et active', 
+              message: 'Unauthorized (401) - Verifiez que votre cle API est valide et active', 
               latency,
-              hint: 'Vérifiez BROWSERBASE_API_KEY dans les variables d\'environnement Vercel'
+              hint: 'Verifiez BROWSERBASE_API_KEY dans les variables d\'environnement Vercel'
             });
           } else {
             results.tests.push({ 
@@ -58,8 +58,8 @@ export default async function handler(req, res) {
           results.tests.push({ 
             name: 'Browserbase API', 
             status: 'fail', 
-            message: `Erreur réseau: ${e.message}`,
-            hint: 'Vérifiez votre connexion internet et les variables d\'environnement'
+            message: `Erreur reseau: ${e.message}`,
+            hint: 'Verifiez votre connexion internet et les variables d\'environnement'
           }); 
         }
       } else { 
@@ -88,13 +88,13 @@ export default async function handler(req, res) {
           if (res2.ok || res2.status === 404) { // 404 est OK car l'endpoint JSON peut ne pas exister
             results.tests.push({ name: 'Browserless API', status: 'pass', message: 'Key configured and valid', latency });
           } else if (res2.status === 401) {
-            results.tests.push({ name: 'Browserless API', status: 'fail', message: 'Unauthorized (401) - Clé API invalide', latency });
+            results.tests.push({ name: 'Browserless API', status: 'fail', message: 'Unauthorized (401) - Cle API invalide', latency });
           } else {
             results.tests.push({ name: 'Browserless API', status: 'pass', message: 'Key configured', latency });
           }
         } catch (e) {
-          // Si la connexion échoue mais la clé est configurée, on considère que c'est OK
-          results.tests.push({ name: 'Browserless API', status: 'pass', message: 'Key configured (test de connexion non disponible)', hint: 'La clé est configurée mais le test de connexion a échoué' });
+          // Si la connexion echoue mais la cle est configuree, on considere que c'est OK
+          results.tests.push({ name: 'Browserless API', status: 'pass', message: 'Key configured (test de connexion non disponible)', hint: 'La cle est configuree mais le test de connexion a echoue' });
         }
       } else {
         results.tests.push({ 
@@ -122,13 +122,13 @@ export default async function handler(req, res) {
           if (res2.ok) {
             results.tests.push({ name: 'Steel API', status: 'pass', message: 'Connected', latency });
           } else if (res2.status === 401) {
-            results.tests.push({ name: 'Steel API', status: 'fail', message: 'Unauthorized (401) - Clé API invalide', latency });
+            results.tests.push({ name: 'Steel API', status: 'fail', message: 'Unauthorized (401) - Cle API invalide', latency });
           } else {
             results.tests.push({ name: 'Steel API', status: 'pass', message: 'Key configured', latency });
           }
         } catch (e) {
-          // Si la connexion échoue mais la clé est configurée, on considère que c'est OK
-          results.tests.push({ name: 'Steel API', status: 'pass', message: 'Key configured (test de connexion non disponible)', hint: 'La clé est configurée mais le test de connexion a échoué' });
+          // Si la connexion echoue mais la cle est configuree, on considere que c'est OK
+          results.tests.push({ name: 'Steel API', status: 'pass', message: 'Key configured (test de connexion non disponible)', hint: 'La cle est configuree mais le test de connexion a echoue' });
         }
       } else {
         results.tests.push({ 
@@ -161,17 +161,17 @@ export default async function handler(req, res) {
           const errorMsg = e.message || 'Unknown error';
           let hint = '';
           if (errorMsg.includes('401') || errorMsg.includes('Unauthorized')) {
-            hint = 'Vérifiez que ANTHROPIC_API_KEY est valide dans Vercel';
+            hint = 'Verifiez que ANTHROPIC_API_KEY est valide dans Vercel';
           } else if (errorMsg.includes('429') || errorMsg.includes('rate limit')) {
-            hint = 'Limite de taux atteinte, réessayez plus tard';
+            hint = 'Limite de taux atteinte, reessayez plus tard';
           } else if (errorMsg.includes('network') || errorMsg.includes('fetch')) {
-            hint = 'Problème de connexion réseau';
+            hint = 'Probleme de connexion reseau';
           }
           results.tests.push({ 
             name: 'Claude AI', 
             status: 'fail', 
             message: `Connection error: ${errorMsg}`,
-            hint: hint || 'Vérifiez ANTHROPIC_API_KEY dans les variables d\'environnement Vercel'
+            hint: hint || 'Verifiez ANTHROPIC_API_KEY dans les variables d\'environnement Vercel'
           }); 
         }
       } else { 

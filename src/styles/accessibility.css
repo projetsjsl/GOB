@@ -1,8 +1,8 @@
 /**
- * Accessibilité WCAG
+ * Accessibilite WCAG
  * 
- * Migré depuis public/css/wcag-accessibility-fixes.css
- * Améliore l'accessibilité du dashboard
+ * Migre depuis public/css/wcag-accessibility-fixes.css
+ * Ameliore l'accessibilite du dashboard
  */
 
 /* Focus visible pour navigation clavier */
@@ -11,7 +11,7 @@
     outline-offset: 2px;
 }
 
-/* Contraste amélioré pour texte */
+/* Contraste ameliore pour texte */
 .text-low-contrast {
     color: var(--gob-text-secondary);
 }
@@ -45,13 +45,13 @@
     border-width: 0;
 }
 
-/* Amélioration du contraste pour les boutons */
+/* Amelioration du contraste pour les boutons */
 button:not(:disabled) {
     min-height: 44px; /* Taille minimale pour touch */
     min-width: 44px;
 }
 
-/* Indicateurs d'état pour lecteurs d'écran */
+/* Indicateurs d'etat pour lecteurs d'ecran */
 [aria-busy="true"]::before {
     content: "Chargement en cours...";
     position: absolute;

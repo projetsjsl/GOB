@@ -10,14 +10,14 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Methode non autorisee' });
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
 
   if (!GEMINI_API_KEY && !PERPLEXITY_API_KEY) {
     return res.status(503).json({
-      error: 'Aucune clé API IA configurée',
+      error: 'Aucune cle API IA configuree',
       fallback: true
     });
   }
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
       language = 'fr'
     } = req.body || {};
 
-    // Construire le contexte des données
+    // Construire le contexte des donnees
     const dataContext = buildDataContext(usData, caData, spreads);
     
     // Construire le prompt selon la section
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
     }
 
     if (!aiResponse) {
-      throw new Error('Toutes les APIs IA ont échoué');
+      throw new Error('Toutes les APIs IA ont echoue');
     }
 
     return res.status(200).json({
@@ -83,11 +83,11 @@ export default async function handler(req, res) {
 function buildDataContext(usData, caData, spreads) {
   const formatRate = (rate) => rate !== undefined ? `${rate.toFixed(2)}%` : 'N/A';
   
-  let context = `## DONNÉES DE MARCHÉ ACTUELLES\n\n`;
+  let context = `## DONNEES DE MARCHE ACTUELLES\n\n`;
   
   // US Rates
   if (usData && usData.points) {
-    context += `### 🇺🇸 Courbe des Taux US (Treasury)\n`;
+    context += `###  Courbe des Taux US (Treasury)\n`;
     usData.points.forEach(p => {
       const change = p.change1D !== undefined ? ` (${p.change1D > 0 ? '+' : ''}${p.change1D.toFixed(1)} pb)` : '';
       context += `- ${p.maturity}: ${formatRate(p.yield)}${change}\n`;
@@ -97,7 +97,7 @@ function buildDataContext(usData, caData, spreads) {
   
   // Canada Rates
   if (caData && caData.points) {
-    context += `### 🇨🇦 Courbe des Taux Canada (Obligations d'État)\n`;
+    context += `###  Courbe des Taux Canada (Obligations d'Etat)\n`;
     caData.points.forEach(p => {
       const change = p.change1D !== undefined ? ` (${p.change1D > 0 ? '+' : ''}${p.change1D.toFixed(1)} pb)` : '';
       context += `- ${p.maturity}: ${formatRate(p.yield)}${change}\n`;
@@ -107,10 +107,10 @@ function buildDataContext(usData, caData, spreads) {
   
   // Spreads
   if (spreads) {
-    context += `### 📊 Écarts Clés (Spreads)\n`;
-    if (spreads['2Y-10Y'] !== undefined) context += `- Spread 2Y-10Y: ${spreads['2Y-10Y'].toFixed(0)} pb ${spreads['2Y-10Y'] < 0 ? '⚠️ INVERSÉ' : ''}\n`;
-    if (spreads['3M-10Y'] !== undefined) context += `- Spread 3M-10Y: ${spreads['3M-10Y'].toFixed(0)} pb ${spreads['3M-10Y'] < 0 ? '⚠️ INVERSÉ' : ''}\n`;
-    if (spreads['US-CA-10Y'] !== undefined) context += `- Différentiel US-CA 10Y: ${spreads['US-CA-10Y'].toFixed(0)} pb\n`;
+    context += `###  Ecarts Cles (Spreads)\n`;
+    if (spreads['2Y-10Y'] !== undefined) context += `- Spread 2Y-10Y: ${spreads['2Y-10Y'].toFixed(0)} pb ${spreads['2Y-10Y'] < 0 ? ' INVERSE' : ''}\n`;
+    if (spreads['3M-10Y'] !== undefined) context += `- Spread 3M-10Y: ${spreads['3M-10Y'].toFixed(0)} pb ${spreads['3M-10Y'] < 0 ? ' INVERSE' : ''}\n`;
+    if (spreads['US-CA-10Y'] !== undefined) context += `- Differentiel US-CA 10Y: ${spreads['US-CA-10Y'].toFixed(0)} pb\n`;
   }
   
   return context;
@@ -125,58 +125,58 @@ function buildAnalysisPrompt(section, dataContext, language) {
   });
 
   const sectionPrompts = {
-    overview: `Tu es un analyste obligataire senior CFA® spécialisé dans les marchés de taux. 
+    overview: `Tu es un analyste obligataire senior CFA specialise dans les marches de taux. 
 
 ${dataContext}
 
 Date d'analyse: ${today}
 
-MISSION: Fournir une analyse concise (150-200 mots) de la situation actuelle des marchés obligataires US et Canada.
+MISSION: Fournir une analyse concise (150-200 mots) de la situation actuelle des marches obligataires US et Canada.
 
 STRUCTURE REQUISE:
-1. **État actuel**: Décris la forme des courbes (normale, plate, inversée) et ce que cela signifie
-2. **Signaux clés**: Les 2-3 points les plus importants à retenir
-3. **Perspective macro**: Implications pour la politique monétaire et l'économie
+1. **Etat actuel**: Decris la forme des courbes (normale, plate, inversee) et ce que cela signifie
+2. **Signaux cles**: Les 2-3 points les plus importants a retenir
+3. **Perspective macro**: Implications pour la politique monetaire et l'economie
 4. **Comparaison historique**: Comment ces niveaux se comparent aux moyennes historiques
 
-STYLE: Professionnel, factuel, sans jargon excessif. Utilise des émojis pour la clarté visuelle.
-LANGUE: Français`,
+STYLE: Professionnel, factuel, sans jargon excessif. Utilise des emojis pour la clarte visuelle.
+LANGUE: Francais`,
 
-    comparison: `Tu es un analyste obligataire senior CFA® spécialisé dans les marchés de taux.
+    comparison: `Tu es un analyste obligataire senior CFA specialise dans les marches de taux.
 
 ${dataContext}
 
 Date d'analyse: ${today}
 
-MISSION: Analyser en détail la comparaison entre les courbes US et Canada (150-200 mots).
+MISSION: Analyser en detail la comparaison entre les courbes US et Canada (150-200 mots).
 
 STRUCTURE REQUISE:
-1. **Différentiel de politique monétaire**: Écart entre Fed et BoC, et ses implications
-2. **Dynamique des spreads**: Évolution récente du différentiel US-CA
+1. **Differentiel de politique monetaire**: Ecart entre Fed et BoC, et ses implications
+2. **Dynamique des spreads**: Evolution recente du differentiel US-CA
 3. **Impact devises**: Lien avec le taux de change USD/CAD
-4. **Opportunités**: Implications pour les investisseurs obligataires
+4. **Opportunites**: Implications pour les investisseurs obligataires
 
-STYLE: Professionnel, axé sur l'actionnable.
-LANGUE: Français`,
+STYLE: Professionnel, axe sur l'actionnable.
+LANGUE: Francais`,
 
-    spreads: `Tu es un analyste obligataire senior CFA® spécialisé dans l'analyse des spreads.
+    spreads: `Tu es un analyste obligataire senior CFA specialise dans l'analyse des spreads.
 
 ${dataContext}
 
 Date d'analyse: ${today}
 
-MISSION: Analyser les écarts de rendement et leurs implications (150-200 mots).
+MISSION: Analyser les ecarts de rendement et leurs implications (150-200 mots).
 
 STRUCTURE REQUISE:
-1. **Inversion de courbe**: Le spread 2Y-10Y est-il inversé? Implications historiques
-2. **Indicateur de récession**: Le spread 3M-10Y comme signal avancé
-3. **Différentiel international**: Ce que dit l'écart US-Canada
-4. **Contexte**: Comment interpréter ces signaux dans l'environnement actuel
+1. **Inversion de courbe**: Le spread 2Y-10Y est-il inverse? Implications historiques
+2. **Indicateur de recession**: Le spread 3M-10Y comme signal avance
+3. **Differentiel international**: Ce que dit l'ecart US-Canada
+4. **Contexte**: Comment interpreter ces signaux dans l'environnement actuel
 
 STYLE: Analytique, avec contexte historique.
-LANGUE: Français`,
+LANGUE: Francais`,
 
-    historical: `Tu es un analyste obligataire senior CFA® avec expertise en cycles économiques.
+    historical: `Tu es un analyste obligataire senior CFA avec expertise en cycles economiques.
 
 ${dataContext}
 
@@ -185,13 +185,13 @@ Date d'analyse: ${today}
 MISSION: Mettre en perspective historique la situation actuelle des taux (150-200 mots).
 
 STRUCTURE REQUISE:
-1. **Cycle actuel**: Où sommes-nous dans le cycle de taux?
-2. **Comparaisons**: Similitudes avec des périodes passées (2006-2007, 2019, etc.)
-3. **Tendances**: Direction probable des taux à moyen terme
-4. **Risques**: Les principaux risques à surveiller
+1. **Cycle actuel**: Ou sommes-nous dans le cycle de taux?
+2. **Comparaisons**: Similitudes avec des periodes passees (2006-2007, 2019, etc.)
+3. **Tendances**: Direction probable des taux a moyen terme
+4. **Risques**: Les principaux risques a surveiller
 
-STYLE: Perspectif historique, éducatif.
-LANGUE: Français`
+STYLE: Perspectif historique, educatif.
+LANGUE: Francais`
   };
 
   return sectionPrompts[section] || sectionPrompts.overview;
@@ -263,57 +263,57 @@ async function callGemini(apiKey, prompt) {
 
 function getFallbackAnalysis(section) {
   const fallbacks = {
-    overview: `📊 **Analyse des Courbes de Taux**
+    overview: ` **Analyse des Courbes de Taux**
 
-Les marchés obligataires affichent actuellement une configuration caractéristique d'une fin de cycle de resserrement monétaire.
+Les marches obligataires affichent actuellement une configuration caracteristique d'une fin de cycle de resserrement monetaire.
 
-**Points clés:**
-• La courbe US reste légèrement inversée sur le segment 2Y-10Y, signal historiquement précurseur d'un ralentissement économique
-• La Fed maintient une posture prudente avec des taux directeurs élevés
-• L'écart US-Canada reflète le différentiel de politique monétaire entre les deux banques centrales
+**Points cles:**
+- La courbe US reste legerement inversee sur le segment 2Y-10Y, signal historiquement precurseur d'un ralentissement economique
+- La Fed maintient une posture prudente avec des taux directeurs eleves
+- L'ecart US-Canada reflete le differentiel de politique monetaire entre les deux banques centrales
 
-**Perspective:** Les marchés anticipent une normalisation graduelle des taux à mesure que l'inflation se rapproche des cibles.
+**Perspective:** Les marches anticipent une normalisation graduelle des taux a mesure que l'inflation se rapproche des cibles.
 
-_Analyse générée localement - Actualisation recommandée_`,
+_Analyse generee localement - Actualisation recommandee_`,
 
-    comparison: `📈 **Comparaison US vs Canada**
+    comparison: ` **Comparaison US vs Canada**
 
-Le différentiel de rendement entre les obligations américaines et canadiennes reflète des trajectoires de politique monétaire distinctes.
+Le differentiel de rendement entre les obligations americaines et canadiennes reflete des trajectoires de politique monetaire distinctes.
 
 **Observations:**
-• Les taux US restent supérieurs aux taux canadiens sur toutes les maturités
-• La BoC a commencé son cycle de baisse avant la Fed
-• L'écart 10Y se situe dans sa fourchette historique normale
+- Les taux US restent superieurs aux taux canadiens sur toutes les maturites
+- La BoC a commence son cycle de baisse avant la Fed
+- L'ecart 10Y se situe dans sa fourchette historique normale
 
-**Impact devises:** Ce différentiel soutient le dollar américain face au dollar canadien.
+**Impact devises:** Ce differentiel soutient le dollar americain face au dollar canadien.
 
-_Analyse générée localement - Actualisation recommandée_`,
+_Analyse generee localement - Actualisation recommandee_`,
 
-    spreads: `🔍 **Analyse des Spreads**
+    spreads: ` **Analyse des Spreads**
 
-Les écarts de rendement fournissent des signaux importants sur les anticipations économiques.
+Les ecarts de rendement fournissent des signaux importants sur les anticipations economiques.
 
 **Signaux:**
-• Le spread 2Y-10Y inversé signale historiquement une récession dans les 12-18 mois
-• Le spread 3M-10Y est un indicateur encore plus fiable
-• L'écart US-Canada reflète les différences de croissance et d'inflation
+- Le spread 2Y-10Y inverse signale historiquement une recession dans les 12-18 mois
+- Le spread 3M-10Y est un indicateur encore plus fiable
+- L'ecart US-Canada reflete les differences de croissance et d'inflation
 
-**Interprétation:** L'inversion actuelle doit être contextualisée avec la politique monétaire exceptionnelle post-COVID.
+**Interpretation:** L'inversion actuelle doit etre contextualisee avec la politique monetaire exceptionnelle post-COVID.
 
-_Analyse générée localement - Actualisation recommandée_`,
+_Analyse generee localement - Actualisation recommandee_`,
 
-    historical: `📅 **Perspective Historique**
+    historical: ` **Perspective Historique**
 
-La configuration actuelle des courbes présente des similitudes avec plusieurs périodes passées.
+La configuration actuelle des courbes presente des similitudes avec plusieurs periodes passees.
 
 **Comparaisons:**
-• Similaire à 2006-2007: fin de cycle de hausse, courbe inversée
-• Différent de 2019: contexte inflationniste plus marqué
-• Niveau absolu des taux plus élevé que la décennie précédente
+- Similaire a 2006-2007: fin de cycle de hausse, courbe inversee
+- Different de 2019: contexte inflationniste plus marque
+- Niveau absolu des taux plus eleve que la decennie precedente
 
-**Cycle:** Nous sommes probablement en fin de cycle de resserrement, avec des baisses de taux anticipées à horizon 6-12 mois.
+**Cycle:** Nous sommes probablement en fin de cycle de resserrement, avec des baisses de taux anticipees a horizon 6-12 mois.
 
-_Analyse générée localement - Actualisation recommandée_`
+_Analyse generee localement - Actualisation recommandee_`
   };
 
   return fallbacks[section] || fallbacks.overview;

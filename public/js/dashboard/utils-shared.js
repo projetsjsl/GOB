@@ -57,9 +57,9 @@
         }
 
         const frenchKeywords = [
-            'à', 'de', 'et', 'pour', 'dans', 'avec', 'sur', 'plus', 'après', 'annonce',
-            'hausse', 'baisse', 'résultats', 'bourse', 'marché', 'économie', 'entreprise',
-            'société', 'actionnaire', 'bénéfice', 'chiffre', 'trimestre', 'milliards', 'millions'
+            'a', 'de', 'et', 'pour', 'dans', 'avec', 'sur', 'plus', 'apres', 'annonce',
+            'hausse', 'baisse', 'resultats', 'bourse', 'marche', 'economie', 'entreprise',
+            'societe', 'actionnaire', 'benefice', 'chiffre', 'trimestre', 'milliards', 'millions'
         ];
 
         const frenchWordCount = frenchKeywords.filter(keyword => text.includes(keyword)).length;
@@ -75,7 +75,7 @@
     };
 
     /**
-     * Convertir une date/heure en heure de Montréal (Eastern Time)
+     * Convertir une date/heure en heure de Montreal (Eastern Time)
      * Format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures"
      */
     const formatTimeMontreal = (dateOrTimeString) => {
@@ -83,7 +83,7 @@
         
         // Si c'est une string de temps existante, essayer de la parser
         if (typeof dateOrTimeString === 'string') {
-            // Si c'est déjà formaté "Aujourd'hui, HH:MM AM/PM", parser l'heure
+            // Si c'est deja formate "Aujourd'hui, HH:MM AM/PM", parser l'heure
             const todayMatch = dateOrTimeString.match(/Aujourd'hui[,\s]+(\d{1,2}):(\d{2})\s*(AM|PM)/i);
             if (todayMatch) {
                 const now = new Date();
@@ -112,12 +112,12 @@
             date = new Date();
         }
         
-        // Vérifier si la date est valide
+        // Verifier si la date est valide
         if (isNaN(date.getTime())) {
             return 'Aujourd\'hui';
         }
         
-        // Obtenir l'heure actuelle en heure de Montréal
+        // Obtenir l'heure actuelle en heure de Montreal
         const nowMontreal = new Date();
         const nowMontrealStr = new Intl.DateTimeFormat('en-CA', {
             timeZone: 'America/Montreal',
@@ -126,7 +126,7 @@
             day: '2-digit'
         }).format(nowMontreal);
         
-        // Convertir la date en heure de Montréal
+        // Convertir la date en heure de Montreal
         const montrealFormatter = new Intl.DateTimeFormat('en-US', {
             timeZone: 'America/Montreal',
             hour: 'numeric',
@@ -140,11 +140,11 @@
         const montrealParts = montrealFormatter.formatToParts(date);
         const montrealDateStr = `${montrealParts.find(p => p.type === 'year').value}-${montrealParts.find(p => p.type === 'month').value}-${montrealParts.find(p => p.type === 'day').value}`;
         
-        // Vérifier si c'est aujourd'hui
+        // Verifier si c'est aujourd'hui
         const isToday = montrealDateStr === nowMontrealStr.replace(/\//g, '-');
         
         if (isToday) {
-            // Formater en "Aujourd'hui, HH:MM AM/PM" en heure de Montréal
+            // Formater en "Aujourd'hui, HH:MM AM/PM" en heure de Montreal
             const hours = parseInt(montrealParts.find(p => p.type === 'hour').value);
             const minutes = parseInt(montrealParts.find(p => p.type === 'minute').value);
             const ampm = montrealParts.find(p => p.type === 'dayPeriod').value;
@@ -153,12 +153,12 @@
             
             return `Aujourd'hui, ${displayHours}:${displayMinutes} ${ampm.toUpperCase()}`;
         } else {
-            // Calculer la différence en heures (en utilisant les timestamps UTC)
+            // Calculer la difference en heures (en utilisant les timestamps UTC)
             const diffMs = nowMontreal.getTime() - date.getTime();
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
             
             if (diffHours < 1) {
-                return 'À l\'instant';
+                return 'A l\'instant';
             } else if (diffHours < 24) {
                 return `Il y a ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
             } else {
@@ -181,38 +181,38 @@
             return React.createElement(
                 'span',
                 { className: `w-9 h-9 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner border ${classes}` },
-                isBull ? '🐂' : '🐻'
+                isBull ? '' : ''
             );
         }
         // Fallback string if React is not available
-        return isBull ? '🐂' : '🐻';
+        return isBull ? '' : '';
     };
 
     const cleanText = (text) => {
         if (!text) return '';
 
         const replacements = [
-            { pattern: /â€”/g, value: '—' },
-            { pattern: /â€“/g, value: '–' },
-            { pattern: /â€¢/g, value: '•' },
-            { pattern: /â€™/g, value: "'" },
-            { pattern: /â€˜/g, value: '‘' },
-            { pattern: /â€œ/g, value: '“' },
-            { pattern: /â€�/g, value: '”' },
-            { pattern: /Ã©/g, value: 'é' },
-            { pattern: /Ã¨/g, value: 'è' },
-            { pattern: /Ã /g, value: 'à' },
-            { pattern: /Ã§/g, value: 'ç' },
-            { pattern: /Ã´/g, value: 'ô' },
-            { pattern: /Ã¢/g, value: 'â' },
-            { pattern: /Ã®/g, value: 'î' },
-            { pattern: /Ã¯/g, value: 'ï' },
-            { pattern: /Ã¹/g, value: 'ù' },
-            { pattern: /Ã»/g, value: 'û' },
-            { pattern: /Ã«/g, value: 'ë' },
-            { pattern: /Ã¤/g, value: 'ä' },
-            { pattern: /Ã¶/g, value: 'ö' },
-            { pattern: /Ã¼/g, value: 'ü' }
+            { pattern: /aEUR"/g, value: '-' },
+            { pattern: /aEUR"/g, value: '-' },
+            { pattern: /aEUR/g, value: '-' },
+            { pattern: /aEURTM/g, value: "'" },
+            { pattern: /aEUR /g, value: ''' },
+            { pattern: /aEUR/g, value: '"' },
+            { pattern: /aEUR/g, value: '"' },
+            { pattern: /A/g, value: 'e' },
+            { pattern: /A /g, value: 'e' },
+            { pattern: /A /g, value: 'a' },
+            { pattern: /A/g, value: 'c' },
+            { pattern: /A /g, value: 'o' },
+            { pattern: /A/g, value: 'a' },
+            { pattern: /A/g, value: 'i' },
+            { pattern: /A /g, value: 'i' },
+            { pattern: /A1/g, value: 'u' },
+            { pattern: /A"/g, value: 'u' },
+            { pattern: /A"/g, value: 'e' },
+            { pattern: /A/g, value: 'a' },
+            { pattern: /A/g, value: 'o' },
+            { pattern: /A14/g, value: 'u' }
         ];
 
         return replacements.reduce((result, { pattern, value }) => result.replace(pattern, value), text);
@@ -235,7 +235,7 @@
         const text = ((title || '') + ' ' + (description || '')).toLowerCase();
         const categories = {
             earnings: {
-                keywords: ['earnings', 'résultats', 'profit', 'bénéfice', 'trimestre', 'quarterly', 'revenue', 'chiffre d\'affaires'],
+                keywords: ['earnings', 'resultats', 'profit', 'benefice', 'trimestre', 'quarterly', 'revenue', 'chiffre d\'affaires'],
                 icon: 'DollarSign',
                 color: 'text-green-500'
             },
@@ -250,7 +250,7 @@
                 color: 'text-yellow-500'
             },
             product: {
-                keywords: ['launch', 'product', 'nouveau', 'innovation', 'dévoile'],
+                keywords: ['launch', 'product', 'nouveau', 'innovation', 'devoile'],
                 icon: 'Box',
                 color: 'text-purple-500'
             }

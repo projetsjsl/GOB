@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // DELIVERY MANAGER - Gestion des destinataires et planification
-// ═══════════════════════════════════════════════════════════════
+// 
 
 import { loadDeliveryConfig as apiLoadDelivery, saveDeliveryConfig as apiSaveDelivery, sendBriefingNow as apiSendBriefing } from './api-client.js';
 import { showStatus } from './ui-helpers.js';
@@ -39,22 +39,22 @@ export async function loadDeliveryConfig(section, key) {
                 checkbox.checked = days.includes(checkbox.value);
             });
 
-            // Afficher section jours si nécessaire
+            // Afficher section jours si necessaire
             const freq = schedule.frequency || 'manual';
             const showDays = freq === 'daily' || freq === 'weekly';
             document.getElementById('deliveryDaysSection').classList.toggle('hidden', !showDays);
         } else {
-            // Pas de config existante, utiliser valeurs par défaut
+            // Pas de config existante, utiliser valeurs par defaut
             resetDeliveryConfig(promptId);
         }
     } catch (error) {
         console.error('Erreur chargement delivery config:', error);
-        showStatus('⚠️ Impossible de charger la config de delivery', 'warning');
+        showStatus(' Impossible de charger la config de delivery', 'warning');
     }
 }
 
 /**
- * Reset delivery config avec valeurs par défaut
+ * Reset delivery config avec valeurs par defaut
  */
 function resetDeliveryConfig(promptId) {
     currentRecipients = [];
@@ -95,20 +95,20 @@ export function addRecipient() {
     const name = document.getElementById('newRecipientName').value.trim();
 
     if (!email) {
-        showStatus('⚠️ Email requis', 'warning');
+        showStatus(' Email requis', 'warning');
         return;
     }
 
-    // Vérifier format email
+    // Verifier format email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        showStatus('⚠️ Format email invalide', 'warning');
+        showStatus(' Format email invalide', 'warning');
         return;
     }
 
-    // Vérifier si email déjà présent
+    // Verifier si email deja present
     if (currentRecipients.some(r => r.email === email)) {
-        showStatus('⚠️ Email déjà dans la liste', 'warning');
+        showStatus(' Email deja dans la liste', 'warning');
         return;
     }
 
@@ -122,7 +122,7 @@ export function addRecipient() {
 
     renderRecipientsList();
     hideAddRecipientForm();
-    showStatus('✅ Destinataire ajouté', 'success');
+    showStatus(' Destinataire ajoute', 'success');
 }
 
 /**
@@ -133,7 +133,7 @@ export function removeRecipient(email) {
 
     currentRecipients = currentRecipients.filter(r => r.email !== email);
     renderRecipientsList();
-    showStatus('✅ Destinataire retiré', 'success');
+    showStatus(' Destinataire retire', 'success');
 }
 
 /**
@@ -155,7 +155,7 @@ function renderRecipientsList() {
     document.getElementById('recipientsCount').textContent = currentRecipients.length;
 
     if (currentRecipients.length === 0) {
-        container.innerHTML = '<p class="text-gray-400 text-sm italic">Aucun destinataire configuré</p>';
+        container.innerHTML = '<p class="text-gray-400 text-sm italic">Aucun destinataire configure</p>';
         return;
     }
 
@@ -177,7 +177,7 @@ function renderRecipientsList() {
                 onclick="window.removeRecipient('${recipient.email}')"
                 class="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded transition-colors"
             >
-                🗑️ Retirer
+                 Retirer
             </button>
         </div>
     `).join('');
@@ -188,12 +188,12 @@ function renderRecipientsList() {
  */
 export async function saveDeliveryConfig(currentConfig) {
     if (!currentConfig) {
-        showStatus('⚠️ Aucun prompt sélectionné', 'warning');
+        showStatus(' Aucun prompt selectionne', 'warning');
         return;
     }
 
     try {
-        // Collecter les jours sélectionnés
+        // Collecter les jours selectionnes
         const selectedDays = Array.from(document.querySelectorAll('input[name="deliveryDay"]:checked'))
             .map(checkbox => checkbox.value);
 
@@ -210,72 +210,72 @@ export async function saveDeliveryConfig(currentConfig) {
         };
 
         await apiSaveDelivery(deliveryConfig);
-        showStatus('✅ Configuration d\'envoi sauvegardée', 'success');
+        showStatus(' Configuration d\'envoi sauvegardee', 'success');
     } catch (error) {
         console.error('Erreur sauvegarde delivery config:', error);
-        showStatus('❌ ' + error.message, 'error');
+        showStatus(' ' + error.message, 'error');
     }
 }
 
 /**
- * Envoyer le briefing immédiatement
+ * Envoyer le briefing immediatement
  */
 export async function sendBriefingNow(currentConfig) {
     if (!currentConfig) {
-        showStatus('⚠️ Aucun prompt sélectionné', 'warning');
+        showStatus(' Aucun prompt selectionne', 'warning');
         return;
     }
 
     const activeRecipients = currentRecipients.filter(r => r.active);
     if (activeRecipients.length === 0) {
-        showStatus('⚠️ Aucun destinataire actif configuré', 'warning');
+        showStatus(' Aucun destinataire actif configure', 'warning');
         return;
     }
 
     // Confirmation avant envoi LIVE
-    const recipientsList = activeRecipients.map(r => `  • ${r.name} (${r.email})`).join('\n');
+    const recipientsList = activeRecipients.map(r => `  - ${r.name} (${r.email})`).join('\n');
     const confirmed = confirm(
-        `📧 ENVOI IMMÉDIAT EN PRODUCTION\n\n` +
-        `Le briefing sera généré et envoyé MAINTENANT à ${activeRecipients.length} destinataire(s):\n\n` +
+        ` ENVOI IMMEDIAT EN PRODUCTION\n\n` +
+        `Le briefing sera genere et envoye MAINTENANT a ${activeRecipients.length} destinataire(s):\n\n` +
         `${recipientsList}\n\n` +
         `Voulez-vous continuer?`
     );
 
     if (!confirmed) {
-        showStatus('❌ Envoi annulé', 'info');
+        showStatus(' Envoi annule', 'info');
         return;
     }
 
     try {
-        showStatus('📧 Génération et envoi en cours...', 'info');
+        showStatus(' Generation et envoi en cours...', 'info');
 
-        // Récupérer le contenu du prompt actuel
+        // Recuperer le contenu du prompt actuel
         const promptContent = document.getElementById('editValue').value;
 
         const data = await apiSendBriefing(currentConfig.key, currentRecipients, promptContent);
 
         if (data.success) {
             showStatus(
-                `✅ ${data.message}\n` +
-                `📊 Envoyés: ${data.sent_count}/${data.total_recipients}\n` +
-                `📧 Sujet: ${data.briefing.subject}`,
+                ` ${data.message}\n` +
+                ` Envoyes: ${data.sent_count}/${data.total_recipients}\n` +
+                ` Sujet: ${data.briefing.subject}`,
                 'success'
             );
-            console.log('Envoi réussi:', data);
+            console.log('Envoi reussi:', data);
 
-            // Afficher les détails des erreurs s'il y en a
+            // Afficher les details des erreurs s'il y en a
             if (data.failed_count > 0 && data.errors) {
-                console.warn('Échecs d\'envoi:', data.errors);
-                const errorList = data.errors.map(e => `  • ${e.email}: ${e.error}`).join('\n');
-                alert(`⚠️ Certains envois ont échoué:\n\n${errorList}`);
+                console.warn('Echecs d\'envoi:', data.errors);
+                const errorList = data.errors.map(e => `  - ${e.email}: ${e.error}`).join('\n');
+                alert(` Certains envois ont echoue:\n\n${errorList}`);
             }
         } else {
-            showStatus('❌ Échec: ' + (data.error || data.message), 'error');
+            showStatus(' Echec: ' + (data.error || data.message), 'error');
             console.error('Erreur envoi:', data);
         }
     } catch (error) {
         console.error('Erreur send-briefing:', error);
-        showStatus('❌ Erreur: ' + error.message, 'error');
+        showStatus(' Erreur: ' + error.message, 'error');
     }
 }
 

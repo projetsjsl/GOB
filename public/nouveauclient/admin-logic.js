@@ -21,16 +21,16 @@ function switchSection(sectionId) {
         el.classList.remove('active');
     });
 
-    // Afficher la section sélectionnée
+    // Afficher la section selectionnee
     document.getElementById(sectionId).classList.add('active');
 
-    // Mettre à jour menu
+    // Mettre a jour menu
     document.querySelectorAll('.menu-item').forEach(el => {
         el.classList.remove('active');
     });
     event.target.classList.add('active');
 
-    // Charger les données si nécessaire
+    // Charger les donnees si necessaire
     if (sectionId === 'users') loadUsers();
     if (sectionId === 'clients') loadClients();
     if (sectionId === 'fields') loadFields();
@@ -106,9 +106,9 @@ function addUser(e) {
 
     const users = JSON.parse(localStorage.getItem('users') || '[]');
 
-    // Vérifier si l'utilisateur existe
+    // Verifier si l'utilisateur existe
     if (users.some(u => u.username === username)) {
-        showAlert('alertUsers', 'Cet utilisateur existe déjà', 'error');
+        showAlert('alertUsers', 'Cet utilisateur existe deja', 'error');
         return;
     }
 
@@ -127,11 +127,11 @@ function addUser(e) {
     document.getElementById('userForm').reset();
     loadUsers();
     loadDashboard();
-    showAlert('alertUsers', 'Utilisateur créé avec succès', 'success');
+    showAlert('alertUsers', 'Utilisateur cree avec succes', 'success');
 }
 
 function deleteUser(index) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?')) {
+    if (confirm('Etes-vous sur de vouloir supprimer cet utilisateur?')) {
         const users = JSON.parse(localStorage.getItem('users') || '[]');
         users.splice(index, 1);
         localStorage.setItem('users', JSON.stringify(users));
@@ -140,7 +140,7 @@ function deleteUser(index) {
     }
 }
 
-// === PARAMÉTRER CHAMPS ===
+// === PARAMETRER CHAMPS ===
 function loadFields() {
     const config = JSON.parse(localStorage.getItem('config') || '{}');
     
@@ -154,9 +154,9 @@ function loadFields() {
 
     let html = '';
     const sectionNames = {
-        section1: '📋 Section 1: Identité',
-        section2: '👨‍👩‍👧 Section 2: Situation',
-        section3: '💰 Section 3: Finances'
+        section1: ' Section 1: Identite',
+        section2: ' Section 2: Situation',
+        section3: ' Section 3: Finances'
     };
 
     for (const [sectionKey, sectionName] of Object.entries(sectionNames)) {
@@ -171,7 +171,7 @@ function loadFields() {
         fields.forEach((field, idx) => {
             html += `
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 80px; gap: 10px; margin-bottom: 10px; align-items: center; background: white; padding: 10px; border-radius: 4px;">
-                    <input type="text" value="${field.label}" placeholder="Libellé" data-section="${sectionKey}" data-idx="${idx}" class="field-label" onchange="updateField('${sectionKey}', ${idx}, 'label', this.value)">
+                    <input type="text" value="${field.label}" placeholder="Libelle" data-section="${sectionKey}" data-idx="${idx}" class="field-label" onchange="updateField('${sectionKey}', ${idx}, 'label', this.value)">
                     <select data-section="${sectionKey}" data-idx="${idx}" class="field-type" onchange="updateField('${sectionKey}', ${idx}, 'type', this.value)">
                         <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
                         <option value="number" ${field.type === 'number' ? 'selected' : ''}>Number</option>
@@ -244,7 +244,7 @@ function saveTemplates() {
     config.pdfSections = document.getElementById('pdfSections').value.split('\n').map(s => s.trim());
 
     localStorage.setItem('config', JSON.stringify(config));
-    showAlert('alertFields', 'Templates sauvegardés avec succès', 'success');
+    showAlert('alertFields', 'Templates sauvegardes avec succes', 'success');
 }
 
 // === CLIENTS ===
@@ -308,7 +308,7 @@ function exportAll() {
 function importConfig() {
     const file = document.getElementById('importFile').files[0];
     if (!file) {
-        alert('Sélectionnez un fichier');
+        alert('Selectionnez un fichier');
         return;
     }
 
@@ -319,7 +319,7 @@ function importConfig() {
             if (data.config) {
                 localStorage.setItem('config', data.config);
                 loadFields();
-                showAlert('alertFields', 'Configuration importée', 'success');
+                showAlert('alertFields', 'Configuration importee', 'success');
             }
         } catch(err) {
             showAlert('alertFields', 'Erreur: fichier invalide', 'error');
@@ -336,8 +336,8 @@ function testAutoSave() {
         email: 'test@example.com'
     };
 
-    // Créer Excel
-    const csv = `Prénom\tNom\tEmail\nTest\tClient\ttest@example.com`;
+    // Creer Excel
+    const csv = `Prenom\tNom\tEmail\nTest\tClient\ttest@example.com`;
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -347,7 +347,7 @@ function testAutoSave() {
     link.click();
     document.body.removeChild(link);
 
-    alert('✅ Fichier Excel généré automatiquement');
+    alert(' Fichier Excel genere automatiquement');
 }
 
 // === UTILITAIRES ===
@@ -359,7 +359,7 @@ function showAlert(elementId, message, type) {
 }
 
 function logoutAdmin() {
-    if (confirm('Déconnexion?')) {
+    if (confirm('Deconnexion?')) {
         localStorage.removeItem('currentUser');
         window.location.href = 'index.html';
     }

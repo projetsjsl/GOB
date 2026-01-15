@@ -1,6 +1,6 @@
 /**
- * Version simplifiée de /api/briefing sans imports externes
- * Pour tester si le problème vient des imports
+ * Version simplifiee de /api/briefing sans imports externes
+ * Pour tester si le probleme vient des imports
  */
 
 import { readFileSync } from 'fs';
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. DÉTERMINER LE TYPE DE BRIEFING
+    // 1. DETERMINER LE TYPE DE BRIEFING
     let briefingType = req.query.type || req.body?.type;
 
     if (!briefingType) {
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 3. Retourner une réponse simple pour test
+    // 3. Retourner une reponse simple pour test
     return res.status(200).json({
       success: true,
       type: briefingType,
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ Erreur génération briefing:', error);
+    console.error(' Erreur generation briefing:', error);
     return res.status(500).json({
       success: false,
       error: error.message,

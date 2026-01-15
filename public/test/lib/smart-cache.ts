@@ -1,5 +1,5 @@
 /**
- * Système de cache intelligent avec invalidation par événement
+ * Systeme de cache intelligent avec invalidation par evenement
  */
 
 interface CacheEntry<T> {
@@ -22,7 +22,7 @@ export class SmartCache<T = any> {
    * Ajouter une valeur au cache
    */
   set(key: string, data: T, ttlMs = 60000, tags: string[] = []): void {
-    // Implémenter une simple LRU si trop d'entrées
+    // Implementer une simple LRU si trop d'entrees
     if (this.cache.size >= this.maxEntries) {
       const oldestKey = Array.from(this.cache.entries()).sort(([, a], [, b]) => a.timestamp - b.timestamp)[0]?.[0]
 
@@ -40,14 +40,14 @@ export class SmartCache<T = any> {
   }
 
   /**
-   * Récupérer une valeur du cache
+   * Recuperer une valeur du cache
    */
   get(key: string): T | null {
     const entry = this.cache.get(key)
 
     if (!entry) return null
 
-    // Vérifier l'expiration
+    // Verifier l'expiration
     const age = Date.now() - entry.timestamp
     if (age > entry.ttl) {
       this.cache.delete(key)
@@ -85,7 +85,7 @@ export class SmartCache<T = any> {
 
     this.listeners.get(tag)!.add(callback)
 
-    // Retourner une fonction pour se désabonner
+    // Retourner une fonction pour se desabonner
     return () => {
       this.listeners.get(tag)?.delete(callback)
     }

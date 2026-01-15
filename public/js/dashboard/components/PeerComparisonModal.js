@@ -250,13 +250,13 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
             debtToAssets: 'Dette/Actifs',
             currentRatio: 'Ratio Courant',
             quickRatio: 'Ratio Rapide',
-            cashRatio: 'Ratio Trésorerie',
-            interestCoverage: 'Couverture Intérêts',
+            cashRatio: 'Ratio Tresorerie',
+            interestCoverage: 'Couverture Interets',
             revenueGrowth: 'Croissance Rev.',
-            earningsGrowth: 'Croissance Bénéf.',
+            earningsGrowth: 'Croissance Benef.',
             netMargin: 'Marge Nette',
             grossMargin: 'Marge Brute',
-            operatingMargin: 'Marge Opérationnelle',
+            operatingMargin: 'Marge Operationnelle',
             dividendYield: 'Rendement Div.',
             payoutRatio: 'Ratio Distribution',
             beta: 'Beta',
@@ -332,10 +332,10 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                 {/* Metrics Selector */}
                 <div className="px-6 py-4 bg-gray-900/50 border-b border-gray-700">
                     <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-semibold text-gray-300">Métriques à comparer</h3>
+                        <h3 className="text-sm font-semibold text-gray-300">Metriques a comparer</h3>
                         <div className="text-xs text-gray-500">
                             <i className="iconoir-info-circle mr-1"></i>
-                            Données: FMP (principal) + Finnhub (fallback)
+                            Donnees: FMP (principal) + Finnhub (fallback)
                         </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -355,7 +355,7 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                             { key: 'currentRatio', label: 'Ratio Courant', category: 'health' },
                             { key: 'quickRatio', label: 'Ratio Rapide', category: 'health' },
                             { key: 'revenueGrowth', label: 'Croissance Rev.', category: 'growth' },
-                            { key: 'earningsGrowth', label: 'Croissance Bénéf.', category: 'growth' },
+                            { key: 'earningsGrowth', label: 'Croissance Benef.', category: 'growth' },
                             { key: 'dividendYield', label: 'Rendement Div.', category: 'other' },
                             { key: 'beta', label: 'Beta', category: 'other' }
                         ].map(metric => (
@@ -384,14 +384,14 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                 <div className="p-6 max-h-[70vh] overflow-y-auto">
                     {comparisonData.length === 0 ? (
                         <div className="text-center py-12">
-                            <p className="text-gray-400">Aucune donnée disponible</p>
+                            <p className="text-gray-400">Aucune donnee disponible</p>
                         </div>
                     ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead className="bg-gray-900 sticky top-0 shadow-sm z-10">
                                 <tr>
-                                    <th className="text-left p-4 text-gray-400 font-medium">Métrique</th>
+                                    <th className="text-left p-4 text-gray-400 font-medium">Metrique</th>
                                     {comparisonData.map((stock, idx) => (
                                         <th key={idx} className="text-center p-4 min-w-[180px]">
                                             <div className="text-white font-bold text-lg">{stock.symbol}</div>
@@ -432,7 +432,7 @@ const PeerComparisonModal = ({ symbols, onClose }) => {
                                                             {formatValue(metric, value)}
                                                         </div>
                                                         {isBest && (
-                                                            <div className="text-xs text-green-400 mt-1">★ Meilleur</div>
+                                                            <div className="text-xs text-green-400 mt-1"> Meilleur</div>
                                                         )}
                                                     </td>
                                                 );

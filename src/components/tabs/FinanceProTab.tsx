@@ -383,12 +383,12 @@ export const FinanceProTab: React.FC<TabProps> = memo((props) => {
     const renderNav = () => (
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
             {[
-                { id: 'portfolio', label: 'Portfolio', icon: '💼' },
-                { id: 'analysis', label: 'Analysis', icon: '📊' },
-                { id: 'screener', label: 'Screener', icon: '🔍' },
-                { id: 'compare', label: 'Compare', icon: '⚖️' },
-                { id: 'ratios', label: 'Ratios', icon: '📈' },
-                { id: 'history', label: 'History', icon: '📅' },
+                { id: 'portfolio', label: 'Portfolio', icon: '' },
+                { id: 'analysis', label: 'Analysis', icon: '' },
+                { id: 'screener', label: 'Screener', icon: '' },
+                { id: 'compare', label: 'Compare', icon: '' },
+                { id: 'ratios', label: 'Ratios', icon: '' },
+                { id: 'history', label: 'History', icon: '' },
             ].map(item => (
                 <button
                     key={item.id}

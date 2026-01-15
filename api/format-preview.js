@@ -1,7 +1,7 @@
 /**
  * API Format Preview - Point unique de formatage
  *
- * Utilisé par:
+ * Utilise par:
  * - emma-config.html (preview)
  * - n8n workflows (si besoin)
  * - Tout autre client
@@ -23,13 +23,13 @@ import {
 
 /**
  * Convertit le markdown en HTML pour email
- * Fonction simple de conversion markdown → HTML avec styles inline
+ * Fonction simple de conversion markdown -> HTML avec styles inline
  */
 function markdownToEmailHtml(markdown, colors = DEFAULT_COLORS) {
   if (!markdown) return '';
   
   let html = markdown
-    // Headers avec couleurs du thème
+    // Headers avec couleurs du theme
     .replace(/^### (.+)$/gm, `<h3 style="color: ${colors.primary || DEFAULT_COLORS.primary}; margin-top: 24px; margin-bottom: 12px; font-size: 18px; font-weight: 600; border-left: 4px solid ${colors.primaryLight || DEFAULT_COLORS.primary}; padding-left: 12px;">$1</h3>`)
     .replace(/^## (.+)$/gm, `<h2 style="color: ${colors.primaryDark || DEFAULT_COLORS.primaryDark}; margin-top: 28px; margin-bottom: 16px; font-size: 20px; font-weight: 700; border-bottom: 3px solid ${colors.primary || DEFAULT_COLORS.primary}; padding-bottom: 8px;">$1</h2>`)
     .replace(/^# (.+)$/gm, `<h1 style="color: ${colors.primaryDark || DEFAULT_COLORS.primaryDark}; margin-top: 32px; margin-bottom: 20px; font-size: 24px; font-weight: 700;">$1</h1>`)
@@ -48,8 +48,8 @@ function markdownToEmailHtml(markdown, colors = DEFAULT_COLORS) {
 }
 
 /**
- * Génère le template email complet (TABLE-BASED pour Outlook)
- * Utilise le moteur de rendu unifié (lib/email-helpers.js)
+ * Genere le template email complet (TABLE-BASED pour Outlook)
+ * Utilise le moteur de rendu unifie (lib/email-helpers.js)
  */
 function generateEmailTemplate(content, type, config) {
   const colors = config.colors || DEFAULT_COLORS;
@@ -62,12 +62,12 @@ function generateEmailTemplate(content, type, config) {
   
   // Date et Emoji contextuel
   const date = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-  const emojis = { morning: '☀️', midday: '📊', evening: '🌙' };
-  const labels = { morning: 'MATIN', midday: 'MI-JOURNÉE', evening: 'SOIRÉE' };
+  const emojis = { morning: '', midday: '', evening: '' };
+  const labels = { morning: 'MATIN', midday: 'MI-JOURNEE', evening: 'SOIREE' };
   
   // Configuration du Header
   const headerSubtitle = header.showDate 
-    ? `${header.showEdition ? `ÉDITION ${labels[type] || 'BRIEFING'} | ` : ''}${date}`
+    ? `${header.showEdition ? `EDITION ${labels[type] || 'BRIEFING'} | ` : ''}${date}`
     : '';
 
   const headerConfig = {
@@ -75,16 +75,16 @@ function generateEmailTemplate(content, type, config) {
     subtitle: branding.tagline + (headerSubtitle ? `<br>${headerSubtitle}` : ''), 
     emoji: (header.showAvatar && branding.avatar.url) 
       ? `<img src="${branding.avatar.url}" alt="${branding.avatar.alt}" width="${branding.avatar.size}" height="${branding.avatar.size}" style="border-radius:50%;border:4px solid rgba(255,255,255,0.3);display:block;margin:0 auto;">` 
-      : (emojis[type] || '📊'),
+      : (emojis[type] || ''),
     colors: colors
   };
 
   // Configuration du Footer
   const footerConfig = {
-    text: `🤖 Généré par <strong style="color:${colors.primaryDark};">Emma IA</strong>`,
+    text: ` Genere par <strong style="color:${colors.primaryDark};">Emma IA</strong>`,
     disclaimer: [
       footer.showDisclaimer ? footer.disclaimerText : '',
-      footer.copyrightText || '© 2025 GOB Apps - Tous droits réservés'
+      footer.copyrightText || ' 2025 GOB Apps - Tous droits reserves'
     ].filter(Boolean).join('<br>'),
     colors: colors
   };
@@ -92,11 +92,11 @@ function generateEmailTemplate(content, type, config) {
   // Si logo footer actif
   if (footer.showLogo && branding.logo.url) {
     // Note: createEmailFooter ne supporte pas encore logo directement, on l'ajoute au text ou disclaimer
-    // Pour "World Class" on pourrait améliorer le helper, mais ici on l'injecte proprement.
+    // Pour "World Class" on pourrait ameliorer le helper, mais ici on l'injecte proprement.
     // Ou mieux: on utilise createEmailRow avant le footer.
   }
 
-  // Construction avec le moteur unifié
+  // Construction avec le moteur unifie
   return createEmailWrapper({
     width: 600,
     colors: colors,
@@ -112,8 +112,8 @@ function generateEmailTemplate(content, type, config) {
 }
 
 /**
- * Génère le template SMS
- * Note: Pas de limite - Twilio gère automatiquement le multi-SMS
+ * Genere le template SMS
+ * Note: Pas de limite - Twilio gere automatiquement le multi-SMS
  */
 async function generateSmsTemplate(content) {
   // Import dynamique avec fallback
@@ -122,21 +122,21 @@ async function generateSmsTemplate(content) {
     const channelAdapter = await import('../lib/channel-adapter.js');
     adaptForSMS = channelAdapter.adaptForSMS;
   } catch (e) {
-    console.warn('⚠️ channel-adapter.js non trouvé, utilisation de fallback');
+    console.warn(' channel-adapter.js non trouve, utilisation de fallback');
     adaptForSMS = (content) => content.replace(/<[^>]*>/g, '').trim();
   }
   
   const sms = await adaptForSMS(content, {});
   const chars = sms.length;
   // SMS standard = 160 chars (GSM-7) ou 70 chars (UCS-2 avec emojis)
-  // On utilise 153 car SMS concaténés = 153 chars utiles par segment
+  // On utilise 153 car SMS concatenes = 153 chars utiles par segment
   const smsCount = Math.ceil(chars / 153);
 
   return {
     text: sms,
     chars,
     smsCount,
-    segments: smsCount, // Alias pour clarté
+    segments: smsCount, // Alias pour clarte
     estimatedCost: `~${(smsCount * 0.0079).toFixed(2)}$ USD` // Twilio pricing
   };
 }
@@ -167,17 +167,17 @@ export default async function handler(req, res) {
     console.log(`[Format Preview] Channel: ${channel}, Type: ${briefingType}, Text length: ${text.length}`);
 
 
-    // ═══════════════════════════════════════════════════════════
+    // 
     // DESIGN: Chaque prompt peut avoir son propre design
-    // - Si customDesign fourni → utiliser ce design spécifique
-    // - Sinon → charger le design global depuis Supabase
-    // ═══════════════════════════════════════════════════════════
+    // - Si customDesign fourni -> utiliser ce design specifique
+    // - Sinon -> charger le design global depuis Supabase
+    // 
     let config;
     if (customDesign) {
-      // Design personnalisé passé par le prompt
+      // Design personnalise passe par le prompt
       config = customDesign;
     } else {
-      // Design global par défaut (cache 1min)
+      // Design global par defaut (cache 1min)
       config = await getDesignConfig();
     }
 
@@ -198,7 +198,7 @@ export default async function handler(req, res) {
     }
 
     const duration = Date.now() - startTime;
-    console.log(`[Format Preview] ✅ Generated in ${duration}ms`);
+    console.log(`[Format Preview]  Generated in ${duration}ms`);
 
     return res.status(200).json({
       success: true,
@@ -215,7 +215,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('[Format Preview] ❌ Error:', error.message);
+    console.error('[Format Preview]  Error:', error.message);
     return res.status(500).json({ 
       error: error.message,
       stack: process.env.NODE_ENV === 'development' ? error.stack : undefined

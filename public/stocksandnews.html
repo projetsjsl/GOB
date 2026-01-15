@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>GOB Apps - Dashboard Financier Pro • Propulsé par JSL AI</title>
+    <title>GOB Apps - Dashboard Financier Pro - Propulse par JSL AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
             overflow-x: hidden;
             font-size: 14px;
         }
-        /* Réduction globale pour mobile: police et espacements à 50% */
+        /* Reduction globale pour mobile: police et espacements a 50% */
         @media (max-width: 768px) {
             html { font-size: 50%; }
         }
@@ -202,7 +202,7 @@
             </div>
             <div style="text-align: center;">
                 <div style="font-size: 18px; font-weight: 600; margin-bottom: 2px;">GOB Apps - Dashboard Financier Pro</div>
-                <div style="font-size: 12px; color: #7d8da6;">Plateforme financière • Propulsée par JSL AI</div>
+                <div style="font-size: 12px; color: #7d8da6;">Plateforme financiere - Propulsee par JSL AI</div>
             </div>
         </div>
         <div class="time" id="time"></div>
@@ -211,53 +211,53 @@
 
     <div class="section">
         <div class="section-title">
-            ⭐ Ma Watchlist Live
+             Ma Watchlist Live
             <span class="live-indicator"></span>
         </div>
         <div class="watchlist-controls">
-            <button class="watchlist-btn" onclick="showWatchlistSettings()">⚙️ Gérer</button>
-            <button class="watchlist-btn" onclick="toggleLiveMode()">📡 Temps Réel</button>
+            <button class="watchlist-btn" onclick="showWatchlistSettings()"> Gerer</button>
+            <button class="watchlist-btn" onclick="toggleLiveMode()"> Temps Reel</button>
         </div>
         <div class="ticker-grid" id="watchlist"></div>
     </div>
 
     <div class="section">
-        <div class="section-title">📰 News - Ma Watchlist</div>
+        <div class="section-title"> News - Ma Watchlist</div>
         <div class="news-container" id="watchlist-news"></div>
     </div>
 
     <div class="section">
-        <div class="section-title">📅 Calendrier Économique (Aujourd'hui)</div>
+        <div class="section-title"> Calendrier Economique (Aujourd'hui)</div>
         <div class="calendar-container" id="economic-calendar"></div>
     </div>
 
     <div class="section">
-        <div class="section-title">💱 Taux de Change</div>
+        <div class="section-title"> Taux de Change</div>
         <div class="ticker-grid" id="forex"></div>
     </div>
 
     <div class="section">
-        <div class="section-title">🇨🇦 Actions Canada (TSX)</div>
+        <div class="section-title"> Actions Canada (TSX)</div>
         <div class="ticker-grid" id="canada-stocks"></div>
     </div>
 
     <div class="section">
-        <div class="section-title">🇺🇸 Actions US</div>
+        <div class="section-title"> Actions US</div>
         <div class="ticker-grid" id="us-stocks"></div>
     </div>
 
     <div class="section">
-        <div class="section-title">📊 ETF</div>
+        <div class="section-title"> ETF</div>
         <div class="ticker-grid" id="etfs"></div>
     </div>
 
     <div class="section">
-        <div class="section-title">💵 Obligations</div>
+        <div class="section-title"> Obligations</div>
         <div class="ticker-grid" id="bonds"></div>
     </div>
 
     <div class="section">
-        <div class="section-title">📰 Actualités Économiques</div>
+        <div class="section-title"> Actualites Economiques</div>
         <div class="news-container" id="general-news"></div>
     </div>
 
@@ -366,7 +366,7 @@
                 });
                 
                 if (!data || !data.economicCalendar || data.economicCalendar.length === 0) {
-                    container.innerHTML = '<div class="loading">Aucun événement économique aujourd\'hui</div>';
+                    container.innerHTML = '<div class="loading">Aucun evenement economique aujourd\'hui</div>';
                     return;
                 }
                 
@@ -380,13 +380,13 @@
                     html += `
                         <div class="calendar-item ${impact}">
                             <div class="calendar-time">
-                                ${time} • ${event.country} • Impact: ${impact.toUpperCase()}
+                                ${time} - ${event.country} - Impact: ${impact.toUpperCase()}
                             </div>
                             <div class="calendar-event">${event.event}</div>
                             <div class="calendar-data">
                                 ${event.actual !== undefined ? `<span>Actuel: ${event.actual}</span>` : ''}
-                                ${event.estimate !== undefined ? `<span>Prévu: ${event.estimate}</span>` : ''}
-                                ${event.prev !== undefined ? `<span>Précédent: ${event.prev}</span>` : ''}
+                                ${event.estimate !== undefined ? `<span>Prevu: ${event.estimate}</span>` : ''}
+                                ${event.prev !== undefined ? `<span>Precedent: ${event.prev}</span>` : ''}
                             </div>
                         </div>
                     `;
@@ -433,12 +433,12 @@
                         <div class="news-item" onclick="window.open('${item.url}', '_blank')">
                             <div class="news-ticker-tag">${item.ticker}</div>
                             <div class="news-title">${item.headline}</div>
-                            <div class="news-source">${item.source} • ${date}</div>
+                            <div class="news-source">${item.source} - ${date}</div>
                         </div>
                     `;
                 });
                 
-                container.innerHTML = html || '<div class="loading">Aucune news récente</div>';
+                container.innerHTML = html || '<div class="loading">Aucune news recente</div>';
             } catch (error) {
                 container.innerHTML = '<div class="loading">Erreur chargement news (API Finnhub requise)</div>';
             }
@@ -462,7 +462,7 @@
                     html += `
                         <div class="news-item" onclick="window.open('${item.url}', '_blank')">
                             <div class="news-title">${item.headline}</div>
-                            <div class="news-source">${item.source} • ${date}</div>
+                            <div class="news-source">${item.source} - ${date}</div>
                         </div>
                     `;
                 });
@@ -476,7 +476,7 @@
             liveMode = !liveMode;
             
             if (liveMode) {
-                alert('Mode temps réel : fonctionnalité avancée. Configurez un WebSocket proxy sur votre serveur Vercel.');
+                alert('Mode temps reel : fonctionnalite avancee. Configurez un WebSocket proxy sur votre serveur Vercel.');
                 liveMode = false;
             }
         }
@@ -486,7 +486,7 @@
             
             const isPositive = data.change >= 0;
             const changeClass = isPositive ? 'positive' : 'negative';
-            const arrow = isPositive ? '▲' : '▼';
+            const arrow = isPositive ? '' : '';
             
             let priceStr = '$' + data.price.toFixed(2);
             if (symbol.includes('^')) {
@@ -522,7 +522,7 @@
         function showWatchlistSettings() {
             const currentSymbols = myWatchlist.map(s => s.symbol).join(', ');
             const newSymbols = prompt(
-                'Entrez vos tickers séparés par des virgules\n\n' +
+                'Entrez vos tickers separes par des virgules\n\n' +
                 'Exemples:\n' +
                 '- Actions US: AAPL, TSLA, GOOGL\n' +
                 '- Actions Canada: SHOP.TO, RY.TO\n' +

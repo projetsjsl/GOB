@@ -26,10 +26,10 @@ export function UnifiedMetrics({ usMetrics, caMetrics, selectedCountries, histor
         <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-red-500 rounded-full"></div>
         <h3 className="text-sm sm:text-base font-semibold text-foreground">
           {selectedCountries.length === 2
-            ? "🇺🇸 Métriques | 🇨🇦 Métriques"
+            ? " Metriques |  Metriques"
             : selectedCountries.includes("US")
-              ? "🇺🇸 Métriques États-Unis"
-              : "🇨🇦 Métriques Canada"}
+              ? " Metriques Etats-Unis"
+              : " Metriques Canada"}
         </h3>
       </div>
 
@@ -38,7 +38,7 @@ export function UnifiedMetrics({ usMetrics, caMetrics, selectedCountries, histor
           <div className={`md:col-span-6 lg:col-span-6 fed-card-bg rounded-lg border border-border/50`}>
             <div className="bg-card-content p-3 sm:p-4">
               <h4 className="text-xs font-semibold text-blue-400 mb-3 flex items-center gap-2">
-                <span>🇺🇸</span> États-Unis
+                <span></span> Etats-Unis
               </h4>
               <CurveMetricsCard metrics={usMetrics} />
             </div>
@@ -49,7 +49,7 @@ export function UnifiedMetrics({ usMetrics, caMetrics, selectedCountries, histor
           <div className={`md:col-span-6 lg:col-span-6 canada-card-bg rounded-lg border border-border/50`}>
             <div className="bg-card-content p-3 sm:p-4">
               <h4 className="text-xs font-semibold text-red-400 mb-3 flex items-center gap-2">
-                <span>🇨🇦</span> Canada
+                <span></span> Canada
               </h4>
               <CurveMetricsCard metrics={caMetrics} />
             </div>

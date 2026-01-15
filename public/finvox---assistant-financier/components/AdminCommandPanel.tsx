@@ -54,7 +54,7 @@ const AdminCommandPanel: React.FC<AdminCommandPanelProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              Admin : Commandes Financières
+              Admin : Commandes Financieres
             </h2>
             <p className="text-sm text-slate-400">Personnalisez les invites pour l'assistant FinVox</p>
           </div>
@@ -72,7 +72,7 @@ const AdminCommandPanel: React.FC<AdminCommandPanelProps> = ({
           <div className="flex-1 overflow-y-auto p-4 border-r border-slate-700 space-y-3 scrollbar-thin">
             <div className="flex justify-between items-center mb-4">
                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{commands.length} Commandes actives</span>
-               <button onClick={onReset} className="text-xs text-red-400 hover:text-red-300 underline">Réinitialiser par défaut</button>
+               <button onClick={onReset} className="text-xs text-red-400 hover:text-red-300 underline">Reinitialiser par defaut</button>
             </div>
             
             {commands.map(cmd => (
@@ -84,7 +84,7 @@ const AdminCommandPanel: React.FC<AdminCommandPanelProps> = ({
                 <div className="flex justify-between items-start mb-1">
                   <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${
                     cmd.category === 'Bourse' ? 'bg-blue-900/50 text-blue-300' : 
-                    cmd.category === 'Économie' ? 'bg-green-900/50 text-green-300' :
+                    cmd.category === 'Economie' ? 'bg-green-900/50 text-green-300' :
                     cmd.category === 'Politique' ? 'bg-red-900/50 text-red-300' :
                     'bg-slate-700 text-slate-300'
                   }`}>{cmd.category}</span>
@@ -106,12 +106,12 @@ const AdminCommandPanel: React.FC<AdminCommandPanelProps> = ({
           {/* Form */}
           <div className="w-full md:w-1/3 bg-slate-850 p-6 flex flex-col gap-4">
              <h3 className="text-lg font-bold text-white mb-2">
-                {isAdding ? 'Ajouter une commande' : editingId ? 'Modifier la commande' : 'Éditeur'}
+                {isAdding ? 'Ajouter une commande' : editingId ? 'Modifier la commande' : 'Editeur'}
              </h3>
              
              {!isAdding && !editingId ? (
                <div className="flex-1 flex flex-col items-center justify-center text-slate-500 text-center">
-                 <p className="mb-4">Sélectionnez une commande pour la modifier ou créez-en une nouvelle.</p>
+                 <p className="mb-4">Selectionnez une commande pour la modifier ou creez-en une nouvelle.</p>
                  <button 
                     onClick={startAdd}
                     className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors shadow-lg shadow-purple-900/20"
@@ -122,18 +122,18 @@ const AdminCommandPanel: React.FC<AdminCommandPanelProps> = ({
              ) : (
                <>
                  <div>
-                   <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Catégorie</label>
+                   <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Categorie</label>
                    <select 
                       className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500 outline-none"
                       value={formData.category}
                       onChange={e => setFormData({...formData, category: e.target.value})}
                    >
                      <option value="Bourse">Bourse</option>
-                     <option value="Économie">Économie</option>
+                     <option value="Economie">Economie</option>
                      <option value="Politique">Politique</option>
                      <option value="Portefeuille">Portefeuille</option>
                      <option value="Actu">Actu</option>
-                     <option value="Général">Général</option>
+                     <option value="General">General</option>
                    </select>
                  </div>
                  
@@ -142,14 +142,14 @@ const AdminCommandPanel: React.FC<AdminCommandPanelProps> = ({
                    <input 
                       type="text" 
                       className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500 outline-none"
-                      placeholder="Ex: 🧠 Analyse Tesla"
+                      placeholder="Ex:  Analyse Tesla"
                       value={formData.label}
                       onChange={e => setFormData({...formData, label: e.target.value})}
                    />
                  </div>
 
                  <div>
-                   <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Prompt (Envoyé à l'IA)</label>
+                   <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Prompt (Envoye a l'IA)</label>
                    <textarea 
                       className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500 outline-none h-32 resize-none"
                       placeholder="Ex: Fais une analyse approfondie de..."
@@ -169,7 +169,7 @@ const AdminCommandPanel: React.FC<AdminCommandPanelProps> = ({
                       onClick={handleSave}
                       className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-purple-900/20"
                    >
-                      {isAdding ? 'Créer' : 'Sauvegarder'}
+                      {isAdding ? 'Creer' : 'Sauvegarder'}
                    </button>
                  </div>
                </>

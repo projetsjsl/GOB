@@ -18,7 +18,7 @@ export function ForwardRatesChart({ forwards, spotRate }: ForwardRatesChartProps
     .map((f, i) => ({
       ...f,
       index: i,
-      label: f.maturity.replace("→", "→\n") || "N/A",
+      label: f.maturity.replace("->", "->\n") || "N/A",
     }))
 
   if (!chartData || chartData.length === 0) {
@@ -27,11 +27,11 @@ export function ForwardRatesChart({ forwards, spotRate }: ForwardRatesChartProps
         <CardHeader>
           <CardTitle className="text-foreground">Courbe des Taux Forwards</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Rendements forwards implicites entre les maturités (calculés à partir des données officielles FRED)
+            Rendements forwards implicites entre les maturites (calcules a partir des donnees officielles FRED)
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="p-4 text-center text-muted-foreground">Données de taux forwards indisponibles</div>
+          <div className="p-4 text-center text-muted-foreground">Donnees de taux forwards indisponibles</div>
         </CardContent>
       </Card>
     )
@@ -42,7 +42,7 @@ export function ForwardRatesChart({ forwards, spotRate }: ForwardRatesChartProps
       <CardHeader>
         <CardTitle className="text-foreground">Courbe des Taux Forwards</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Rendements forwards implicites entre les maturités (calculés à partir des données officielles FRED)
+          Rendements forwards implicites entre les maturites (calcules a partir des donnees officielles FRED)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -54,8 +54,8 @@ export function ForwardRatesChart({ forwards, spotRate }: ForwardRatesChartProps
             <div>
               <p className="font-semibold">Ce que vous voyez:</p>
               <p>
-                Les taux forwards implicites entre chaque paire de maturités. Par exemple, "2Y→5Y" montre le taux
-                d'intérêt attendu dans 2 ans pour une obligation à 3 ans.
+                Les taux forwards implicites entre chaque paire de maturites. Par exemple, "2Y->5Y" montre le taux
+                d'interet attendu dans 2 ans pour une obligation a 3 ans.
               </p>
             </div>
           </div>
@@ -93,7 +93,7 @@ export function ForwardRatesChart({ forwards, spotRate }: ForwardRatesChartProps
                 color: "#f3f4f6",
               }}
               formatter={(value: number) => [`${value.toFixed(3)}%`, "Taux Forward"]}
-              labelFormatter={(label) => `Période: ${label}`}
+              labelFormatter={(label) => `Periode: ${label}`}
             />
             <ReferenceLine
               y={spotRate}
@@ -126,7 +126,7 @@ export function ForwardRatesChart({ forwards, spotRate }: ForwardRatesChartProps
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            Source: FRED (Réserve Fédérale des États-Unis) / Banque du Canada
+            Source: FRED (Reserve Federale des Etats-Unis) / Banque du Canada
           </p>
         </div>
       </CardContent>

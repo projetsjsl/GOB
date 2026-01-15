@@ -9,7 +9,7 @@ let LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
 
 
 const JLabTab = () => {
-    // Récupère les données/handlers globaux du dashboard
+    // Recupere les donnees/handlers globaux du dashboard
     const dashboard = window.BetaCombinedDashboard || {};
     // Fix compatibility: use explicit check for boolean, || for others
     const isDarkMode = (dashboard.isDarkMode !== undefined) ? dashboard.isDarkMode : true;
@@ -79,7 +79,7 @@ const JLabTab = () => {
     const [loadingJLab, setLoadingJLab] = useState(true);
     const [connected, setConnected] = useState(false);
     const [lastUpdateJLab, setLastUpdateJLab] = useState(null);
-    // Helppop: visibilité et liste des violations détectées
+    // Helppop: visibilite et liste des violations detectees
     const [showHelp, setShowHelp] = useState(false);
     const [violations, setViolations] = useState([]);
     // Screener visibility
@@ -102,14 +102,14 @@ const JLabTab = () => {
         sector: 'all'
     });
 
-    // 🎯 Configuration du Score JSLAI™ (pondérations)
+    //  Configuration du Score JSLAITM (ponderations)
     const [jslaiConfig, setJslaiConfig] = useState(() => {
         const saved = localStorage.getItem('jslaiConfig');
         return saved ? JSON.parse(saved) : {
             valuation: 20,        // Multiples de valorisation
             profitability: 20,    // Marges, ROE, ROA
             growth: 15,           // Croissance revenus & EPS
-            financialHealth: 20,  // Bilan, dette, liquidité
+            financialHealth: 20,  // Bilan, dette, liquidite
             momentum: 10,         // RSI, tendances, moyennes mobiles
             moat: 10,             // Avantage concurrentiel
             sectorPosition: 5     // Position dans le secteur
@@ -121,7 +121,7 @@ const JLabTab = () => {
         localStorage.setItem('jslaiConfig', JSON.stringify(jslaiConfig));
     }, [jslaiConfig]);
 
-    // Génération de données mock
+    // Generation de donnees mock
     const generateMockData = (symbol) => {
         const basePrice = {
             AAPL: 183.45, TSLA: 251.23, GOOGL: 143.12,
@@ -170,17 +170,17 @@ const JLabTab = () => {
             },
             news: [
                 {
-                    title: `${symbol} annonce résultats trimestriels record`,
+                    title: `${symbol} annonce resultats trimestriels record`,
                     publishedDate: new Date(Date.now() - 2 * 3600000).toISOString(),
                     site: 'Reuters'
                 },
                 {
-                    title: `Nouveau partenariat stratégique annoncé`,
+                    title: `Nouveau partenariat strategique annonce`,
                     publishedDate: new Date(Date.now() - 5 * 3600000).toISOString(),
                     site: 'Bloomberg'
                 },
                 {
-                    title: `Analystes relèvent objectif de prix`,
+                    title: `Analystes relevent objectif de prix`,
                     publishedDate: new Date(Date.now() - 8 * 3600000).toISOString(),
                     site: 'CNBC'
                 }
@@ -191,18 +191,18 @@ const JLabTab = () => {
                 social: Math.floor(Math.random() * 30 + 60),
                 institutional: Math.floor(Math.random() * 30 + 55),
                 retail: Math.floor(Math.random() * 30 + 70),
-                summary: 'Sentiment globalement positif avec optimisme modéré'
+                summary: 'Sentiment globalement positif avec optimisme modere'
             },
             insights: {
                 catalysts: [
-                    'Résultats trimestriels supérieurs aux attentes',
-                    'Innovation produit majeure annoncée',
-                    'Expansion internationale réussie'
+                    'Resultats trimestriels superieurs aux attentes',
+                    'Innovation produit majeure annoncee',
+                    'Expansion internationale reussie'
                 ],
                 risks: [
                     'Concurrence accrue dans le secteur',
-                    'Incertitudes macroéconomiques',
-                    'Volatilité des marchés'
+                    'Incertitudes macroeconomiques',
+                    'Volatilite des marches'
                 ],
                 consensus: 'bullish',
                 reasoning: 'Les fondamentaux solides et la croissance continue justifient un sentiment positif'
@@ -210,14 +210,14 @@ const JLabTab = () => {
         };
     };
 
-    // 🎯 CALCULATED SENTIMENT - No AI, pure data-driven analysis
+    //  CALCULATED SENTIMENT - No AI, pure data-driven analysis
     // Replaces Perplexity AI with free calculated metrics
 
-    // 🎯 Calculate sentiment from financial data (NO AI, NO COST)
+    //  Calculate sentiment from financial data (NO AI, NO COST)
     const calculateSentiment = (symbol, stockData) => {
         const { quote, metrics, ratios, profile, news } = stockData;
 
-        void(`📊 Calculating sentiment for ${symbol} from financial data...`);
+        void(` Calculating sentiment for ${symbol} from financial data...`);
 
         // 1. Calculate fundamental score (0-100)
         let fundamentalScore = 50;
@@ -316,12 +316,12 @@ const JLabTab = () => {
         };
     };
 
-    // Fonction pour récupérer les données réelles d'un stock
+    // Fonction pour recuperer les donnees reelles d'un stock
     const fetchRealStockData = async (symbol, currentTimeframe = '1D') => {
         try {
-            void(`🔍 Récupération des données réelles pour ${symbol}...`);
+            void(` Recuperation des donnees reelles pour ${symbol}...`);
 
-            // Déterminer le timeframe et les paramètres pour les données historiques
+            // Determiner le timeframe et les parametres pour les donnees historiques
             let historicalTimeframe, historicalLimit;
             switch (currentTimeframe) {
                 case '1D':
@@ -358,7 +358,7 @@ const JLabTab = () => {
                     break;
                 case 'YTD':
                     historicalTimeframe = '1day';
-                    // Calculer le nombre de jours depuis le début de l'année
+                    // Calculer le nombre de jours depuis le debut de l'annee
                     const now = new Date();
                     const startOfYear = new Date(now.getFullYear(), 0, 1);
                     const daysSinceStart = Math.ceil((now - startOfYear) / (1000 * 60 * 60 * 24));
@@ -369,9 +369,9 @@ const JLabTab = () => {
                     historicalLimit = 30;
             }
 
-            // Appels parallèles aux APIs hybrides (Base locale + APIs externes)
+            // Appels paralleles aux APIs hybrides (Base locale + APIs externes)
 
-            // Appels parallèles aux APIs avec gestion d'erreur améliorée
+            // Appels paralleles aux APIs avec gestion d'erreur amelioree
             const [quoteResult, profileResult, ratiosResult, newsResult, intradayResult, analystResult, earningsResult] = await Promise.allSettled([
                 fetchHybridData(symbol, 'quote'),
                 fetchHybridData(symbol, 'profile'),
@@ -382,7 +382,7 @@ const JLabTab = () => {
                 fetchHybridData(symbol, 'earnings')
             ]);
 
-            // Parser les résultats hybrides avec indicateurs de fallback
+            // Parser les resultats hybrides avec indicateurs de fallback
             const quote = quoteResult.status === 'fulfilled' && quoteResult.value.success ? quoteResult.value.data : null;
             const profile = profileResult.status === 'fulfilled' && profileResult.value.success ? profileResult.value.data : null;
             const ratios = ratiosResult.status === 'fulfilled' && ratiosResult.value.success ? ratiosResult.value.data : null;
@@ -403,8 +403,8 @@ const JLabTab = () => {
             };
 
 
-            // Log des données récupérées avec indicateurs de fallback
-            void('✅ Données récupérées:', {
+            // Log des donnees recuperees avec indicateurs de fallback
+            void(' Donnees recuperees:', {
                 hasQuote: !!quote,
                 hasProfile: !!profile,
                 hasRatios: !!ratios,
@@ -415,13 +415,13 @@ const JLabTab = () => {
                 fallbackIndicators: fallbackIndicators
             });
 
-            // Calculer le pourcentage de données réelles
+            // Calculer le pourcentage de donnees reelles
             const totalSections = Object.keys(fallbackIndicators).length;
             const fallbackSections = Object.values(fallbackIndicators).filter(Boolean).length;
             const productionSections = totalSections - fallbackSections;
             const qualityPercentage = Math.round((productionSections / totalSections) * 100);
 
-            void(`📊 Qualité des données: ${qualityPercentage}% (${productionSections}/${totalSections} sections en production)`);
+            void(` Qualite des donnees: ${qualityPercentage}% (${productionSections}/${totalSections} sections en production)`);
 
             // Gestion des erreurs
             const errors = [];
@@ -432,11 +432,11 @@ const JLabTab = () => {
             // if (!news) errors.push('News manquant');
 
             if (errors.length > 0) {
-                console.warn('⚠️ Données manquantes:', errors);
+                console.warn(' Donnees manquantes:', errors);
                 // setMessage removed - was causing infinite loop due to undefined reference
             }
 
-            void('✅ Données hybrides récupérées:', {
+            void(' Donnees hybrides recuperees:', {
                 hasQuote: !!quote,
                 hasProfile: !!profile,
                 hasRatios: !!ratios,
@@ -455,12 +455,12 @@ const JLabTab = () => {
                 ratiosFreshness: ratios?.metadata?.freshness || 'unknown'
             });
 
-            // 🎯 Calcul du Score JSLAI™ Global (0-100)
+            //  Calcul du Score JSLAITM Global (0-100)
             const calculateJSLAIScore = () => {
                 let totalScore = 0;
                 let scores = {};
 
-                // 1. VALUATION (basé sur P/E ratio)
+                // 1. VALUATION (base sur P/E ratio)
                 const pe = ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || null;
                 let valuationScore = 50;
                 if (pe) {
@@ -474,7 +474,7 @@ const JLabTab = () => {
                 scores.valuation = valuationScore;
                 totalScore += (valuationScore * jslaiConfig.valuation) / 100;
 
-                // 2. PROFITABILITY (basé sur ROE)
+                // 2. PROFITABILITY (base sur ROE)
                 const roe = ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || null;
                 let profitabilityScore = 50;
                 if (roe) {
@@ -489,10 +489,10 @@ const JLabTab = () => {
                 scores.profitability = profitabilityScore;
                 totalScore += (profitabilityScore * jslaiConfig.profitability) / 100;
 
-                // 3. GROWTH (basé sur croissance revenue + marges)
+                // 3. GROWTH (base sur croissance revenue + marges)
                 const grossMargin = ratios?.data?.[0]?.grossProfitMarginTTM || ratios?.grossProfitMarginTTM || null;
                 const netMargin = ratios?.data?.[0]?.netProfitMarginTTM || ratios?.netProfitMarginTTM || null;
-                let growthScore = 60; // Neutre par défaut
+                let growthScore = 60; // Neutre par defaut
 
                 // Utiliser les marges comme proxy de croissance
                 if (grossMargin && netMargin) {
@@ -507,12 +507,12 @@ const JLabTab = () => {
                 scores.growth = growthScore;
                 totalScore += (growthScore * jslaiConfig.growth) / 100;
 
-                // 4. FINANCIAL HEALTH (basé sur debt/equity + current ratio)
+                // 4. FINANCIAL HEALTH (base sur debt/equity + current ratio)
                 const de = ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || null;
                 const currentRatio = ratios?.data?.[0]?.currentRatio || ratios?.currentRatio || null;
                 let healthScore = 50;
 
-                // Score basé sur D/E
+                // Score base sur D/E
                 let deScore = 50;
                 if (de !== null) {
                     if (de < 0.3) deScore = 100;
@@ -523,7 +523,7 @@ const JLabTab = () => {
                     else deScore = 25;
                 }
 
-                // Score basé sur Current Ratio (liquidité)
+                // Score base sur Current Ratio (liquidite)
                 let liquidityScore = 50;
                 if (currentRatio !== null) {
                     if (currentRatio > 3.0) liquidityScore = 100;
@@ -534,16 +534,16 @@ const JLabTab = () => {
                     else liquidityScore = 25;
                 }
 
-                // Moyenne pondérée: 60% D/E, 40% liquidité
+                // Moyenne ponderee: 60% D/E, 40% liquidite
                 healthScore = Math.round((deScore * 0.6) + (liquidityScore * 0.4));
                 scores.financialHealth = healthScore;
                 totalScore += (healthScore * jslaiConfig.financialHealth) / 100;
 
-                // 5. MOMENTUM (basé sur performance récente)
+                // 5. MOMENTUM (base sur performance recente)
                 const priceChange = quote?.dp || 0; // Variation % depuis fermeture
                 let momentumScore = 50;
 
-                if (priceChange > 10) momentumScore = 100; // +10%+ = très fort momentum
+                if (priceChange > 10) momentumScore = 100; // +10%+ = tres fort momentum
                 else if (priceChange > 5) momentumScore = 85;
                 else if (priceChange > 2) momentumScore = 70;
                 else if (priceChange > 0) momentumScore = 60;
@@ -554,11 +554,11 @@ const JLabTab = () => {
                 scores.momentum = momentumScore;
                 totalScore += (momentumScore * jslaiConfig.momentum) / 100;
 
-                // 6. MOAT (basé sur marges opérationnelles et brutes)
+                // 6. MOAT (base sur marges operationnelles et brutes)
                 const operatingMargin = ratios?.data?.[0]?.operatingProfitMarginTTM || ratios?.operatingProfitMarginTTM || null;
-                let moatScore = 60; // Neutre par défaut
+                let moatScore = 60; // Neutre par defaut
 
-                // Entreprises avec fortes marges = moat économique solide
+                // Entreprises avec fortes marges = moat economique solide
                 if (grossMargin && operatingMargin) {
                     const avgProfitMargin = (grossMargin + operatingMargin) / 2;
                     if (avgProfitMargin > 0.40) moatScore = 100; // Marges >40% = moat exceptionnel
@@ -571,19 +571,19 @@ const JLabTab = () => {
                 scores.moat = moatScore;
                 totalScore += (moatScore * jslaiConfig.moat) / 100;
 
-                // 7. SECTOR POSITION (basé sur beta - volatilité vs marché)
+                // 7. SECTOR POSITION (base sur beta - volatilite vs marche)
                 const beta = profile?.data?.[0]?.beta || profile?.beta || null;
-                let sectorScore = 60; // Neutre par défaut
+                let sectorScore = 60; // Neutre par defaut
 
-                // Beta < 1 = moins volatil que le marché (bon signe)
+                // Beta < 1 = moins volatil que le marche (bon signe)
                 // Beta > 1 = plus volatil (risque)
                 if (beta !== null) {
-                    if (beta < 0.5) sectorScore = 100; // Très stable
+                    if (beta < 0.5) sectorScore = 100; // Tres stable
                     else if (beta < 0.8) sectorScore = 85;
                     else if (beta < 1.0) sectorScore = 75;
                     else if (beta < 1.2) sectorScore = 60;
                     else if (beta < 1.5) sectorScore = 45;
-                    else sectorScore = 30; // Très volatil
+                    else sectorScore = 30; // Tres volatil
                 }
                 scores.sectorPosition = sectorScore;
                 totalScore += (sectorScore * jslaiConfig.sectorPosition) / 100;
@@ -594,36 +594,36 @@ const JLabTab = () => {
                     total: finalScore,
                     breakdown: scores,
                     interpretation: finalScore >= 85 ? 'Excellent' :
-                        finalScore >= 75 ? 'Très Bon' :
+                        finalScore >= 75 ? 'Tres Bon' :
                             finalScore >= 65 ? 'Bon' :
                                 finalScore >= 50 ? 'Moyen' :
                                     finalScore >= 35 ? 'Faible' : 'Mauvais',
                     recommendation: finalScore >= 75 ? 'Achat Fort' :
                         finalScore >= 65 ? 'Achat' :
                             finalScore >= 50 ? 'Conserver' :
-                                finalScore >= 35 ? 'Surveiller' : 'Éviter'
+                                finalScore >= 35 ? 'Surveiller' : 'Eviter'
                 };
             };
 
             const jslaiScore = calculateJSLAIScore();
 
-            // 🎯 Calcul automatique du sentiment et insights basé sur les données réelles
-            // Plus besoin de Perplexity - on utilise les données gratuites des APIs
-            void('🤖 Calcul du sentiment et insights à partir des données réelles...');
+            //  Calcul automatique du sentiment et insights base sur les donnees reelles
+            // Plus besoin de Perplexity - on utilise les donnees gratuites des APIs
+            void(' Calcul du sentiment et insights a partir des donnees reelles...');
 
-            // Calculer le sentiment basé sur le changement de prix et les ratios
+            // Calculer le sentiment base sur le changement de prix et les ratios
             const priceChange = quote?.dp || 0;
             const roe = (ratios?.data?.[0]?.returnOnEquityTTM || ratios?.returnOnEquityTTM || 0) * 100;
             const pe = ratios?.data?.[0]?.peRatioTTM || ratios?.peRatioTTM || 0;
 
-            // Score basé sur les fondamentaux (0-100)
+            // Score base sur les fondamentaux (0-100)
             let fundamentalScore = 50;
             if (roe > 20) fundamentalScore += 20;
             else if (roe > 15) fundamentalScore += 10;
             if (pe > 0 && pe < 15) fundamentalScore += 15;
             else if (pe > 0 && pe < 25) fundamentalScore += 5;
 
-            // Score basé sur le momentum (0-100)
+            // Score base sur le momentum (0-100)
             let momentumScore = 60;
             if (priceChange > 5) momentumScore = 85;
             else if (priceChange > 2) momentumScore = 75;
@@ -632,30 +632,30 @@ const JLabTab = () => {
             else if (priceChange > -5) momentumScore = 45;
             else momentumScore = 30;
 
-            // Sentiment global (moyenne pondérée: 60% fondamentaux, 40% momentum)
+            // Sentiment global (moyenne ponderee: 60% fondamentaux, 40% momentum)
             const overallSentiment = Math.round(fundamentalScore * 0.6 + momentumScore * 0.4);
 
-            // Générer catalysts basés sur les données
+            // Generer catalysts bases sur les donnees
             const catalysts = [];
-            if (roe > 20) catalysts.push(`ROE excellent à ${roe.toFixed(1)}%`);
-            if (priceChange > 2) catalysts.push(`Forte dynamique haussière (+${priceChange.toFixed(2)}%)`);
+            if (roe > 20) catalysts.push(`ROE excellent a ${roe.toFixed(1)}%`);
+            if (priceChange > 2) catalysts.push(`Forte dynamique haussiere (+${priceChange.toFixed(2)}%)`);
             if (pe > 0 && pe < 15) catalysts.push(`Valorisation attractive (P/E: ${pe.toFixed(1)})`);
             if (catalysts.length === 0) catalysts.push('Fondamentaux stables');
 
-            // Générer risques basés sur les données
+            // Generer risques bases sur les donnees
             const risks = [];
             const debtEquity = ratios?.data?.[0]?.debtEquityRatioTTM || ratios?.debtEquityRatioTTM || 0;
-            if (debtEquity > 2) risks.push(`Endettement élevé (D/E: ${debtEquity.toFixed(2)})`);
+            if (debtEquity > 2) risks.push(`Endettement eleve (D/E: ${debtEquity.toFixed(2)})`);
             if (priceChange < -5) risks.push('Momentum baissier significatif');
-            if (pe > 40) risks.push(`Valorisation élevée (P/E: ${pe.toFixed(1)})`);
-            if (risks.length === 0) risks.push('Volatilité de marché normale');
+            if (pe > 40) risks.push(`Valorisation elevee (P/E: ${pe.toFixed(1)})`);
+            if (risks.length === 0) risks.push('Volatilite de marche normale');
 
-            // Déterminer le consensus
+            // Determiner le consensus
             let consensus = 'neutral';
             if (overallSentiment >= 70) consensus = 'bullish';
             else if (overallSentiment <= 45) consensus = 'bearish';
 
-            // Déterminer la recommandation basée sur le score JSLAI
+            // Determiner la recommandation basee sur le score JSLAI
             let recommendation = 'HOLD';
             let confidence = overallSentiment;
             if (jslaiScore.total >= 75) { recommendation = 'STRONG_BUY'; confidence = Math.min(90, confidence + 10); }
@@ -667,30 +667,30 @@ const JLabTab = () => {
                 sentiment: {
                     overall: overallSentiment,
                     news: momentumScore,
-                    summary: `Sentiment ${consensus === 'bullish' ? 'positif' : consensus === 'bearish' ? 'négatif' : 'neutre'} basé sur les fondamentaux et le momentum`
+                    summary: `Sentiment ${consensus === 'bullish' ? 'positif' : consensus === 'bearish' ? 'negatif' : 'neutre'} base sur les fondamentaux et le momentum`
                 },
                 insights: {
                     catalysts,
                     risks,
                     consensus,
-                    reasoning: `Score JSLAI™ de ${jslaiScore.total}/100 (${jslaiScore.interpretation}). ${jslaiScore.recommendation}.`
+                    reasoning: `Score JSLAITM de ${jslaiScore.total}/100 (${jslaiScore.interpretation}). ${jslaiScore.recommendation}.`
                 },
                 analyst: {
                     recommendation,
                     confidence,
                     keyPoints: [
-                        `Score JSLAI™: ${jslaiScore.total}/100`,
+                        `Score JSLAITM: ${jslaiScore.total}/100`,
                         `Sentiment: ${overallSentiment}/100`,
                         `Tendance: ${consensus}`
                     ]
                 }
             };
 
-            void('✅ Sentiment et insights calculés à partir des données réelles (sans Perplexity)');
+            void(' Sentiment et insights calcules a partir des donnees reelles (sans Perplexity)');
 
-            // Construire l'objet de données structuré
+            // Construire l'objet de donnees structure
             return {
-                jslaiScore: jslaiScore,  // 🎯 Score JSLAI™ ajouté
+                jslaiScore: jslaiScore,  //  Score JSLAITM ajoute
                 quote: {
                     symbol: symbol,
                     name: profile?.data?.[0]?.companyName || profile?.companyName || `${symbol} Inc.`,
@@ -702,9 +702,9 @@ const JLabTab = () => {
                     avgVolume: quote?.avgVolume || 0
                 },
                 intraday: (() => {
-                    // Si on a des données historiques réelles, les utiliser
+                    // Si on a des donnees historiques reelles, les utiliser
                     if (intradayData && Array.isArray(intradayData) && intradayData.length > 0) {
-                        void(`📊 Données historiques réelles récupérées: ${intradayData.length} points`);
+                        void(` Donnees historiques reelles recuperees: ${intradayData.length} points`);
                         return intradayData.map((candle, i) => ({
                             date: candle.date || new Date(candle.timestamp || Date.now() - i * 60000).toLocaleString('fr-FR'),
                             open: candle.open || 0,
@@ -715,20 +715,20 @@ const JLabTab = () => {
                         }));
                     }
 
-                    // Si on a des données dans le format FMP
+                    // Si on a des donnees dans le format FMP
                     if (intradayData?.historical && Array.isArray(intradayData.historical) && intradayData.historical.length > 0) {
-                        void(`📊 Données FMP historiques récupérées: ${intradayData.historical.length} points`);
+                        void(` Donnees FMP historiques recuperees: ${intradayData.historical.length} points`);
 
                         let filteredData = intradayData.historical;
 
-                        // Pour YTD, filtrer les données depuis le début de l'année
+                        // Pour YTD, filtrer les donnees depuis le debut de l'annee
                         if (currentTimeframe === 'YTD') {
                             const currentYear = new Date().getFullYear();
                             filteredData = intradayData.historical.filter(candle => {
                                 const candleDate = new Date(candle.date);
                                 return candleDate.getFullYear() === currentYear;
                             });
-                            void(`📊 Données YTD filtrées: ${filteredData.length} points`);
+                            void(` Donnees YTD filtrees: ${filteredData.length} points`);
                         }
 
                         return filteredData.map((candle, i) => ({
@@ -741,16 +741,16 @@ const JLabTab = () => {
                         }));
                     }
 
-                    // Sinon, générer des données de fallback basées sur le prix actuel
+                    // Sinon, generer des donnees de fallback basees sur le prix actuel
                     const currentPrice = quote?.c || 0;
                     const change = quote?.d || 0;
                     const changePercent = quote?.dp || 0;
 
                     if (currentPrice > 0) {
-                        // Générer des données selon le timeframe sélectionné
+                        // Generer des donnees selon le timeframe selectionne
                         const dataPoints = [];
                         const basePrice = currentPrice - change; // Prix d'ouverture
-                        const timeframe = currentTimeframe; // Utiliser le timeframe passé en paramètre
+                        const timeframe = currentTimeframe; // Utiliser le timeframe passe en parametre
 
                         let pointCount, timeInterval, timeFormat;
 
@@ -829,10 +829,10 @@ const JLabTab = () => {
                                 break;
                             case 'YTD':
                                 pointCount = 12;
-                                timeInterval = 30; // 1 mois depuis début d'année
+                                timeInterval = 30; // 1 mois depuis debut d'annee
                                 timeFormat = (i) => {
                                     const date = new Date();
-                                    date.setMonth(i); // Janvier = 0, Décembre = 11
+                                    date.setMonth(i); // Janvier = 0, Decembre = 11
                                     return date.toLocaleDateString('fr-FR', { month: 'short' });
                                 };
                                 break;
@@ -846,37 +846,37 @@ const JLabTab = () => {
                                 };
                         }
 
-                        // Générer des données historiques plus réalistes
+                        // Generer des donnees historiques plus realistes
                         for (let i = 0; i < pointCount; i++) {
-                            const progress = i / (pointCount - 1); // 0 à 1
+                            const progress = i / (pointCount - 1); // 0 a 1
 
-                            // Calculer le prix historique basé sur la tendance et la volatilité
+                            // Calculer le prix historique base sur la tendance et la volatilite
                             let historicalPrice;
 
                             if (timeframe === 'YTD') {
-                                // Pour YTD, commencer au prix d'ouverture de l'année
-                                const yearStartPrice = basePrice * (1 - changePercent / 100 * 0.8); // Prix approximatif début d'année
+                                // Pour YTD, commencer au prix d'ouverture de l'annee
+                                const yearStartPrice = basePrice * (1 - changePercent / 100 * 0.8); // Prix approximatif debut d'annee
                                 const yearProgress = i / (pointCount - 1);
                                 historicalPrice = yearStartPrice + (yearProgress * (currentPrice - yearStartPrice));
                             } else if (timeframe === '5A' || timeframe === 'MAX') {
-                                // Pour les périodes longues, simuler une croissance/évolution historique
+                                // Pour les periodes longues, simuler une croissance/evolution historique
                                 const yearsBack = timeframe === '5A' ? 5 : 10;
-                                const historicalMultiplier = 1 - (changePercent / 100) * (yearsBack * 0.2); // Évolution sur plusieurs années
+                                const historicalMultiplier = 1 - (changePercent / 100) * (yearsBack * 0.2); // Evolution sur plusieurs annees
                                 const startPrice = currentPrice * historicalMultiplier;
                                 historicalPrice = startPrice + (progress * (currentPrice - startPrice));
                             } else {
-                                // Pour les périodes courtes, utiliser la logique existante
+                                // Pour les periodes courtes, utiliser la logique existante
                                 const trend = changePercent > 0 ? 1 : -1;
-                                const volatility = Math.random() * 0.02 - 0.01; // ±1% de volatilité
+                                const volatility = Math.random() * 0.02 - 0.01; // 1% de volatilite
                                 const priceVariation = (progress * change) + (volatility * basePrice);
                                 historicalPrice = Math.max(0.01, basePrice + priceVariation);
                             }
 
-                            // Ajouter de la volatilité réaliste
-                            const volatility = Math.random() * 0.015 - 0.0075; // ±0.75% de volatilité
+                            // Ajouter de la volatilite realiste
+                            const volatility = Math.random() * 0.015 - 0.0075; // 0.75% de volatilite
                             const finalPrice = historicalPrice * (1 + volatility);
 
-                            // Calculer OHLC réalistes
+                            // Calculer OHLC realistes
                             const open = i === 0 ? (timeframe === 'YTD' ? basePrice * 0.9 : basePrice) : dataPoints[i - 1]?.close || finalPrice;
                             const close = Math.max(0.01, finalPrice);
                             const high = Math.max(open, close) * (1 + Math.random() * 0.01);
@@ -888,11 +888,11 @@ const JLabTab = () => {
                                 high: high,
                                 low: low,
                                 close: close,
-                                volume: Math.floor(Math.random() * 2000000) + 500000 // Volume plus réaliste
+                                volume: Math.floor(Math.random() * 2000000) + 500000 // Volume plus realiste
                             });
                         }
 
-                        void(`📊 Données ${timeframe} générées pour ${symbol}: ${dataPoints.length} points`);
+                        void(` Donnees ${timeframe} generees pour ${symbol}: ${dataPoints.length} points`);
                         return dataPoints;
                     }
 
@@ -936,7 +936,7 @@ const JLabTab = () => {
                     retail: 70,  // Pas encore disponible via IA
                     summary: aiData?.sentiment?.summary || 'Analyse en cours'
                 },
-                // 🎯 Nouvelles données avec validation croisée
+                //  Nouvelles donnees avec validation croisee
                 analystRecommendations: analystData ? {
                     consensus: analystData.consensus?.rating || 'N/A',
                     targetPrice: analystData.consensus?.targetPrice || null,
@@ -977,25 +977,25 @@ const JLabTab = () => {
                 },
                 insights: {
                     catalysts: aiData?.insights?.catalysts || [
-                        'Analyse en cours des catalyseurs de marché',
+                        'Analyse en cours des catalyseurs de marche',
                         'Surveillance des annonces d\'entreprise',
                         'Suivi des tendances du secteur'
                     ],
                     risks: aiData?.insights?.risks || [
-                        'Volatilité du marché',
-                        'Conditions macroéconomiques',
+                        'Volatilite du marche',
+                        'Conditions macroeconomiques',
                         'Concurrence sectorielle'
                     ],
                     consensus: aiData?.insights?.consensus || 'neutral',
-                    reasoning: aiData?.insights?.reasoning || 'Analyse basée sur les données de marché actuelles'
+                    reasoning: aiData?.insights?.reasoning || 'Analyse basee sur les donnees de marche actuelles'
                 },
-                // 🎯 Recommandations d'analyste IA (batch Perplexity)
+                //  Recommandations d'analyste IA (batch Perplexity)
                 aiAnalyst: aiData?.analyst ? {
                     recommendation: aiData.analyst.recommendation,
                     confidence: aiData.analyst.confidence,
                     keyPoints: aiData.analyst.keyPoints
                 } : null,
-                // 🎯 Indicateurs de fallback pour transparence
+                //  Indicateurs de fallback pour transparence
                 fallbackIndicators: fallbackIndicators,
                 dataQuality: {
                     total_sections: totalSections,
@@ -1014,12 +1014,12 @@ const JLabTab = () => {
         }
     };
 
-    // Chargement des données
+    // Chargement des donnees
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoadingJLab(true);
-                void(`📊 Chargement des données pour ${selectedStock}...`);
+                void(` Chargement des donnees pour ${selectedStock}...`);
 
                 // Essayer d'abord avec les vraies APIs
                 const realData = await fetchRealStockData(selectedStock, timeframe);
@@ -1037,27 +1037,27 @@ const JLabTab = () => {
                     setStockDataJLab(normalizedData);
                     setConnected(true);
                     setLastUpdateJLab(new Date());
-                    void('✅ Données chargées avec succès');
+                    void(' Donnees chargees avec succes');
 
-                    // Vérifier si les données intraday sont disponibles
+                    // Verifier si les donnees intraday sont disponibles
                     if (!normalizedData.intraday || normalizedData.intraday.length === 0) {
                         setViolations(prev => {
                             if (prev.find(v => v.code === 'intraday_missing')) return prev;
                             return [
                                 ...prev,
-                                { code: 'intraday_missing', severity: 'low', message: 'Données intraday non disponibles.' }
+                                { code: 'intraday_missing', severity: 'low', message: 'Donnees intraday non disponibles.' }
                             ];
                         });
                     }
                 } else {
                     // Don't throw - use mock data instead
-                    console.warn('⚠️ Données incomplètes, utilisation des données de fallback');
+                    console.warn(' Donnees incompletes, utilisation des donnees de fallback');
                     const mockData = generateMockData(selectedStock);
                     setStockDataJLab(mockData);
                     setConnected(false);
                 }
             } catch (error) {
-                console.error('❌ Erreur lors du chargement:', error?.message || String(error));
+                console.error(' Erreur lors du chargement:', error?.message || String(error));
                 setConnected(false);
 
                 // Utiliser mock data en dernier recours
@@ -1069,7 +1069,7 @@ const JLabTab = () => {
                     if (prev.find(v => v.code === 'data_fetch_error')) return prev;
                     return [
                         ...prev,
-                        { code: 'data_fetch_error', severity: 'high', message: 'Échec de récupération API. Vérifiez votre connexion et les clés API.' }
+                        { code: 'data_fetch_error', severity: 'high', message: 'Echec de recuperation API. Verifiez votre connexion et les cles API.' }
                     ];
                 });
                 setShowHelp(true);
@@ -1078,18 +1078,18 @@ const JLabTab = () => {
             }
         };
         fetchData();
-        // ⚡ OPTIMISATION API: Pas d'auto-refresh
+        //  OPTIMISATION API: Pas d'auto-refresh
         // Chargement uniquement au changement de stock ou manuel
     }, [selectedStock]);
 
-    // 🔄 Rechargement du TradingView Mini Chart quand le ticker change - VAGUE 2
+    //  Rechargement du TradingView Mini Chart quand le ticker change - VAGUE 2
     useEffect(() => {
         const container = document.getElementById('tradingview-mini-chart-jlab');
         if (container) {
             // Supprimer l'ancien widget
             container.innerHTML = '';
 
-            // Créer le nouveau script avec le ticker mis à jour
+            // Creer le nouveau script avec le ticker mis a jour
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
@@ -1106,18 +1106,18 @@ const JLabTab = () => {
                 "largeChartUrl": ""
             });
             container.appendChild(script);
-            void(`📊 TradingView Mini Chart rechargé pour ${selectedStock}`);
+            void(` TradingView Mini Chart recharge pour ${selectedStock}`);
         }
     }, [selectedStock, isDarkMode]);
 
-    // ⚡ AUTO-REFRESH: Désactivé - Chargement unique à l'arrivée sur la page
+    //  AUTO-REFRESH: Desactive - Chargement unique a l'arrivee sur la page
     // L'utilisateur peut actualiser manuellement via le bouton refresh
-    // Les caches API optimisent les appels répétés:
+    // Les caches API optimisent les appels repetes:
     // - Quotes: 5 min cache
     // - Fundamentals: 1h cache
     // - AI data: 30 min cache
 
-    // Timer (désactivé pour éviter les actualisations inutiles)
+    // Timer (desactive pour eviter les actualisations inutiles)
     // useEffect(() => {
     //     const timer = setInterval(() => setTime(new Date()), 1000);
     //     return () => clearInterval(timer);
@@ -1127,7 +1127,7 @@ const JLabTab = () => {
     useEffect(() => {
         const newViolations = [];
         try {
-            // Vérifier les bibliothèques de graphiques
+            // Verifier les bibliotheques de graphiques
             const rechartsAvailable = typeof window.Recharts !== 'undefined' ||
                 typeof Recharts !== 'undefined' ||
                 (typeof window !== 'undefined' && window.Recharts);
@@ -1139,21 +1139,21 @@ const JLabTab = () => {
                 newViolations.push({
                     code: 'charts_missing',
                     severity: 'high',
-                    message: 'Aucune bibliothèque de graphiques disponible — graphiques désactivés.'
+                    message: 'Aucune bibliotheque de graphiques disponible - graphiques desactives.'
                 });
             } else if (!rechartsAvailable && chartJsAvailable) {
                 newViolations.push({
                     code: 'recharts_missing',
                     severity: 'medium',
-                    message: 'Recharts non disponible — utilisation de Chart.js comme alternative.'
+                    message: 'Recharts non disponible - utilisation de Chart.js comme alternative.'
                 });
             }
         } catch (_) {
-            newViolations.push({ code: 'charts_missing', severity: 'high', message: 'Erreur de détection des bibliothèques de graphiques.' });
+            newViolations.push({ code: 'charts_missing', severity: 'high', message: 'Erreur de detection des bibliotheques de graphiques.' });
         }
 
         try {
-            // Vérifier les icônes (maintenant gérées par notre composant LucideIcon)
+            // Verifier les icones (maintenant gerees par notre composant LucideIcon)
             const iconsAvailable = typeof window.LucideIcon !== 'undefined' &&
                 typeof window.LucideIcon === 'function';
 
@@ -1161,11 +1161,11 @@ const JLabTab = () => {
                 newViolations.push({
                     code: 'icons_missing',
                     severity: 'low',
-                    message: 'Composant d\'icônes personnalisé non disponible (fallback activé).'
+                    message: 'Composant d\'icones personnalise non disponible (fallback active).'
                 });
             }
         } catch (_) {
-            newViolations.push({ code: 'icons_missing', severity: 'low', message: 'Composant d\'icônes personnalisé non disponible (fallback activé).' });
+            newViolations.push({ code: 'icons_missing', severity: 'low', message: 'Composant d\'icones personnalise non disponible (fallback active).' });
         }
 
         setViolations(newViolations);
@@ -1187,8 +1187,8 @@ const JLabTab = () => {
         { symbol: 'INTC', name: 'Intel Corporation' },
     ];
 
-    // Fonction pour déterminer la couleur d'un indicateur
-    // Basée sur les standards de l'industrie financière et les meilleures pratiques d'analyse
+    // Fonction pour determiner la couleur d'un indicateur
+    // Basee sur les standards de l'industrie financiere et les meilleures pratiques d'analyse
     const getMetricColor = (metric, value) => {
         if (value == null || value === 'N/A') return 'text-gray-400';
 
@@ -1200,39 +1200,39 @@ const JLabTab = () => {
                 // P/E Ratio (Price to Earnings)
                 // Standards: S&P 500 moyenne historique ~15-20
                 // Source: Investopedia, Morningstar
-                if (v < 0) return 'text-red-500'; // Négatif = pertes
-                if (v < 15) return 'text-emerald-500'; // Sous-évalué / Excellent
-                if (v < 25) return 'text-blue-500'; // Juste valorisé / Bon
-                if (v < 35) return 'text-yellow-500'; // Légèrement surévalué / Attention
-                return 'text-red-500'; // Surévalué / Risque élevé
+                if (v < 0) return 'text-red-500'; // Negatif = pertes
+                if (v < 15) return 'text-emerald-500'; // Sous-evalue / Excellent
+                if (v < 25) return 'text-blue-500'; // Juste valorise / Bon
+                if (v < 35) return 'text-yellow-500'; // Legerement surevalue / Attention
+                return 'text-red-500'; // Surevalue / Risque eleve
 
             case 'PEG':
                 // PEG Ratio (Price/Earnings to Growth)
-                // Standard: Peter Lynch suggère <1 = sous-évalué
+                // Standard: Peter Lynch suggere <1 = sous-evalue
                 // Source: "One Up on Wall Street" par Peter Lynch
                 if (v < 0) return 'text-red-500'; // Invalide
-                if (v < 1) return 'text-emerald-500'; // Sous-évalué / Excellent achat
-                if (v < 1.5) return 'text-blue-500'; // Juste valorisé / Bon
-                if (v < 2) return 'text-yellow-500'; // Légèrement cher / Attention
-                return 'text-green-500'; // Surévalué / Éviter
+                if (v < 1) return 'text-emerald-500'; // Sous-evalue / Excellent achat
+                if (v < 1.5) return 'text-blue-500'; // Juste valorise / Bon
+                if (v < 2) return 'text-yellow-500'; // Legerement cher / Attention
+                return 'text-green-500'; // Surevalue / Eviter
 
             case 'PS':
                 // P/S Ratio (Price to Sales)
                 // Standards varient par secteur, Tech: 2-5, Retail: 0.5-2
-                if (v < 1) return 'text-emerald-500'; // Sous-évalué
+                if (v < 1) return 'text-emerald-500'; // Sous-evalue
                 if (v < 3) return 'text-blue-500'; // Raisonnable
-                if (v < 5) return 'text-yellow-500'; // Élevé
-                return 'text-green-500'; // Très élevé
+                if (v < 5) return 'text-yellow-500'; // Eleve
+                return 'text-green-500'; // Tres eleve
 
             case 'ROE':
                 // ROE (Return on Equity)
-                // Standard: Warren Buffett recherche >15% de manière constante
+                // Standard: Warren Buffett recherche >15% de maniere constante
                 // Source: Berkshire Hathaway Letters to Shareholders
-                if (v < 0) return 'text-red-500'; // Perte / Très mauvais
+                if (v < 0) return 'text-red-500'; // Perte / Tres mauvais
                 if (v < 10) return 'text-green-500'; // Faible / Mauvais
                 if (v < 15) return 'text-yellow-500'; // Moyen / Acceptable
                 if (v < 20) return 'text-blue-500'; // Bon / Au-dessus moyenne
-                return 'text-emerald-500'; // Excellent / Supérieur
+                return 'text-emerald-500'; // Excellent / Superieur
 
             case 'ROA':
                 // ROA (Return on Assets)
@@ -1241,39 +1241,39 @@ const JLabTab = () => {
                 if (v < 0) return 'text-red-500'; // Perte
                 if (v < 5) return 'text-green-500'; // Faible utilisation des actifs
                 if (v < 10) return 'text-blue-500'; // Bon
-                if (v < 15) return 'text-emerald-500'; // Très bon
+                if (v < 15) return 'text-emerald-500'; // Tres bon
                 return 'text-emerald-400'; // Exceptionnel
 
             case 'DE':
                 // D/E Ratio (Debt to Equity)
-                // Standard: <1 sain, >2 risqué (varie selon secteur)
+                // Standard: <1 sain, >2 risque (varie selon secteur)
                 // Source: Financial Times, Wall Street Journal
-                if (v < 0.3) return 'text-emerald-500'; // Très faible endettement / Excellent
+                if (v < 0.3) return 'text-emerald-500'; // Tres faible endettement / Excellent
                 if (v < 0.7) return 'text-blue-500'; // Endettement sain / Bon
-                if (v < 1.5) return 'text-yellow-500'; // Endettement modéré / Attention
-                if (v < 2.5) return 'text-green-500'; // Endettement élevé / Risque
-                return 'text-red-500'; // Endettement très élevé / Danger
+                if (v < 1.5) return 'text-yellow-500'; // Endettement modere / Attention
+                if (v < 2.5) return 'text-green-500'; // Endettement eleve / Risque
+                return 'text-red-500'; // Endettement tres eleve / Danger
 
             case 'Margin':
                 // Marge Nette (Net Profit Margin)
                 // Standards: Tech 15-25%, Retail 2-5%, Services 10-20%
                 // Source: NYU Stern School of Business - Damodaran
                 if (v < 0) return 'text-red-500'; // Pertes
-                if (v < 5) return 'text-green-500'; // Faible rentabilité
-                if (v < 10) return 'text-yellow-500'; // Rentabilité modérée
-                if (v < 20) return 'text-blue-500'; // Bonne rentabilité
-                return 'text-emerald-500'; // Excellente rentabilité
+                if (v < 5) return 'text-green-500'; // Faible rentabilite
+                if (v < 10) return 'text-yellow-500'; // Rentabilite moderee
+                if (v < 20) return 'text-blue-500'; // Bonne rentabilite
+                return 'text-emerald-500'; // Excellente rentabilite
 
             case 'Beta':
-                // Beta (Volatilité vs marché)
-                // Standard: 1 = volatilité du marché, <1 défensif, >1 agressif
+                // Beta (Volatilite vs marche)
+                // Standard: 1 = volatilite du marche, <1 defensif, >1 agressif
                 // Source: Modern Portfolio Theory - Markowitz
-                if (v < 0) return 'text-purple-500'; // Inverse du marché / Rare
-                if (v < 0.8) return 'text-emerald-500'; // Très défensif / Faible volatilité
-                if (v < 1) return 'text-blue-500'; // Défensif / Stable
-                if (v < 1.3) return 'text-yellow-500'; // Légèrement volatile
+                if (v < 0) return 'text-purple-500'; // Inverse du marche / Rare
+                if (v < 0.8) return 'text-emerald-500'; // Tres defensif / Faible volatilite
+                if (v < 1) return 'text-blue-500'; // Defensif / Stable
+                if (v < 1.3) return 'text-yellow-500'; // Legerement volatile
                 if (v < 1.7) return 'text-green-500'; // Volatile
-                return 'text-red-500'; // Très volatile / Risque élevé
+                return 'text-red-500'; // Tres volatile / Risque eleve
 
             case 'Div':
                 // Dividend Yield
@@ -1283,29 +1283,29 @@ const JLabTab = () => {
                 if (v < 2) return 'text-blue-400'; // Dividende modeste
                 if (v < 4) return 'text-blue-500'; // Bon dividende
                 if (v < 6) return 'text-emerald-500'; // Excellent dividende
-                if (v < 8) return 'text-yellow-500'; // Élevé - vérifier soutenabilité
-                return 'text-green-500'; // Très élevé - risque de coupure
+                if (v < 8) return 'text-yellow-500'; // Eleve - verifier soutenabilite
+                return 'text-green-500'; // Tres eleve - risque de coupure
 
             case 'CurrentRatio':
-                // Current Ratio (Liquidité)
-                // Standard: 1.5-3 idéal, <1 problème de liquidité
-                if (v < 1) return 'text-red-500'; // Problème de liquidité
-                if (v < 1.5) return 'text-green-500'; // Liquidité juste
-                if (v < 2.5) return 'text-emerald-500'; // Liquidité saine
-                if (v < 3.5) return 'text-blue-500'; // Bonne liquidité
-                return 'text-yellow-500'; // Trop de liquidité non utilisée
+                // Current Ratio (Liquidite)
+                // Standard: 1.5-3 ideal, <1 probleme de liquidite
+                if (v < 1) return 'text-red-500'; // Probleme de liquidite
+                if (v < 1.5) return 'text-green-500'; // Liquidite juste
+                if (v < 2.5) return 'text-emerald-500'; // Liquidite saine
+                if (v < 3.5) return 'text-blue-500'; // Bonne liquidite
+                return 'text-yellow-500'; // Trop de liquidite non utilisee
 
             case 'QuickRatio':
                 // Quick Ratio (Test acide)
                 // Standard: >1 bon, >1.5 excellent
-                if (v < 0.5) return 'text-red-500'; // Problème majeur
-                if (v < 1) return 'text-green-500'; // Risque de liquidité
+                if (v < 0.5) return 'text-red-500'; // Probleme majeur
+                if (v < 1) return 'text-green-500'; // Risque de liquidite
                 if (v < 1.5) return 'text-blue-500'; // Acceptable
                 return 'text-emerald-500'; // Excellent
 
             case 'EPS':
                 // Earnings Per Share (croissance)
-                // Analyser la tendance plutôt que la valeur absolue
+                // Analyser la tendance plutot que la valeur absolue
                 if (v < 0) return 'text-red-500'; // Pertes
                 if (v < 1) return 'text-green-500'; // Faible
                 if (v < 3) return 'text-blue-500'; // Moyen
@@ -1316,13 +1316,13 @@ const JLabTab = () => {
         }
     };
 
-    // Fonction pour exécuter le screener (utilise la liste de stocks fournie)
+    // Fonction pour executer le screener (utilise la liste de stocks fournie)
     const runScreenerForStocks = async (stocksList) => {
         setLoadingScreener(true);
         try {
             const results = [];
 
-            // Parcourir les stocks fournis et récupérer leurs données
+            // Parcourir les stocks fournis et recuperer leurs donnees
             for (const stock of stocksList) {
                 try {
                     const [quoteRes, profileRes, ratiosRes] = await Promise.allSettled([
@@ -1364,7 +1364,7 @@ const JLabTab = () => {
             }
 
             setScreenerResults(results);
-            void(`✅ Screener: ${results.length} résultats trouvés sur ${stocksList.length} titres`);
+            void(` Screener: ${results.length} resultats trouves sur ${stocksList.length} titres`);
         } catch (error) {
             console.error('Erreur screener:', error);
         } finally {
@@ -1428,13 +1428,13 @@ const JLabTab = () => {
 
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-500 mx-auto mb-4"></div>
-                    <div className="text-sm text-gray-400">Chargement des données…</div>
+                    <div className="text-sm text-gray-400">Chargement des donnees...</div>
                 </div>
             </div>
         );
     }
 
-    // Composant de graphique simple (alternative à Recharts)
+    // Composant de graphique simple (alternative a Recharts)
     const SimpleChart = ({ data, type = 'line', width = 300, height = 200 }) => {
         const chartRef = useRef(null);
 
@@ -1464,7 +1464,7 @@ const JLabTab = () => {
         );
     };
 
-    // Référence locale pour utiliser le composant global
+    // Reference locale pour utiliser le composant global
     const LucideIcon = window.LucideIcon;
 
     return (
@@ -1487,7 +1487,7 @@ const JLabTab = () => {
                 const PeerComparisonModal = window.PeerComparisonModal;
                 return PeerComparisonModal ? (
                     <PeerComparisonModal
-                        symbols={[selectedStock, 'MSFT', 'GOOGL', 'AMZN']} // Exemple de pairs, idéalement dynamique
+                        symbols={[selectedStock, 'MSFT', 'GOOGL', 'AMZN']} // Exemple de pairs, idealement dynamique
                         onClose={() => setShowPeerComparison(false)}
                     />
                 ) : null;
@@ -1496,9 +1496,9 @@ const JLabTab = () => {
             {/* Scenario Analysis Modal */}
             {showScenarioAnalysis && (() => {
                 const ScenarioAnalysisModal = window.ScenarioAnalysisModal;
-                // Utiliser les données chargées ou des valeurs par défaut sûres
+                // Utiliser les donnees chargees ou des valeurs par defaut sures
                 const baselineData = stockDataJLab ? {
-                    latestFCF: stockDataJLab.dcfValue * 1000000000 * 0.05, // Estimation approximative si pas de données brutes
+                    latestFCF: stockDataJLab.dcfValue * 1000000000 * 0.05, // Estimation approximative si pas de donnees brutes
                     netDebt: 0,
                     sharesOutstanding: 1000000000,
                     avgGrowth: 10
@@ -1523,7 +1523,7 @@ const JLabTab = () => {
                         onSelectStock={(symbol) => {
                             setSelectedStock(symbol);
                             setShowAdvancedScreener(false);
-                            // Déclencher le chargement des données pour le nouveau symbole
+                            // Declencher le chargement des donnees pour le nouveau symbole
                         }}
                     />
                 ) : null;
@@ -1537,7 +1537,7 @@ const JLabTab = () => {
                         <div className="flex items-center gap-2">
                             <LucideIcon name="Filter" className="w-4 h-4 text-blue-500" />
                             <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                🔍 Screener de Titres
+                                 Screener de Titres
                             </h3>
                         </div>
                         <button
@@ -1612,7 +1612,7 @@ const JLabTab = () => {
                                 <option value="all">Tous</option>
                                 <option value="Technology">Technologie</option>
                                 <option value="Consumer Cyclical">Consommation</option>
-                                <option value="Healthcare">Santé</option>
+                                <option value="Healthcare">Sante</option>
                                 <option value="Financial">Finance</option>
                             </select>
                         </div>
@@ -1626,14 +1626,14 @@ const JLabTab = () => {
                             : 'bg-gray-800 hover:bg-gray-700 text-white'
                             }`}
                     >
-                        {loadingScreener ? '⏳ Analyse en cours...' : '🔍 Lancer le Screener'}
+                        {loadingScreener ? ' Analyse en cours...' : ' Lancer le Screener'}
                     </button>
 
-                    {/* Résultats */}
+                    {/* Resultats */}
                     {screenerResults.length > 0 && (
                         <div className="mt-3">
                             <div className="text-xs text-gray-500 mb-2">
-                                {screenerResults.length} titre(s) trouvé(s)
+                                {screenerResults.length} titre(s) trouve(s)
                             </div>
                             <div className={`max-h-64 overflow-y-auto border rounded ${isDarkMode ? 'border-neutral-700' : 'border-gray-300'
                                 }`}>
@@ -1729,7 +1729,7 @@ const JLabTab = () => {
                                         ? 'bg-gradient-to-r from-white via-blue-100 to-emerald-200 bg-clip-text text-transparent' 
                                         : 'text-gray-900'
                                 }`}>
-                                    JLab™ Terminal
+                                    JLabTM Terminal
                                 </h1>
                                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30">
                                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -1737,7 +1737,7 @@ const JLabTab = () => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 text-[11px]">
-                                <span className="text-gray-500 font-medium">Quantum Core™</span>
+                                <span className="text-gray-500 font-medium">Quantum CoreTM</span>
                                 {stockDataJLab?.dataQuality && (
                                     <span className={`font-bold ${
                                         stockDataJLab.dataQuality.quality_percentage > 80 ? 'text-emerald-400' : 'text-yellow-400'
@@ -1745,7 +1745,7 @@ const JLabTab = () => {
                                         {stockDataJLab.dataQuality.quality_percentage}% Accurate
                                     </span>
                                 )}
-                                <span className="text-gray-600">•</span>
+                                <span className="text-gray-600">-</span>
                                 <span className="font-mono text-gray-400">{time.toLocaleTimeString()}</span>
                             </div>
                         </div>
@@ -1768,7 +1768,7 @@ const JLabTab = () => {
                             </div>
                             <div className="text-left">
                                 <div className="text-[8px] font-bold uppercase tracking-wider opacity-70 leading-none">Intelligence</div>
-                                <div className="text-sm font-bold leading-tight">Emma AI™</div>
+                                <div className="text-sm font-bold leading-tight">Emma AITM</div>
                             </div>
                         </button>
 
@@ -1794,7 +1794,7 @@ const JLabTab = () => {
                                     isDarkMode ? 'bg-neutral-900 border-neutral-700' : 'bg-white border-gray-200'
                                 }`}>
                                     <div className={`p-2.5 border-b ${isDarkMode ? 'border-neutral-800 bg-neutral-900/50' : 'border-gray-100'}`}>
-                                        <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Sélectionner un Actif</h4>
+                                        <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Selectionner un Actif</h4>
                                     </div>
                                     <div className="max-h-64 overflow-y-auto">
                                         {stocks.map(s => (
@@ -1842,7 +1842,7 @@ const JLabTab = () => {
                                     ? 'bg-neutral-800/50 border-neutral-700 hover:border-emerald-500/50 hover:text-emerald-400' 
                                     : 'bg-white border-gray-200 hover:border-emerald-400 hover:text-emerald-600'
                             } text-gray-500`}
-                            title="Actualiser les données"
+                            title="Actualiser les donnees"
                         >
                             <LucideIcon name="RefreshCw" className={`w-4 h-4 ${loadingJLab ? 'animate-spin' : ''}`} />
                         </button>
@@ -1917,7 +1917,7 @@ const JLabTab = () => {
                                 <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                     Aide & Diagnostics JLab
                                 </h3>
-                                <p className="text-[10px] text-gray-500">Mode Hybride • FMP + JSLAI™</p>
+                                <p className="text-[10px] text-gray-500">Mode Hybride - FMP + JSLAITM</p>
                             </div>
                         </div>
                         <button 
@@ -1935,7 +1935,7 @@ const JLabTab = () => {
                         </div>
                         <div className={`p-3 rounded-lg border ${isDarkMode ? 'bg-yellow-500/5 border-yellow-500/20' : 'bg-yellow-50 border-yellow-200'}`}>
                             <div className="text-yellow-500 font-bold text-[10px] uppercase tracking-wider mb-1">Points de Vigilance</div>
-                            <p className="text-[11px] text-gray-500">P/E &gt; 25, D/E &gt; 2, RSI extrêmes</p>
+                            <p className="text-[11px] text-gray-500">P/E &gt; 25, D/E &gt; 2, RSI extremes</p>
                         </div>
                     </div>
                     
@@ -1943,7 +1943,7 @@ const JLabTab = () => {
                         <h4 className="font-bold text-[11px] text-gray-400 uppercase tracking-wider mb-2">Glossaire Rapide</h4>
                         <div className="grid grid-cols-3 gap-2 text-[10px]">
                             <div><strong className="text-blue-400">PEG:</strong> <span className="text-gray-500">Croissance / PE</span></div>
-                            <div><strong className="text-blue-400">Beta:</strong> <span className="text-gray-500">Volatilité marché</span></div>
+                            <div><strong className="text-blue-400">Beta:</strong> <span className="text-gray-500">Volatilite marche</span></div>
                             <div><strong className="text-blue-400">RSI:</strong> <span className="text-gray-500">Momentum 0-100</span></div>
                         </div>
                     </div>
@@ -1963,7 +1963,7 @@ const JLabTab = () => {
                                 <div>
                                     <h2 className={`text-sm font-bold mb-0.5 transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>{selectedStock}</h2>
-                                    <p className="text-[8px] text-gray-600">{profile.companyName || currentStock?.name} • {profile.sector || 'NASDAQ'}</p>
+                                    <p className="text-[8px] text-gray-600">{profile.companyName || currentStock?.name} - {profile.sector || 'NASDAQ'}</p>
                                 </div>
                                 <div className="text-right">
                                     <div className={`text-lg font-bold transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'
@@ -1985,7 +1985,7 @@ const JLabTab = () => {
                                 {typeof Chart !== 'undefined' && intraday && intraday.length > 0 ? (
                                     <canvas key={`chart-${selectedStock}-${timeframe}`} ref={(canvas) => {
                                         if (canvas) {
-                                            // Détruire l'ancien graphique s'il existe
+                                            // Detruire l'ancien graphique s'il existe
                                             if (canvas.chart) {
                                                 canvas.chart.destroy();
                                                 canvas.chart = null;
@@ -2023,7 +2023,7 @@ const JLabTab = () => {
                                                     },
                                                     scales: {
                                                         x: {
-                                                            display: timeframe === '1D' ? false : true, // Afficher les dates pour les périodes longues
+                                                            display: timeframe === '1D' ? false : true, // Afficher les dates pour les periodes longues
                                                             grid: { display: false },
                                                             ticks: {
                                                                 color: isDarkMode ? '#888' : '#666',
@@ -2050,7 +2050,7 @@ const JLabTab = () => {
                                     }} width="100%" height="140"></canvas>
                                 ) : (
                                     <div className="text-center text-gray-500 text-xs py-8">
-                                        📈 Chargement des données du graphique...
+                                         Chargement des donnees du graphique...
                                     </div>
                                 )}
                             </div>
@@ -2061,19 +2061,19 @@ const JLabTab = () => {
                                         key={period}
                                         onClick={async () => {
                                             setTimeframe(period);
-                                            // Recharger les données avec le nouveau timeframe
+                                            // Recharger les donnees avec le nouveau timeframe
                                             try {
                                                 setLoadingJLab(true);
-                                                void(`📊 Changement de timeframe vers ${period}...`);
+                                                void(` Changement de timeframe vers ${period}...`);
                                                 const realData = await fetchRealStockData(selectedStock, period);
                                                 if (realData && realData.quote && realData.quote.price > 0) {
                                                     setStockDataJLab(realData);
                                                     setConnected(true);
                                                     setLastUpdateJLab(new Date());
-                                                    void(`✅ Données ${period} chargées avec succès`);
+                                                    void(` Donnees ${period} chargees avec succes`);
                                                 }
                                             } catch (error) {
-                                                console.error('❌ Erreur lors du changement de timeframe:', error);
+                                                console.error(' Erreur lors du changement de timeframe:', error);
                                             } finally {
                                                 setLoadingJLab(false);
                                             }
@@ -2157,7 +2157,7 @@ const JLabTab = () => {
                                         }} width="100%" height="80"></canvas>
                                     ) : (
                                         <div className="text-center text-gray-500 text-xs py-4">
-                                            📊 Chargement du volume...
+                                             Chargement du volume...
                                         </div>
                                     )}
                                 </div>
@@ -2217,7 +2217,7 @@ const JLabTab = () => {
                                     style={{ height: '100%', width: '100%' }}
                                     ref={(container) => {
                                         if (container && !container.hasChildNodes()) {
-                                            // Créer le script TradingView
+                                            // Creer le script TradingView
                                             const script = document.createElement('script');
                                             script.type = 'text/javascript';
                                             script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
@@ -2264,8 +2264,8 @@ const JLabTab = () => {
                                     movingAverages.interpretation?.trend?.includes('Baissier') ? 'text-red-500' :
                                         'text-gray-400'
                                     }`}>
-                                    {movingAverages.interpretation?.trend === 'Haussier fort' && '📈 '}
-                                    {movingAverages.interpretation?.trend === 'Baissier fort' && '📉 '}
+                                    {movingAverages.interpretation?.trend === 'Haussier fort' && ' '}
+                                    {movingAverages.interpretation?.trend === 'Baissier fort' && ' '}
                                     {movingAverages.interpretation?.trend || 'Calcul en cours...'}
                                 </div>
                             </div>
@@ -2284,7 +2284,7 @@ const JLabTab = () => {
                                         <div className={`text-[8px] font-semibold ${movingAverages.sma20?.diff > 0 ? 'text-emerald-500' : 'text-red-500'
                                             }`}>
                                             {movingAverages.interpretation?.sma20}
-                                            {movingAverages.sma20?.diff > 0 ? ' ↑' : ' ↓'}
+                                            {movingAverages.sma20?.diff > 0 ? ' ^' : ' v'}
                                         </div>
                                         <div className={`text-xs font-bold ${Math.abs(movingAverages.sma20?.diff || 0) > 5
                                             ? (movingAverages.sma20?.diff > 0 ? 'text-emerald-500' : 'text-red-500')
@@ -2295,14 +2295,14 @@ const JLabTab = () => {
                                     </div>
                                     <div className="text-[7px] text-gray-500 mt-1 italic">
                                         {Math.abs(movingAverages.sma20?.diff || 0) < 2
-                                            ? '💡 Proche de la moyenne - Zone de consolidation'
+                                            ? ' Proche de la moyenne - Zone de consolidation'
                                             : movingAverages.sma20?.diff > 5
-                                                ? '🚀 Fort au-dessus - Momentum haussier'
+                                                ? ' Fort au-dessus - Momentum haussier'
                                                 : movingAverages.sma20?.diff < -5
-                                                    ? '⚠️ Fort en-dessous - Pression baissière'
+                                                    ? ' Fort en-dessous - Pression baissiere'
                                                     : movingAverages.sma20?.diff > 0
-                                                        ? '✅ Au-dessus - Signal positif'
-                                                        : '⚠️ En-dessous - Signal négatif'}
+                                                        ? ' Au-dessus - Signal positif'
+                                                        : ' En-dessous - Signal negatif'}
                                     </div>
                                 </div>
 
@@ -2319,7 +2319,7 @@ const JLabTab = () => {
                                         <div className={`text-[8px] font-semibold ${movingAverages.sma50?.diff > 0 ? 'text-emerald-500' : 'text-red-500'
                                             }`}>
                                             {movingAverages.interpretation?.sma50}
-                                            {movingAverages.sma50?.diff > 0 ? ' ↑' : ' ↓'}
+                                            {movingAverages.sma50?.diff > 0 ? ' ^' : ' v'}
                                         </div>
                                         <div className={`text-xs font-bold ${Math.abs(movingAverages.sma50?.diff || 0) > 5
                                             ? (movingAverages.sma50?.diff > 0 ? 'text-emerald-500' : 'text-red-500')
@@ -2330,12 +2330,12 @@ const JLabTab = () => {
                                     </div>
                                     <div className="text-[7px] text-gray-500 mt-1 italic">
                                         {movingAverages.sma50?.diff > 0 && movingAverages.sma20?.diff > 0
-                                            ? '📊 Tendance moyen terme positive'
+                                            ? ' Tendance moyen terme positive'
                                             : movingAverages.sma50?.diff < 0 && movingAverages.sma20?.diff < 0
-                                                ? '📉 Tendance moyen terme négative'
+                                                ? ' Tendance moyen terme negative'
                                                 : movingAverages.sma50?.diff > 0
-                                                    ? '⚡ Support potentiel - Test en cours'
-                                                    : '⚠️ Résistance - Vigilance recommandée'}
+                                                    ? ' Support potentiel - Test en cours'
+                                                    : ' Resistance - Vigilance recommandee'}
                                     </div>
                                 </div>
 
@@ -2352,7 +2352,7 @@ const JLabTab = () => {
                                         <div className={`text-[8px] font-semibold ${movingAverages.sma200?.diff > 0 ? 'text-emerald-500' : 'text-red-500'
                                             }`}>
                                             {movingAverages.interpretation?.sma200}
-                                            {movingAverages.sma200?.diff > 0 ? ' ↑' : ' ↓'}
+                                            {movingAverages.sma200?.diff > 0 ? ' ^' : ' v'}
                                         </div>
                                         <div className={`text-xs font-bold ${Math.abs(movingAverages.sma200?.diff || 0) > 10
                                             ? (movingAverages.sma200?.diff > 0 ? 'text-emerald-500' : 'text-red-500')
@@ -2363,17 +2363,17 @@ const JLabTab = () => {
                                     </div>
                                     <div className="text-[7px] text-gray-500 mt-1 italic">
                                         {movingAverages.sma200?.diff > 10
-                                            ? '🎯 Bull Market confirmé - Tendance long terme haussière'
+                                            ? ' Bull Market confirme - Tendance long terme haussiere'
                                             : movingAverages.sma200?.diff > 0
-                                                ? '✅ Au-dessus SMA200 - Marché haussier'
+                                                ? ' Au-dessus SMA200 - Marche haussier'
                                                 : movingAverages.sma200?.diff < -10
-                                                    ? '🐻 Bear Market - Tendance long terme baissière'
-                                                    : '⚠️ En-dessous SMA200 - Marché baissier'}
+                                                    ? ' Bear Market - Tendance long terme baissiere'
+                                                    : ' En-dessous SMA200 - Marche baissier'}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Interprétation des croisements */}
+                            {/* Interpretation des croisements */}
                             {(movingAverages.sma20 && movingAverages.sma50) && (
                                 <div className={`mt-2 p-2 border rounded text-[8px] ${movingAverages.sma20.value > movingAverages.sma50.value && movingAverages.sma50.value > movingAverages.sma200.value
                                     ? (isDarkMode ? 'bg-emerald-900/20 border-emerald-800 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700')
@@ -2382,17 +2382,17 @@ const JLabTab = () => {
                                         : (isDarkMode ? 'bg-yellow-900/20 border-yellow-800 text-yellow-300' : 'bg-yellow-50 border-yellow-200 text-yellow-700')
                                     }`}>
                                     <div className="font-semibold mb-1 flex items-center gap-2">
-                                        <Icon emoji="📊" size={16} />
+                                        <Icon emoji="" size={16} />
                                         Analyse des Croisements
                                     </div>
                                     {movingAverages.sma20.value > movingAverages.sma50.value && movingAverages.sma50.value > movingAverages.sma200.value ? (
-                                        <div>✅ Configuration idéale : SMA20 &gt; SMA50 &gt; SMA200. Tendance haussière confirmée sur tous les horizons temporels.</div>
+                                        <div> Configuration ideale : SMA20 &gt; SMA50 &gt; SMA200. Tendance haussiere confirmee sur tous les horizons temporels.</div>
                                     ) : movingAverages.sma20.value < movingAverages.sma50.value && movingAverages.sma50.value < movingAverages.sma200.value ? (
-                                        <div>⚠️ Configuration baissière : SMA20 &lt; SMA50 &lt; SMA200. Pression vendeuse sur tous les horizons. Prudence recommandée.</div>
+                                        <div> Configuration baissiere : SMA20 &lt; SMA50 &lt; SMA200. Pression vendeuse sur tous les horizons. Prudence recommandee.</div>
                                     ) : movingAverages.sma20.value > movingAverages.sma50.value ? (
-                                        <div>⚡ Croisement récent possible : SMA20 au-dessus de SMA50. Signal de retournement haussier à confirmer.</div>
+                                        <div> Croisement recent possible : SMA20 au-dessus de SMA50. Signal de retournement haussier a confirmer.</div>
                                     ) : (
-                                        <div>📉 Moyennes désalignées : Configuration mixte. Attendre confirmation de tendance avant prise de position.</div>
+                                        <div> Moyennes desalignees : Configuration mixte. Attendre confirmation de tendance avant prise de position.</div>
                                     )}
                                 </div>
                             )}
@@ -2478,16 +2478,16 @@ const JLabTab = () => {
                                     </div>
                                     <div>
                                         <h3 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                            📊 Analyse Approfondie
+                                             Analyse Approfondie
                                         </h3>
                                         <p className="text-xs text-gray-400">
-                                            Valorisation DCF, États Financiers, Insights IA
+                                            Valorisation DCF, Etats Financiers, Insights IA
                                         </p>
                                     </div>
                                 </div>
                                 <div className={`px-4 py-2 rounded-lg font-semibold text-sm ${isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
                                     }`}>
-                                    Ouvrir →
+                                    Ouvrir ->
                                 </div>
                             </div>
                         </div>
@@ -2511,7 +2511,7 @@ const JLabTab = () => {
                                         <h4 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                             Comparaison Multi-Titres
                                         </h4>
-                                        <p className="text-xs text-gray-400">Comparez côte à côte</p>
+                                        <p className="text-xs text-gray-400">Comparez cote a cote</p>
                                     </div>
                                     <i className="iconoir-nav-arrow-right text-emerald-500"></i>
                                 </div>
@@ -2532,7 +2532,7 @@ const JLabTab = () => {
                                     </div>
                                     <div className="flex-1">
                                         <h4 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                            Analyse de Scénarios
+                                            Analyse de Scenarios
                                         </h4>
                                         <p className="text-xs text-gray-400">Simulation What-If</p>
                                     </div>
@@ -2555,9 +2555,9 @@ const JLabTab = () => {
                                     </div>
                                     <div className="flex-1">
                                         <h4 className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                            Screener Avancé
+                                            Screener Avance
                                         </h4>
-                                        <p className="text-xs text-gray-400">Filtres personnalisés</p>
+                                        <p className="text-xs text-gray-400">Filtres personnalises</p>
                                     </div>
                                     <i className="iconoir-nav-arrow-right text-orange-500"></i>
                                 </div>
@@ -2874,7 +2874,7 @@ const JLabTab = () => {
                                 </div>
                             ) : (
                                 <div className="text-center text-gray-500 text-xs py-4">
-                                    <div className="mb-2"><Icon emoji="📊" size={24} /></div>
+                                    <div className="mb-2"><Icon emoji="" size={24} /></div>
                                     <div>Chargement des ratios historiques...</div>
                                 </div>
                             )}
@@ -2890,15 +2890,15 @@ const JLabTab = () => {
                                 </h3>
                                 <div className="space-y-2">
                                     <div>
-                                        <div className="text-[9px] text-gray-500 mb-1 font-semibold">🚀 Catalyseurs</div>
+                                        <div className="text-[9px] text-gray-500 mb-1 font-semibold"> Catalyseurs</div>
                                         {insights.catalysts.map((cat, i) => (
-                                            <div key={i} className="text-[8px] text-emerald-400 mb-0.5">• {cat}</div>
+                                            <div key={i} className="text-[8px] text-emerald-400 mb-0.5">- {cat}</div>
                                         ))}
                                     </div>
                                     <div>
-                                        <div className="text-[9px] text-gray-500 mb-1 font-semibold">⚠️ Risques</div>
+                                        <div className="text-[9px] text-gray-500 mb-1 font-semibold"> Risques</div>
                                         {insights.risks.map((risk, i) => (
-                                            <div key={i} className="text-[8px] text-green-400 mb-0.5">• {risk}</div>
+                                            <div key={i} className="text-[8px] text-green-400 mb-0.5">- {risk}</div>
                                         ))}
                                     </div>
                                     <div className={`p-1.5 border rounded transition-colors duration-300 ${isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-gray-50 border-gray-200'
@@ -2907,8 +2907,8 @@ const JLabTab = () => {
                                             <span className={`ml-1 font-bold ${insights.consensus === 'bullish' ? 'text-emerald-500' :
                                                 insights.consensus === 'bearish' ? 'text-red-500' : 'text-gray-400'
                                                 }`}>
-                                                {insights.consensus === 'bullish' ? '📈 Bullish' :
-                                                    insights.consensus === 'bearish' ? '📉 Bearish' : '➖ Neutre'}
+                                                {insights.consensus === 'bullish' ? ' Bullish' :
+                                                    insights.consensus === 'bearish' ? ' Bearish' : ' Neutre'}
                                             </span>
                                         </div>
                                         <div className="text-[8px] text-gray-400">{insights.reasoning}</div>
@@ -2926,7 +2926,7 @@ const JLabTab = () => {
                             </h3>
                             <div style={{ width: '100%', height: 120 }}>
                                 <div className="text-center text-gray-500 text-xs py-8">
-                                    📊 Graphique Radar (Recharts nécessite une configuration avancée)
+                                     Graphique Radar (Recharts necessite une configuration avancee)
                                 </div>
                             </div>
                         </div>
@@ -2957,7 +2957,7 @@ const JLabTab = () => {
                                     </div>
                                 </div>
                                 <div className="text-[8px] text-emerald-500 mt-0.5">
-                                    {(sentiment.overall || 0) > 70 ? 'Très Bullish' : (sentiment.overall || 0) > 50 ? 'Bullish' : 'Neutre'}
+                                    {(sentiment.overall || 0) > 70 ? 'Tres Bullish' : (sentiment.overall || 0) > 50 ? 'Bullish' : 'Neutre'}
                                 </div>
                             </div>
 
@@ -2970,7 +2970,7 @@ const JLabTab = () => {
                             </div>
                         </div>
 
-                        {/* Sentiment détaillé */}
+                        {/* Sentiment detaille */}
                         {sentiment.overall && (
                             <div className={`border rounded-lg p-2 transition-colors duration-300 ${isDarkMode ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300'
                                 }`}>
@@ -2980,7 +2980,7 @@ const JLabTab = () => {
                                 </h3>
                                 <div style={{ width: '100%', height: 90 }}>
                                     <div className="text-center text-gray-500 text-xs py-6">
-                                        📊 Graphique Sentiment
+                                         Graphique Sentiment
                                     </div>
                                 </div>
                                 {sentiment.summary && (
@@ -2997,7 +2997,7 @@ const JLabTab = () => {
                             }`}>
                             <h3 className="text-[9px] font-bold mb-1.5 flex items-center gap-1 text-gray-400">
                                 <LucideIcon name="Newspaper" className="w-3 h-3 text-gray-500" />
-                                News Temps Réel
+                                News Temps Reel
                             </h3>
                             <div className="space-y-1 max-h-40 overflow-y-auto">
                                 {news.map((item, i) => (
@@ -3006,7 +3006,7 @@ const JLabTab = () => {
                                         : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                                         }`}>
                                         <div className="flex items-start justify-between mb-0.5">
-                                            <div className="text-[7px] px-1 py-0.5 rounded bg-emerald-900 text-emerald-500">📈</div>
+                                            <div className="text-[7px] px-1 py-0.5 rounded bg-emerald-900 text-emerald-500"></div>
                                             <span className="text-[7px] text-gray-600">{formatTimeAgo(item.publishedDate)}</span>
                                         </div>
                                         <div className={`font-semibold text-[8px] mb-0.5 transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -3027,15 +3027,15 @@ const JLabTab = () => {
                         <LucideIcon name="AlertCircle" className="w-3 h-3 text-gray-500" />
                         <div className="flex-1">
                             <div className="font-semibold text-[9px] text-gray-400">
-                                ✅ Dashboard Hybride Fonctionnel
+                                 Dashboard Hybride Fonctionnel
                             </div>
                             <div className="text-[7px] text-gray-600">
-                                Mode Production • FMP (Données Précises) + JSLAI™ (Intelligence Cognitive)
+                                Mode Production - FMP (Donnees Precises) + JSLAITM (Intelligence Cognitive)
                             </div>
                         </div>
                         <div className="text-right">
                             <div className="text-[8px] text-gray-500 font-bold">Hybride Optimal</div>
-                            <div className="text-[7px] text-gray-600">Précision + JSLAI™</div>
+                            <div className="text-[7px] text-gray-600">Precision + JSLAITM</div>
                         </div>
                     </div>
                 </div>

@@ -119,7 +119,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('❌ Batch Processing API Error:', error.message);
+    console.error(' Batch Processing API Error:', error.message);
     return res.status(500).json({
       success: false,
       error: error.message,
@@ -149,7 +149,7 @@ async function processBatch(batch_id, tickers, force_refresh) {
           .single();
 
         if (existing) {
-          console.log(`⏭️  Skipping ${tickerUpper} - already analyzed today`);
+          console.log(`  Skipping ${tickerUpper} - already analyzed today`);
           status.completed++;
           status.results.push({
             ticker: tickerUpper,
@@ -170,7 +170,7 @@ async function processBatch(batch_id, tickers, force_refresh) {
         .single();
 
       if (rawError || !rawData) {
-        console.error(`❌ No raw data found for ${tickerUpper}`);
+        console.error(` No raw data found for ${tickerUpper}`);
         status.failed++;
         status.results.push({
           ticker: tickerUpper,
@@ -181,7 +181,7 @@ async function processBatch(batch_id, tickers, force_refresh) {
       }
 
       // Analyze with Claude
-      console.log(`🤖 Analyzing ${tickerUpper} with Claude...`);
+      console.log(` Analyzing ${tickerUpper} with Claude...`);
       const analysisStart = Date.now();
 
       const analysis = await analyzeWithClaude(tickerUpper, rawData.raw_text);
@@ -207,7 +207,7 @@ async function processBatch(batch_id, tickers, force_refresh) {
         throw new Error(`Failed to save analysis: ${insertError.message}`);
       }
 
-      console.log(`✅ ${tickerUpper} analyzed successfully (${processingTime}ms)`);
+      console.log(` ${tickerUpper} analyzed successfully (${processingTime}ms)`);
       status.completed++;
       status.results.push({
         ticker: tickerUpper,
@@ -216,7 +216,7 @@ async function processBatch(batch_id, tickers, force_refresh) {
       });
 
     } catch (error) {
-      console.error(`❌ Failed to process ${ticker}:`, error.message);
+      console.error(` Failed to process ${ticker}:`, error.message);
       status.failed++;
       status.results.push({
         ticker: ticker.toUpperCase(),
@@ -229,7 +229,7 @@ async function processBatch(batch_id, tickers, force_refresh) {
   // Mark batch as complete
   status.status = 'completed';
   status.completed_at = new Date().toISOString();
-  console.log(`🎉 Batch ${batch_id} completed: ${status.completed} success, ${status.failed} failed`);
+  console.log(` Batch ${batch_id} completed: ${status.completed} success, ${status.failed} failed`);
 }
 
 // ============================================================================

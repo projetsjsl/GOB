@@ -38,7 +38,7 @@ const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
                     <div className="flex flex-col items-center gap-4">
                         <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                         <p className="text-gray-300 text-lg">Analyse approfondie de {symbol}...</p>
-                        <p className="text-gray-500 text-sm">Récupération des états financiers et calcul des métriques</p>
+                        <p className="text-gray-500 text-sm">Recuperation des etats financiers et calcul des metriques</p>
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@ const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
                                 onClick={loadAnalysisData}
                                 className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
                             >
-                                Réessayer
+                                Reessayer
                             </button>
                             <button
                                 onClick={onClose}
@@ -101,8 +101,8 @@ const StockAnalysisModal = ({ symbol, currentPrice, onClose }) => {
                 <div className="flex border-b border-gray-700 bg-gray-900/50 px-6 overflow-x-auto">
                     {[
                         { id: 'valuation', label: 'Valorisation', icon: 'dollar' },
-                        { id: 'financials', label: 'États Financiers', icon: 'doc-star' },
-                        { id: 'metrics', label: 'Métriques Clés', icon: 'dashboard-speed' },
+                        { id: 'financials', label: 'Etats Financiers', icon: 'doc-star' },
+                        { id: 'metrics', label: 'Metriques Cles', icon: 'dashboard-speed' },
                         { id: 'insights', label: 'Insights IA', icon: 'brain' }
                     ].map(tab => (
                         <button
@@ -136,7 +136,7 @@ const ValuationTab = ({ data }) => {
     const { valuation, dcf, currentPrice, cashFlow = [], incomeStatement = [] } = data;
 
     if (!valuation) {
-        return <div className="text-gray-400 text-center py-12">Données de valorisation non disponibles</div>;
+        return <div className="text-gray-400 text-center py-12">Donnees de valorisation non disponibles</div>;
     }
 
     const fairValue = valuation.fairValue || 0;
@@ -227,7 +227,7 @@ const ValuationTab = ({ data }) => {
             <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <i className="iconoir-calculator text-purple-400"></i>
-                    Méthodes de Valorisation
+                    Methodes de Valorisation
                 </h3>
                 <div className="space-y-4">
                     {valuation.dcfValue && (
@@ -279,7 +279,7 @@ const ValuationTab = ({ data }) => {
             <div className="lg:col-span-2 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-gray-700">
                 <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <i className="iconoir-chart-line text-emerald-400"></i>
-                    Tendances Financières (5-6 périodes)
+                    Tendances Financieres (5-6 periodes)
                 </h3>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-800">
@@ -291,7 +291,7 @@ const ValuationTab = ({ data }) => {
                         </div>
                         <div className="h-28 relative">
                             {fcfSeries.length === 0 ? (
-                                <div className="text-gray-500 text-sm">Données FCF indisponibles</div>
+                                <div className="text-gray-500 text-sm">Donnees FCF indisponibles</div>
                             ) : (
                                 <svg viewBox="0 0 220 80" className="w-full h-full">
                                     <defs>
@@ -319,7 +319,7 @@ const ValuationTab = ({ data }) => {
                         </div>
                         <div className="h-28 relative">
                             {revenueSeries.length === 0 ? (
-                                <div className="text-gray-500 text-sm">Données revenus indisponibles</div>
+                                <div className="text-gray-500 text-sm">Donnees revenus indisponibles</div>
                             ) : (
                                 <svg viewBox="0 0 220 80" className="w-full h-full">
                                     <defs>
@@ -349,7 +349,7 @@ const ValuationTab = ({ data }) => {
                             Recommandation: {valuation.recommendation}
                         </h3>
                         <p className="text-gray-300">
-                            Marge de sécurité: <span className={`font-bold ${marginOfSafety > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            Marge de securite: <span className={`font-bold ${marginOfSafety > 0 ? 'text-green-400' : 'text-red-400'}`}>
                                 {(marginOfSafety || 0).toFixed(1)}%
                             </span>
                         </p>
@@ -386,7 +386,7 @@ const FinancialsTab = ({ data }) => {
     const currentStatements = statements[statementType];
 
     if (!currentStatements || currentStatements.length === 0) {
-        return <div className="text-gray-400 text-center py-12">Données financières non disponibles</div>;
+        return <div className="text-gray-400 text-center py-12">Donnees financieres non disponibles</div>;
     }
 
     const formatNumber = (num) => {
@@ -400,10 +400,10 @@ const FinancialsTab = ({ data }) => {
             case 'income':
                 return [
                     { label: 'Revenus', key: 'revenue' },
-                    { label: 'Coût des ventes', key: 'costOfRevenue' },
-                    { label: 'Bénéfice brut', key: 'grossProfit' },
+                    { label: 'Cout des ventes', key: 'costOfRevenue' },
+                    { label: 'Benefice brut', key: 'grossProfit' },
                     { label: 'EBITDA', key: 'ebitda' },
-                    { label: 'Bénéfice net', key: 'netIncome' },
+                    { label: 'Benefice net', key: 'netIncome' },
                     { label: 'EPS', key: 'eps', format: (v) => `$${v?.toFixed(2) || 'N/A'}` }
                 ];
             case 'balance':
@@ -413,16 +413,16 @@ const FinancialsTab = ({ data }) => {
                     { label: 'Passifs totaux', key: 'totalLiabilities' },
                     { label: 'Dette totale', key: 'totalDebt' },
                     { label: 'Capitaux propres', key: 'totalStockholdersEquity' },
-                    { label: 'Trésorerie', key: 'cashAndCashEquivalents' }
+                    { label: 'Tresorerie', key: 'cashAndCashEquivalents' }
                 ];
             case 'cashflow':
                 return [
-                    { label: 'Flux opérationnels', key: 'operatingCashFlow' },
+                    { label: 'Flux operationnels', key: 'operatingCashFlow' },
                     { label: 'Flux d\'investissement', key: 'netCashUsedForInvestingActivites' },
                     { label: 'Flux de financement', key: 'netCashUsedProvidedByFinancingActivities' },
                     { label: 'Free Cash Flow', key: 'freeCashFlow' },
                     { label: 'CapEx', key: 'capitalExpenditure' },
-                    { label: 'Dividendes payés', key: 'dividendsPaid' }
+                    { label: 'Dividendes payes', key: 'dividendsPaid' }
                 ];
             default:
                 return [];
@@ -434,9 +434,9 @@ const FinancialsTab = ({ data }) => {
             {/* Statement Type Selector */}
             <div className="flex gap-3 bg-gray-900/50 p-2 rounded-lg">
                 {[
-                    { id: 'income', label: 'Compte de Résultat', icon: 'dollar' },
+                    { id: 'income', label: 'Compte de Resultat', icon: 'dollar' },
                     { id: 'balance', label: 'Bilan', icon: 'percentage' },
-                    { id: 'cashflow', label: 'Flux de Trésorerie', icon: 'graph-up' }
+                    { id: 'cashflow', label: 'Flux de Tresorerie', icon: 'graph-up' }
                 ].map(type => (
                     <button
                         key={type.id}
@@ -458,7 +458,7 @@ const FinancialsTab = ({ data }) => {
                     <table className="w-full">
                         <thead className="bg-gray-900/80">
                             <tr>
-                                <th className="text-left p-4 text-gray-400 font-medium sticky left-0 bg-gray-900">Métrique</th>
+                                <th className="text-left p-4 text-gray-400 font-medium sticky left-0 bg-gray-900">Metrique</th>
                                 {currentStatements.map((stmt, idx) => (
                                     <th key={idx} className="text-right p-4 text-gray-400 font-medium whitespace-nowrap">
                                         {stmt.date || stmt.calendarYear}
@@ -509,7 +509,7 @@ const MetricsTab = ({ data }) => {
     const { keyMetrics, ratios } = data;
 
     if (!keyMetrics || keyMetrics.length === 0) {
-        return <div className="text-gray-400 text-center py-12">Métriques non disponibles</div>;
+        return <div className="text-gray-400 text-center py-12">Metriques non disponibles</div>;
     }
 
     const latest = keyMetrics[0];
@@ -517,7 +517,7 @@ const MetricsTab = ({ data }) => {
 
     const metricCategories = [
         {
-            title: 'Rentabilité',
+            title: 'Rentabilite',
             icon: 'percentage',
             color: 'green',
             metrics: [
@@ -539,7 +539,7 @@ const MetricsTab = ({ data }) => {
             ]
         },
         {
-            title: 'Liquidité',
+            title: 'Liquidite',
             icon: 'droplet',
             color: 'cyan',
             metrics: [
@@ -550,7 +550,7 @@ const MetricsTab = ({ data }) => {
             ]
         },
         {
-            title: 'Solvabilité',
+            title: 'Solvabilite',
             icon: 'shield-check',
             color: 'purple',
             metrics: [
@@ -800,7 +800,7 @@ const InsightsTab = ({ data }) => {
                 <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 border border-blue-700/30">
                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                         <i className="iconoir-graph-up text-blue-400"></i>
-                        Tendances Clés
+                        Tendances Cles
                     </h3>
                     <ul className="space-y-3">
                         {aiInsights.trends.map((trend, idx) => (

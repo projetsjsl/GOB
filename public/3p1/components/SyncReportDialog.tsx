@@ -1,5 +1,5 @@
 /**
- * Rapport détaillé de synchronisation en masse
+ * Rapport detaille de synchronisation en masse
  * Affiche toutes les informations de synchronisation par ticker
  */
 
@@ -168,26 +168,26 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
             'Statut',
             'Temps (ms)',
             'Prix Actuel',
-            'Années de Données',
-            'Points de Données',
-            'Outliers Détectés',
+            'Annees de Donnees',
+            'Points de Donnees',
+            'Outliers Detectes',
             'Outliers Exclus',
-            'Cases Orange Recalculées',
-            'Données EPS à Zéro',
-            'Données CF à Zéro',
-            'Données BV à Zéro',
-            'Données DIV à Zéro',
-            'Données N/A',
-            'Snapshot Sauvegardé',
-            'Assumptions Mises à Jour',
-            'Info Mise à Jour',
+            'Cases Orange Recalculees',
+            'Donnees EPS a Zero',
+            'Donnees CF a Zero',
+            'Donnees BV a Zero',
+            'Donnees DIV a Zero',
+            'Donnees N/A',
+            'Snapshot Sauvegarde',
+            'Assumptions Mises a Jour',
+            'Info Mise a Jour',
             'ValueLine Synced',
             'Erreur'
         ];
 
         const rows = reportData.tickerResults.map(result => [
             result.ticker,
-            result.success ? 'Succès' : 'Erreur',
+            result.success ? 'Succes' : 'Erreur',
             result.timeMs.toString(),
             result.currentPrice > 0 ? `$${result.currentPrice.toFixed(2)}` : 'N/A',
             result.dataRetrieved?.years?.toString() || '0',
@@ -213,7 +213,7 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
         const csvContent = [
             headers.join(','),
             ...rows.map(row => row.map(cell => {
-                // Échapper les guillemets et les virgules
+                // Echapper les guillemets et les virgules
                 const cellStr = String(cell || '');
                 if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
                     return `"${cellStr.replace(/"/g, '""')}"`;
@@ -299,7 +299,7 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                     </div>
                 </div>
 
-                {/* Résumé Global */}
+                {/* Resume Global */}
                 <div className="p-6 border-b border-gray-200 bg-gray-50">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                         <div className="bg-white p-4 rounded-lg border border-gray-200">
@@ -307,7 +307,7 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                             <div className="text-2xl font-bold text-gray-900">{reportData.totalTickers}</div>
                         </div>
                         <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                            <div className="text-sm text-green-600">Succès</div>
+                            <div className="text-sm text-green-600">Succes</div>
                             <div className="text-2xl font-bold text-green-700">{reportData.successCount}</div>
                             <div className="text-xs text-green-600 mt-1">{successRate}%</div>
                         </div>
@@ -316,14 +316,14 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                             <div className="text-2xl font-bold text-red-700">{reportData.errorCount}</div>
                         </div>
                         <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                            <div className="text-sm text-yellow-600">Ignorés</div>
+                            <div className="text-sm text-yellow-600">Ignores</div>
                             <div className="text-2xl font-bold text-yellow-700">{reportData.skippedCount}</div>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="bg-white p-4 rounded-lg border border-gray-200">
-                            <div className="text-sm text-gray-500">Durée Totale</div>
+                            <div className="text-sm text-gray-500">Duree Totale</div>
                             <div className="text-xl font-bold text-gray-900">
                                 {Math.floor(duration / 1000)}s
                             </div>
@@ -338,38 +338,38 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                             </div>
                         </div>
                         <div className="bg-white p-4 rounded-lg border border-gray-200">
-                            <div className="text-sm text-gray-500">Points de Données</div>
+                            <div className="text-sm text-gray-500">Points de Donnees</div>
                             <div className="text-xl font-bold text-gray-900">
                                 {reportData.globalStats.totalDataPoints.toLocaleString()}
                             </div>
                         </div>
                         <div className="bg-white p-4 rounded-lg border border-gray-200">
-                            <div className="text-sm text-gray-500">Outliers Détectés</div>
+                            <div className="text-sm text-gray-500">Outliers Detectes</div>
                             <div className="text-xl font-bold text-gray-900">
                                 {reportData.globalStats.totalOutliersDetected}
                             </div>
                         </div>
                     </div>
 
-                    {/* ✅ Section Options Utilisées avec Temps et Utilité */}
+                    {/*  Section Options Utilisees avec Temps et Utilite */}
                     {reportData.options && (
                         <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
                             <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
                                 <InformationCircleIcon className="w-5 h-5 text-gray-600" />
-                                Options de Synchronisation Utilisées
+                                Options de Synchronisation Utilisees
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                 {Object.entries(reportData.options as SyncOptions).map(([key, value]) => {
-                                    if (!value || key === 'syncAllTickers') return null; // Ignorer les options désactivées et syncAllTickers
+                                    if (!value || key === 'syncAllTickers') return null; // Ignorer les options desactivees et syncAllTickers
                                     const metadata = OPTION_METADATA[key as keyof SyncOptions];
                                     if (!metadata) return null;
                                     
                                     const getUtilityColor = (utility: string) => {
                                         const colors = {
                                             essentiel: 'bg-red-100 text-red-800 border-red-300',
-                                            recommandé: 'bg-blue-100 text-blue-800 border-blue-300',
+                                            recommande: 'bg-blue-100 text-blue-800 border-blue-300',
                                             optionnel: 'bg-gray-100 text-gray-800 border-gray-300',
-                                            avancé: 'bg-purple-100 text-purple-800 border-purple-300'
+                                            avance: 'bg-purple-100 text-purple-800 border-purple-300'
                                         };
                                         return colors[utility as keyof typeof colors] || colors.optionnel;
                                     };
@@ -411,7 +411,7 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                                         .map(r => ({
                                             ticker: r.ticker,
                                             temps: r.timeMs,
-                                            statut: r.success ? 'Succès' : 'Erreur'
+                                            statut: r.success ? 'Succes' : 'Erreur'
                                         }))}
                                 >
                                     <CartesianGrid strokeDasharray="3 3" />
@@ -430,16 +430,16 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                             </ResponsiveContainer>
                         </div>
 
-                        {/* Graphique en camembert - Répartition succès/erreurs/ignorés */}
+                        {/* Graphique en camembert - Repartition succes/erreurs/ignores */}
                         <div className="bg-white p-4 rounded-lg border border-gray-200">
-                            <h4 className="text-sm font-semibold text-gray-700 mb-4">Répartition des Résultats</h4>
+                            <h4 className="text-sm font-semibold text-gray-700 mb-4">Repartition des Resultats</h4>
                             <ResponsiveContainer width="100%" height={250}>
                                 <PieChart>
                                     <Pie
                                         data={[
-                                            { name: 'Succès', value: reportData.successCount, color: '#10b981' },
+                                            { name: 'Succes', value: reportData.successCount, color: '#10b981' },
                                             { name: 'Erreurs', value: reportData.errorCount, color: '#ef4444' },
-                                            { name: 'Ignorés', value: reportData.skippedCount, color: '#f59e0b' }
+                                            { name: 'Ignores', value: reportData.skippedCount, color: '#f59e0b' }
                                         ]}
                                         cx="50%"
                                         cy="50%"
@@ -450,9 +450,9 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                                         dataKey="value"
                                     >
                                         {[
-                                            { name: 'Succès', value: reportData.successCount, color: '#10b981' },
+                                            { name: 'Succes', value: reportData.successCount, color: '#10b981' },
                                             { name: 'Erreurs', value: reportData.errorCount, color: '#ef4444' },
-                                            { name: 'Ignorés', value: reportData.skippedCount, color: '#f59e0b' }
+                                            { name: 'Ignores', value: reportData.skippedCount, color: '#f59e0b' }
                                         ].map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
@@ -476,9 +476,9 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                                 className="border border-gray-300 rounded-md px-3 py-1 text-sm"
                             >
                                 <option value="all">Tous</option>
-                                <option value="success">Succès</option>
+                                <option value="success">Succes</option>
                                 <option value="error">Erreurs</option>
-                                <option value="skipped">Ignorés</option>
+                                <option value="skipped">Ignores</option>
                             </select>
                         </div>
                         <div className="flex items-center gap-2">
@@ -494,7 +494,7 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                             </select>
                         </div>
                         <div className="ml-auto text-sm text-gray-500">
-                            {filteredResults.length} ticker(s) affiché(s)
+                            {filteredResults.length} ticker(s) affiche(s)
                         </div>
                     </div>
                 </div>
@@ -526,7 +526,7 @@ export const SyncReportDialog: React.FC<SyncReportDialogProps> = ({
                                 className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors text-sm font-medium flex items-center gap-2"
                             >
                                 <ArrowPathIcon className="w-4 h-4" />
-                                Réessayer les Échecs ({reportData.errorCount})
+                                Reessayer les Echecs ({reportData.errorCount})
                             </button>
                         )}
                     </div>
@@ -572,7 +572,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                         <div>
                             <div className="font-bold text-lg">{result.ticker}</div>
                             <div className="text-sm text-gray-500">
-                                {result.success ? 'Synchronisé avec succès' : result.error || 'Erreur'}
+                                {result.success ? 'Synchronise avec succes' : result.error || 'Erreur'}
                             </div>
                         </div>
                     </div>
@@ -583,26 +583,26 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                         </div>
                         <div className="flex items-center gap-2">
                             {hasOutliers && (
-                                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" title="Outliers détectés" />
+                                <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" title="Outliers detectes" />
                             )}
                             {hasZeroData && (
-                                <InformationCircleIcon className="w-5 h-5 text-blue-600" title="Données à zéro" />
+                                <InformationCircleIcon className="w-5 h-5 text-blue-600" title="Donnees a zero" />
                             )}
                             {hasNaData && (
-                                <InformationCircleIcon className="w-5 h-5 text-gray-600" title="Données N/A" />
+                                <InformationCircleIcon className="w-5 h-5 text-gray-600" title="Donnees N/A" />
                             )}
                         </div>
                         <div className="text-gray-400">
-                            {isExpanded ? '▼' : '▶'}
+                            {isExpanded ? '' : ''}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Détails expandables */}
+            {/* Details expandables */}
             {isExpanded && result.success && (
                 <div className="p-4 pt-0 border-t border-gray-200 bg-white space-y-4">
-                    {/* Prix et Données Récupérées */}
+                    {/* Prix et Donnees Recuperees */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                             <div className="text-sm text-gray-500 mb-1">Prix Actuel</div>
@@ -611,13 +611,13 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                             </div>
                         </div>
                         <div>
-                            <div className="text-sm text-gray-500 mb-1">Années de Données</div>
+                            <div className="text-sm text-gray-500 mb-1">Annees de Donnees</div>
                             <div className="text-lg font-bold text-gray-900">
                                 {result.dataRetrieved.years}
                             </div>
                         </div>
                         <div>
-                            <div className="text-sm text-gray-500 mb-1">Points de Données</div>
+                            <div className="text-sm text-gray-500 mb-1">Points de Donnees</div>
                             <div className="text-lg font-bold text-gray-900">
                                 {result.dataRetrieved.dataPoints}
                             </div>
@@ -625,10 +625,10 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                         <div>
                             <div className="text-sm text-gray-500 mb-1">Sources</div>
                             <div className="text-sm text-gray-700">
-                                {result.dataRetrieved.hasProfile && '✅ Profile '}
-                                {result.dataRetrieved.hasKeyMetrics && '✅ Metrics '}
-                                {result.dataRetrieved.hasQuotes && '✅ Quotes '}
-                                {result.dataRetrieved.hasFinancials && '✅ Financials'}
+                                {result.dataRetrieved.hasProfile && ' Profile '}
+                                {result.dataRetrieved.hasKeyMetrics && ' Metrics '}
+                                {result.dataRetrieved.hasQuotes && ' Quotes '}
+                                {result.dataRetrieved.hasFinancials && ' Financials'}
                             </div>
                         </div>
                     </div>
@@ -639,7 +639,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                             <div className="flex items-center gap-2 mb-2">
                                 <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
                                 <div className="font-semibold text-yellow-900">
-                                    Métriques Aberrantes Détectées
+                                    Metriques Aberrantes Detectees
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -647,7 +647,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                     <div key={metric} className="flex items-center justify-between text-sm">
                                         <span className="font-medium">{metric}</span>
                                         <span className="text-yellow-700">
-                                            {result.outliers.excluded[metric as keyof typeof result.outliers.excluded] ? '❌ Exclue' : '⚠️ Détectée'}
+                                            {result.outliers.excluded[metric as keyof typeof result.outliers.excluded] ? ' Exclue' : ' Detectee'}
                                         </span>
                                         {result.outliers.reasons[metric] && (
                                             <span className="text-xs text-yellow-600 ml-2">
@@ -670,7 +670,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                 </div>
                                 {result.orangeData.wasReplaced && (
                                     <span className="text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded">
-                                        Recalculées
+                                        Recalculees
                                     </span>
                                 )}
                             </div>
@@ -743,19 +743,19 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                         </div>
                     )}
 
-                    {/* Données à Zéro */}
+                    {/* Donnees a Zero */}
                     {hasZeroData && (
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-3">
                                 <InformationCircleIcon className="w-5 h-5 text-blue-600" />
                                 <div className="font-semibold text-blue-900">
-                                    Données à Zéro
+                                    Donnees a Zero
                                 </div>
                             </div>
                             <div className="space-y-2 text-sm">
                                 {result.zeroData.earningsPerShare > 0 && (
                                     <div>
-                                        <span className="font-medium">EPS: {result.zeroData.earningsPerShare} années</span>
+                                        <span className="font-medium">EPS: {result.zeroData.earningsPerShare} annees</span>
                                         {result.zeroData.reasons.earningsPerShare && (
                                             <span className="text-blue-700 ml-2">
                                                 ({result.zeroData.reasons.earningsPerShare})
@@ -765,7 +765,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                 )}
                                 {result.zeroData.cashFlowPerShare > 0 && (
                                     <div>
-                                        <span className="font-medium">CF: {result.zeroData.cashFlowPerShare} années</span>
+                                        <span className="font-medium">CF: {result.zeroData.cashFlowPerShare} annees</span>
                                         {result.zeroData.reasons.cashFlowPerShare && (
                                             <span className="text-blue-700 ml-2">
                                                 ({result.zeroData.reasons.cashFlowPerShare})
@@ -775,7 +775,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                 )}
                                 {result.zeroData.bookValuePerShare > 0 && (
                                     <div>
-                                        <span className="font-medium">BV: {result.zeroData.bookValuePerShare} années</span>
+                                        <span className="font-medium">BV: {result.zeroData.bookValuePerShare} annees</span>
                                         {result.zeroData.reasons.bookValuePerShare && (
                                             <span className="text-blue-700 ml-2">
                                                 ({result.zeroData.reasons.bookValuePerShare})
@@ -785,7 +785,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                 )}
                                 {result.zeroData.dividendPerShare > 0 && (
                                     <div>
-                                        <span className="font-medium">DIV: {result.zeroData.dividendPerShare} années</span>
+                                        <span className="font-medium">DIV: {result.zeroData.dividendPerShare} annees</span>
                                         {result.zeroData.reasons.dividendPerShare && (
                                             <span className="text-blue-700 ml-2">
                                                 ({result.zeroData.reasons.dividendPerShare})
@@ -797,13 +797,13 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                         </div>
                     )}
 
-                    {/* Données N/A */}
+                    {/* Donnees N/A */}
                     {hasNaData && (
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                             <div className="flex items-center gap-2 mb-3">
                                 <InformationCircleIcon className="w-5 h-5 text-gray-600" />
                                 <div className="font-semibold text-gray-900">
-                                    Données N/A
+                                    Donnees N/A
                                 </div>
                             </div>
                             <div className="space-y-1 text-sm">
@@ -831,7 +831,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                 ) : (
                                     <XMarkIcon className="w-4 h-4 text-gray-400" />
                                 )}
-                                <span>Snapshot sauvegardé</span>
+                                <span>Snapshot sauvegarde</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 {result.other.assumptionsUpdated ? (
@@ -839,7 +839,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                 ) : (
                                     <XMarkIcon className="w-4 h-4 text-gray-400" />
                                 )}
-                                <span>Assumptions mises à jour</span>
+                                <span>Assumptions mises a jour</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 {result.other.infoUpdated ? (
@@ -847,7 +847,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                 ) : (
                                     <XMarkIcon className="w-4 h-4 text-gray-400" />
                                 )}
-                                <span>Info mise à jour</span>
+                                <span>Info mise a jour</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 {result.other.valueLineMetricsSynced ? (
@@ -855,7 +855,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                 ) : (
                                     <XMarkIcon className="w-4 h-4 text-gray-400" />
                                 )}
-                                <span>Métriques ValueLine</span>
+                                <span>Metriques ValueLine</span>
                             </div>
                         </div>
                     </div>
@@ -878,7 +878,7 @@ const TickerResultCard: React.FC<TickerResultCardProps> = ({ result, isExpanded,
                                     className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium flex items-center gap-2"
                                 >
                                     <ArrowPathIcon className="w-4 h-4" />
-                                    Réessayer
+                                    Reessayer
                                 </button>
                             </div>
                         </div>

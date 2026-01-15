@@ -23,11 +23,11 @@ export default async function handler(req, res) {
     if (!process.env.GITHUB_TOKEN) {
       return res.status(500).json({ 
         error: 'GitHub token not configured',
-        message: 'Les fichiers ne peuvent pas être mis à jour sans token GitHub'
+        message: 'Les fichiers ne peuvent pas etre mis a jour sans token GitHub'
       });
     }
 
-    // Récupérer le contenu actuel du fichier
+    // Recuperer le contenu actuel du fichier
     let currentContent = '';
     let currentSha = null;
 
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       if (error.status !== 404) {
         throw error;
       }
-      // Le fichier n'existe pas encore, on le créera
+      // Le fichier n'existe pas encore, on le creera
     }
 
     // Parser le contenu JSON existant
@@ -59,16 +59,16 @@ export default async function handler(req, res) {
       }
     }
 
-    // Mettre à jour les données selon l'action
+    // Mettre a jour les donnees selon l'action
     if (action === 'update_stock') {
-      // Mettre à jour stock_data.json
+      // Mettre a jour stock_data.json
       if (!jsonData.stocks) {
         jsonData.stocks = {};
       }
       jsonData.stocks[ticker] = data;
       jsonData.lastUpdate = new Date().toISOString();
     } else if (action === 'update_analysis') {
-      // Mettre à jour stock_analysis.json
+      // Mettre a jour stock_analysis.json
       if (!jsonData.stocks) {
         jsonData.stocks = [];
       }
@@ -77,13 +77,13 @@ export default async function handler(req, res) {
       const existingIndex = jsonData.stocks.findIndex(stock => stock.ticker === ticker);
       
       if (existingIndex >= 0) {
-        // Mettre à jour l'entrée existante
+        // Mettre a jour l'entree existante
         jsonData.stocks[existingIndex] = {
           ...jsonData.stocks[existingIndex],
           ...data
         };
       } else {
-        // Ajouter une nouvelle entrée
+        // Ajouter une nouvelle entree
         jsonData.stocks.push(data);
       }
       
@@ -93,10 +93,10 @@ export default async function handler(req, res) {
       jsonData.failed = 0;
     }
 
-    // Convertir en JSON formaté
+    // Convertir en JSON formate
     const updatedContent = JSON.stringify(jsonData, null, 2);
 
-    // Mettre à jour le fichier sur GitHub
+    // Mettre a jour le fichier sur GitHub
     const updateResponse = await octokit.repos.createOrUpdateFileContents({
       owner: REPO_OWNER,
       repo: REPO_NAME,
@@ -109,7 +109,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({
       success: true,
-      message: `Fichier ${file} mis à jour avec succès pour ${ticker}`,
+      message: `Fichier ${file} mis a jour avec succes pour ${ticker}`,
       commit: updateResponse.data.commit.sha,
       action: action
     });
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Erreur GitHub API:', error);
     res.status(500).json({ 
-      error: 'Erreur lors de la mise à jour GitHub',
+      error: 'Erreur lors de la mise a jour GitHub',
       details: error.message 
     });
   }

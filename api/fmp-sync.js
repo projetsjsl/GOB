@@ -1,15 +1,15 @@
 /**
- * Service d'ingestion FMP Premier → Supabase
+ * Service d'ingestion FMP Premier -> Supabase
  * 
- * Ce service synchronise les données FMP Premier vers Supabase :
+ * Ce service synchronise les donnees FMP Premier vers Supabase :
  * - Instruments (liste des symboles)
- * - Données de marché (quotes, historiques)
+ * - Donnees de marche (quotes, historiques)
  * - Fondamentaux (ratios, key metrics)
  * - Indicateurs techniques
  * 
  * Usage:
- * - Appelé via cron (Vercel Cron ou Supabase Cron)
- * - Peut être appelé manuellement via POST /api/fmp-sync
+ * - Appele via cron (Vercel Cron ou Supabase Cron)
+ * - Peut etre appele manuellement via POST /api/fmp-sync
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -22,7 +22,7 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('SUPABASE_URL et SUPABASE_KEY doivent être définis');
+  throw new Error('SUPABASE_URL et SUPABASE_KEY doivent etre definis');
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -60,7 +60,7 @@ async function logJob(jobType, status, options = {}) {
  */
 async function callFMP(endpoint, params = {}) {
   if (!FMP_API_KEY) {
-    throw new Error('FMP_API_KEY non configurée');
+    throw new Error('FMP_API_KEY non configuree');
   }
 
   const url = new URL(`${FMP_BASE_URL}/${endpoint}`);
@@ -88,11 +88,11 @@ async function syncInstruments() {
   const startedAt = new Date();
   
   try {
-    // Récupérer les symboles du S&P 500
+    // Recuperer les symboles du S&P 500
     const sp500 = await callFMP('sp500_constituent');
     
-    // Récupérer les symboles du TSX (si disponible)
-    // Note: FMP peut avoir des endpoints différents pour TSX
+    // Recuperer les symboles du TSX (si disponible)
+    // Note: FMP peut avoir des endpoints differents pour TSX
     let tsx = [];
     try {
       tsx = await callFMP('tsx_constituent') || [];
@@ -102,7 +102,7 @@ async function syncInstruments() {
 
     const allSymbols = [...sp500, ...tsx];
     
-    // Insérer/mettre à jour les instruments
+    // Inserer/mettre a jour les instruments
     const instruments = allSymbols.map(item => ({
       symbol: item.symbol,
       name: item.name,
@@ -155,7 +155,7 @@ async function syncQuote(symbol) {
       throw new Error(`Pas de quote pour ${symbol}`);
     }
 
-    // Mettre à jour l'instrument avec les dernières données
+    // Mettre a jour l'instrument avec les dernieres donnees
     await supabase
       .from('instruments')
       .update({
@@ -175,7 +175,7 @@ async function syncQuote(symbol) {
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h
       }, { onConflict: 'symbol,endpoint,as_of' });
 
-    // Extraire et stocker les métriques
+    // Extraire et stocker les metriques
     const metrics = [];
     const today = new Date().toISOString().split('T')[0];
 
@@ -254,7 +254,7 @@ async function syncPriceHistory(symbol, limit = 252) {
       throw new Error(`Pas d'historique pour ${symbol}`);
     }
 
-    // Transformer les données
+    // Transformer les donnees
     const priceData = history.historical.map(day => ({
       symbol,
       date: day.date,
@@ -314,16 +314,16 @@ async function syncFundamentals(symbol) {
   const startedAt = new Date();
   
   try {
-    // Récupérer key metrics TTM
+    // Recuperer key metrics TTM
     const [keyMetrics] = await callFMP('key-metrics-ttm', { symbol });
     
-    // Récupérer les ratios
+    // Recuperer les ratios
     const [ratios] = await callFMP('ratios-ttm', { symbol });
 
     const today = new Date().toISOString().split('T')[0];
     const metrics = [];
 
-    // Extraire les métriques de key-metrics-ttm
+    // Extraire les metriques de key-metrics-ttm
     if (keyMetrics) {
       const metricMappings = {
         roicTTM: 'ROIC_TTM',
@@ -351,7 +351,7 @@ async function syncFundamentals(symbol) {
       });
     }
 
-    // Extraire les métriques de ratios-ttm
+    // Extraire les metriques de ratios-ttm
     if (ratios) {
       const ratioMappings = {
         currentRatio: 'CURRENT_RATIO_TTM',
@@ -363,7 +363,7 @@ async function syncFundamentals(symbol) {
 
       Object.entries(ratioMappings).forEach(([fmpKey, metricCode]) => {
         if (ratios[fmpKey] !== undefined && ratios[fmpKey] !== null) {
-          // Éviter les doublons (ROE peut être dans les deux)
+          // Eviter les doublons (ROE peut etre dans les deux)
           if (!metrics.find(m => m.metric_code === metricCode)) {
             metrics.push({
               symbol,
@@ -402,7 +402,7 @@ async function syncFundamentals(symbol) {
         }, { onConflict: 'symbol,endpoint,as_of' });
     }
 
-    // Insérer les métriques
+    // Inserer les metriques
     if (metrics.length > 0) {
       await supabase
         .from('metrics')
@@ -433,7 +433,7 @@ async function syncFundamentals(symbol) {
 }
 
 /**
- * Synchronise les indices de marché
+ * Synchronise les indices de marche
  */
 async function syncMarketIndices() {
   const startedAt = new Date();
@@ -561,14 +561,14 @@ export default async function handler(req, res) {
         break;
 
       case 'sync-all':
-        // Synchronisation complète pour un symbole
+        // Synchronisation complete pour un symbole
         if (!symbol) {
           return res.status(400).json({ error: 'symbol requis pour sync-all' });
         }
         await syncQuote(symbol);
         await syncPriceHistory(symbol);
         await syncFundamentals(symbol);
-        result = { success: true, symbol, message: 'Synchronisation complète terminée' };
+        result = { success: true, symbol, message: 'Synchronisation complete terminee' };
         break;
 
       default:

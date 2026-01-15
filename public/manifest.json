@@ -1,7 +1,7 @@
 {
   "name": "GOB Terminal Financier - JLab",
   "short_name": "JLab",
-  "description": "Dashboard financier propulsé par JSL AI",
+  "description": "Dashboard financier propulse par JSL AI",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
@@ -33,7 +33,7 @@
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "Accéder au dashboard principal",
+      "description": "Acceder au dashboard principal",
       "url": "/beta-combined-dashboard.html",
       "icons": [{ "src": "/jlab.png", "sizes": "192x192" }]
     }

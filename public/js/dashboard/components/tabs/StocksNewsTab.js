@@ -3,11 +3,11 @@ const { useState, useEffect, useRef, useCallback } = React;
 // Create local reference with different name to avoid Babel transpilation conflicts
 const LazyWrapper = window.LazyWidgetWrapper || (({ children }) => children);
 
-// Note: MarketOverviewWidget et ScreenerWidget ont été déplacés vers MarketsEconomyTab et AdvancedAnalysisTab
-// pour éviter les doublons de widgets TradingView
+// Note: MarketOverviewWidget et ScreenerWidget ont ete deplaces vers MarketsEconomyTab et AdvancedAnalysisTab
+// pour eviter les doublons de widgets TradingView
 
 const StocksNewsTab = (props) => {
-        // Récupère les données/handlers depuis la surface globale du dashboard avec fallback props
+        // Recupere les donnees/handlers depuis la surface globale du dashboard avec fallback props
         const dashboard = typeof window !== 'undefined' ? window.BetaCombinedDashboard || {} : {};
         const isDarkMode = props.isDarkMode ?? dashboard.isDarkMode ?? true;
         const tickers = (props.tickers && props.tickers.length > 0 ? props.tickers : dashboard.tickers) ?? [];
@@ -57,25 +57,25 @@ const StocksNewsTab = (props) => {
 
         // Fonction pour extraire la raison du mouvement depuis les news
         const extractMoveReason = (ticker, changePercent) => {
-            // PRIORITÉ 1: Utiliser l'explication "Why Is It Moving?" de Finviz si disponible
+            // PRIORITE 1: Utiliser l'explication "Why Is It Moving?" de Finviz si disponible
             const whyMoving = tickerMoveReasons[ticker];
             if (whyMoving && whyMoving.explanation) {
                 const explanation = whyMoving.explanation_enriched || whyMoving.explanation;
                 return explanation.length > 120 ? explanation.substring(0, 120) + '...' : explanation;
             }
         
-            // PRIORITÉ 2: Utiliser la news récente depuis tickerLatestNews
+            // PRIORITE 2: Utiliser la news recente depuis tickerLatestNews
             let news = tickerLatestNews[ticker];
             if (news && news.title) {
                 return news.title.length > 120 ? news.title.substring(0, 120) + '...' : news.title;
             }
         
-            // FALLBACK: Message générique
+            // FALLBACK: Message generique
             const directionLabel = changePercent > 0 ? 'hausse' : 'baisse';
-            return `Variation en ${directionLabel} de ${Math.abs(changePercent).toFixed(2)}% sans actualité confirmée.`;
+            return `Variation en ${directionLabel} de ${Math.abs(changePercent).toFixed(2)}% sans actualite confirmee.`;
         };
 
-        const [stocksViewMode, setStocksViewMode] = useState('list'); // list par défaut (3 vues: list, cards, table)
+        const [stocksViewMode, setStocksViewMode] = useState('list'); // list par defaut (3 vues: list, cards, table)
         const [expandedStock, setExpandedStock] = useState(null);
         const [expandedArticle, setExpandedArticle] = useState(null); // Article expandu avec iframe
 
@@ -98,12 +98,12 @@ const StocksNewsTab = (props) => {
                                     : 'bg-rose-100 border-rose-300 text-rose-700'
                         }`}
                     >
-                        {isBull ? '🐂' : '🐻'}
+                        {isBull ? '' : ''}
                     </span>
                 );
             };
 
-        // Helper functions for news credibility scoring (définies dans le composant)
+        // Helper functions for news credibility scoring (definies dans le composant)
         const getNewsCredibilityScore = (sourceName) => {
             if (!sourceName) return 50;
 
@@ -157,7 +157,7 @@ const StocksNewsTab = (props) => {
 
         return (
         <div className="space-y-6">
-            {/* Message d'état si pas de données */}
+            {/* Message d'etat si pas de donnees */}
             {tickers.length === 0 && stockDataCount === 0 && newsData.length === 0 && (
                 <div className={`p-6 rounded-xl border-2 transition-colors duration-300 ${
                     isDarkMode
@@ -165,9 +165,9 @@ const StocksNewsTab = (props) => {
                         : 'bg-yellow-50 border-yellow-200'
                 }`}>
                     <div className="flex items-center gap-3 mb-2">
-                        <span className="text-2xl">⏳</span>
+                        <span className="text-2xl"></span>
                         <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            Chargement des données...
+                            Chargement des donnees...
                         </h3>
                     </div>
                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -184,7 +184,7 @@ const StocksNewsTab = (props) => {
                                 : 'bg-blue-500 hover:bg-blue-600 text-white'
                         }`}
                     >
-                        🔄 Forcer le chargement
+                         Forcer le chargement
                     </button>
                 </div>
             )}
@@ -192,7 +192,7 @@ const StocksNewsTab = (props) => {
             <div className="flex justify-between items-center">
                 <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>📊 Titres & nouvelles</h2>
+                }`}> Titres & nouvelles</h2>
                 <div className="flex gap-2">
                     {/* Toggle Vue */}
                     <div className={`flex gap-1 p-1 rounded-lg transition-colors duration-300 ${
@@ -206,7 +206,7 @@ const StocksNewsTab = (props) => {
                                     : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                         >
-                            📋 Liste
+                             Liste
                         </button>
                         <button
                             onClick={() => setStocksViewMode('cards')}
@@ -216,7 +216,7 @@ const StocksNewsTab = (props) => {
                                     : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                         >
-                            🎴 Cartes
+                             Cartes
                         </button>
                         <button
                             onClick={() => setStocksViewMode('table')}
@@ -226,7 +226,7 @@ const StocksNewsTab = (props) => {
                                     : (isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900')
                             }`}
                         >
-                            📊 Tableau
+                             Tableau
                         </button>
                     </div>
                     <button
@@ -242,14 +242,14 @@ const StocksNewsTab = (props) => {
                                 : 'bg-gray-700 hover:bg-gray-600 text-white'
                         }`}
                     >
-                        {loading ? '⏳ Actualisation...' : '🔄 Actualiser'}
+                        {loading ? ' Actualisation...' : ' Actualiser'}
                     </button>
                 </div>
             </div>
 
             {lastUpdate && (
                 <p className="text-gray-400 text-sm">
-                    Dernière mise à jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
+                    Derniere mise a jour: {new Date(lastUpdate).toLocaleString('fr-FR')}
                 </p>
             )}
 
@@ -328,7 +328,7 @@ const StocksNewsTab = (props) => {
                                         change: stockData[ticker]?.dp || 0,
                                         price: stockData[ticker]?.c || 0
                                     }))
-                                    .filter(item => item.change > 0 && stockData[item.ticker]) // Filtrer seulement ceux avec données
+                                    .filter(item => item.change > 0 && stockData[item.ticker]) // Filtrer seulement ceux avec donnees
                                     .sort((a, b) => b.change - a.change)
                                     .slice(0, 5)
                                     .map((item, idx) => (
@@ -368,7 +368,7 @@ const StocksNewsTab = (props) => {
                                                                 // Essayer SeekingAlpha
                                                                 e.target.src = `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
                                                             } else {
-                                                                // Tous les fallbacks ont échoué, masquer l'image
+                                                                // Tous les fallbacks ont echoue, masquer l'image
                                                                 e.target.style.display = 'none';
                                                             }
                                                         }}
@@ -379,14 +379,14 @@ const StocksNewsTab = (props) => {
                                                     <div className={`font-bold text-base ml-auto flex-shrink-0 ${
                                                         isDarkMode ? 'text-green-400' : 'text-green-600'
                                                     } drop-shadow-sm`}>
-                                                        +{item.change.toFixed(2)}% ↑
+                                                        +{item.change.toFixed(2)}% ^
                                                     </div>
                                                     <div className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0 drop-shadow-sm`}>
                                                         ${item.price.toFixed(2)}
                                                     </div>
                                                 </div>
                                                 
-                                                {/* Espace dédié pour les news avec placeholder */}
+                                                {/* Espace dedie pour les news avec placeholder */}
                                                 <div className={`mt-2 ml-8 min-h-[20px] ${isDarkMode ? 'bg-gray-900/40 rounded px-2 py-1' : 'bg-gray-50 rounded px-2 py-1'}`}>
                                                     {(() => {
                                                         const reason = extractMoveReason(item.ticker, item.change);
@@ -404,7 +404,7 @@ const StocksNewsTab = (props) => {
                                                                         </span>
                                                                     ) : (
                                                                         <span className="inline-flex items-start gap-1.5">
-                                                                            <span className="text-blue-400 flex-shrink-0 text-sm">📰</span>
+                                                                            <span className="text-blue-400 flex-shrink-0 text-sm"></span>
                                                                             <span className="leading-relaxed break-words">{reason}</span>
                                                                         </span>
                                                                     )}
@@ -493,7 +493,7 @@ const StocksNewsTab = (props) => {
                                         change: stockData[ticker]?.dp || 0,
                                         price: stockData[ticker]?.c || 0
                                     }))
-                                    .filter(item => item.change < 0 && stockData[item.ticker]) // Filtrer seulement ceux avec données
+                                    .filter(item => item.change < 0 && stockData[item.ticker]) // Filtrer seulement ceux avec donnees
                                     .sort((a, b) => a.change - b.change)
                                     .slice(0, 5)
                                     .map((item, idx) => (
@@ -533,7 +533,7 @@ const StocksNewsTab = (props) => {
                                                                 // Essayer SeekingAlpha
                                                                 e.target.src = `https://static.seekingalpha.com/cdn/s3/company_logos/mark_vector_light/${ticker}.svg`;
                                                             } else {
-                                                                // Tous les fallbacks ont échoué, masquer l'image
+                                                                // Tous les fallbacks ont echoue, masquer l'image
                                                                 e.target.style.display = 'none';
                                                             }
                                                         }}
@@ -544,14 +544,14 @@ const StocksNewsTab = (props) => {
                                                     <div className={`font-bold text-base ml-auto flex-shrink-0 ${
                                                         isDarkMode ? 'text-red-400' : 'text-red-600'
                                                     } drop-shadow-sm`}>
-                                                        {item.change.toFixed(2)}% ↓
+                                                        {item.change.toFixed(2)}% v
                                                     </div>
                                                     <div className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} flex-shrink-0 drop-shadow-sm`}>
                                                         ${item.price.toFixed(2)}
                                                     </div>
                                                 </div>
                                                 
-                                                {/* Espace dédié pour les news avec placeholder */}
+                                                {/* Espace dedie pour les news avec placeholder */}
                                                 <div className={`mt-2 ml-8 min-h-[20px] ${isDarkMode ? 'bg-gray-900/40 rounded px-2 py-1' : 'bg-gray-50 rounded px-2 py-1'}`}>
                                                     {(() => {
                                                         const reason = extractMoveReason(item.ticker, item.change);
@@ -569,7 +569,7 @@ const StocksNewsTab = (props) => {
                                                                         </span>
                                                                     ) : (
                                                                         <span className="inline-flex items-start gap-1.5">
-                                                                            <span className="text-blue-400 flex-shrink-0 text-sm">📰</span>
+                                                                            <span className="text-blue-400 flex-shrink-0 text-sm"></span>
                                                                             <span className="leading-relaxed break-words">{reason}</span>
                                                                         </span>
                                                                     )}
@@ -725,7 +725,7 @@ const StocksNewsTab = (props) => {
                                         <div className="flex items-center gap-2">
                                             <LucideIcon name="ArrowUpRight" className="w-3 h-3 text-gray-400" />
                                             <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                Cliquer pour analyse complète
+                                                Cliquer pour analyse complete
                                             </span>
                                         </div>
                                     </div>
@@ -747,13 +747,13 @@ const StocksNewsTab = (props) => {
                         <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                             <LucideIcon name="AlertCircle" className="w-12 h-12 mx-auto mb-3 opacity-50" />
                             <p>Aucune recommandation d'analyste disponible pour le moment</p>
-                            <p className="text-sm mt-2">Les données seront chargées lors de la prochaine actualisation</p>
+                            <p className="text-sm mt-2">Les donnees seront chargees lors de la prochaine actualisation</p>
                         </div>
                     )}
                 </div>
             )}
 
-            {/* Debug des données déplacé vers Admin-JSLAI */}
+            {/* Debug des donnees deplace vers Admin-JSLAI */}
 
             {/* Vue LIST - Compacte */}
             {stocksViewMode === 'list' && (
@@ -765,16 +765,16 @@ const StocksNewsTab = (props) => {
                     }`}>
                         <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>📊 Titres - Vue Liste</h2>
+                        }`}> Titres - Vue Liste</h2>
 
                         {tickers.length === 0 ? (
                             <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 <p className="text-lg font-semibold mb-2">Aucun titre disponible</p>
-                                <p className="text-sm">Les données sont en cours de chargement...</p>
+                                <p className="text-sm">Les donnees sont en cours de chargement...</p>
                             </div>
                         ) : Object.keys(stockData).length === 0 ? (
                             <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <p className="text-lg font-semibold mb-2">Chargement des données de marché...</p>
+                                <p className="text-lg font-semibold mb-2">Chargement des donnees de marche...</p>
                                 <p className="text-sm">Veuillez patienter quelques instants</p>
                             </div>
                         ) : (
@@ -814,7 +814,7 @@ const StocksNewsTab = (props) => {
                                                     {companyNames[ticker] || ticker}
                                                 </div>
                                                 
-                                                {/* Espace dédié pour les news avec extractMoveReason */}
+                                                {/* Espace dedie pour les news avec extractMoveReason */}
                                                 <div className={`mt-2 min-h-[20px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                     {extractMoveReason(ticker, changePercent) ? (
                                                         <div className={`text-xs flex items-start gap-2 ${
@@ -829,14 +829,14 @@ const StocksNewsTab = (props) => {
                                                                 </span>
                                                             ) : (
                                                                 <span className="inline-flex items-start gap-1.5">
-                                                                    <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                    <span className="text-blue-400 flex-shrink-0"></span>
                                                                     <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
                                                                 </span>
                                                             )}
                                                         </div>
                                                     ) : tickerLatestNews[ticker] ? (
                                                         <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                            📰 <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
+                                                             <span className="italic">{tickerLatestNews[ticker].title.length > 70 ? tickerLatestNews[ticker].title.substring(0, 70) + '...' : tickerLatestNews[ticker].title}</span>
                                                         </div>
                                                     ) : (
                                                         <div className={`text-xs italic ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
@@ -874,16 +874,16 @@ const StocksNewsTab = (props) => {
                     }`}>
                         <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🎴 Titres - Vue Cartes</h2>
+                        }`}> Titres - Vue Cartes</h2>
 
                         {tickers.length === 0 ? (
                             <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                 <p className="text-lg font-semibold mb-2">Aucun titre disponible</p>
-                                <p className="text-sm">Les données sont en cours de chargement...</p>
+                                <p className="text-sm">Les donnees sont en cours de chargement...</p>
                             </div>
                         ) : Object.keys(stockData).length === 0 ? (
                             <div className={`text-center py-12 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <p className="text-lg font-semibold mb-2">Chargement des données de marché...</p>
+                                <p className="text-lg font-semibold mb-2">Chargement des donnees de marche...</p>
                                 <p className="text-sm">Veuillez patienter quelques instants</p>
                             </div>
                         ) : (
@@ -927,7 +927,7 @@ const StocksNewsTab = (props) => {
                                                         {companyNames[ticker] || ticker}
                                                     </div>
                                                     
-                                                    {/* Espace dédié pour les news avec extractMoveReason */}
+                                                    {/* Espace dedie pour les news avec extractMoveReason */}
                                                     <div className={`mt-2 min-h-[24px] ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                         {extractMoveReason(ticker, changePercent) ? (
                                                             <div className={`text-xs flex items-start gap-2 ${
@@ -942,14 +942,14 @@ const StocksNewsTab = (props) => {
                                                                     </span>
                                                                 ) : (
                                                                     <span className="inline-flex items-start gap-1.5">
-                                                                        <span className="text-blue-400 flex-shrink-0">📰</span>
+                                                                        <span className="text-blue-400 flex-shrink-0"></span>
                                                                         <span className="leading-relaxed">{extractMoveReason(ticker, changePercent)}</span>
                                                                     </span>
                                                                 )}
                                                             </div>
                                                         ) : tickerLatestNews[ticker] ? (
                                                             <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                                                                📰 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
+                                                                 <span className="italic">{tickerLatestNews[ticker].title.length > 60 ? tickerLatestNews[ticker].title.substring(0, 60) + '...' : tickerLatestNews[ticker].title}</span>
                                                             </div>
                                                         ) : (
                                                             <div className={`text-xs italic ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -965,7 +965,7 @@ const StocksNewsTab = (props) => {
                                                     ? 'bg-green-500/20 text-green-500 border border-green-500/30'
                                                     : 'bg-red-500/20 text-red-500 border border-red-500/30'
                                             }`}>
-                                                {isPositive ? '▲' : '▼'}
+                                                {isPositive ? '' : ''}
                                             </div>
                                         </div>
 
@@ -1001,7 +1001,7 @@ const StocksNewsTab = (props) => {
                 </div>
             )}
 
-            {/* Section Données Financières & Actualités (Finnhub) - PRINCIPALE */}
+            {/* Section Donnees Financieres & Actualites (Finnhub) - PRINCIPALE */}
             {stocksViewMode === 'table' && (
             <div className="mt-8">
                 <div className={`backdrop-blur-sm rounded-2xl p-8 border-2 shadow-2xl transition-colors duration-300 ${
@@ -1013,20 +1013,20 @@ const StocksNewsTab = (props) => {
                         <h2 className={`text-2xl font-bold mb-3 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            📊 Données Financières & Actualités
+                             Donnees Financieres & Actualites
                         </h2>
                         <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300 ${
                             isDarkMode 
                                 ? 'bg-gray-600/20 text-gray-300 border border-gray-500/30' 
                                 : 'bg-gray-700/80 text-gray-200 border border-gray-600/50'
                         }`}>
-                            <span className="mr-2">🔗</span>
+                            <span className="mr-2"></span>
                             Source: Finnhub API
                         </div>
                         <p className={`text-sm mt-3 transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                         }`}>
-                            Données en temps réel avec 3 actualités par titre
+                            Donnees en temps reel avec 3 actualites par titre
                         </p>
                     </div>
                     <div className="overflow-x-auto max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 relative text-sm">
@@ -1037,43 +1037,43 @@ const StocksNewsTab = (props) => {
                                 }`}>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>📈 Ticker</th>
+                                    }`}> Ticker</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>💰 Prix</th>
+                                    }`}> Prix</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>📊 Change</th>
+                                    }`}> Change</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>📈 P/E</th>
+                                    }`}> P/E</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>💎 Dividende</th>
+                                    }`}> Dividende</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>🏢 Secteur</th>
+                                    }`}> Secteur</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>⭐ Rating</th>
+                                    }`}> Rating</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>😊 Sentiment</th>
+                                    }`}> Sentiment</th>
                                     <th className={`text-left py-2 px-3 font-bold transition-colors duration-300 ${
                                         isDarkMode ? 'text-blue-300' : 'text-blue-700'
-                                    }`}>⚡ Actions</th>
+                                    }`}> Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {tickers.map(ticker => {
-                                    // Données de Finnhub uniquement
+                                    // Donnees de Finnhub uniquement
                                     const finnhubData = stockData[ticker];
                                     const price = finnhubData?.c ? `$${finnhubData.c.toFixed(2)}` : 'N/A';
                                     const change = finnhubData?.d ? `${finnhubData.d > 0 ? '+' : ''}${finnhubData.d.toFixed(2)}` : 'N/A';
                                     const changePercent = finnhubData?.dp ? `${finnhubData.dp > 0 ? '+' : ''}${finnhubData.dp.toFixed(2)}%` : 'N/A';
                                     const changeColor = finnhubData?.d > 0 ? 'text-green-400' : finnhubData?.d < 0 ? 'text-red-400' : 'text-gray-400';
                                     
-                                    // Données de profil Finnhub
+                                    // Donnees de profil Finnhub
                                     const profile = finnhubData?.profile;
                                     const fundamentals = finnhubData?.fundamentals;
                                     const peRatio = fundamentals?.peRatio
@@ -1084,13 +1084,13 @@ const StocksNewsTab = (props) => {
                                         : (profile?.dividend ? `${(profile.dividend * 100).toFixed(2)}%` : 'N/A');
                                     const sector = fundamentals?.sector || profile?.industry || 'N/A';
                                     
-                                    // Données de recommandation Finnhub
+                                    // Donnees de recommandation Finnhub
                                     const recommendation = finnhubData?.recommendation;
                                     const rating = recommendation?.length > 0 ? 
                                         (recommendation[0].buy + recommendation[0].strongBuy > recommendation[0].sell + recommendation[0].strongSell ? 'Achat' : 
                                          recommendation[0].sell + recommendation[0].strongSell > recommendation[0].buy + recommendation[0].strongBuy ? 'Vente' : 'Neutre') : 'N/A';
                                     
-                                    // 2 actualités les plus crédibles pour ce ticker
+                                    // 2 actualites les plus credibles pour ce ticker
                                     const tickerNews = sortNewsByCredibility(
                                         newsData.filter(article => {
                                         const text = (article.title + ' ' + article.description).toLowerCase();
@@ -1101,14 +1101,14 @@ const StocksNewsTab = (props) => {
                                     // Analyse du sentiment
                                     const analyzeSentiment = (title, description) => {
                                         const text = (title + ' ' + description).toLowerCase();
-                                        const positiveWords = ['hausse', 'croissance', 'gain', 'profit', 'positif', 'amélioration', 'succès', 'fort', 'solide'];
-                                        const negativeWords = ['baisse', 'chute', 'perte', 'négatif', 'déclin', 'faible', 'problème', 'risque', 'inquiétude'];
+                                        const positiveWords = ['hausse', 'croissance', 'gain', 'profit', 'positif', 'amelioration', 'succes', 'fort', 'solide'];
+                                        const negativeWords = ['baisse', 'chute', 'perte', 'negatif', 'declin', 'faible', 'probleme', 'risque', 'inquietude'];
                                         
                                         const positiveCount = positiveWords.filter(word => text.includes(word)).length;
                                         const negativeCount = negativeWords.filter(word => text.includes(word)).length;
                                         
                                         if (positiveCount > negativeCount) return { sentiment: 'Positif', color: 'text-green-400' };
-                                        if (negativeCount > positiveCount) return { sentiment: 'Négatif', color: 'text-red-400' };
+                                        if (negativeCount > positiveCount) return { sentiment: 'Negatif', color: 'text-red-400' };
                                         return { sentiment: 'Neutre', color: 'text-gray-400' };
                                     };
                                     
@@ -1164,12 +1164,12 @@ const StocksNewsTab = (props) => {
                                                 <td className="py-4 px-3">
                                                     <div className={`flex items-center gap-2 px-3 py-2 rounded-full transition-colors duration-300 ${
                                                         sentiment.sentiment === 'Positif' ? 'bg-green-100 text-green-800' :
-                                                        sentiment.sentiment === 'Négatif' ? 'bg-red-100 text-red-800' :
+                                                        sentiment.sentiment === 'Negatif' ? 'bg-red-100 text-red-800' :
                                                         'bg-gray-100 text-gray-800'
                                                     }`}>
                                                         <span className="text-lg">
-                                                            {sentiment.sentiment === 'Positif' ? '😊' : 
-                                                             sentiment.sentiment === 'Négatif' ? '😟' : '😐'}
+                                                            {sentiment.sentiment === 'Positif' ? '' : 
+                                                             sentiment.sentiment === 'Negatif' ? '' : ''}
                                                         </span>
                                                         <span className="font-semibold">{sentiment.sentiment}</span>
                                                     </div>
@@ -1186,7 +1186,7 @@ const StocksNewsTab = (props) => {
                                                                 : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white shadow-blue-400/25'
                                                         }`}
                                                     >
-                                                        📊 Voir dans JLab
+                                                         Voir dans JLab
                                                     </button>
                                                 </td>
                                             </tr>
@@ -1200,7 +1200,7 @@ const StocksNewsTab = (props) => {
                                                 }`}>
                                                     <td colSpan="9" className="py-4 px-4">
                                                         <div className="flex items-start gap-3">
-                                                            {/* Icône étoile (sparkles) */}
+                                                            {/* Icone etoile (sparkles) */}
                                                             <div className={`p-2 rounded-full ${
                                                                 isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'
                                                             }`}>
@@ -1213,7 +1213,7 @@ const StocksNewsTab = (props) => {
                                                                     <span className={`text-xs font-bold px-2 py-0.5 rounded ${
                                                                         isDarkMode ? 'bg-purple-500/30 text-purple-300' : 'bg-purple-200 text-purple-700'
                                                                     }`}>
-                                                                        🔥 CE QUI BOUGE
+                                                                         CE QUI BOUGE
                                                                     </span>
                                                                     <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                                         {finvizNews[ticker].date}
@@ -1244,7 +1244,7 @@ const StocksNewsTab = (props) => {
                                                 </tr>
                                             )}
 
-                                            {/* Lignes d'actualités (3 maximum) - STYLE AMÉLIORÉ */}
+                                            {/* Lignes d'actualites (3 maximum) - STYLE AMELIORE */}
                                             {tickerNews.map((news, newsIndex) => (
                                                 <tr key={`${ticker}-news-${newsIndex}`} className={`border-b-2 transition-all duration-300 hover:scale-[1.01] ${
                                                     isDarkMode 
@@ -1303,7 +1303,7 @@ const StocksNewsTab = (props) => {
                                                                         <div className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors duration-300 ${
                                                                             isDarkMode ? 'bg-gray-800' : 'bg-gray-200'
                                                                         }`}>
-                                                                            <span>🕒</span>
+                                                                            <span></span>
                                                                             <span>
                                                                                 {news.publishedAt ? 
                                                                                     new Date(news.publishedAt).toLocaleString('fr-FR') : 
@@ -1322,7 +1322,7 @@ const StocksNewsTab = (props) => {
                                                                                         : 'bg-gray-700 hover:bg-gray-600 text-white shadow-lg shadow-gray-400/25'
                                                                                 }`}
                                                                             >
-                                                                                📖 Lire l'article
+                                                                                 Lire l'article
                                                                             </a>
                                                                         )}
                                                                     </div>
@@ -1346,44 +1346,44 @@ const StocksNewsTab = (props) => {
                         <div className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
                             isDarkMode ? 'text-blue-300' : 'text-blue-700'
                         }`}>
-                            📜 Section Principale - Données Financières
+                             Section Principale - Donnees Financieres
                         </div>
                         <div className={`text-sm transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                         }`}>
-                            Faites défiler pour voir toutes les données • Source: Finnhub API • 3 actualités par titre
+                            Faites defiler pour voir toutes les donnees - Source: Finnhub API - 3 actualites par titre
                         </div>
                         <div className={`text-xs mt-2 transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
                         }`}>
-                            Données mises à jour automatiquement toutes les 5 minutes
+                            Donnees mises a jour automatiquement toutes les 5 minutes
                         </div>
                     </div>
                 </div>
             </div>
             )}
 
-            {/* BUG #3 FIX: EmptyState amélioré pour Portfolio */}
+            {/* BUG #3 FIX: EmptyState ameliore pour Portfolio */}
             {tickers.length === 0 && (
                 <div className={`flex flex-col items-center justify-center min-h-[400px] p-8 rounded-xl border-2 transition-colors duration-300 ${
                     isDarkMode
                         ? 'bg-gray-800/50 border-dashed border-gray-700'
                         : 'bg-gray-50 border-dashed border-gray-300'
                 }`}>
-                    <div className="text-6xl mb-4 opacity-60">📊</div>
+                    <div className="text-6xl mb-4 opacity-60"></div>
                     <h3 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                         {tickerSource === 'portfolio' 
                             ? 'Aucun titre dans votre portfolio'
                             : tickerSource === 'watchlist'
                             ? 'Aucun titre dans votre watchlist'
-                            : 'Aucun ticker configuré'}
+                            : 'Aucun ticker configure'}
                     </h3>
                     <p className={`text-sm text-center max-w-md mb-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         {tickerSource === 'portfolio'
-                            ? 'Ajoutez des actions à votre portfolio pour commencer le suivi de vos investissements.'
+                            ? 'Ajoutez des actions a votre portfolio pour commencer le suivi de vos investissements.'
                             : tickerSource === 'watchlist'
-                            ? 'Ajoutez des titres à votre watchlist pour suivre leurs performances.'
-                            : 'Ajoutez des tickers dans l\'onglet Seeking Alpha pour voir les données ici.'}
+                            ? 'Ajoutez des titres a votre watchlist pour suivre leurs performances.'
+                            : 'Ajoutez des tickers dans l\'onglet Seeking Alpha pour voir les donnees ici.'}
                     </p>
                     {tickerSource === 'portfolio' && (
                         <button
@@ -1406,7 +1406,7 @@ const StocksNewsTab = (props) => {
                 </div>
             )}
 
-            {/* ===== SECTION ACTUALITÉS SÉPARÉE ===== */}
+            {/* ===== SECTION ACTUALITES SEPAREE ===== */}
             {newsData.length > 0 && (
                 <div className="mt-12">
                     <div className={`backdrop-blur-md rounded-3xl p-8 md:p-10 border-2 shadow-2xl transition-all duration-300 relative overflow-hidden ${
@@ -1414,7 +1414,7 @@ const StocksNewsTab = (props) => {
                             ? 'bg-gradient-to-br from-gray-800/95 via-gray-800/90 to-gray-900/95 border-purple-500/40 shadow-purple-500/20'
                             : 'bg-gradient-to-br from-white/98 via-white/95 to-gray-50/98 border-purple-400/50 shadow-purple-400/20'
                     }`}>
-                        {/* Pattern de fond décoratif */}
+                        {/* Pattern de fond decoratif */}
                         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
                             backgroundImage: `radial-gradient(circle at 2px 2px, ${isDarkMode ? '#a855f7' : '#9333ea'} 1px, transparent 0)`,
                             backgroundSize: '40px 40px'
@@ -1428,7 +1428,7 @@ const StocksNewsTab = (props) => {
                         }}></div>
                         
                         <div className="relative z-10">
-                            {/* Header amélioré */}
+                            {/* Header ameliore */}
                             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                                 <div className="flex items-center gap-4">
                                     <div className={`p-3 rounded-2xl ${
@@ -1436,7 +1436,7 @@ const StocksNewsTab = (props) => {
                                             ? 'bg-gradient-to-br from-purple-600/30 to-purple-500/20 border border-purple-500/30' 
                                             : 'bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200'
                                     }`}>
-                                        <span className="text-3xl">📰</span>
+                                        <span className="text-3xl"></span>
                                     </div>
                                     <div>
                                         <h2 className={`text-3xl md:text-4xl font-black transition-colors duration-300 mb-1 ${
@@ -1446,12 +1446,12 @@ const StocksNewsTab = (props) => {
                                             fontWeight: 900,
                                             letterSpacing: '-0.02em'
                                         }}>
-                                            Actualités du Marché
+                                            Actualites du Marche
                                         </h2>
                                         <p className={`text-sm transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                         }`}>
-                                            Dernières nouvelles financières en temps réel
+                                            Dernieres nouvelles financieres en temps reel
                                         </p>
                                     </div>
                                 </div>
@@ -1461,7 +1461,7 @@ const StocksNewsTab = (props) => {
                                             ? 'bg-gradient-to-r from-purple-600/40 to-purple-500/30 text-purple-200 border-2 border-purple-500/50 shadow-purple-500/20'
                                             : 'bg-gradient-to-r from-purple-100 to-purple-50 text-purple-700 border-2 border-purple-300 shadow-purple-200/50'
                                     }`}>
-                                        <span className="text-lg mr-2">📊</span>
+                                        <span className="text-lg mr-2"></span>
                                         {newsData.length} articles
                                     </div>
                                 </div>
@@ -1507,7 +1507,7 @@ const StocksNewsTab = (props) => {
                                                 animation: 'shimmer 2s infinite'
                                             }}></div>
                                             
-                                            {/* Indicateur de crédibilité coloré à gauche */}
+                                            {/* Indicateur de credibilite colore a gauche */}
                                             <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl ${
                                                 credibilityTier === 'premium'
                                                     ? 'bg-gradient-to-b from-yellow-400 to-yellow-600'
@@ -1521,7 +1521,7 @@ const StocksNewsTab = (props) => {
                                             }`}></div>
                                             
                                             <div className="relative z-10">
-                                                {/* Source et crédibilité */}
+                                                {/* Source et credibilite */}
                                                 <div className="flex items-center justify-between mb-4">
                                                     <div className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-300 ${
                                                         credibilityTier === 'premium'
@@ -1634,7 +1634,7 @@ const StocksNewsTab = (props) => {
                                                     {expandedArticle.title}
                                                 </h3>
                                                 <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                    {expandedArticle.source?.name || 'Source inconnue'} • {new Date(expandedArticle.publishedAt).toLocaleDateString('fr-FR', {
+                                                    {expandedArticle.source?.name || 'Source inconnue'} - {new Date(expandedArticle.publishedAt).toLocaleDateString('fr-FR', {
                                                         month: 'long',
                                                         day: 'numeric',
                                                         year: 'numeric',
@@ -1657,7 +1657,7 @@ const StocksNewsTab = (props) => {
                                             </button>
                                         </div>
                                         
-                                        {/* Iframe Content - Chargé seulement quand la modal est ouverte */}
+                                        {/* Iframe Content - Charge seulement quand la modal est ouverte */}
                                         <div className="relative w-full h-[calc(90vh-80px)]">
                                             {expandedArticle.url ? (
                                                 <iframe
@@ -1688,9 +1688,9 @@ const StocksNewsTab = (props) => {
                                                 : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-2 border-purple-300/50'
                                         }`}
                                     >
-                                        <span className="mr-2">📰</span>
-                                        Voir toutes les actualités ({newsData.length})
-                                        <span className="ml-2">→</span>
+                                        <span className="mr-2"></span>
+                                        Voir toutes les actualites ({newsData.length})
+                                        <span className="ml-2">-></span>
                                     </button>
                                 </div>
                             )}

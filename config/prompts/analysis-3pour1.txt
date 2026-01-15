@@ -1,91 +1,91 @@
-💎 ANALYSE 3-POUR-1 (DCF + Value Investing + Scénarios)
+ ANALYSE 3-POUR-1 (DCF + Value Investing + Scenarios)
 
 Cette section fournit une analyse quantitative approfondie selon les principes de Benjamin Graham et Warren Buffett.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💰 DCF - VALEUR INTRINSÈQUE (Benjamin Graham)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🔢 HYPOTHÈSES DE CALCUL:
-• Free Cash Flow actuel: ${FCF_CURRENT}M
-• Taux croissance 5Y projeté: {GROWTH_RATE}%
-• WACC (coût du capital): {WACC}%
-• Taux de croissance terminal: {TERMINAL_RATE}%
-• Période de projection: 10 ans
+ DCF - VALEUR INTRINSEQUE (Benjamin Graham)
 
-📊 CALCUL DCF:
-Valeur intrinsèque par action: ${INTRINSIC_VALUE}
+
+ HYPOTHESES DE CALCUL:
+- Free Cash Flow actuel: ${FCF_CURRENT}M
+- Taux croissance 5Y projete: {GROWTH_RATE}%
+- WACC (cout du capital): {WACC}%
+- Taux de croissance terminal: {TERMINAL_RATE}%
+- Periode de projection: 10 ans
+
+ CALCUL DCF:
+Valeur intrinseque par action: ${INTRINSIC_VALUE}
 Prix actuel: ${CURRENT_PRICE}
-Marge de sécurité: {MARGIN_OF_SAFETY}%
+Marge de securite: {MARGIN_OF_SAFETY}%
 
-💡 INTERPRÉTATION:
-{Si marge > 30%: "✅ EXCELLENTE marge de sécurité selon Graham (>30%)"}
-{Si marge 15-30%: "✅ Bonne marge de sécurité (15-30%)"}
-{Si marge 0-15%: "⚠️ Marge de sécurité faible (<15%)"}
-{Si marge < 0: "❌ Survalorisation actuelle"}
+ INTERPRETATION:
+{Si marge > 30%: " EXCELLENTE marge de securite selon Graham (>30%)"}
+{Si marge 15-30%: " Bonne marge de securite (15-30%)"}
+{Si marge 0-15%: " Marge de securite faible (<15%)"}
+{Si marge < 0: " Survalorisation actuelle"}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📈 SCÉNARIOS MULTIPLES (3-POUR-1)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🔴 SCÉNARIO PESSIMISTE (Récession)
-• Croissance FCF: {PESSIMISTIC_GROWTH}% (contraction)
-• Valeur intrinsèque: ${PESSIMISTIC_VALUE}
-• Upside/Downside: {PESSIMISTIC_UPSIDE}%
-• Probabilité: 20%
+ SCENARIOS MULTIPLES (3-POUR-1)
 
-🟡 SCÉNARIO RÉALISTE (Base Case)
-• Croissance FCF: {REALISTIC_GROWTH}% (historique)
-• Valeur intrinsèque: ${REALISTIC_VALUE}
-• Upside/Downside: {REALISTIC_UPSIDE}%
-• Probabilité: 60%
 
-🟢 SCÉNARIO OPTIMISTE (Expansion)
-• Croissance FCF: {OPTIMISTIC_GROWTH}% (accélération)
-• Valeur intrinsèque: ${OPTIMISTIC_VALUE}
-• Upside/Downside: {OPTIMISTIC_UPSIDE}%
-• Probabilité: 20%
+ SCENARIO PESSIMISTE (Recession)
+- Croissance FCF: {PESSIMISTIC_GROWTH}% (contraction)
+- Valeur intrinseque: ${PESSIMISTIC_VALUE}
+- Upside/Downside: {PESSIMISTIC_UPSIDE}%
+- Probabilite: 20%
 
-📊 ESPÉRANCE DE VALEUR (Probabilité-pondérée):
-${E_VALUE} = (20% × ${PESSIMISTIC_VALUE}) + (60% × ${REALISTIC_VALUE}) + (20% × ${OPTIMISTIC_VALUE})
+ SCENARIO REALISTE (Base Case)
+- Croissance FCF: {REALISTIC_GROWTH}% (historique)
+- Valeur intrinseque: ${REALISTIC_VALUE}
+- Upside/Downside: {REALISTIC_UPSIDE}%
+- Probabilite: 60%
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 RECOMMANDATION VALUE INVESTING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ SCENARIO OPTIMISTE (Expansion)
+- Croissance FCF: {OPTIMISTIC_GROWTH}% (acceleration)
+- Valeur intrinseque: ${OPTIMISTIC_VALUE}
+- Upside/Downside: {OPTIMISTIC_UPSIDE}%
+- Probabilite: 20%
 
-💵 PRIX D'ENTRÉE SUGGÉRÉ: ${ENTRY_PRICE}
-   (Valeur intrinsèque - 30% selon principes Graham)
+ ESPERANCE DE VALEUR (Probabilite-ponderee):
+${E_VALUE} = (20% x ${PESSIMISTIC_VALUE}) + (60% x ${REALISTIC_VALUE}) + (20% x ${OPTIMISTIC_VALUE})
 
-📊 ALLOCATION RECOMMANDÉE: {ALLOCATION}% du portefeuille
-   (Basé sur: conviction × marge sécurité × qualité moat)
 
-⏰ HORIZON D'INVESTISSEMENT: {HORIZON} ans minimum
+ RECOMMANDATION VALUE INVESTING
+
+
+ PRIX D'ENTREE SUGGERE: ${ENTRY_PRICE}
+   (Valeur intrinseque - 30% selon principes Graham)
+
+ ALLOCATION RECOMMANDEE: {ALLOCATION}% du portefeuille
+   (Base sur: conviction x marge securite x qualite moat)
+
+ HORIZON D'INVESTISSEMENT: {HORIZON} ans minimum
    (Value investing = long-terme)
 
-🎓 PRINCIPES APPLIQUÉS:
-• ✅ Marge de sécurité (Graham): {MARGIN}%
-• ✅ Moat durable (Buffett): {MOAT_SCORE}/10
-• ✅ FCF positif et croissant: {FCF_GROWTH}%
-• ✅ Management de qualité: {MANAGEMENT_SCORE}/10
-• ✅ Prix < Valeur intrinsèque: {UNDERVALUED}
+ PRINCIPES APPLIQUES:
+-  Marge de securite (Graham): {MARGIN}%
+-  Moat durable (Buffett): {MOAT_SCORE}/10
+-  FCF positif et croissant: {FCF_GROWTH}%
+-  Management de qualite: {MANAGEMENT_SCORE}/10
+-  Prix < Valeur intrinseque: {UNDERVALUED}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ SENSIBILITÉ & RISQUES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📊 ANALYSE DE SENSIBILITÉ:
+ SENSIBILITE & RISQUES
+
+
+ ANALYSE DE SENSIBILITE:
 Si WACC +1%: Valeur ${VALUE_WACC_PLUS_1}
 Si Croissance -2%: Valeur ${VALUE_GROWTH_MINUS_2}
 
-🚨 RISQUES PRINCIPAUX:
-• {Risque 1 avec impact quantifié}
-• {Risque 2 avec impact quantifié}
-• {Risque 3 avec impact quantifié}
+ RISQUES PRINCIPAUX:
+- {Risque 1 avec impact quantifie}
+- {Risque 2 avec impact quantifie}
+- {Risque 3 avec impact quantifie}
 
-💡 NOTE: Cette analyse suppose {ASSUMPTIONS_SUMMARY}
+ NOTE: Cette analyse suppose {ASSUMPTIONS_SUMMARY}
 
-═══════════════════════════════════════════════════════════
 
-⚙️ MÉTHODOLOGIE:
-Calculs basés sur DCF (Discounted Cash Flow), WACC calculé via CAPM, 
-hypothèses de croissance basées sur historique 5Y et consensus analystes.
+
+ METHODOLOGIE:
+Calculs bases sur DCF (Discounted Cash Flow), WACC calcule via CAPM, 
+hypotheses de croissance basees sur historique 5Y et consensus analystes.

@@ -357,7 +357,7 @@ const NewsRow = ({ title, source, timeAgo, isDarkMode = true }) => {
         'div',
         { className: 'text-xs opacity-70 flex gap-2' },
         source ? React.createElement('span', null, source) : null,
-        timeAgo ? React.createElement('span', null, `· ${timeAgo}`) : null
+        timeAgo ? React.createElement('span', null, ` ${timeAgo}`) : null
     );
     return React.createElement(
         'div',

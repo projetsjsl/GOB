@@ -56,7 +56,7 @@
     margin-bottom: 16px;
 }
 
-/* Carte de résultat */
+/* Carte de resultat */
 .result-card {
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border: 2px solid #f59e0b;
@@ -98,7 +98,7 @@
     background: #fef2f2;
 }
 
-/* Correction spécifique pour l'âge d'indifférence */
+/* Correction specifique pour l'age d'indifference */
 .result-card .age-value:empty::before,
 .result-card .age-value:contains("undefined")::before {
     content: "Non calculable";

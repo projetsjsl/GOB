@@ -2,98 +2,98 @@
  * SMS Adapter Client-Side
  * 
  * Version JavaScript (frontend) de lib/channel-adapter.js
- * pour prévisualiser les messages SMS optimisés dans le chatbot web
+ * pour previsualiser les messages SMS optimises dans le chatbot web
  */
 
 /**
- * Adapte un message pour affichage SMS (identique au vrai SMS envoyé)
+ * Adapte un message pour affichage SMS (identique au vrai SMS envoye)
  * 
- * @param {string} text - Le texte à adapter
+ * @param {string} text - Le texte a adapter
  * @param {object} context - Contexte (tickers, citations, etc.)
- * @returns {string} Texte adapté pour SMS
+ * @returns {string} Texte adapte pour SMS
  */
 function adaptForSMS(text, context = {}) {
   let cleanedText = text;
 
-  // 🚨 OPTIMISATION SMS: Remplacer emojis complexes par ASCII pour GSM-7
+  //  OPTIMISATION SMS: Remplacer emojis complexes par ASCII pour GSM-7
   
-  // Emojis numérotés → chiffres simples
-  cleanedText = cleanedText.replace(/0️⃣/g, '0.');
-  cleanedText = cleanedText.replace(/1️⃣/g, '1.');
-  cleanedText = cleanedText.replace(/2️⃣/g, '2.');
-  cleanedText = cleanedText.replace(/3️⃣/g, '3.');
-  cleanedText = cleanedText.replace(/4️⃣/g, '4.');
-  cleanedText = cleanedText.replace(/5️⃣/g, '5.');
-  cleanedText = cleanedText.replace(/6️⃣/g, '6.');
-  cleanedText = cleanedText.replace(/7️⃣/g, '7.');
-  cleanedText = cleanedText.replace(/8️⃣/g, '8.');
-  cleanedText = cleanedText.replace(/9️⃣/g, '9.');
-  cleanedText = cleanedText.replace(/🔟/g, '10.');
+  // Emojis numerotes -> chiffres simples
+  cleanedText = cleanedText.replace(/0/g, '0.');
+  cleanedText = cleanedText.replace(/1/g, '1.');
+  cleanedText = cleanedText.replace(/2/g, '2.');
+  cleanedText = cleanedText.replace(/3/g, '3.');
+  cleanedText = cleanedText.replace(/4/g, '4.');
+  cleanedText = cleanedText.replace(/5/g, '5.');
+  cleanedText = cleanedText.replace(/6/g, '6.');
+  cleanedText = cleanedText.replace(/7/g, '7.');
+  cleanedText = cleanedText.replace(/8/g, '8.');
+  cleanedText = cleanedText.replace(/9/g, '9.');
+  cleanedText = cleanedText.replace(//g, '10.');
 
-  // Emojis communs → ASCII équivalent
-  cleanedText = cleanedText.replace(/📊/g, '[Graphique]');
-  cleanedText = cleanedText.replace(/📈/g, '[Hausse]');
-  cleanedText = cleanedText.replace(/📉/g, '[Baisse]');
-  cleanedText = cleanedText.replace(/💰/g, '$');
-  cleanedText = cleanedText.replace(/💵/g, '$');
-  cleanedText = cleanedText.replace(/💲/g, '$');
-  cleanedText = cleanedText.replace(/🔍/g, '[Analyse]');
-  cleanedText = cleanedText.replace(/⚠️/g, '[ATTENTION]');
-  cleanedText = cleanedText.replace(/✅/g, '[OK]');
-  cleanedText = cleanedText.replace(/❌/g, '[NON]');
-  cleanedText = cleanedText.replace(/🚀/g, '[+]');
-  cleanedText = cleanedText.replace(/📰/g, '*');
-  cleanedText = cleanedText.replace(/📱/g, '');
-  cleanedText = cleanedText.replace(/💬/g, '');
-  cleanedText = cleanedText.replace(/🎯/g, '>');
-  cleanedText = cleanedText.replace(/💡/g, '[Info]');
-  cleanedText = cleanedText.replace(/🔑/g, '-');
-  cleanedText = cleanedText.replace(/📚/g, 'Sources:');
-  cleanedText = cleanedText.replace(/🏆/g, '[Top]');
-  cleanedText = cleanedText.replace(/⭐/g, '*');
-  cleanedText = cleanedText.replace(/🔴/g, '[Rouge]');
-  cleanedText = cleanedText.replace(/🟢/g, '[Vert]');
-  cleanedText = cleanedText.replace(/🟡/g, '[Jaune]');
+  // Emojis communs -> ASCII equivalent
+  cleanedText = cleanedText.replace(//g, '[Graphique]');
+  cleanedText = cleanedText.replace(//g, '[Hausse]');
+  cleanedText = cleanedText.replace(//g, '[Baisse]');
+  cleanedText = cleanedText.replace(//g, '$');
+  cleanedText = cleanedText.replace(//g, '$');
+  cleanedText = cleanedText.replace(//g, '$');
+  cleanedText = cleanedText.replace(//g, '[Analyse]');
+  cleanedText = cleanedText.replace(//g, '[ATTENTION]');
+  cleanedText = cleanedText.replace(//g, '[OK]');
+  cleanedText = cleanedText.replace(//g, '[NON]');
+  cleanedText = cleanedText.replace(//g, '[+]');
+  cleanedText = cleanedText.replace(//g, '*');
+  cleanedText = cleanedText.replace(//g, '');
+  cleanedText = cleanedText.replace(//g, '');
+  cleanedText = cleanedText.replace(//g, '>');
+  cleanedText = cleanedText.replace(//g, '[Info]');
+  cleanedText = cleanedText.replace(//g, '-');
+  cleanedText = cleanedText.replace(//g, 'Sources:');
+  cleanedText = cleanedText.replace(//g, '[Top]');
+  cleanedText = cleanedText.replace(//g, '*');
+  cleanedText = cleanedText.replace(//g, '[Rouge]');
+  cleanedText = cleanedText.replace(//g, '[Vert]');
+  cleanedText = cleanedText.replace(//g, '[Jaune]');
 
-  // 🎨 GARDER EMOJI EMMA AU DÉBUT (personnalisation)
-  const startsWithEmma = cleanedText.startsWith('👩🏻');
-  const emmaPrefix = startsWithEmma ? '👩🏻 ' : '';
+  //  GARDER EMOJI EMMA AU DEBUT (personnalisation)
+  const startsWithEmma = cleanedText.startsWith('');
+  const emmaPrefix = startsWithEmma ? ' ' : '';
   
-  // Supprimer TOUS les emojis Emma (on remettra 1 seul au début)
-  cleanedText = cleanedText.replace(/👩🏻‍💼/g, '');
-  cleanedText = cleanedText.replace(/🤖/g, '');
-  cleanedText = cleanedText.replace(/👩🏻/g, '');
-  cleanedText = cleanedText.replace(/👋/g, 'Salut');
+  // Supprimer TOUS les emojis Emma (on remettra 1 seul au debut)
+  cleanedText = cleanedText.replace(//g, '');
+  cleanedText = cleanedText.replace(//g, '');
+  cleanedText = cleanedText.replace(//g, '');
+  cleanedText = cleanedText.replace(//g, 'Salut');
   cleanedText = cleanedText.trim();
 
-  // 🔤 NORMALISATION CARACTÈRES ACCENTUÉS pour GSM-7
-  cleanedText = cleanedText.replace(/[âãäå]/g, 'a');
-  cleanedText = cleanedText.replace(/[ÂÃÄÅ]/g, 'A');
-  cleanedText = cleanedText.replace(/[êë]/g, 'e');
-  cleanedText = cleanedText.replace(/[ÊË]/g, 'E');
-  cleanedText = cleanedText.replace(/[îï]/g, 'i');
-  cleanedText = cleanedText.replace(/[ÎÏ]/g, 'I');
-  cleanedText = cleanedText.replace(/[ôõö]/g, 'o');
-  cleanedText = cleanedText.replace(/[ÔÕÖ]/g, 'O');
-  cleanedText = cleanedText.replace(/[ûü]/g, 'u');
-  cleanedText = cleanedText.replace(/[ÛÜ]/g, 'U');
-  cleanedText = cleanedText.replace(/ç/g, 'c');
-  cleanedText = cleanedText.replace(/Ç/g, 'C');
-  cleanedText = cleanedText.replace(/ñ/g, 'n');
-  cleanedText = cleanedText.replace(/Ñ/g, 'N');
-  cleanedText = cleanedText.replace(/[œ]/g, 'oe');
-  cleanedText = cleanedText.replace(/[Œ]/g, 'OE');
-  cleanedText = cleanedText.replace(/[æ]/g, 'ae');
-  cleanedText = cleanedText.replace(/[Æ]/g, 'AE');
+  //  NORMALISATION CARACTERES ACCENTUES pour GSM-7
+  cleanedText = cleanedText.replace(/[aaaa]/g, 'a');
+  cleanedText = cleanedText.replace(/[AAAA]/g, 'A');
+  cleanedText = cleanedText.replace(/[ee]/g, 'e');
+  cleanedText = cleanedText.replace(/[EE]/g, 'E');
+  cleanedText = cleanedText.replace(/[ii]/g, 'i');
+  cleanedText = cleanedText.replace(/[II]/g, 'I');
+  cleanedText = cleanedText.replace(/[ooo]/g, 'o');
+  cleanedText = cleanedText.replace(/[OOO]/g, 'O');
+  cleanedText = cleanedText.replace(/[uu]/g, 'u');
+  cleanedText = cleanedText.replace(/[UU]/g, 'U');
+  cleanedText = cleanedText.replace(/c/g, 'c');
+  cleanedText = cleanedText.replace(/C/g, 'C');
+  cleanedText = cleanedText.replace(/n/g, 'n');
+  cleanedText = cleanedText.replace(/N/g, 'N');
+  cleanedText = cleanedText.replace(/[]/g, 'oe');
+  cleanedText = cleanedText.replace(/[]/g, 'OE');
+  cleanedText = cleanedText.replace(/[]/g, 'ae');
+  cleanedText = cleanedText.replace(/[]/g, 'AE');
 
-  // 📝 NORMALISATION PONCTUATION pour GSM-7
+  //  NORMALISATION PONCTUATION pour GSM-7
   cleanedText = cleanedText.replace(/['']/g, "'");
   cleanedText = cleanedText.replace(/[""]/g, '"');
-  cleanedText = cleanedText.replace(/[‹›]/g, '<>');
-  cleanedText = cleanedText.replace(/[«»]/g, '"');
-  cleanedText = cleanedText.replace(/[—–]/g, '-');
-  cleanedText = cleanedText.replace(/[…]/g, '...');
-  cleanedText = cleanedText.replace(/[•]/g, '-');
+  cleanedText = cleanedText.replace(/[]/g, '<>');
+  cleanedText = cleanedText.replace(/[""]/g, '"');
+  cleanedText = cleanedText.replace(/[--]/g, '-');
+  cleanedText = cleanedText.replace(/[...]/g, '...');
+  cleanedText = cleanedText.replace(/[-]/g, '-');
 
   // Supprimer markdown
   cleanedText = cleanedText.replace(/\*\*\*/g, '');
@@ -105,7 +105,7 @@ function adaptForSMS(text, context = {}) {
   cleanedText = cleanedText.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
   cleanedText = cleanedText.replace(/^#{1,6}\s+/gm, '');
   
-  // 📝 MISE EN ÉVIDENCE pour SMS (sans formatage riche)
+  //  MISE EN EVIDENCE pour SMS (sans formatage riche)
   // Titres en MAJUSCULES
   cleanedText = cleanedText.replace(/^(\d+)\.\s+([^\n]+)/gm, (match, num, title) => {
     if (title.length < 40) {
@@ -119,28 +119,28 @@ function adaptForSMS(text, context = {}) {
     return `>>> ${match.toUpperCase()}`;
   });
   
-  // Séparateurs entre sections
+  // Separateurs entre sections
   cleanedText = cleanedText.replace(/\n\n(\d+\.)/g, '\n\n---\n$1');
   
-  // Mettre en évidence les chiffres importants
+  // Mettre en evidence les chiffres importants
   cleanedText = cleanedText.replace(/(\$[\d,]+\.?\d*)/g, '[$1]');
   cleanedText = cleanedText.replace(/([+-]?\d+\.?\d*%)/g, '[$1]');
 
   // Supprimer images et URLs d'images
   cleanedText = cleanedText.replace(/!\[([^\]]*)\]\([^)]+\)/g, '');
-  cleanedText = cleanedText.replace(/https?:\/\/finviz\.com\/chart\.ashx[^\s)]+/g, '[Graphique supprimé]');
-  cleanedText = cleanedText.replace(/https?:\/\/[^\s)]+\.(png|jpg|jpeg|gif|svg|webp)[^\s)]*/gi, '[Image supprimée]');
+  cleanedText = cleanedText.replace(/https?:\/\/finviz\.com\/chart\.ashx[^\s)]+/g, '[Graphique supprime]');
+  cleanedText = cleanedText.replace(/https?:\/\/[^\s)]+\.(png|jpg|jpeg|gif|svg|webp)[^\s)]*/gi, '[Image supprimee]');
 
   // Nettoyer espaces
   cleanedText = cleanedText.replace(/\n{3,}/g, '\n\n');
   cleanedText = cleanedText.replace(/ {2,}/g, ' ');
   cleanedText = cleanedText.trim();
 
-  // 🛡️ PROTECTION CONTRE RÉPONSES ULTRA-LONGUES
+  //  PROTECTION CONTRE REPONSES ULTRA-LONGUES
   const MAX_SMS_LENGTH = 1500;
   
   if (cleanedText.length > MAX_SMS_LENGTH) {
-    console.log(`⚠️ [SMS Preview] Réponse très longue (${cleanedText.length} chars) - création d'un résumé`);
+    console.log(` [SMS Preview] Reponse tres longue (${cleanedText.length} chars) - creation d'un resume`);
     
     const sections = cleanedText.split(/\n\n+/);
     let summary = '';
@@ -168,14 +168,14 @@ function adaptForSMS(text, context = {}) {
     cleanedText = summary;
   }
 
-  // ✅ RETOUR OPTIMISÉ avec emoji Emma au début
+  //  RETOUR OPTIMISE avec emoji Emma au debut
   return emmaPrefix + cleanedText;
 }
 
 /**
- * Découpe un message en chunks pour affichage multi-SMS
+ * Decoupe un message en chunks pour affichage multi-SMS
  * 
- * @param {string} text - Le texte à découper
+ * @param {string} text - Le texte a decouper
  * @param {number} maxLength - Longueur max par chunk (default: 1500)
  * @returns {string[]} Tableau de chunks
  */

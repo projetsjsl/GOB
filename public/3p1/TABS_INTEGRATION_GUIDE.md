@@ -27,19 +27,19 @@ const [currentView, setCurrentView] = useState<'analysis' | 'info' | 'kpi'>('ana
         onClick={() => setCurrentView('analysis')}
         className={...}
     >
-        📊 Analysis
+         Analysis
     </button>
     <button
         onClick={() => setCurrentView('kpi')}
         className={...}
     >
-        📈 KPI Dashboard
+         KPI Dashboard
     </button>
     <button
         onClick={() => setCurrentView('info')}
         className={...}
     >
-        ℹ️ Info
+        i Info
     </button>
 </div>
 ```
@@ -215,13 +215,13 @@ function App() {
 
 After integration, test:
 
-1. ✅ Tab switching works
-2. ✅ Sub-tab navigation works
-3. ✅ Data persists when switching tabs
-4. ✅ Keyboard navigation (arrows, Tab, Enter)
-5. ✅ URL updates with tab changes
-6. ✅ Browser back/forward buttons work
-7. ✅ Tab state persists after refresh
+1.  Tab switching works
+2.  Sub-tab navigation works
+3.  Data persists when switching tabs
+4.  Keyboard navigation (arrows, Tab, Enter)
+5.  URL updates with tab changes
+6.  Browser back/forward buttons work
+7.  Tab state persists after refresh
 
 ## Rollback Plan
 

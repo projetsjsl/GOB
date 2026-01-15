@@ -1,17 +1,17 @@
 /**
- * API Endpoint: Cron Briefings Automatisés
+ * API Endpoint: Cron Briefings Automatises
  *
- * Génère et envoie automatiquement les briefings Emma selon le schedule:
- * - 7h20: Briefing Matin (Asie • Futures • Préouverture)
- * - 11h50: Briefing Midi (Wall Street • Clôture Europe)
- * - 16h20: Briefing Soir (Clôture US • Asie Next)
+ * Genere et envoie automatiquement les briefings Emma selon le schedule:
+ * - 7h20: Briefing Matin (Asie - Futures - Preouverture)
+ * - 11h50: Briefing Midi (Wall Street - Cloture Europe)
+ * - 16h20: Briefing Soir (Cloture US - Asie Next)
  *
  * @route GET /api/cron-briefings
  */
 
 export default async function handler(req, res) {
     try {
-        // 🔐 Vérification du secret CRON (sécurité Vercel)
+        //  Verification du secret CRON (securite Vercel)
         const authHeader = req.headers.authorization;
         const cronSecret = process.env.CRON_SECRET;
 
@@ -27,44 +27,44 @@ export default async function handler(req, res) {
             });
         }
 
-        // 🕐 Déterminer le type de briefing selon l'heure
+        //  Determiner le type de briefing selon l'heure
         const now = new Date();
         const hour = now.getUTCHours(); // UTC time
-        // Timezone ET = UTC-5 (hiver) ou UTC-4 (été)
-        // 7h20 ET = 12h20 UTC (hiver) ou 11h20 UTC (été)
-        // 11h50 ET = 16h50 UTC (hiver) ou 15h50 UTC (été)
-        // 16h20 ET = 21h20 UTC (hiver) ou 20h20 UTC (été)
+        // Timezone ET = UTC-5 (hiver) ou UTC-4 (ete)
+        // 7h20 ET = 12h20 UTC (hiver) ou 11h20 UTC (ete)
+        // 11h50 ET = 16h50 UTC (hiver) ou 15h50 UTC (ete)
+        // 16h20 ET = 21h20 UTC (hiver) ou 20h20 UTC (ete)
 
         let briefingType = 'morning';
-        let subject = '🌅 Briefing Matin - Emma Financial';
+        let subject = ' Briefing Matin - Emma Financial';
 
-        // Détection basée sur l'heure locale du serveur
+        // Detection basee sur l'heure locale du serveur
         const localHour = now.getHours();
 
         if (localHour >= 7 && localHour < 11) {
             briefingType = 'morning';
-            subject = '🌅 Briefing Matin - Emma Financial';
+            subject = ' Briefing Matin - Emma Financial';
         } else if (localHour >= 11 && localHour < 16) {
             briefingType = 'noon';
-            subject = '☀️ Briefing Midi - Emma Financial';
+            subject = ' Briefing Midi - Emma Financial';
         } else if (localHour >= 16 && localHour < 22) {
             briefingType = 'evening';
-            subject = '🌆 Briefing Soir - Emma Financial';
+            subject = ' Briefing Soir - Emma Financial';
         }
 
         console.log(`[CRON] Generating ${briefingType} briefing at ${now.toISOString()}`);
 
-        // 🤖 Appeler Emma Agent pour générer le briefing
+        //  Appeler Emma Agent pour generer le briefing
         const baseUrl = process.env.VERCEL_URL
             ? `https://${process.env.VERCEL_URL}`
             : 'http://localhost:3000';
 
-        // ÉTAPE 1: Intent Analysis
+        // ETAPE 1: Intent Analysis
         const intentResponse = await fetch(`${baseUrl}/api/emma-agent`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                message: `Génère un briefing ${briefingType} pour aujourd'hui`,
+                message: `Genere un briefing ${briefingType} pour aujourd'hui`,
                 mode: 'chat'
             })
         });
@@ -75,12 +75,12 @@ export default async function handler(req, res) {
 
         const intentData = await intentResponse.json();
 
-        // ÉTAPE 2: Gather Smart Data
+        // ETAPE 2: Gather Smart Data
         const dataResponse = await fetch(`${baseUrl}/api/emma-agent`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                message: `Collecte les données pour briefing ${briefingType}`,
+                message: `Collecte les donnees pour briefing ${briefingType}`,
                 mode: 'data',
                 context: {
                     intent: intentData.intent || 'market_briefing',
@@ -96,12 +96,12 @@ export default async function handler(req, res) {
 
         const toolsData = await dataResponse.json();
 
-        // ÉTAPE 3: Generate Briefing avec MODE BRIEFING
+        // ETAPE 3: Generate Briefing avec MODE BRIEFING
         const briefingResponse = await fetch(`${baseUrl}/api/emma-agent`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                message: `Génère un briefing ${briefingType} détaillé avec analyses multi-médias`,
+                message: `Genere un briefing ${briefingType} detaille avec analyses multi-medias`,
                 mode: 'briefing',
                 context: {
                     briefingType: briefingType,
@@ -121,14 +121,14 @@ export default async function handler(req, res) {
         const briefingData = await briefingResponse.json();
         const markdownContent = briefingData.response || briefingData.analysis;
 
-        // ÉTAPE 4: Enrichir avec visuels (simulé côté serveur)
-        // Note: La fonction enrichBriefingWithVisuals() est côté client
+        // ETAPE 4: Enrichir avec visuels (simule cote serveur)
+        // Note: La fonction enrichBriefingWithVisuals() est cote client
         // On va envoyer le markdown brut et laisser l'email client le renderer
 
-        // ÉTAPE 5: Créer le HTML du briefing
+        // ETAPE 5: Creer le HTML du briefing
         const htmlContent = createBriefingHTML(markdownContent, briefingType, toolsData.data);
 
-        // 📧 Envoyer l'email via Resend
+        //  Envoyer l'email via Resend
         const emailResponse = await fetch(`${baseUrl}/api/send-email`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -146,7 +146,7 @@ export default async function handler(req, res) {
 
         const emailResult = await emailResponse.json();
 
-        // ✅ Succès
+        //  Succes
         return res.status(200).json({
             success: true,
             message: `${briefingType} briefing generated and sent successfully`,
@@ -172,35 +172,35 @@ export default async function handler(req, res) {
 }
 
 /**
- * Crée le HTML du briefing pour l'email
+ * Cree le HTML du briefing pour l'email
  * 
- * ════════════════════════════════════════════════════════════════════════════
- * BONNES PRATIQUES HTML EMAIL (compatibilité Outlook, Gmail, Apple Mail)
- * ════════════════════════════════════════════════════════════════════════════
  * 
- * ✅ UTILISER:
+ * BONNES PRATIQUES HTML EMAIL (compatibilite Outlook, Gmail, Apple Mail)
+ * 
+ * 
+ *  UTILISER:
  * - Tables avec role="presentation" pour le layout
  * - Attributs: cellpadding="0" cellspacing="0" border="0"
  * - Styles 100% inline (pas de <style> dans <head>)
- * - Couleurs hexadécimales complètes (#FFFFFF, pas #FFF)
+ * - Couleurs hexadecimales completes (#FFFFFF, pas #FFF)
  * - Font stack: Arial, Helvetica, sans-serif
  * - Width explicites sur tables (max 600px)
  * - Padding au lieu de margin
  * 
- * ❌ NE PAS UTILISER:
+ *  NE PAS UTILISER:
  * - <div> pour structure principale
  * - Flexbox, Grid, CSS moderne
  * - linear-gradient, box-shadow
  * - border-radius > 4px (Outlook l'ignore)
  * - Classes CSS ou <style> block
  * - margin (utiliser padding)
- * ════════════════════════════════════════════════════════════════════════════
+ * 
  */
 function createBriefingHTML(markdownContent, briefingType, data) {
     const typeEmojis = {
-        morning: '🌅',
-        noon: '☀️',
-        evening: '🌆'
+        morning: '',
+        noon: '',
+        evening: ''
     };
 
     const typeTitles = {
@@ -210,16 +210,16 @@ function createBriefingHTML(markdownContent, briefingType, data) {
     };
 
     const typeSubtitles = {
-        morning: 'Asie • Futures • Préouverture',
-        noon: 'Wall Street • Clôture Europe',
-        evening: 'Clôture US • Asie Next'
+        morning: 'Asie - Futures - Preouverture',
+        noon: 'Wall Street - Cloture Europe',
+        evening: 'Cloture US - Asie Next'
     };
 
-    const emoji = typeEmojis[briefingType] || '📊';
+    const emoji = typeEmojis[briefingType] || '';
     const title = typeTitles[briefingType] || 'Briefing Financier';
-    const subtitle = typeSubtitles[briefingType] || 'Analyse de marché';
+    const subtitle = typeSubtitles[briefingType] || 'Analyse de marche';
 
-    // Convertir Markdown en HTML simplifié avec styles inline
+    // Convertir Markdown en HTML simplifie avec styles inline
     let htmlBody = markdownContent
         .replace(/^### (.+)$/gm, '<tr><td style="color: #1e40af; font-size: 16px; font-weight: bold; padding: 20px 0 8px 0; font-family: Arial, Helvetica, sans-serif;">$1</td></tr>')
         .replace(/^## (.+)$/gm, '<tr><td style="color: #1e3a8a; font-size: 18px; font-weight: bold; padding: 24px 0 10px 0; font-family: Arial, Helvetica, sans-serif;">$1</td></tr>')
@@ -237,7 +237,7 @@ function createBriefingHTML(markdownContent, briefingType, data) {
     const dateStr = new Date().toLocaleDateString('fr-CA');
     const timeStr = new Date().toLocaleTimeString('fr-CA', { hour: '2-digit', minute: '2-digit' });
 
-    // Template HTML complet - TABLE-BASED pour compatibilité Outlook
+    // Template HTML complet - TABLE-BASED pour compatibilite Outlook
     return `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -271,7 +271,7 @@ function createBriefingHTML(markdownContent, briefingType, data) {
                                 </tr>
                                 <tr>
                                     <td style="border-top: 1px solid rgba(255,255,255,0.3); padding-top: 16px; font-size: 12px; text-align: center; color: #ffffff; opacity: 0.8; font-family: Arial, Helvetica, sans-serif;">
-                                        📡 Généré par Emma Agent &bull; ${dateStr} ${timeStr}
+                                         Genere par Emma Agent &bull; ${dateStr} ${timeStr}
                                     </td>
                                 </tr>
                             </table>
@@ -291,12 +291,12 @@ function createBriefingHTML(markdownContent, briefingType, data) {
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
                                     <td style="font-size: 12px; color: #6b7280; text-align: center; font-family: Arial, Helvetica, sans-serif; padding-bottom: 8px;">
-                                        🤖 Généré automatiquement par <strong>Emma Agent</strong>
+                                         Genere automatiquement par <strong>Emma Agent</strong>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td style="font-size: 12px; color: #9ca3af; text-align: center; font-family: Arial, Helvetica, sans-serif;">
-                                        GOB Apps &bull; Intelligence Financière
+                                        GOB Apps &bull; Intelligence Financiere
                                     </td>
                                 </tr>
                             </table>

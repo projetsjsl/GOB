@@ -43,7 +43,7 @@ const SecondaryNavEditor = ({ isOpen, onClose, activeTab, currentConfig, onSave,
                 
                 <div className="p-4 overflow-y-auto flex-1 space-y-2">
                     <p className="text-sm text-gray-500 mb-4">
-                        Sélectionnez les éléments à afficher dans le menu secondaire pour l'onglet <strong>{activeTab}</strong>.
+                        Selectionnez les elements a afficher dans le menu secondaire pour l'onglet <strong>{activeTab}</strong>.
                     </p>
                     
                     <div className="grid grid-cols-1 gap-2">

@@ -18,9 +18,9 @@
 
     const API_ENDPOINT = '/api/orchestrator';
 
-    // ═══════════════════════════════════════════════════════════════════
+    // 
     // CORE CLIENT
-    // ═══════════════════════════════════════════════════════════════════
+    // 
 
     const orchestratorClient = {
         version: '2.0',
@@ -37,9 +37,9 @@
             try {
                 const status = await this.getStatus();
                 this.initialized = status.success;
-                console.log('🎯 [OrchestratorClient] Initialized', status.status?.ready ? '✅' : '⚠️');
+                console.log(' [OrchestratorClient] Initialized', status.status?.ready ? '' : '');
             } catch (error) {
-                console.warn('⚠️ [OrchestratorClient] Init failed:', error.message);
+                console.warn(' [OrchestratorClient] Init failed:', error.message);
             }
             
             return this;
@@ -74,42 +74,42 @@
         // PERSONA SHORTCUTS - Quick access to each Emma personality
         // =============================================================
 
-        /** 📊 Finance persona - Stock analysis, dividends, portfolio */
+        /**  Finance persona - Stock analysis, dividends, portfolio */
         async askFinance(message, options = {}) {
             return this.askWithPersona('finance', message, options);
         },
 
-        /** ⚖️ Critic persona - Risk analysis, contrarian views */
+        /**  Critic persona - Risk analysis, contrarian views */
         async askCritic(message, options = {}) {
             return this.askWithPersona('critic', message, options);
         },
 
-        /** 🔬 Researcher persona - Deep research, citations */
+        /**  Researcher persona - Deep research, citations */
         async askResearcher(message, options = {}) {
             return this.askWithPersona('researcher', message, options);
         },
 
-        /** ✍️ Writer persona - Briefings, emails, reports */
+        /**  Writer persona - Briefings, emails, reports */
         async askWriter(message, options = {}) {
             return this.askWithPersona('writer', message, options);
         },
 
-        /** 📈 Geek persona - Technical analysis, charts */
+        /**  Geek persona - Technical analysis, charts */
         async askGeek(message, options = {}) {
             return this.askWithPersona('geek', message, options);
         },
 
-        /** 👔 CEO persona - Strategic decisions, executive summary */
+        /**  CEO persona - Strategic decisions, executive summary */
         async askCEO(message, options = {}) {
             return this.askWithPersona('ceo', message, options);
         },
 
-        /** 🌍 Macro persona - Macroeconomics, rates */
+        /**  Macro persona - Macroeconomics, rates */
         async askMacro(message, options = {}) {
             return this.askWithPersona('macro', message, options);
         },
 
-        /** 🏛️ Politics persona - Policy impact, regulations */
+        /**  Politics persona - Policy impact, regulations */
         async askPolitics(message, options = {}) {
             return this.askWithPersona('politics', message, options);
         },
@@ -433,12 +433,12 @@
                 this.lastResponse = data;
                 
                 if (!response.ok) {
-                    console.error('❌ [OrchestratorClient] Error:', data.error);
+                    console.error(' [OrchestratorClient] Error:', data.error);
                 }
                 
                 return data;
             } catch (error) {
-                console.error('❌ [OrchestratorClient] Network error:', error);
+                console.error(' [OrchestratorClient] Network error:', error);
                 return { success: false, error: error.message };
             }
         },
@@ -449,7 +449,7 @@
                 const data = await response.json();
                 return data;
             } catch (error) {
-                console.error('❌ [OrchestratorClient] GET error:', error);
+                console.error(' [OrchestratorClient] GET error:', error);
                 return { success: false, error: error.message };
             }
         },
@@ -485,45 +485,45 @@
          */
         help() {
             console.log(`
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                    🧪 JLAB ORCHESTRATOR - QUICK REFERENCE                    ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║                                                                               ║
-║  📝 CHAT:  emma.ask("Analyse AAPL") | emma.askFinance() | emma.askStream()   ║
-║                                                                               ║
-║  🔬 RESEARCH:  emma.analyzeStock("AAPL") | emma.deepDive() | emma.getBullBear()║
-║                emma.assessRisk() | emma.generateThesis() | emma.comparePeers()║
-║                                                                               ║
-║  💼 PORTFOLIO:  emma.createPortfolio() | emma.addHolding() | emma.analyzePortfolio()║
-║                 emma.getPortfolioDividends() | emma.suggestRebalance()        ║
-║                                                                               ║
-║  🔔 ALERTS:  emma.createAlert("AAPL", "price_above", 200) | emma.checkAlerts()║
-║              emma.setAlertChannel("email", "you@email.com")                   ║
-║                                                                               ║
-║  ⏰ SCHEDULER:  emma.createSchedule("Morning", "@daily", "briefing", "generate")║
-║                 emma.getSchedules() | emma.runScheduleNow() | emma.getNextRuns()║
-║                                                                               ║
-║  🔧 TOOLS:  emma.getStockQuote() | emma.calculateDCF() | emma.getYieldCurve() ║
-║                                                                               ║
-║  📊 ANALYTICS:  emma.getAnalytics("24h") | emma.getLatencyReport()            ║
-║                                                                               ║
-║  💬 CONTEXT:  emma.getHistory() | emma.clearHistory() | emma.setPreferences() ║
-║                                                                               ║
-║  🔌 MCP:  emma.listMCPTools() | emma.perplexityAsk() | emma.supabaseQuery()   ║
-║                                                                               ║
-║  ℹ️  INFO:  emma.getStatus() | emma.getPersonas() | emma.getAgents()          ║
-║                                                                               ║
-║  🎭 PERSONAS: finance, critic, researcher, writer, geek, ceo, macro, politics║
-║  🤖 AGENTS (15): data, news, earnings, briefing, research, tools, analytics, ║
-║                  mcp, context, portfolio, alert, scheduler, workflow, model   ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+
+                     JLAB ORCHESTRATOR - QUICK REFERENCE                    
+
+                                                                               
+   CHAT:  emma.ask("Analyse AAPL") | emma.askFinance() | emma.askStream()   
+                                                                               
+   RESEARCH:  emma.analyzeStock("AAPL") | emma.deepDive() | emma.getBullBear()
+                emma.assessRisk() | emma.generateThesis() | emma.comparePeers()
+                                                                               
+   PORTFOLIO:  emma.createPortfolio() | emma.addHolding() | emma.analyzePortfolio()
+                 emma.getPortfolioDividends() | emma.suggestRebalance()        
+                                                                               
+   ALERTS:  emma.createAlert("AAPL", "price_above", 200) | emma.checkAlerts()
+              emma.setAlertChannel("email", "you@email.com")                   
+                                                                               
+   SCHEDULER:  emma.createSchedule("Morning", "@daily", "briefing", "generate")
+                 emma.getSchedules() | emma.runScheduleNow() | emma.getNextRuns()
+                                                                               
+   TOOLS:  emma.getStockQuote() | emma.calculateDCF() | emma.getYieldCurve() 
+                                                                               
+   ANALYTICS:  emma.getAnalytics("24h") | emma.getLatencyReport()            
+                                                                               
+   CONTEXT:  emma.getHistory() | emma.clearHistory() | emma.setPreferences() 
+                                                                               
+   MCP:  emma.listMCPTools() | emma.perplexityAsk() | emma.supabaseQuery()   
+                                                                               
+  i  INFO:  emma.getStatus() | emma.getPersonas() | emma.getAgents()          
+                                                                               
+   PERSONAS: finance, critic, researcher, writer, geek, ceo, macro, politics
+   AGENTS (15): data, news, earnings, briefing, research, tools, analytics, 
+                  mcp, context, portfolio, alert, scheduler, workflow, model   
+
             `);
         }
     };
 
-    // ═══════════════════════════════════════════════════════════════════
+    // 
     // EXPORT TO GLOBAL SCOPE
-    // ═══════════════════════════════════════════════════════════════════
+    // 
 
     // Make available globally
     global.orchestratorClient = orchestratorClient;
@@ -535,7 +535,7 @@
     if (typeof document !== 'undefined') {
         document.addEventListener('DOMContentLoaded', () => {
             orchestratorClient.init().then(() => {
-                console.log('🎯 Orchestrator ready. Type orchestratorClient.help() for commands.');
+                console.log(' Orchestrator ready. Type orchestratorClient.help() for commands.');
             });
         });
     }

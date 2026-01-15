@@ -1,42 +1,42 @@
 # CurveWatch - Plateforme d'Analyse des Courbes de Rendement
 
-Une plateforme professionnelle d'analyse des courbes de rendement obligataires avec données en temps réel du Trésor américain et de la Banque du Canada.
+Une plateforme professionnelle d'analyse des courbes de rendement obligataires avec donnees en temps reel du Tresor americain et de la Banque du Canada.
 
-## 🎯 Caractéristiques Principales
+##  Caracteristiques Principales
 
-- **Visualisation Interactive**: Graphiques Recharts avec zoom, pan et tooltips détaillés
-- **Données Temps Réel**: Integration FRED (Federal Reserve) et BOC (Bank of Canada)
-- **Analyse Avancée**: Métriques de courbe, PCA, spreads papillon, taux forwards
-- **Multi-Pays**: Comparaison simultanée US et Canada
-- **Responsive Design**: Optimisé pour mobile, tablette, desktop et grand écran
-- **Dark/Light Mode**: Support complet du thème avec transitions fluides
-- **Accessibilité**: WCAG 2.1 AA compliant avec support clavier
+- **Visualisation Interactive**: Graphiques Recharts avec zoom, pan et tooltips detailles
+- **Donnees Temps Reel**: Integration FRED (Federal Reserve) et BOC (Bank of Canada)
+- **Analyse Avancee**: Metriques de courbe, PCA, spreads papillon, taux forwards
+- **Multi-Pays**: Comparaison simultanee US et Canada
+- **Responsive Design**: Optimise pour mobile, tablette, desktop et grand ecran
+- **Dark/Light Mode**: Support complet du theme avec transitions fluides
+- **Accessibilite**: WCAG 2.1 AA compliant avec support clavier
 - **Performance**: Caching intelligent, code-splitting, lazy loading
 
-## 📋 Architecture
+##  Architecture
 
 ```
-├── app/
-│   ├── page.tsx          # Page principale
-│   ├── layout.tsx        # Layout root
-│   └── globals.css       # Styles globaux
-├── components/
-│   ├── curve-watch-compatible.tsx  # Composant JLab principal
-│   ├── expandable-card.tsx         # Système d'expansion fullscreen
-│   ├── yield-curve-chart.tsx       # Visualisation graphique
-│   └── ...                         # Autres composants
-├── lib/
-│   ├── fred-api.ts       # Integration FRED API
-│   ├── canadian-yields.ts # Integration BOC API
-│   ├── performance.ts    # Monitoring performance
-│   ├── logger.ts         # Logging structured
-│   ├── config.ts         # Configuration centralisee
-│   └── ...               # Autres utilitaires
-└── hooks/
-    └── use-yield-data.ts # Hook de gestion de donnees
+ app/
+    page.tsx          # Page principale
+    layout.tsx        # Layout root
+    globals.css       # Styles globaux
+ components/
+    curve-watch-compatible.tsx  # Composant JLab principal
+    expandable-card.tsx         # Systeme d'expansion fullscreen
+    yield-curve-chart.tsx       # Visualisation graphique
+    ...                         # Autres composants
+ lib/
+    fred-api.ts       # Integration FRED API
+    canadian-yields.ts # Integration BOC API
+    performance.ts    # Monitoring performance
+    logger.ts         # Logging structured
+    config.ts         # Configuration centralisee
+    ...               # Autres utilitaires
+ hooks/
+     use-yield-data.ts # Hook de gestion de donnees
 ```
 
-## 🚀 Démarrage Rapide
+##  Demarrage Rapide
 
 ### Installation
 
@@ -48,7 +48,7 @@ yarn install
 
 ### Environnement
 
-Créer un fichier `.env.local`:
+Creer un fichier `.env.local`:
 
 ```env
 # Optional: FRED API key from https://fred.stlouisfed.org/docs/api/api_key.html
@@ -58,7 +58,7 @@ FRED_API_KEY=your_api_key_here
 FMP_API_KEY=your_fmp_key_here
 ```
 
-### Développement
+### Developpement
 
 ```bash
 npm run dev
@@ -73,59 +73,59 @@ npm run build
 npm start
 ```
 
-## 📊 Fonctionnalités Détaillées
+##  Fonctionnalites Detaillees
 
-### Aperçu
+### Apercu
 - Vue d'ensemble des taux actuels US et CA
 - Taux directeur central
-- Timestamps de mise à jour
-- Bouton de rafraîchissement
+- Timestamps de mise a jour
+- Bouton de rafraichissement
 
 ### Comparaison Historique
-- Sélecteur de dates multiples (jusqu'à 5)
+- Selecteur de dates multiples (jusqu'a 5)
 - Graphiques de comparaison temporelle
-- Statistiques d'écarts US vs CA
-- Contrôles de filtrage avancés
+- Statistiques d'ecarts US vs CA
+- Controles de filtrage avances
 
 ### Analytique
 - Taux forwards implicites
 - Analyse PCA (Principal Component Analysis)
 - Spreads papillon
-- Métriques de courbe (pente, convexité)
+- Metriques de courbe (pente, convexite)
 
 ### Historique
 - Tendances de spreads
 - Analyse temporelle
 - Comparaison dates multiples
 
-## 🔧 Configuration
+##  Configuration
 
-Tous les paramètres configurables sont dans `lib/config.ts`:
+Tous les parametres configurables sont dans `lib/config.ts`:
 
 ```typescript
 import CONFIG from "@/lib/config"
 
-// Accéder aux configurations
+// Acceder aux configurations
 console.log(CONFIG.API.TIMEOUT_MS)
 console.log(CONFIG.THEME.US_COLOR)
 ```
 
-## 📈 API Endpoints
+##  API Endpoints
 
 - `GET /api/yield-curve/current` - Taux actuels
-- `GET /api/yield-curve/historical?period=1m` - Données historiques
+- `GET /api/yield-curve/historical?period=1m` - Donnees historiques
 - `GET /api/yield-curve/compare?date=2024-01-01` - Comparaison date
 
-## 🎨 Thème et Styling
+##  Theme et Styling
 
-Le projet utilise Tailwind CSS v4 avec un système de couleurs premium:
+Le projet utilise Tailwind CSS v4 avec un systeme de couleurs premium:
 
 - **Bleu**: #3b82f6 (US)
 - **Rouge**: #ef4444 (Canada)
 - **Emeraude**: #10b981 (Forwards)
 - **Ambre**: #f59e0b (Treasury)
 
-## ♿ Accessibilité
+##  Accessibilite
 
 - WCAG 2.1 Level AA
 - ARIA labels et roles
@@ -133,25 +133,25 @@ Le projet utilise Tailwind CSS v4 avec un système de couleurs premium:
 - Contraste suffisant (4.5:1 minimum)
 - Semantic HTML
 
-## 🔍 Performance
+##  Performance
 
 - Cache intelligent avec TTL
-- Debounce/throttle pour événements
+- Debounce/throttle pour evenements
 - Code-splitting et lazy loading
-- Performance monitoring intégré
-- Memoization pour calculs coûteux
+- Performance monitoring integre
+- Memoization pour calculs couteux
 
-## 🔐 Sécurité
+##  Securite
 
-- Variables d'environnement protégées
-- Validation stricte des données
-- Gestion d'erreurs centralisée
+- Variables d'environnement protegees
+- Validation stricte des donnees
+- Gestion d'erreurs centralisee
 - Retry logic avec exponential backoff
-- HTTPS recommendé en production
+- HTTPS recommende en production
 
-## 📚 Intégration JLab
+##  Integration JLab
 
-Pour l'intégration avec JLab dashboard:
+Pour l'integration avec JLab dashboard:
 
 ```jsx
 {activeTab === 'jlab-curvewatch' && window.CurveWatchTab && (
@@ -159,9 +159,9 @@ Pour l'intégration avec JLab dashboard:
 )}
 ```
 
-Le composant est exposé globalement via `window.CurveWatchTab`.
+Le composant est expose globalement via `window.CurveWatchTab`.
 
-## 🧪 Tests
+##  Tests
 
 ```bash
 npm run test
@@ -169,14 +169,14 @@ npm run test:watch
 npm run test:coverage
 ```
 
-## 📄 Licence
+##  Licence
 
 MIT
 
-## 👥 Support
+##  Support
 
-Pour les problèmes ou suggestions: [support@curvewatch.app](mailto:support@curvewatch.app)
+Pour les problemes ou suggestions: [support@curvewatch.app](mailto:support@curvewatch.app)
 
 ---
 
-**Construit avec ❤️ pour les analystes financiers**
+**Construit avec  pour les analystes financiers**

@@ -31,7 +31,7 @@
             background: #0a0e27 !important;
             color: #e0e0e0 !important;
             overflow-x: hidden !important;
-            /* Isolation visuelle pour éviter les conflits avec le dashboard parent */
+            /* Isolation visuelle pour eviter les conflits avec le dashboard parent */
             isolation: isolate !important;
         }
 
@@ -328,7 +328,7 @@
     <div class="terminal-container">
         <!-- Header -->
         <div class="terminal-header">
-            <div class="terminal-title">📊 Terminal Emma IA</div>
+            <div class="terminal-title"> Terminal Emma IA</div>
             <div class="header-controls">
                 <select id="universeSelect" class="universe-select">
                     <option value="sp500">S&P 500</option>
@@ -336,7 +336,7 @@
                     <option value="all">Tous</option>
                 </select>
                 <select id="kpiSelect" class="kpi-select">
-                    <option value="">Sélectionner un KPI</option>
+                    <option value="">Selectionner un KPI</option>
                 </select>
             </div>
         </div>
@@ -345,7 +345,7 @@
         <div class="terminal-content">
             <!-- Market Dashboard -->
             <div class="market-dashboard">
-                <div class="section-title">📈 Dashboard Marché</div>
+                <div class="section-title"> Dashboard Marche</div>
                 <div id="indicesContainer" class="indices-grid">
                     <div class="loading">Chargement des indices...</div>
                 </div>
@@ -353,7 +353,7 @@
 
             <!-- Screener -->
             <div class="screener-section">
-                <div class="section-title">🔍 Screener & Analyse</div>
+                <div class="section-title"> Screener & Analyse</div>
                 <div class="screener-controls">
                     <input 
                         type="text" 
@@ -372,7 +372,7 @@
 
             <!-- Watchlist -->
             <div class="watchlist-section">
-                <div class="section-title">⭐ Watchlists</div>
+                <div class="section-title"> Watchlists</div>
                 <div id="watchlistContainer" class="watchlist-list">
                     <div class="loading">Chargement des watchlists...</div>
                 </div>
@@ -431,7 +431,7 @@
             });
         });
 
-        // Charger les indices de marché
+        // Charger les indices de marche
         async function loadMarketIndices() {
             try {
                 const response = await fetch(`${API_BASE}/api/terminal-data?action=market-indices`);
@@ -478,14 +478,14 @@
             }
         }
 
-        // Charger les définitions de KPI
+        // Charger les definitions de KPI
         async function loadKPIDefinitions() {
             try {
-                // Pour l'instant, on utilise des KPI hardcodés
-                // Dans une vraie implémentation, on appellerait l'API
+                // Pour l'instant, on utilise des KPI hardcodes
+                // Dans une vraie implementation, on appellerait l'API
                 const kpiSelect = document.getElementById('kpiSelect');
                 kpiSelect.innerHTML = `
-                    <option value="">Sélectionner un KPI</option>
+                    <option value="">Selectionner un KPI</option>
                     <option value="QUALITY_SCORE_V1">Quality Score</option>
                     <option value="VALUE_SCORE_V1">Value Score</option>
                     <option value="MOMENTUM_SCORE_V1">Momentum Score</option>
@@ -535,7 +535,7 @@
             const container = document.getElementById('screenerTable');
             
             if (instruments.length === 0) {
-                container.innerHTML = '<div class="loading">Aucun instrument trouvé</div>';
+                container.innerHTML = '<div class="loading">Aucun instrument trouve</div>';
                 return;
             }
 
@@ -608,7 +608,7 @@
         async function loadWatchlists() {
             try {
                 // Pour l'instant, on affiche un message
-                // Dans une vraie implémentation, on récupérerait l'user_id depuis l'auth
+                // Dans une vraie implementation, on recupererait l'user_id depuis l'auth
                 const container = document.getElementById('watchlistContainer');
                 container.innerHTML = `
                     <div class="loading">
@@ -620,9 +620,9 @@
             }
         }
 
-        // Ouvrir le détail d'un symbole
+        // Ouvrir le detail d'un symbole
         function openSymbolDetail(symbol) {
-            // Ouvrir dans une nouvelle fenêtre ou un modal
+            // Ouvrir dans une nouvelle fenetre ou un modal
             window.open(`/titre/${symbol}`, '_blank');
         }
 
@@ -642,7 +642,7 @@
             }
         }
 
-        // Rafraîchir les données toutes les 5 minutes
+        // Rafraichir les donnees toutes les 5 minutes
         setInterval(() => {
             loadMarketIndices();
             if (instrumentsData.length > 0) {

@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // PREVIEW MANAGER - Gestion des previews (Web, SMS, Email)
-// ═══════════════════════════════════════════════════════════════
+// 
 
 import { fetchFormattedPreview } from './api-client.js';
 
@@ -14,10 +14,10 @@ function markdownToHtml(text) {
     if (!text) return '';
 
     let html = text
-        // Emoji section headers (📊 SECTION, 🎯 OBJECTIF, etc.)
-        .replace(/^([\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}])\s*(\d+\.?\s*)?([A-ZÀÂÄÉÈÊËÎÏÔÙÛÜÇ\s]+)(\s*[:：])?$/gmu,
+        // Emoji section headers ( SECTION,  OBJECTIF, etc.)
+        .replace(/^([\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}])\s*(\d+\.?\s*)?([A-ZAAAEEEEIIOUUUC\s]+)(\s*[::])?$/gmu,
             '<span class="section-header">$1 $2$3</span>')
-        // Emoji line headers (📈 Something:)
+        // Emoji line headers ( Something:)
         .replace(/^([\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}])\s+(.+)$/gmu, '<span class="emoji-header">$1 $2</span>')
         // Markdown headers
         .replace(/^### (.*$)/gm, '<h3>$1</h3>')
@@ -27,14 +27,14 @@ function markdownToHtml(text) {
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         // Inline code
         .replace(/`([^`]+)`/g, '<code>$1</code>')
-        // Warning lines (⚠️, 🚨)
-        .replace(/^(⚠️|🚨)(.*)$/gm, '<div class="warning">$1$2</div>')
+        // Warning lines (, )
+        .replace(/^(|)(.*)$/gm, '<div class="warning">$1$2</div>')
         // Example blocks
-        .replace(/^EXEMPLE[S]?[\s:：]*(.*)/gim, '<div class="example">📋 $1</div>')
+        .replace(/^EXEMPLE[S]?[\s::]*(.*)/gim, '<div class="example"> $1</div>')
         // Numbered lists
         .replace(/^(\d+)\.\s+(.*)$/gm, '<li><strong>$1.</strong> $2</li>')
         // Bullet points
-        .replace(/^[•\-✓✅]\s+(.*)$/gm, '<li>$1</li>')
+        .replace(/^[-\-]\s+(.*)$/gm, '<li>$1</li>')
         // Italic
         .replace(/\*([^*]+)\*/g, '<em>$1</em>')
         // Double line breaks = paragraph
@@ -56,34 +56,34 @@ function formatJsonPreview(json) {
 
     // Header avec nom
     if (json.name) {
-        html += `<h2 style="margin-top:0">📋 ${json.name}</h2>`;
+        html += `<h2 style="margin-top:0"> ${json.name}</h2>`;
     }
 
     // Metadata
     const meta = [];
-    if (json.schedule) meta.push(`🕐 ${json.schedule}`);
-    if (json.tone) meta.push(`🎭 ${json.tone}`);
-    if (json.length) meta.push(`📏 ${json.length}`);
+    if (json.schedule) meta.push(` ${json.schedule}`);
+    if (json.tone) meta.push(` ${json.tone}`);
+    if (json.length) meta.push(` ${json.length}`);
     if (meta.length) {
-        html += `<p style="color:#6b7280;font-size:0.85rem">${meta.join(' • ')}</p>`;
+        html += `<p style="color:#6b7280;font-size:0.85rem">${meta.join(' - ')}</p>`;
     }
 
     // Prompt principal
     if (json.prompt) {
         html += `<div style="margin:1rem 0;padding:1rem;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">`;
-        html += `<strong style="color:#4f46e5">📝 Prompt:</strong>`;
+        html += `<strong style="color:#4f46e5"> Prompt:</strong>`;
         html += `<div style="margin-top:0.5rem">${markdownToHtml(json.prompt)}</div>`;
         html += `</div>`;
     }
 
     // Tools
     if (json.tools_priority && json.tools_priority.length) {
-        html += `<p><strong>🔧 Outils:</strong> <span style="font-size:0.85rem;color:#6b7280">${json.tools_priority.join(', ')}</span></p>`;
+        html += `<p><strong> Outils:</strong> <span style="font-size:0.85rem;color:#6b7280">${json.tools_priority.join(', ')}</span></p>`;
     }
 
     // Structure
     if (json.structure?.sections) {
-        html += `<p><strong>📊 Sections:</strong></p><ul>`;
+        html += `<p><strong> Sections:</strong></p><ul>`;
         json.structure.sections.forEach(s => {
             html += `<li>${s.replace(/_/g, ' ')}</li>`;
         });
@@ -93,7 +93,7 @@ function formatJsonPreview(json) {
     // Email config
     if (json.email_config) {
         html += `<div style="margin-top:1rem;padding:0.75rem;background:#eff6ff;border-radius:6px">`;
-        html += `<strong>📧 Email:</strong> ${json.email_config.subject_template || ''}`;
+        html += `<strong> Email:</strong> ${json.email_config.subject_template || ''}`;
         if (json.email_config.preview_text) {
             html += `<br><span style="font-size:0.8rem;color:#6b7280">${json.email_config.preview_text}</span>`;
         }
@@ -110,7 +110,7 @@ function formatJsonPreview(json) {
 function formatWebPreview(text) {
     if (!text) return '';
 
-    // Détecter si c'est du JSON
+    // Detecter si c'est du JSON
     const trimmed = text.trim();
     if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
         try {
@@ -132,7 +132,7 @@ function wrapSmsPreview(data) {
     return `
         <div style="background:#1a1a1a;color:white;border-radius:20px;padding:16px;max-width:340px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #333;">
-                <span style="font-size:28px;">👩🏻</span>
+                <span style="font-size:28px;"></span>
                 <div>
                     <p style="margin:0;font-weight:600;">Emma IA</p>
                     <p style="margin:0;font-size:11px;color:#888;">+1 438-544-EMMA</p>
@@ -144,13 +144,13 @@ function wrapSmsPreview(data) {
                 <span style="color:${isLong ? '#fbbf24' : '#10b981'};">${data.smsCount} segments</span>
                 <span style="color:#888;">${data.estimatedCost || ''}</span>
             </div>
-            ${isLong ? '<p style="color:#fbbf24;font-size:11px;margin-top:8px;">💡 Conseil: Réduire le contenu pour moins de segments</p>' : ''}
+            ${isLong ? '<p style="color:#fbbf24;font-size:11px;margin-top:8px;"> Conseil: Reduire le contenu pour moins de segments</p>' : ''}
         </div>
     `;
 }
 
 /**
- * Extrait le design personnalisé depuis les champs du formulaire
+ * Extrait le design personnalise depuis les champs du formulaire
  */
 function getCurrentPromptDesign() {
     return {
@@ -169,7 +169,7 @@ function getCurrentPromptDesign() {
         },
         branding: {
             companyName: document.getElementById('promptDesignBrandingCompanyName')?.value || 'GOB Apps',
-            tagline: document.getElementById('promptDesignBrandingTagline')?.value || 'Emma IA - Votre assistante financière',
+            tagline: document.getElementById('promptDesignBrandingTagline')?.value || 'Emma IA - Votre assistante financiere',
             avatar: {
                 url: document.getElementById('promptDesignBrandingAvatarUrl')?.value || '',
                 alt: 'Emma IA',
@@ -185,13 +185,13 @@ function getCurrentPromptDesign() {
             showAvatar: document.getElementById('promptDesignHeaderShowAvatar')?.checked ?? true,
             showDate: document.getElementById('promptDesignHeaderShowDate')?.checked ?? true,
             showEdition: document.getElementById('promptDesignHeaderShowEdition')?.checked ?? true,
-            emoji: document.getElementById('promptDesignEmojiHeader')?.value || '📊'
+            emoji: document.getElementById('promptDesignEmojiHeader')?.value || ''
         },
         footer: {
             showLogo: document.getElementById('promptDesignFooterShowLogo')?.checked ?? false,
             showDisclaimer: document.getElementById('promptDesignFooterShowDisclaimer')?.checked ?? true,
-            disclaimerText: 'Les informations fournies sont à titre indicatif et ne constituent pas des conseils financiers.',
-            copyrightText: document.getElementById('promptDesignFooterCopyright')?.value || '© 2025 GOB Apps - Tous droits réservés'
+            disclaimerText: 'Les informations fournies sont a titre indicatif et ne constituent pas des conseils financiers.',
+            copyrightText: document.getElementById('promptDesignFooterCopyright')?.value || ' 2025 GOB Apps - Tous droits reserves'
         },
         sms: {
             maxSegments: parseInt(document.getElementById('promptDesignSmsMaxSegments')?.value) || 10,
@@ -220,15 +220,15 @@ function getCurrentPromptDesign() {
             }
         },
         emojis: {
-            header: document.getElementById('promptDesignEmojiHeader')?.value || '📊',
-            success: document.getElementById('promptDesignEmojiSuccess')?.value || '✅',
-            alert: document.getElementById('promptDesignEmojiAlert')?.value || '⚠️'
+            header: document.getElementById('promptDesignEmojiHeader')?.value || '',
+            success: document.getElementById('promptDesignEmojiSuccess')?.value || '',
+            alert: document.getElementById('promptDesignEmojiAlert')?.value || ''
         }
     };
 }
 
 /**
- * Met à jour le preview (fonction principale)
+ * Met a jour le preview (fonction principale)
  */
 export async function updatePreview() {
     const text = document.getElementById('editValue').value;
@@ -249,12 +249,12 @@ export async function updatePreview() {
     lineCount.textContent = lines;
 
     // Mode label
-    const labels = { web: '(Web)', sms: '(SMS 🔄)', email: '(Email 🔄)' };
+    const labels = { web: '(Web)', sms: '(SMS )', email: '(Email )' };
     modeLabel.textContent = labels[mode] || '(Web)';
 
     // Render preview
     if (!text.trim()) {
-        previewArea.innerHTML = '<p class="text-gray-400 italic">Le preview s\'affiche ici en temps réel...</p>';
+        previewArea.innerHTML = '<p class="text-gray-400 italic">Le preview s\'affiche ici en temps reel...</p>';
         return;
     }
 
@@ -264,7 +264,7 @@ export async function updatePreview() {
 
     if (requestKey === lastPreviewRequest) return;
 
-    previewArea.innerHTML = '<p class="text-gray-400 italic">⏳ Chargement preview via API...</p>';
+    previewArea.innerHTML = '<p class="text-gray-400 italic"> Chargement preview via API...</p>';
 
     previewDebounceTimer = setTimeout(async () => {
         lastPreviewRequest = requestKey;
@@ -276,9 +276,9 @@ export async function updatePreview() {
             if (json.prompt) contentToFormat = json.prompt;
         } catch (e) {}
 
-        // Détecter le type de briefing
+        // Detecter le type de briefing
         let briefingType = 'morning';
-        if (text.includes('midday') || text.includes('Mi-Journée')) briefingType = 'midday';
+        if (text.includes('midday') || text.includes('Mi-Journee')) briefingType = 'midday';
         if (text.includes('evening') || text.includes('Soir')) briefingType = 'evening';
 
         // Extraire le design actuel
@@ -290,45 +290,45 @@ export async function updatePreview() {
             if (mode === 'sms') {
                 previewArea.innerHTML = wrapSmsPreview(result);
             } else if (mode === 'web') {
-                // Mode Web: afficher le texte formaté
+                // Mode Web: afficher le texte formate
                 previewArea.innerHTML = `<div class="preview-content" style="padding:12px;background:#f9fafb;border-radius:8px;line-height:1.6;">${result.text || result.html || markdownToHtml(contentToFormat)}</div>`;
             } else {
                 // Mode Email: afficher le HTML complet
                 previewArea.innerHTML = result.html;
             }
-            modeLabel.textContent = labels[mode].replace('🔄', '✅');
+            modeLabel.textContent = labels[mode].replace('', '');
         } else {
             // Fallback local si API fail
             previewArea.innerHTML = `<div class="preview-content">${markdownToHtml(contentToFormat)}</div>`;
-            modeLabel.textContent = labels[mode].replace('🔄', '⚠️');
+            modeLabel.textContent = labels[mode].replace('', '');
         }
     }, 500);
 }
 
 /**
- * Met à jour les badges de canaux selon le contenu
+ * Met a jour les badges de canaux selon le contenu
  */
 export function updateChannelBadges(configKey) {
     const badges = document.getElementById('channelBadges');
     if (!configKey) return;
 
-    // Détecter les canaux depuis le nom de la config ou son contenu
+    // Detecter les canaux depuis le nom de la config ou son contenu
     const key = configKey.toLowerCase();
     const text = document.getElementById('editValue').value.toLowerCase();
 
     let channels = [];
 
-    // Détection par annotation @channels dans le prompt
+    // Detection par annotation @channels dans le prompt
     const channelMatch = text.match(/@channels?:\s*([a-z,\s]+)/i);
     if (channelMatch) {
         channels = channelMatch[1].split(',').map(c => c.trim());
     } else {
-        // Détection par défaut
+        // Detection par defaut
         if (key.includes('sms') || text.includes('format sms')) channels.push('sms');
         if (key.includes('email') || text.includes('format email')) channels.push('email');
         if (key.includes('web') || text.includes('format web')) channels.push('web');
 
-        // Si aucun canal spécifique, tous les canaux
+        // Si aucun canal specifique, tous les canaux
         if (channels.length === 0) channels = ['web', 'sms', 'email'];
     }
 
@@ -339,7 +339,7 @@ export function updateChannelBadges(configKey) {
             sms: 'bg-green-100 text-green-700',
             email: 'bg-purple-100 text-purple-700'
         };
-        const icons = { web: '💻', sms: '📱', email: '📧' };
+        const icons = { web: '', sms: '', email: '' };
         return `<span class="px-2 py-0.5 text-xs rounded ${styles[ch] || 'bg-gray-100'}">${icons[ch] || ''} ${ch.toUpperCase()}</span>`;
     }).join('');
 
@@ -347,7 +347,7 @@ export function updateChannelBadges(configKey) {
 }
 
 /**
- * Met à jour le nombre de caractères
+ * Met a jour le nombre de caracteres
  */
 export function updateCharCount() {
     const text = document.getElementById('editValue').value;

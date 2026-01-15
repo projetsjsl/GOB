@@ -389,7 +389,7 @@ const SyncSelectionDialog = ({
   ]);
   const handleConfirm = () => {
     if (filteredTickers.length === 0) {
-      alert("Aucun ticker ne correspond aux critères sélectionnés.");
+      alert("Aucun ticker ne correspond aux criteres selectionnes.");
       return;
     }
     onConfirm(filteredTickers);
@@ -407,10 +407,10 @@ const SyncSelectionDialog = ({
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mb-6", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$6, { className: "w-6 h-6 text-blue-600" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-gray-900", children: "Synchronisation avec critères avancés" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-bold text-gray-900", children: "Synchronisation avec criteres avances" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 flex items-center justify-between", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600", children: "Choisissez les critères pour sélectionner les tickers à synchroniser :" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600", children: "Choisissez les criteres pour selectionner les tickers a synchroniser :" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
@@ -418,7 +418,7 @@ const SyncSelectionDialog = ({
           className: "text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$7, { className: "w-4 h-4" }),
-            showAdvanced ? "Options simples" : "Options avancées"
+            showAdvanced ? "Options simples" : "Options avancees"
           ]
         }
       )
@@ -471,7 +471,7 @@ const SyncSelectionDialog = ({
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$8, { className: "w-5 h-5 text-yellow-500" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Portefeuille (étoiles)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Portefeuille (etoiles)" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500", children: [
                   profileMetrics.filter((m) => !m.profile.isWatchlist).length,
                   " ticker(s)"
@@ -501,7 +501,7 @@ const SyncSelectionDialog = ({
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$9, { className: "w-5 h-5 text-blue-500" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Watchlist (œil)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Watchlist (il)" }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500", children: [
                   profileMetrics.filter((m) => m.profile.isWatchlist).length,
                   " ticker(s)"
@@ -561,7 +561,7 @@ const SyncSelectionDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Par secteur" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: selectedSector ? `${profileMetrics.filter((m) => m.profile.info.sector === selectedSector).length} ticker(s) dans "${selectedSector}"` : "Sélectionnez un secteur" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: selectedSector ? `${profileMetrics.filter((m) => m.profile.info.sector === selectedSector).length} ticker(s) dans "${selectedSector}"` : "Selectionnez un secteur" })
               ] })
             ]
           }
@@ -573,7 +573,7 @@ const SyncSelectionDialog = ({
             onChange: (e) => setSelectedSector(e.target.value),
             className: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: "-- Sélectionnez un secteur --" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: "-- Selectionnez un secteur --" }),
               sectors.map((sector) => /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: sector, children: [
                 sector,
                 " (",
@@ -604,7 +604,7 @@ const SyncSelectionDialog = ({
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Par recommandation" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: selectedRecommendation ? `${profileMetrics.filter((m) => m.recommendation === selectedRecommendation).length} ticker(s) avec "${selectedRecommendation}"` : "Sélectionnez une recommandation" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: selectedRecommendation ? `${profileMetrics.filter((m) => m.recommendation === selectedRecommendation).length} ticker(s) avec "${selectedRecommendation}"` : "Selectionnez une recommandation" })
               ] })
             ]
           }
@@ -616,10 +616,10 @@ const SyncSelectionDialog = ({
             onChange: (e) => setSelectedRecommendation(e.target.value),
             className: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: "-- Sélectionnez une recommandation --" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: "-- Selectionnez une recommandation --" }),
               recommendations.map((rec) => {
                 const count = profileMetrics.filter((m) => m.recommendation === rec).length;
-                const emoji = rec === "ACHAT" ? "🟢" : rec === "CONSERVER" ? "🟡" : rec === "VENTE" ? "🔴" : "⚪";
+                const emoji = rec === "ACHAT" ? "" : rec === "CONSERVER" ? "" : rec === "VENTE" ? "" : "";
                 return /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: rec, children: [
                   emoji,
                   " ",
@@ -653,7 +653,7 @@ const SyncSelectionDialog = ({
                   }
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Par métrique (plage de valeurs)" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Par metrique (plage de valeurs)" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "Filtrer par JPEGY, Ratio 3:1, Return %, etc." })
                 ] })
               ]
@@ -670,7 +670,7 @@ const SyncSelectionDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "jpegy", children: "JPEGY" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "ratio31", children: "Ratio 3:1" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "return", children: "Return %" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "volatility", children: "Volatilité %" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "volatility", children: "Volatilite %" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pe", children: "P/E" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "yield", children: "Yield %" })
                 ]
@@ -733,7 +733,7 @@ const SyncSelectionDialog = ({
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Par performance (Top/Bottom)" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "Top 10 ou Bottom 10 par métrique" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "Top 10 ou Bottom 10 par metrique" })
                 ] })
               ]
             }
@@ -773,7 +773,7 @@ const SyncSelectionDialog = ({
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "jpegy", children: "JPEGY" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "ratio31", children: "Ratio 3:1" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "return", children: "Return %" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "volatility", children: "Volatilité %" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "volatility", children: "Volatilite %" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pe", children: "P/E" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "yield", children: "Yield %" })
                 ]
@@ -801,7 +801,7 @@ const SyncSelectionDialog = ({
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Par statut" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "Approuvé, non approuvé, ou squelette" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "Approuve, non approuve, ou squelette" })
                 ] })
               ]
             }
@@ -813,9 +813,9 @@ const SyncSelectionDialog = ({
               onChange: (e) => setStatusFilter(e.target.value),
               className: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "skeleton", children: "Squelette (données incomplètes)" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "not-approved", children: "Non approuvé" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "approved", children: "Approuvé" })
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "skeleton", children: "Squelette (donnees incompletes)" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "not-approved", children: "Non approuve" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "approved", children: "Approuve" })
               ]
             }
           ) })
@@ -839,8 +839,8 @@ const SyncSelectionDialog = ({
                   }
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Filtres combinés" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "Combiner plusieurs critères" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Filtres combines" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500", children: "Combiner plusieurs criteres" })
                 ] })
               ]
             }
@@ -856,7 +856,7 @@ const SyncSelectionDialog = ({
                   className: "w-4 h-4"
                 }
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Portefeuille (étoiles)" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Portefeuille (etoiles)" })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -868,7 +868,7 @@ const SyncSelectionDialog = ({
                   className: "w-4 h-4"
                 }
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Watchlist (œil)" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: "Watchlist (il)" })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "select",
@@ -915,10 +915,10 @@ const SyncSelectionDialog = ({
                   }
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Sélection manuelle" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold text-gray-900", children: "Selection manuelle" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500", children: [
                     customSelection.size,
-                    " ticker(s) sélectionné(s)"
+                    " ticker(s) selectionne(s)"
                   ] })
                 ] })
               ]
@@ -954,7 +954,7 @@ const SyncSelectionDialog = ({
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm font-semibold text-blue-900 mb-1", children: [
-        "Tickers sélectionnés : ",
+        "Tickers selectionnes : ",
         filteredTickers.length
       ] }),
       filteredTickers.length > 0 && filteredTickers.length <= 10 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-blue-700 mt-1", children: filteredTickers.join(", ") }),
@@ -1009,8 +1009,8 @@ const GuideDialog = ({ isOpen, onClose }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mb-6 pb-4 border-b border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$c, { className: "w-8 h-8 text-blue-600" }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-bold text-gray-900", children: "Guide : Réduire les N/A et Actualiser les Profils" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mt-1", children: 'Comment réduire le nombre de tickers affichant "N/A" dans le KPI Dashboard' })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-bold text-gray-900", children: "Guide : Reduire les N/A et Actualiser les Profils" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 mt-1", children: 'Comment reduire le nombre de tickers affichant "N/A" dans le KPI Dashboard' })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "prose prose-sm max-w-none", children: [
@@ -1019,7 +1019,7 @@ const GuideDialog = ({ isOpen, onClose }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$d, { className: "w-5 h-5 text-blue-600" }),
           "Objectif"
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-700", children: 'Réduire le nombre de tickers affichant "N/A" dans le KPI Dashboard en synchronisant et nettoyant les profils.' })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-700", children: 'Reduire le nombre de tickers affichant "N/A" dans le KPI Dashboard en synchronisant et nettoyant les profils.' })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "mb-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-bold text-gray-900 mb-3 flex items-center gap-2", children: [
@@ -1029,27 +1029,27 @@ const GuideDialog = ({ isOpen, onClose }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-700 mb-3", children: 'Les tickers affichent "N/A" pour JPEGY et "-100%" pour le rendement lorsque :' }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside space-y-2 text-gray-700 ml-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Profils non synchronisés" }),
-            " : Pas encore chargés depuis l'API FMP",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Profils non synchronises" }),
+            " : Pas encore charges depuis l'API FMP",
             /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "list-circle list-inside ml-4 mt-1 text-sm text-gray-600", children: /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Solution : Synchroniser depuis Supabase puis actualiser depuis FMP" }) })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Données invalides" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Donnees invalides" }),
             " :",
             /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-circle list-inside ml-4 mt-1 text-sm text-gray-600", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix actuel invalide (≤ 0)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Prix actuel invalide (<= 0)" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "EPS = 0 ou invalide" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Croissance EPS + Yield ≤ 0.01%" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Aucune donnée financière valide" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Croissance EPS + Yield <= 0.01%" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Aucune donnee financiere valide" })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fonds mutuels" }),
-            " : Maintenant automatiquement filtrés"
+            " : Maintenant automatiquement filtres"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tickers obsolètes" }),
-            " : Données trop anciennes ou corrompues"
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tickers obsoletes" }),
+            " : Donnees trop anciennes ou corrompues"
           ] })
         ] })
       ] }),
@@ -1059,7 +1059,7 @@ const GuideDialog = ({ isOpen, onClose }) => {
           "Solutions"
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded-r", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-blue-900 mb-2", children: "Option 1 : Synchronisation en Masse (RECOMMANDÉ)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-blue-900 mb-2", children: "Option 1 : Synchronisation en Masse (RECOMMANDE)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-blue-800 text-sm mb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Dans l'application Finance Pro 3p1 :" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { className: "list-decimal list-inside space-y-2 text-blue-800 text-sm ml-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Ouvrez la sidebar (menu hamburger)" }),
@@ -1074,49 +1074,49 @@ const GuideDialog = ({ isOpen, onClose }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 p-3 bg-white rounded border border-blue-200", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs font-semibold text-blue-900 mb-2", children: "Ce que fait la synchronisation :" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-check list-inside space-y-1 text-xs text-blue-800", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "✅ Crée un snapshot de sauvegarde avant chaque sync" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "✅ Met à jour les données depuis FMP" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "✅ Préserve vos modifications manuelles" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "✅ Recalcule les hypothèses automatiquement" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "✅ Détecte et exclut les métriques aberrantes" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: " Cree un snapshot de sauvegarde avant chaque sync" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: " Met a jour les donnees depuis FMP" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: " Preserve vos modifications manuelles" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: " Recalcule les hypotheses automatiquement" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: " Detecte et exclut les metriques aberrantes" })
             ] })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 border-l-4 border-green-500 p-4 mb-4 rounded-r", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-green-900 mb-2", children: "Option 2 : Synchronisation avec Critères" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-green-900 mb-2", children: "Option 2 : Synchronisation avec Criteres" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-green-800 text-sm mb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Dans l'onglet KPI :" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { className: "list-decimal list-inside space-y-2 text-green-800 text-sm ml-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
               "Cliquez sur ",
-              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: '"Sync avec critères"' }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: '"Sync avec criteres"' }),
               " (bouton bleu)"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-              "Choisissez un critère :",
+              "Choisissez un critere :",
               /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-4 mt-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tous les tickers" }),
                   " - Synchronise tout"
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Portefeuille (étoiles)" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Portefeuille (etoiles)" }),
                   " - Uniquement les tickers du portefeuille"
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Watchlist (œil)" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Watchlist (il)" }),
                   " - Uniquement la watchlist"
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Tickers avec N/A" }),
-                  " - Uniquement les tickers problématiques"
+                  " - Uniquement les tickers problematiques"
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Par secteur" }),
-                  " - Un secteur spécifique"
+                  " - Un secteur specifique"
                 ] })
               ] })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vérifiez le résumé des tickers sélectionnés" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Verifiez le resume des tickers selectionnes" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
               "Cliquez sur ",
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: '"Synchroniser (X)"' })
@@ -1127,11 +1127,11 @@ const GuideDialog = ({ isOpen, onClose }) => {
           /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold text-orange-900 mb-2", children: "Option 3 : Synchronisation Individuelle" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-orange-800 text-sm mb-3", children: "Pour chaque ticker avec N/A :" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { className: "list-decimal list-inside space-y-2 text-orange-800 text-sm ml-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Sélectionnez le ticker dans la sidebar" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Selectionnez le ticker dans la sidebar" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
               "Cliquez sur ",
               /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: '"Synchroniser"' }),
-              " (bouton avec icône de rafraîchissement)"
+              " (bouton avec icone de rafraichissement)"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Confirmez si des modifications manuelles existent" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Attendez la fin de la synchronisation" })
@@ -1139,37 +1139,37 @@ const GuideDialog = ({ isOpen, onClose }) => {
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "mb-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 mb-3", children: "🔄 Processus Recommandé" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 mb-3", children: " Processus Recommande" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-gray-50 border border-gray-200 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("ol", { className: "list-decimal list-inside space-y-3 text-gray-700", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Nettoyer les Fonds Mutuels (AUTOMATIQUE)" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 ml-6 mt-1", children: "✅ Déjà fait - Les fonds mutuels sont automatiquement supprimés au chargement" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 ml-6 mt-1", children: " Deja fait - Les fonds mutuels sont automatiquement supprimes au chargement" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Synchroniser Tous les Tickers" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-6 mt-1 text-sm text-gray-600", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Ouvrez Finance Pro 3p1" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-                "Sidebar → ",
+                "Sidebar -> ",
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: '"Sync Tous les Tickers"' })
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Attendez la fin (peut prendre 5-15 minutes selon le nombre de tickers)" })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Vérifier les Résultats" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Verifier les Resultats" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside ml-6 mt-1 text-sm text-gray-600", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                 "Allez dans l'onglet ",
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: '"KPI"' })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vérifiez le nombre de N/A restants" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Verifiez le nombre de N/A restants" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-                "Les tickers avec N/A après sync sont probablement :",
+                "Les tickers avec N/A apres sync sont probablement :",
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-circle list-inside ml-4 mt-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Des fonds mutuels non détectés" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Des tickers avec données vraiment invalides" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Des tickers obsolètes" })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Des fonds mutuels non detectes" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Des tickers avec donnees vraiment invalides" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Des tickers obsoletes" })
                 ] })
               ] })
             ] })
@@ -1185,26 +1185,26 @@ const GuideDialog = ({ isOpen, onClose }) => {
               /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
                 "Cliquez sur ",
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: '"Sync N/A (X)"' }),
-                " pour synchroniser uniquement les tickers problématiques"
+                " pour synchroniser uniquement les tickers problematiques"
               ] })
             ] })
           ] })
         ] }) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "mb-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 mb-3", children: "📈 Résultats Attendus" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 mb-3", children: " Resultats Attendus" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-green-50 border-l-4 border-green-500 p-4 rounded-r", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-green-800 text-sm mb-2", children: "Après la synchronisation en masse :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-green-800 text-sm mb-2", children: "Apres la synchronisation en masse :" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-check list-inside space-y-1 text-green-800 text-sm ml-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "✅ Tous les profils valides auront des données à jour" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "✅ JPEGY calculable pour la plupart des tickers" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "✅ Rendements projetés réalistes" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "✅ Moins de N/A dans le dashboard" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: " Tous les profils valides auront des donnees a jour" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: " JPEGY calculable pour la plupart des tickers" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: " Rendements projetes realistes" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: " Moins de N/A dans le dashboard" })
           ] })
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "mb-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 mb-3", children: "⚠️ Notes Importantes" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 mb-3", children: " Notes Importantes" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside space-y-2 text-yellow-800 text-sm", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Temps de traitement" }),
@@ -1212,35 +1212,35 @@ const GuideDialog = ({ isOpen, onClose }) => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Sauvegarde automatique" }),
-            " : Un snapshot est créé avant chaque sync"
+            " : Un snapshot est cree avant chaque sync"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Préservation des données" }),
-            " : Vos modifications manuelles sont préservées"
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Preservation des donnees" }),
+            " : Vos modifications manuelles sont preservees"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fonds mutuels" }),
-            " : Sont automatiquement exclus (ne peuvent pas être analysés)"
+            " : Sont automatiquement exclus (ne peuvent pas etre analyses)"
           ] })
         ] }) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("section", { className: "mb-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 mb-3", children: "🐛 Dépannage" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-bold text-gray-900 mb-3", children: " Depannage" }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-red-50 border-l-4 border-red-500 p-4 rounded-r", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-red-900 mb-2", children: "Si la synchronisation échoue pour certains tickers :" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-red-900 mb-2", children: "Si la synchronisation echoue pour certains tickers :" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside space-y-1 text-red-800 text-sm ml-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vérifiez la console pour les messages d'erreur" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Certains tickers peuvent être obsolètes ou invalides" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Verifiez la console pour les messages d'erreur" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Certains tickers peuvent etre obsoletes ou invalides" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Utilisez le script de nettoyage pour les identifier" })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-blue-900 mb-2", children: "Si trop de N/A persistent :" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "list-disc list-inside space-y-1 text-blue-800 text-sm ml-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vérifiez que les tickers ne sont pas des fonds mutuels" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Vérifiez que les données FMP sont disponibles" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Certains tickers peuvent nécessiter une synchronisation manuelle" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Verifiez que les tickers ne sont pas des fonds mutuels" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Verifiez que les donnees FMP sont disponibles" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Certains tickers peuvent necessiter une synchronisation manuelle" })
             ] })
           ] })
         ] })
@@ -1516,7 +1516,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
           _isLoading: false,
           // Pas de spinner
           hasInvalidData: true,
-          invalidReason: "Données manquantes ou échec chargement"
+          invalidReason: "Donnees manquantes ou echec chargement"
         };
       }
       const { recommendation, targetPrice } = calculateRecommendation(profile.data, profile.assumptions);
@@ -1668,13 +1668,13 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       const invalidReason = [];
       const hasEmptyData = profile.data.length === 1 && profile.data[0].earningsPerShare === 0 && profile.data[0].cashFlowPerShare === 0 && profile.data[0].bookValuePerShare === 0 && (profile.assumptions.currentPrice === 100 || profile.assumptions.currentPrice === 0) && profile.assumptions.currentDividend === 0;
       if (hasEmptyData) {
-        invalidReason.push(`⚠️ DONNÉES NON SYNCHRONISÉES - Cliquez sur "Synchroniser" dans l'onglet Analysis pour charger les données réelles`);
+        invalidReason.push(` DONNEES NON SYNCHRONISEES - Cliquez sur "Synchroniser" dans l'onglet Analysis pour charger les donnees reelles`);
       } else {
         if (currentPrice <= 0 || !isFinite(currentPrice)) {
           invalidReason.push("Prix actuel invalide ou manquant");
         }
         if (baseEPS === 0 && baseYearData) {
-          invalidReason.push("EPS de base = 0 (données historiques manquantes ou nulles)");
+          invalidReason.push("EPS de base = 0 (donnees historiques manquantes ou nulles)");
         }
         if (validTargets.length === 0) {
           const excludedMetrics = [];
@@ -1683,15 +1683,15 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
           if (profile.assumptions.excludeBV) excludedMetrics.push("BV");
           if (profile.assumptions.excludeDIV) excludedMetrics.push("DIV");
           const excludedText = excludedMetrics.length > 0 ? ` (${excludedMetrics.join(", ")} exclus)` : "";
-          invalidReason.push(`Aucun ratio cible valide${excludedText} - Vérifiez les ratios cibles (P/E, P/CF, P/BV, Yield) et les données historiques`);
+          invalidReason.push(`Aucun ratio cible valide${excludedText} - Verifiez les ratios cibles (P/E, P/CF, P/BV, Yield) et les donnees historiques`);
         }
         if (jpegy === null) {
           const growthRate = profile.assumptions.growthRateEPS != null && isFinite(profile.assumptions.growthRateEPS) ? profile.assumptions.growthRateEPS.toFixed(2) : "0.00";
           const yieldValue = baseYield != null && isFinite(baseYield) ? baseYield.toFixed(2) : "0.00";
-          invalidReason.push(`JPEGY non calculable: Croissance EPS (${growthRate}%) + Yield (${yieldValue}%) trop faible (≤0.01%) ou EPS invalide - Ajustez la croissance, le dividende ou synchronisez les données`);
+          invalidReason.push(`JPEGY non calculable: Croissance EPS (${growthRate}%) + Yield (${yieldValue}%) trop faible (<=0.01%) ou EPS invalide - Ajustez la croissance, le dividende ou synchronisez les donnees`);
         }
         if (totalReturnPercent <= -99.9) {
-          invalidReason.push("Rendement impossible à calculer - Vérifiez le prix actuel et les ratios cibles");
+          invalidReason.push("Rendement impossible a calculer - Verifiez le prix actuel et les ratios cibles");
         }
       }
       const hasInvalidData = invalidReason.length > 0;
@@ -1712,11 +1712,11 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
         historicalGrowth,
         volatility,
         hasInvalidData,
-        // Nouveau flag pour indiquer données invalides
+        // Nouveau flag pour indiquer donnees invalides
         invalidReason: hasInvalidData ? invalidReason.join("; ") : void 0,
-        // Raison de l'invalidité pour debug
+        // Raison de l'invalidite pour debug
         isNotSynchronized: hasEmptyData
-        // Flag spécial pour profils non synchronisés
+        // Flag special pour profils non synchronises
       };
     });
   }, [profiles, approvedVersions]);
@@ -1727,12 +1727,12 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       const now = Date.now();
       const currentProfileIds = profiles.map((p) => p.id).sort().join(",");
       if (approvedVersionsCacheRef.current && approvedVersionsCacheRef.current.profileIds === currentProfileIds && now - approvedVersionsCacheRef.current.timestamp < APPROVED_VERSIONS_CACHE_TTL) {
-        console.log("✅ KPI: Using cached approved versions");
+        console.log(" KPI: Using cached approved versions");
         setApprovedVersions(approvedVersionsCacheRef.current.approvedSet);
         setIsLoadingApprovedVersions(false);
         return;
       }
-      console.log(`📊 KPI: Loading approved versions for ${profiles.length} profiles...`);
+      console.log(` KPI: Loading approved versions for ${profiles.length} profiles...`);
       setIsLoadingApprovedVersions(true);
       try {
         const bulkResult = await getAllApprovedTickers();
@@ -1745,13 +1745,13 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
           };
           setApprovedVersions(approvedSet);
           setIsLoadingApprovedVersions(false);
-          console.log(`✅ KPI: Bulk load complete - ${approvedSet.size} approved tickers`);
+          console.log(` KPI: Bulk load complete - ${approvedSet.size} approved tickers`);
           return;
         }
       } catch (bulkError) {
-        console.warn("⚠️ KPI: Bulk query not available, skipping approved check for performance");
+        console.warn(" KPI: Bulk query not available, skipping approved check for performance");
       }
-      console.log("⚡ KPI: Skipping slow approved check - showing all data immediately");
+      console.log(" KPI: Skipping slow approved check - showing all data immediately");
       setApprovedVersions(/* @__PURE__ */ new Set());
       setIsLoadingApprovedVersions(false);
     };
@@ -1826,12 +1826,12 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
     const jpegyValues = profileMetrics.map((m) => m.jpegy).filter((j) => j !== null);
     return {
       minReturn: Math.floor(Math.min(...returns, -100)) - 10,
-      // Marge de sécurité
+      // Marge de securite
       maxReturn: Math.ceil(Math.max(...returns, 500)) + 10,
-      // Marge de sécurité
+      // Marge de securite
       minJPEGY: jpegyValues.length > 0 ? Math.max(0, Math.floor(Math.min(...jpegyValues, 0))) : 0,
       maxJPEGY: jpegyValues.length > 0 ? Math.ceil(Math.max(...jpegyValues, 10)) + 2 : 10,
-      // Marge de sécurité
+      // Marge de securite
       sector: "",
       recommendation: "all",
       source: "all"
@@ -2000,7 +2000,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
   }, []);
   const handleExport = reactExports.useCallback(() => {
     const csv = [
-      ["Ticker", "Nom", "Secteur", "JPEGY", "Rendement Total", "Ratio 3:1", "Potentiel Hausse", "Risque Baisse", "P/E", "Yield", "Croissance", "Recommandation", "Prix Actuel", "Prix Cible", "Prix Achat", "Prix Vente", "P/CF", "P/BV", "Volatilité"].join(","),
+      ["Ticker", "Nom", "Secteur", "JPEGY", "Rendement Total", "Ratio 3:1", "Potentiel Hausse", "Risque Baisse", "P/E", "Yield", "Croissance", "Recommandation", "Prix Actuel", "Prix Cible", "Prix Achat", "Prix Vente", "P/CF", "P/BV", "Volatilite"].join(","),
       ...filteredMetrics.map((m) => [
         m.profile.id,
         `"${m.profile.info.name}"`,
@@ -2098,7 +2098,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-8 rounded-lg shadow border border-gray-200 text-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-bold text-gray-700 mb-4", children: "Vue KPI Dashboard" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 mb-4", children: "Aucun profil disponible pour afficher les KPI." }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-400", children: "Ajoutez des tickers dans la sidebar de gauche pour voir les métriques." })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-400", children: "Ajoutez des tickers dans la sidebar de gauche pour voir les metriques." })
     ] });
   }
   const chartWidth = 900;
@@ -2174,7 +2174,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
     globalStats && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-50 to-indigo-50 p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-blue-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: [
-          "📊 Statistiques Globales du Portefeuille",
+          " Statistiques Globales du Portefeuille",
           globalStats.validCount < globalStats.count && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 text-sm font-normal text-blue-600 animate-pulse", children: [
             "(Chargement... ",
             globalStats.validCount,
@@ -2188,7 +2188,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
           {
             onClick: () => toggleSection("globalStats"),
             className: "p-1.5 hover:bg-blue-100 rounded transition-colors cursor-help",
-            title: sectionsVisibility.globalStats ? "Réduire cette section" : "Agrandir cette section",
+            title: sectionsVisibility.globalStats ? "Reduire cette section" : "Agrandir cette section",
             children: sectionsVisibility.globalStats ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
           }
         )
@@ -2198,17 +2198,17 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-1", children: "Rendement Moyen" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg sm:text-xl md:text-2xl font-bold text-blue-600", children: globalStats.validCount > 0 ? (((_a = globalStats.avgReturn) == null ? void 0 : _a.toFixed(1)) ?? "N/A") + "%" : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-normal text-gray-400", children: "En attente..." }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 mt-1", children: [
-            "Médiane: ",
+            "Mediane: ",
             globalStats.validCount > 0 ? (((_b = globalStats.medianReturn) == null ? void 0 : _b.toFixed(1)) ?? "N/A") + "%" : "-"
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-1", children: "Écart-Type" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-1", children: "Ecart-Type" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-2xl font-bold text-purple-600", children: [
             globalStats.stdReturn !== null && globalStats.stdReturn !== void 0 ? globalStats.stdReturn.toFixed(1) : "N/A",
             "%"
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-400 mt-1", children: "Volatilité" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-400 mt-1", children: "Volatilite" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-4 rounded-lg shadow border border-gray-200", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-1", children: "Rendement Min" }),
@@ -2229,17 +2229,17 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
           globalStats.avgJPEGY != null && isFinite(globalStats.avgJPEGY) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-2xl font-bold ${getJpegyTextClass(globalStats.avgJPEGY)}`, children: ((_c = globalStats.avgJPEGY) == null ? void 0 : _c.toFixed(2)) ?? "N/A" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 mt-1", children: [
-              "Médiane: ",
+              "Mediane: ",
               globalStats.medianJPEGY != null && isFinite(globalStats.medianJPEGY) ? globalStats.medianJPEGY.toFixed(2) : "N/A"
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 pt-2 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[10px] text-gray-400 space-y-0.5", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source:" }),
-                " P/E Actuel ÷ (Croissance EPS % + Yield %)"
+                " P/E Actuel / (Croissance EPS % + Yield %)"
               ] }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fournisseur:" }),
-                " Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Ajuste le P/E par la somme du taux de croissance et du rendement du dividende pour une évaluation nuancée de la valorisation."
+                " Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Ajuste le P/E par la somme du taux de croissance et du rendement du dividende pour une evaluation nuancee de la valorisation."
               ] })
             ] }) })
           ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
@@ -2259,7 +2259,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
     comparisonMode && selectedForComparison.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-purple-50 to-pink-50 p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border-2 border-purple-300", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2", children: [
-          "🔍 Mode Comparaison (",
+          " Mode Comparaison (",
           selectedForComparison.length,
           " titre(s))"
         ] }),
@@ -2269,7 +2269,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
             {
               onClick: () => toggleSection("comparison"),
               className: "p-1.5 hover:bg-purple-100 rounded transition-colors cursor-help",
-              title: sectionsVisibility.comparison ? "Réduire cette section" : "Agrandir cette section",
+              title: sectionsVisibility.comparison ? "Reduire cette section" : "Agrandir cette section",
               children: sectionsVisibility.comparison ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
             }
           ),
@@ -2299,7 +2299,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
               {
                 onClick: () => setSelectedForComparison((prev) => prev.filter((t) => t !== ticker)),
                 className: "text-red-500 hover:text-red-700 text-sm",
-                children: "✕"
+                children: ""
               }
             )
           ] }),
@@ -2318,11 +2318,11 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1 pt-1 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[9px] text-gray-400 space-y-0.5 text-left", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source:" }),
-                    " P/E ÷ (Growth % + Yield %)"
+                    " P/E / (Growth % + Yield %)"
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fournisseur:" }),
-                    " JSLAI™ - Métrique propriétaire ajustant le P/E par croissance et dividende."
+                    " JSLAITM - Metrique proprietaire ajustant le P/E par croissance et dividende."
                   ] })
                 ] }) })
               ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-bold text-gray-400 flex items-center gap-1", children: [
@@ -2357,7 +2357,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
               {
                 onClick: () => onSelect(ticker),
                 className: "w-full mt-3 px-3 py-2 bg-blue-500 text-white text-xs font-semibold rounded hover:bg-blue-600 transition-colors",
-                children: "Voir détails →"
+                children: "Voir details ->"
               }
             )
           ] })
@@ -2367,13 +2367,13 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border-2 transition-all ${filters.minReturn !== -100 || filters.maxReturn !== 500 || filters.minJPEGY !== 0 || filters.maxJPEGY !== 5 || filters.sector !== "" || filters.recommendation !== "all" ? "border-blue-400 bg-blue-50" : "border-gray-200"}`, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 sm:gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg font-bold", children: "🔍 Filtres de Screening" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg font-bold", children: " Filtres de Screening" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "button",
             {
               onClick: () => toggleSection("filters"),
               className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-              title: sectionsVisibility.filters ? "Réduire cette section" : "Agrandir cette section",
+              title: sectionsVisibility.filters ? "Reduire cette section" : "Agrandir cette section",
               children: sectionsVisibility.filters ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
             }
           ),
@@ -2388,8 +2388,8 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
             {
               onClick: () => setComparisonMode(!comparisonMode),
               className: `px-2 sm:px-3 py-1 text-[10px] sm:text-xs rounded transition-colors ${comparisonMode ? "bg-purple-500 text-white" : "bg-purple-100 hover:bg-purple-200 text-purple-700"}`,
-              title: comparisonMode ? "Désactiver le Mode Comparaison\n\nCliquez pour désactiver le mode comparaison.\n\nEn mode comparaison, vous pouvez sélectionner jusqu'à 5 tickers pour les comparer côte à côte." : "Activer le Mode Comparaison\n\nCliquez pour activer le mode comparaison.\n\nEn mode comparaison:\n• Sélectionnez jusqu'à 5 tickers (cliquez sur les tuiles)\n• Les tickers sélectionnés sont marqués avec un numéro\n• Comparez leurs métriques côte à côte\n\nUtile pour comparer plusieurs opportunités d'investissement.",
-              children: comparisonMode ? "✕ Mode Comparaison" : "🔍 Mode Comparaison"
+              title: comparisonMode ? "Desactiver le Mode Comparaison\n\nCliquez pour desactiver le mode comparaison.\n\nEn mode comparaison, vous pouvez selectionner jusqu'a 5 tickers pour les comparer cote a cote." : "Activer le Mode Comparaison\n\nCliquez pour activer le mode comparaison.\n\nEn mode comparaison:\n- Selectionnez jusqu'a 5 tickers (cliquez sur les tuiles)\n- Les tickers selectionnes sont marques avec un numero\n- Comparez leurs metriques cote a cote\n\nUtile pour comparer plusieurs opportunites d'investissement.",
+              children: comparisonMode ? " Mode Comparaison" : " Mode Comparaison"
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -2413,8 +2413,8 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
                 groupBy: "none"
               }),
               className: "px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors",
-              title: "Réinitialiser tous les filtres\\n\\nRéinitialise tous les filtres actifs:\\n• Rendement\\n• JPEGY\\n• Ratio 3:1\\n• Recommandation\\n• Secteur\\n• Source\\n\\nAffiche tous les titres du portefeuille.",
-              children: "🔄 Réinitialiser"
+              title: "Reinitialiser tous les filtres\\n\\nReinitialise tous les filtres actifs:\\n- Rendement\\n- JPEGY\\n- Ratio 3:1\\n- Recommandation\\n- Secteur\\n- Source\\n\\nAffiche tous les titres du portefeuille.",
+              children: " Reinitialiser"
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -2427,7 +2427,7 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
                 setFilters((prev) => ({ ...prev, minReturn: minReturn2 - 5, maxReturn: maxReturn2 + 5 }));
               },
               className: "px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 rounded transition-colors",
-              title: "Zoom Top 10\\n\\nFiltre automatiquement pour afficher uniquement les 10 tickers avec le meilleur rendement total projeté.\\n\\nAjuste les filtres Min/Max de rendement pour encadrer ces 10 tickers.",
+              title: "Zoom Top 10\\n\\nFiltre automatiquement pour afficher uniquement les 10 tickers avec le meilleur rendement total projete.\\n\\nAjuste les filtres Min/Max de rendement pour encadrer ces 10 tickers.",
               children: "Top 10"
             }
           ),
@@ -2444,8 +2444,8 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
                 }
               },
               className: "px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-green-100 hover:bg-green-200 rounded transition-colors",
-              title: "Sous-évalués (JPEGY ≤ 1.5)\\n\\nFiltre automatiquement pour afficher uniquement les tickers avec un JPEGY ≤ 1.5.\\n\\nJPEGY ≤ 1.5 indique une action sous-évaluée ou raisonnablement valorisée.\\n\\nAjuste automatiquement les filtres JPEGY Min/Max.",
-              children: "Sous-évalués"
+              title: "Sous-evalues (JPEGY <= 1.5)\\n\\nFiltre automatiquement pour afficher uniquement les tickers avec un JPEGY <= 1.5.\\n\\nJPEGY <= 1.5 indique une action sous-evaluee ou raisonnablement valorisee.\\n\\nAjuste automatiquement les filtres JPEGY Min/Max.",
+              children: "Sous-evalues"
             }
           )
         ] })
@@ -2453,20 +2453,20 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
       sectionsVisibility.filters && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-4 flex items-center justify-between", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold text-blue-600", children: filteredMetrics.length }),
-          " titre(s) affiché(s) sur",
+          " titre(s) affiche(s) sur",
           " ",
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: profileMetrics.length }),
           " total",
           (filters.minReturn !== defaultFilterValues.minReturn || filters.maxReturn !== defaultFilterValues.maxReturn || filters.minJPEGY !== defaultFilterValues.minJPEGY || filters.maxJPEGY !== defaultFilterValues.maxJPEGY || filters.sector !== "" || filters.recommendation !== "all" || filters.source !== "all") && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-2 text-xs text-blue-600", children: [
             "(",
             profileMetrics.length - filteredMetrics.length,
-            " masqué(s))"
+            " masque(s))"
           ] }),
-          isLoadingApprovedVersions && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-xs text-gray-400", children: "⏳ Vérification des versions approuvées..." })
+          isLoadingApprovedVersions && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 text-xs text-gray-400", children: " Verification des versions approuvees..." })
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2.5 md:gap-3 lg:gap-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-min-return", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "Rendement Total Projeté Minimum (%)\\n\\nFiltre les tickers avec un rendement total projeté supérieur ou égal à cette valeur.\\n\\nLe rendement total inclut:\\n• Appréciation du prix (5 ans)\\n• Dividendes cumulés (5 ans)\\n\\nPlage par défaut: -100% à +1000%", children: "Rendement Min (%)" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-min-return", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "Rendement Total Projete Minimum (%)\\n\\nFiltre les tickers avec un rendement total projete superieur ou egal a cette valeur.\\n\\nLe rendement total inclut:\\n- Appreciation du prix (5 ans)\\n- Dividendes cumules (5 ans)\\n\\nPlage par defaut: -100% a +1000%", children: "Rendement Min (%)" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
               {
@@ -2477,14 +2477,14 @@ const KPIDashboard = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isB
                 className: `w-full px-2 sm:px-2.5 md:px-3 lg:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all ${filters.minReturn !== defaultFilterValues.minReturn ? "border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500" : "border-gray-300 focus:border-blue-400"}`,
                 title: `Filtre: Rendement Min = ${filters.minReturn}%
 
-Affiche uniquement les tickers avec un rendement total projeté ≥ ${filters.minReturn}%.
+Affiche uniquement les tickers avec un rendement total projete >= ${filters.minReturn}%.
 
-${filters.minReturn !== defaultFilterValues.minReturn ? "✅ Filtre actif" : "Filtre par défaut"}`
+${filters.minReturn !== defaultFilterValues.minReturn ? " Filtre actif" : "Filtre par defaut"}`
               }
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-max-return", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "Rendement Total Projeté Maximum (%)\\n\\nFiltre les tickers avec un rendement total projeté inférieur ou égal à cette valeur.\\n\\nLe rendement total inclut:\\n• Appréciation du prix (5 ans)\\n• Dividendes cumulés (5 ans)\\n\\nPlage par défaut: -100% à +1000%", children: "Rendement Max (%)" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-max-return", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "Rendement Total Projete Maximum (%)\\n\\nFiltre les tickers avec un rendement total projete inferieur ou egal a cette valeur.\\n\\nLe rendement total inclut:\\n- Appreciation du prix (5 ans)\\n- Dividendes cumules (5 ans)\\n\\nPlage par defaut: -100% a +1000%", children: "Rendement Max (%)" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
               {
@@ -2495,14 +2495,14 @@ ${filters.minReturn !== defaultFilterValues.minReturn ? "✅ Filtre actif" : "Fi
                 className: `w-full px-2 sm:px-2.5 md:px-3 lg:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all ${filters.maxReturn !== defaultFilterValues.maxReturn ? "border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500" : "border-gray-300 focus:border-blue-400"}`,
                 title: `Filtre: Rendement Max = ${filters.maxReturn}%
 
-Affiche uniquement les tickers avec un rendement total projeté ≤ ${filters.maxReturn}%.
+Affiche uniquement les tickers avec un rendement total projete <= ${filters.maxReturn}%.
 
-${filters.maxReturn !== defaultFilterValues.maxReturn ? "✅ Filtre actif" : "Filtre par défaut"}`
+${filters.maxReturn !== defaultFilterValues.maxReturn ? " Filtre actif" : "Filtre par defaut"}`
               }
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-min-jpegy", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "JPEGY Minimum\\n\\nFiltre les tickers avec un JPEGY supérieur ou égal à cette valeur.\\n\\nJPEGY = P/E ÷ (Croissance % + Yield %)\\n\\nPlage recommandée: 0.0 à 5.0\\n\\nPlus le JPEGY est bas, plus l'action est attractive.", children: "JPEGY Min" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-min-jpegy", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "JPEGY Minimum\\n\\nFiltre les tickers avec un JPEGY superieur ou egal a cette valeur.\\n\\nJPEGY = P/E / (Croissance % + Yield %)\\n\\nPlage recommandee: 0.0 a 5.0\\n\\nPlus le JPEGY est bas, plus l'action est attractive.", children: "JPEGY Min" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
               {
@@ -2514,14 +2514,14 @@ ${filters.maxReturn !== defaultFilterValues.maxReturn ? "✅ Filtre actif" : "Fi
                 className: `w-full px-2 sm:px-2.5 md:px-3 lg:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all ${filters.minJPEGY !== defaultFilterValues.minJPEGY ? "border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500" : "border-gray-300 focus:border-green-400"}`,
                 title: `Filtre: JPEGY Min = ${filters.minJPEGY}
 
-Affiche uniquement les tickers avec un JPEGY ≥ ${filters.minJPEGY}.
+Affiche uniquement les tickers avec un JPEGY >= ${filters.minJPEGY}.
 
-${filters.minJPEGY !== defaultFilterValues.minJPEGY ? "✅ Filtre actif" : "Filtre par défaut"}`
+${filters.minJPEGY !== defaultFilterValues.minJPEGY ? " Filtre actif" : "Filtre par defaut"}`
               }
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-max-jpegy", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "JPEGY Maximum\\n\\nFiltre les tickers avec un JPEGY inférieur ou égal à cette valeur.\\n\\nJPEGY = P/E ÷ (Croissance % + Yield %)\\n\\nPlage recommandée: 0.0 à 5.0\\n\\nPlus le JPEGY est bas, plus l'action est attractive.", children: "JPEGY Max" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-max-jpegy", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "JPEGY Maximum\\n\\nFiltre les tickers avec un JPEGY inferieur ou egal a cette valeur.\\n\\nJPEGY = P/E / (Croissance % + Yield %)\\n\\nPlage recommandee: 0.0 a 5.0\\n\\nPlus le JPEGY est bas, plus l'action est attractive.", children: "JPEGY Max" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
               {
@@ -2533,14 +2533,14 @@ ${filters.minJPEGY !== defaultFilterValues.minJPEGY ? "✅ Filtre actif" : "Filt
                 className: `w-full px-2 sm:px-2.5 md:px-3 lg:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all ${filters.maxJPEGY !== defaultFilterValues.maxJPEGY ? "border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500" : "border-gray-300 focus:border-green-400"}`,
                 title: `Filtre: JPEGY Max = ${filters.maxJPEGY}
 
-Affiche uniquement les tickers avec un JPEGY ≤ ${filters.maxJPEGY}.
+Affiche uniquement les tickers avec un JPEGY <= ${filters.maxJPEGY}.
 
-${filters.maxJPEGY !== defaultFilterValues.maxJPEGY ? "✅ Filtre actif" : "Filtre par défaut"}`
+${filters.maxJPEGY !== defaultFilterValues.maxJPEGY ? " Filtre actif" : "Filtre par defaut"}`
               }
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-sector", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "Filtre par Secteur\\n\\nFiltre les tickers par secteur d'activité.\\n\\nLaissez vide pour afficher tous les secteurs.\\n\\nLa recherche est insensible à la casse et cherche dans le nom du secteur.", children: "Secteur" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-sector", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "Filtre par Secteur\\n\\nFiltre les tickers par secteur d'activite.\\n\\nLaissez vide pour afficher tous les secteurs.\\n\\nLa recherche est insensible a la casse et cherche dans le nom du secteur.", children: "Secteur" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "input",
               {
@@ -2554,12 +2554,12 @@ ${filters.maxJPEGY !== defaultFilterValues.maxJPEGY ? "✅ Filtre actif" : "Filt
 
 ${filters.sector ? `Affiche uniquement les tickers du secteur contenant "${filters.sector}".` : "Affiche tous les secteurs."}
 
-${filters.sector ? "✅ Filtre actif" : "Filtre par défaut"}`
+${filters.sector ? " Filtre actif" : "Filtre par defaut"}`
               }
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-recommendation", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "Filtre par Recommandation\\n\\nFiltre les tickers selon la recommandation calculée:\\n\\n• ACHAT: Prix actuel ≤ Limite d'achat\\n• CONSERVER: Entre limite d'achat et vente\\n• VENTE: Prix actuel ≥ Limite de vente\\n\\nSélectionnez 'Toutes' pour afficher toutes les recommandations.", children: "Recommandation" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-recommendation", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help", title: "Filtre par Recommandation\\n\\nFiltre les tickers selon la recommandation calculee:\\n\\n- ACHAT: Prix actuel <= Limite d'achat\\n- CONSERVER: Entre limite d'achat et vente\\n- VENTE: Prix actuel >= Limite de vente\\n\\nSelectionnez 'Toutes' pour afficher toutes les recommandations.", children: "Recommandation" }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "select",
               {
@@ -2571,7 +2571,7 @@ ${filters.sector ? "✅ Filtre actif" : "Filtre par défaut"}`
 
 ${filters.recommendation !== "all" ? `Affiche uniquement les tickers avec la recommandation "${filters.recommendation}".` : "Affiche toutes les recommandations."}
 
-${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`,
+${filters.recommendation !== "all" ? " Filtre actif" : "Filtre par defaut"}`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: "Toutes" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "ACHAT", children: "Achat" }),
@@ -2582,7 +2582,7 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "filter-source", className: "flex text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2 items-center gap-1.5 sm:gap-2 cursor-help", title: "Filtre par Source\\n\\nFiltre les tickers selon leur source:\\n\\n• ⭐ Portefeuille: Titres détenus actuellement\\n• 👁️ Watchlist: Titres surveillés (non détenus)\\n• Tous: Affiche les deux sources\\n\\nLe badge coloré indique le filtre actif.", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "filter-source", className: "flex text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2 items-center gap-1.5 sm:gap-2 cursor-help", title: "Filtre par Source\\n\\nFiltre les tickers selon leur source:\\n\\n-  Portefeuille: Titres detenus actuellement\\n-  Watchlist: Titres surveilles (non detenus)\\n- Tous: Affiche les deux sources\\n\\nLe badge colore indique le filtre actif.", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "truncate", children: "Source" }),
               filters.source !== "all" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-full flex items-center gap-0.5 sm:gap-1 flex-shrink-0 ${filters.source === "watchlist" ? "bg-blue-100 text-blue-700" : "bg-yellow-100 text-yellow-700"}`, children: filters.source === "watchlist" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-2.5 h-2.5 sm:w-3 sm:h-3" }),
@@ -2602,8 +2602,8 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
                   className: `w-full px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 border-2 rounded-lg text-xs sm:text-sm transition-all appearance-none ${filters.source !== "all" ? filters.source === "watchlist" ? "border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500" : "border-yellow-400 bg-yellow-50 focus:ring-2 focus:ring-yellow-500" : "border-gray-300 focus:border-blue-400"}`,
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: "Tous (Portefeuille + Watchlist)" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "portfolio", children: "⭐ Portefeuille" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "watchlist", children: "👁️ Watchlist" })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "portfolio", children: " Portefeuille" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "watchlist", children: " Watchlist" })
                   ]
                 }
               ),
@@ -2612,8 +2612,8 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
                 {
                   onClick: () => setFilters({ ...filters, source: "all" }),
                   className: "absolute right-6 sm:right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-xs",
-                  title: "Réinitialiser le filtre Source\\n\\nRemet le filtre Source à 'Tous' (Portefeuille + Watchlist).",
-                  children: "✕"
+                  title: "Reinitialiser le filtre Source\\n\\nRemet le filtre Source a 'Tous' (Portefeuille + Watchlist).",
+                  children: ""
                 }
               )
             ] })
@@ -2621,13 +2621,13 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 pt-4 border-t border-gray-200", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-700", children: "Filtres avancés" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-700", children: "Filtres avances" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "button",
               {
                 onClick: () => setFilters((prev) => ({ ...prev, showOnlyNA: !prev.showOnlyNA })),
                 className: `px-2 py-1 text-xs rounded transition-colors ${filters.showOnlyNA ? "bg-orange-500 text-white" : "bg-gray-100 hover:bg-orange-100 text-gray-700"}`,
-                children: filters.showOnlyNA ? "✓ N/A uniquement" : "Afficher N/A"
+                children: filters.showOnlyNA ? " N/A uniquement" : "Afficher N/A"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -2635,7 +2635,7 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
               {
                 onClick: () => setFilters((prev) => ({ ...prev, showOnlyApproved: !prev.showOnlyApproved })),
                 className: `px-2 py-1 text-xs rounded transition-colors ${filters.showOnlyApproved ? "bg-green-500 text-white" : "bg-gray-100 hover:bg-green-100 text-gray-700"}`,
-                children: filters.showOnlyApproved ? "✓ Approuvés uniquement" : "Approuvés"
+                children: filters.showOnlyApproved ? " Approuves uniquement" : "Approuves"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -2643,7 +2643,7 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
               {
                 onClick: () => setFilters((prev) => ({ ...prev, showOnlySkeleton: !prev.showOnlySkeleton })),
                 className: `px-2 py-1 text-xs rounded transition-colors ${filters.showOnlySkeleton ? "bg-blue-500 text-white" : "bg-gray-100 hover:bg-blue-100 text-gray-700"}`,
-                children: filters.showOnlySkeleton ? "✓ Squelettes uniquement" : "Squelettes"
+                children: filters.showOnlySkeleton ? " Squelettes uniquement" : "Squelettes"
               }
             )
           ] }),
@@ -2733,7 +2733,7 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
               )
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-volatility-min", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1", children: "Volatilité Min (%)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-volatility-min", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1", children: "Volatilite Min (%)" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "input",
                 {
@@ -2747,7 +2747,7 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
               )
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-volatility-max", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1", children: "Volatilité Max (%)" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "filter-volatility-max", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1", children: "Volatilite Max (%)" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "input",
                 {
@@ -2812,7 +2812,7 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
           /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-700 mb-3", children: "Options d'affichage" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "display-density", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1", children: "Densité" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "display-density", className: "block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1", children: "Densite" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "select",
                 {
@@ -2878,18 +2878,18 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 sm:gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: "🎯 Matrice de Performance" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: " Matrice de Performance" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "button",
               {
                 onClick: () => toggleSection("performanceMatrix"),
                 className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-                title: sectionsVisibility.performanceMatrix ? "Réduire cette section" : "Agrandir cette section",
+                title: sectionsVisibility.performanceMatrix ? "Reduire cette section" : "Agrandir cette section",
                 children: sectionsVisibility.performanceMatrix ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
               }
             )
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 mt-1", children: "Cliquez sur un carreau pour sélectionner le titre" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 mt-1", children: "Cliquez sur un carreau pour selectionner le titre" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-0.5 sm:gap-1 bg-gray-100 rounded-lg p-0.5 sm:p-1", children: [
@@ -2898,8 +2898,8 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
               {
                 onClick: () => setMatrixView("grid"),
                 className: `px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold rounded transition-all ${matrixView === "grid" ? "bg-white text-blue-600 shadow-sm" : "text-gray-600 hover:text-gray-800"}`,
-                title: "Vue grille\\n\\nAffiche les tickers dans une grille de tuiles colorées.\\n\\nChaque tuile montre:\\n• Symbole du ticker\\n• Rendement total projeté\\n• JPEGY\\n• Icônes (Portefeuille/Watchlist)\\n\\nLes couleurs indiquent le rendement (vert = élevé, rouge = faible).",
-                children: "⬜ Grille"
+                title: "Vue grille\\n\\nAffiche les tickers dans une grille de tuiles colorees.\\n\\nChaque tuile montre:\\n- Symbole du ticker\\n- Rendement total projete\\n- JPEGY\\n- Icones (Portefeuille/Watchlist)\\n\\nLes couleurs indiquent le rendement (vert = eleve, rouge = faible).",
+                children: " Grille"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -2907,8 +2907,8 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
               {
                 onClick: () => setMatrixView("list"),
                 className: `px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold rounded transition-all ${matrixView === "list" ? "bg-white text-blue-600 shadow-sm" : "text-gray-600 hover:text-gray-800"}`,
-                title: "Vue liste détaillée\\n\\nAffiche les tickers dans un tableau détaillé.\\n\\nColonnes:\\n• Symbole\\n• Nom\\n• Rendement Total\\n• JPEGY\\n• Ratio 3:1\\n• P/E, P/CF, P/BV, Yield\\n• Recommandation\\n• Secteur\\n\\nCliquez sur une ligne pour voir l'analyse complète.",
-                children: "☰ Liste"
+                title: "Vue liste detaillee\\n\\nAffiche les tickers dans un tableau detaille.\\n\\nColonnes:\\n- Symbole\\n- Nom\\n- Rendement Total\\n- JPEGY\\n- Ratio 3:1\\n- P/E, P/CF, P/BV, Yield\\n- Recommandation\\n- Secteur\\n\\nCliquez sur une ligne pour voir l'analyse complete.",
+                children: " Liste"
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -2916,15 +2916,15 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
               {
                 onClick: () => setMatrixView("compact"),
                 className: `px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-semibold rounded transition-all ${matrixView === "compact" ? "bg-white text-blue-600 shadow-sm" : "text-gray-600 hover:text-gray-800"}`,
-                title: "Vue compacte (matrice)\\n\\nAffiche les tickers dans une matrice compacte.\\n\\nChaque case montre:\\n• Symbole du ticker\\n• Rendement total projeté\\n• JPEGY\\n\\nIdéal pour une vue d'ensemble rapide de tous les tickers.\\n\\nLes cases sont colorées selon le rendement.",
-                children: "▦ Compacte"
+                title: "Vue compacte (matrice)\\n\\nAffiche les tickers dans une matrice compacte.\\n\\nChaque case montre:\\n- Symbole du ticker\\n- Rendement total projete\\n- JPEGY\\n\\nIdeal pour une vue d'ensemble rapide de tous les tickers.\\n\\nLes cases sont colorees selon le rendement.",
+                children: " Compacte"
               }
             )
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 text-[10px] sm:text-xs", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-600" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "≥50%" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: ">=50%" })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-300" }),
@@ -2941,16 +2941,16 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
           ] })
         ] })
       ] }),
-      sectionsVisibility.performanceMatrix && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre ne correspond aux filtres sélectionnés." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      sectionsVisibility.performanceMatrix && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre ne correspond aux filtres selectionnes." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         filteredMetrics.some((m) => m.hasInvalidData) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `mb-4 p-3 border-l-4 rounded-r ${filteredMetrics.some((m) => m.isNotSynchronized) ? "bg-blue-50 border-blue-400" : "bg-yellow-50 border-yellow-400"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: `w-5 h-5 flex-shrink-0 mt-0.5 ${filteredMetrics.some((m) => m.isNotSynchronized) ? "text-blue-600" : "text-yellow-600"}` }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `flex-1 text-xs sm:text-sm ${filteredMetrics.some((m) => m.isNotSynchronized) ? "text-blue-800" : "text-yellow-800"}`, children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: filteredMetrics.some((m) => m.isNotSynchronized) ? "⚠️ Action requise:" : "Attention:" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: filteredMetrics.some((m) => m.isNotSynchronized) ? " Action requise:" : "Attention:" }),
             " ",
             filteredMetrics.filter((m) => m.hasInvalidData).length,
-            " titre(s) ont des données invalides ou manquantes.",
+            " titre(s) ont des donnees invalides ou manquantes.",
             filteredMetrics.some((m) => m.isNotSynchronized) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-semibold block mt-1 space-y-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "La plupart nécessitent une synchronisation depuis l'API." }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "La plupart necessitent une synchronisation depuis l'API." }),
               onBulkSync ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "button",
                 {
@@ -2964,18 +2964,18 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
                 }
               ) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs", children: `Allez dans l'onglet "Analysis" et cliquez sur "Synchroniser" pour chaque ticker, ou utilisez "Sync Tous les Tickers" dans la sidebar.` })
             ] }),
-            "Ces tickers sont marqués avec ",
+            "Ces tickers sont marques avec ",
             /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-4 h-4 inline text-red-500" }),
             ' et affichent "N/A".',
             /* @__PURE__ */ jsxRuntimeExports.jsxs("details", { className: "mt-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("summary", { className: "cursor-pointer font-semibold hover:opacity-80", children: "Voir les détails par ticker" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("summary", { className: "cursor-pointer font-semibold hover:opacity-80", children: "Voir les details par ticker" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("ul", { className: "mt-2 space-y-1 ml-4 list-disc", children: filteredMetrics.filter((m) => m.hasInvalidData).map((metric) => /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "text-xs", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("strong", { children: [
                   metric.profile.id,
                   ":"
                 ] }),
                 " ",
-                metric.invalidReason || "Données invalides"
+                metric.invalidReason || "Donnees invalides"
               ] }, metric.profile.id)) })
             ] })
           ] })
@@ -2995,14 +2995,14 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
               {
                 onClick: () => setShowGuideDialog(true),
                 className: "px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center gap-1 transition-colors",
-                title: "Ouvrir le guide complet pour réduire les N/A",
+                title: "Ouvrir le guide complet pour reduire les N/A",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$c, { className: "w-3 h-3" }),
                   "Guide"
                 ]
               }
             ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400 hidden sm:inline", title: "Raccourcis clavier disponibles", children: "⌨️ Ctrl+Shift+F: Filtre N/A | Ctrl+Shift+E: Export | Ctrl+Shift+D: Sync critères" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400 hidden sm:inline", title: "Raccourcis clavier disponibles", children: " Ctrl+Shift+F: Filtre N/A | Ctrl+Shift+E: Export | Ctrl+Shift+D: Sync criteres" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 flex-wrap", children: [
             onOpenSettings && /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -3010,10 +3010,10 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
               {
                 onClick: onOpenSettings,
                 className: "px-3 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 flex items-center gap-1",
-                title: "⚙️ Configuration Complète : Guardrails, Validation, Ajustements\\n\\nOuvre le panneau de configuration unifié pour gérer tous les paramètres de l'application.\\n\\n🛡️ Guardrails (Limites d'affichage):\\n• Limites de croissance (min/max pour toutes les métriques)\\n• Limites de ratios (P/E, P/CF, P/BV min/max)\\n• Multiplicateur maximum raisonnable pour les projections\\n• Contrôlent l'affichage des graphiques et tableaux\\n• Stockés dans localStorage (navigateur)\\n• Affectent uniquement l'affichage, pas les calculs\\n\\n✅ Validation (Paramètres de sanitisation):\\n• Limites de croissance par métrique (EPS, CF, BV, DIV)\\n• Limites de ratios cibles (P/E, P/CF, P/BV, Yield)\\n• Précision des calculs (décimales)\\n• Automatisation de la sanitisation lors de la sync FMP\\n• Cohérence des données\\n• Stockés dans Supabase (partagés entre utilisateurs)\\n• Affectent les calculs et la sauvegarde\\n\\n📊 Ajustements:\\n• Paramètres généraux de l'application\\n• Comportement par défaut\\n• Options d'affichage\\n\\n💡 Impact:\\n• Les Guardrails affectent l'affichage uniquement\\n• La Validation affecte les calculs et la sauvegarde\\n• Les changements sont appliqués immédiatement\\n• Les paramètres sont persistants (localStorage ou Supabase)",
+                title: " Configuration Complete : Guardrails, Validation, Ajustements\\n\\nOuvre le panneau de configuration unifie pour gerer tous les parametres de l'application.\\n\\n Guardrails (Limites d'affichage):\\n- Limites de croissance (min/max pour toutes les metriques)\\n- Limites de ratios (P/E, P/CF, P/BV min/max)\\n- Multiplicateur maximum raisonnable pour les projections\\n- Controlent l'affichage des graphiques et tableaux\\n- Stockes dans localStorage (navigateur)\\n- Affectent uniquement l'affichage, pas les calculs\\n\\n Validation (Parametres de sanitisation):\\n- Limites de croissance par metrique (EPS, CF, BV, DIV)\\n- Limites de ratios cibles (P/E, P/CF, P/BV, Yield)\\n- Precision des calculs (decimales)\\n- Automatisation de la sanitisation lors de la sync FMP\\n- Coherence des donnees\\n- Stockes dans Supabase (partages entre utilisateurs)\\n- Affectent les calculs et la sauvegarde\\n\\n Ajustements:\\n- Parametres generaux de l'application\\n- Comportement par defaut\\n- Options d'affichage\\n\\n Impact:\\n- Les Guardrails affectent l'affichage uniquement\\n- La Validation affecte les calculs et la sauvegarde\\n- Les changements sont appliques immediatement\\n- Les parametres sont persistants (localStorage ou Supabase)",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$h, { className: "w-3 h-3" }),
-                  "Paramètres"
+                  "Parametres"
                 ]
               }
             ),
@@ -3024,7 +3024,7 @@ ${filters.recommendation !== "all" ? "✅ Filtre actif" : "Filtre par défaut"}`
                   setFilters((prev) => ({ ...prev, showOnlyNA: !prev.showOnlyNA }));
                 },
                 className: `px-3 py-1 text-xs rounded transition-colors ${filters.showOnlyNA ? "bg-orange-600 hover:bg-orange-700 text-white" : "bg-gray-100 hover:bg-orange-100 hover:text-orange-600 text-gray-700"}`,
-                title: filters.showOnlyNA ? "👁️ Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers de votre portefeuille et watchlist.\n\n📊 Affichage:\n• Tous les tickers (valides et avec N/A)\n• Métriques complètes pour les tickers valides\n• Indicateurs N/A pour les tickers incomplets\n\n⌨️ Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)" : "⚠️ Afficher uniquement les tickers avec N/A\n\nFiltre pour ne voir que les tickers avec des données invalides ou manquantes.\n\n🔍 Utilité:\n• Identifier rapidement les tickers nécessitant une synchronisation\n• Voir quels tickers ont des problèmes de données\n• Faciliter le nettoyage et la maintenance\n• Permet de synchroniser uniquement les tickers problématiques\n\n📊 Indicateurs N/A:\n• Prix actuel invalide ou manquant\n• Données historiques incomplètes\n• Métriques impossibles à calculer\n• Tickers non synchronisés depuis FMP\n\n⌨️ Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)",
+                title: filters.showOnlyNA ? " Afficher tous les tickers\n\nDesactive le filtre N/A pour voir tous les tickers de votre portefeuille et watchlist.\n\n Affichage:\n- Tous les tickers (valides et avec N/A)\n- Metriques completes pour les tickers valides\n- Indicateurs N/A pour les tickers incomplets\n\n Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)" : " Afficher uniquement les tickers avec N/A\n\nFiltre pour ne voir que les tickers avec des donnees invalides ou manquantes.\n\n Utilite:\n- Identifier rapidement les tickers necessitant une synchronisation\n- Voir quels tickers ont des problemes de donnees\n- Faciliter le nettoyage et la maintenance\n- Permet de synchroniser uniquement les tickers problematiques\n\n Indicateurs N/A:\n- Prix actuel invalide ou manquant\n- Donnees historiques incompletes\n- Metriques impossibles a calculer\n- Tickers non synchronises depuis FMP\n\n Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)",
                 "aria-label": filters.showOnlyNA ? "Afficher tous les tickers" : "Afficher uniquement les tickers avec N/A",
                 "aria-pressed": filters.showOnlyNA ? "true" : "false",
                 tabIndex: 0,
@@ -3045,31 +3045,31 @@ Tickers: ${naTickers.slice(0, 10).join(", ")}${naTickers.length > 10 ? `
                 },
                 disabled: isBulkSyncing,
                 className: "px-3 py-1 text-xs bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1",
-                title: `🔄 Synchroniser uniquement les ${filteredMetrics.length} ticker(s) avec N/A
+                title: ` Synchroniser uniquement les ${filteredMetrics.length} ticker(s) avec N/A
 
-Synchronise uniquement les tickers affichés (ceux avec des données invalides ou manquantes).
+Synchronise uniquement les tickers affiches (ceux avec des donnees invalides ou manquantes).
 
-⚡ Avantages:
-• Plus rapide que de synchroniser tous les tickers
-• Cible uniquement les tickers problématiques
-• Économise les appels API FMP
-• Permet de corriger rapidement les données manquantes
+ Avantages:
+- Plus rapide que de synchroniser tous les tickers
+- Cible uniquement les tickers problematiques
+- Economise les appels API FMP
+- Permet de corriger rapidement les donnees manquantes
 
-📊 Processus:
-• Récupère les données FMP Premium pour chaque ticker
-• Met à jour les données historiques (30 ans)
-• Recalcule les hypothèses automatiquement
-• Préserve les modifications manuelles existantes
-• Sauvegarde un snapshot avant et après la sync
+ Processus:
+- Recupere les donnees FMP Premium pour chaque ticker
+- Met a jour les donnees historiques (30 ans)
+- Recalcule les hypotheses automatiquement
+- Preserve les modifications manuelles existantes
+- Sauvegarde un snapshot avant et apres la sync
 
-⏱️ Durée:
-• Environ 2-3 secondes par ticker
-• Traitement en batch (3 tickers en parallèle)
-• Barre de progression affichée
+ Duree:
+- Environ 2-3 secondes par ticker
+- Traitement en batch (3 tickers en parallele)
+- Barre de progression affichee
 
-💡 Astuce:
-• Utilisez ce bouton après avoir filtré les N/A
-• Plus efficace que 'Sync Warehouse (Deep)' si vous avez beaucoup de tickers`,
+ Astuce:
+- Utilisez ce bouton apres avoir filtre les N/A
+- Plus efficace que 'Sync Warehouse (Deep)' si vous avez beaucoup de tickers`,
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: `w-3 h-3 ${isBulkSyncing ? "animate-spin" : ""}` }),
                   "Sync N/A (",
@@ -3101,11 +3101,11 @@ Synchronise uniquement les tickers affichés (ceux avec des données invalides o
                       });
                       if (result.naTickers && result.naTickers.length > 0 && onSyncNA) {
                         const shouldSync = confirm(
-                          `Analyse terminée:
+                          `Analyse terminee:
 
-✅ Tickers valides: ${result.validTickers}
-⚠️ Tickers avec N/A: ${result.naTickers.length}
-❌ Erreurs: ${result.errorTickers}
+ Tickers valides: ${result.validTickers}
+ Tickers avec N/A: ${result.naTickers.length}
+ Erreurs: ${result.errorTickers}
 
 Voulez-vous synchroniser automatiquement les ${result.naTickers.length} tickers avec N/A ?`
                         );
@@ -3113,9 +3113,9 @@ Voulez-vous synchroniser automatiquement les ${result.naTickers.length} tickers 
                           onSyncNA(result.naTickers);
                         }
                       } else if (result.naTickers && result.naTickers.length === 0) {
-                        alert(`✅ Excellent! Aucun ticker avec N/A trouvé.
+                        alert(` Excellent! Aucun ticker avec N/A trouve.
 
-Tous les ${result.validTickers} tickers ont des données valides.`);
+Tous les ${result.validTickers} tickers ont des donnees valides.`);
                       }
                     } else {
                       alert(`Erreur: ${result.error || "Erreur inconnue"}`);
@@ -3129,7 +3129,7 @@ Tous les ${result.validTickers} tickers ont des données valides.`);
                 },
                 disabled: isBulkSyncing || isAnalyzingNA,
                 className: "px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1",
-                title: "🔍 Analyser les tickers avec N/A\\n\\nAnalyse tous les tickers de votre portefeuille et watchlist pour identifier ceux avec des données invalides ou manquantes.\\n\\n📊 Résultats de l'analyse:\\n• Nombre total de tickers analysés\\n• Nombre de tickers valides (données complètes)\\n• Nombre de tickers avec N/A (données manquantes)\\n• Nombre d'erreurs rencontrées\\n• Liste des tickers problématiques\\n\\n⚡ Fonctionnalités:\\n• Analyse rapide via l'API backend\\n• Limite de 200 tickers par analyse\\n• Propose automatiquement de synchroniser les N/A\\n• Affiche un résumé détaillé\\n\\n💡 Utilisation:\\n• Cliquez pour lancer l'analyse\\n• Attendez quelques secondes\\n• Si des N/A sont trouvés, vous pouvez les synchroniser automatiquement\\n• Plus efficace que de vérifier manuellement chaque ticker",
+                title: " Analyser les tickers avec N/A\\n\\nAnalyse tous les tickers de votre portefeuille et watchlist pour identifier ceux avec des donnees invalides ou manquantes.\\n\\n Resultats de l'analyse:\\n- Nombre total de tickers analyses\\n- Nombre de tickers valides (donnees completes)\\n- Nombre de tickers avec N/A (donnees manquantes)\\n- Nombre d'erreurs rencontrees\\n- Liste des tickers problematiques\\n\\n Fonctionnalites:\\n- Analyse rapide via l'API backend\\n- Limite de 200 tickers par analyse\\n- Propose automatiquement de synchroniser les N/A\\n- Affiche un resume detaille\\n\\n Utilisation:\\n- Cliquez pour lancer l'analyse\\n- Attendez quelques secondes\\n- Si des N/A sont trouves, vous pouvez les synchroniser automatiquement\\n- Plus efficace que de verifier manuellement chaque ticker",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$b, { className: `w-3 h-3 ${isAnalyzingNA ? "animate-spin" : ""}` }),
                   isAnalyzingNA ? "Analyse..." : "Auto-Sync N/A"
@@ -3137,10 +3137,10 @@ Tous les ${result.validTickers} tickers ont des données valides.`);
               }
             ),
             naAnalysisResult && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-1 text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded border border-blue-200 dark:border-blue-800", children: naAnalysisResult.na > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-              "⚠️ ",
+              " ",
               naAnalysisResult.na,
-              " N/A trouvés"
-            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "✅ Tous valides" }) }),
+              " N/A trouves"
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: " Tous valides" }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "button",
               {
@@ -3156,7 +3156,7 @@ Tous les ${result.validTickers} tickers ont des données valides.`);
                   });
                 },
                 className: "px-3 py-1 text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 rounded transition-colors",
-                title: "Zoom Top 10\\n\\nFait défiler automatiquement vers les 10 meilleurs tickers (par rendement total projeté).\\n\\nUtile pour se concentrer rapidement sur les meilleures opportunités.",
+                title: "Zoom Top 10\\n\\nFait defiler automatiquement vers les 10 meilleurs tickers (par rendement total projete).\\n\\nUtile pour se concentrer rapidement sur les meilleures opportunites.",
                 children: "Zoom Top 10"
               }
             )
@@ -3183,16 +3183,16 @@ Tous les ${result.validTickers} tickers ont des données valides.`);
             },
             className: `p-1.5 sm:p-2 md:p-2.5 lg:p-3 rounded-lg cursor-pointer transition-all hover:scale-105 sm:hover:scale-110 hover:shadow-xl border-2 ${currentId === metric.profile.id ? "border-blue-600 ring-4 ring-blue-300 shadow-xl" : comparisonMode && selectedForComparison.includes(metric.profile.id) ? "border-purple-600 ring-4 ring-purple-300 shadow-xl" : "border-gray-200"} ${getReturnBgClass(metric.totalReturnPercent)} ${currentId === metric.profile.id ? "opacity-100" : "opacity-85"}`,
             title: `${metric.profile.info.name || metric.profile.id}
-Rendement: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A (données invalides)" : `${metric.totalReturnPercent.toFixed(1)}%`}
+Rendement: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "N/A (donnees invalides)" : `${metric.totalReturnPercent.toFixed(1)}%`}
 JPEGY: ${metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(2) : "N/A (non calculable)"}
 Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === void 0 ? "N/A" : metric.ratio31.toFixed(2)}
 P/E: ${metric.currentPE !== null && metric.currentPE !== void 0 ? metric.currentPE.toFixed(1) : "N/A"}x
 Secteur: ${metric.profile.info.sector}
-${metric.hasApprovedVersion ? "✓ Version approuvée" : ""}
-${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
+${metric.hasApprovedVersion ? " Version approuvee" : ""}
+${metric.invalidReason ? ` ${metric.invalidReason}` : ""}`,
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-white relative", children: [
               comparisonMode && selectedForComparison.includes(metric.profile.id) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold z-10", children: selectedForComparison.indexOf(metric.profile.id) + 1 }),
-              metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10", title: "Données invalides ou manquantes", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3 text-white" }) }),
+              metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10", title: "Donnees invalides ou manquantes", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3 text-white" }) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 mb-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `text-xs font-bold ${metric.hasInvalidData ? "line-through opacity-70" : ""}`, children: metric.profile.id }),
                 metric.profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-3 h-3 text-blue-300", title: "Watchlist" }) : metric.profile.isWatchlist === false ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-3 h-3 text-yellow-400", title: "Portefeuille" }) : null
@@ -3206,7 +3206,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   "JPEGY: ",
                   metric.jpegy !== null && metric.jpegy !== void 0 ? metric.jpegy.toFixed(1) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white/50", children: "N/A" })
                 ] }),
-                !metric._isLoading && metric.jpegy === null && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-1 text-red-200", children: "⚠️" })
+                !metric._isLoading && metric.jpegy === null && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-1 text-red-200", children: "" })
               ] }),
               metric.hasApprovedVersion && !metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-4 h-4 mt-1 text-white" })
             ] })
@@ -3243,7 +3243,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `absolute inset-0 rounded-lg ${metric.hasInvalidData ? "" : getReturnBgClass(metric.totalReturnPercent)}` }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "relative z-10", children: metric.profile.id }),
                       metric.profile.isWatchlist !== null && metric.profile.isWatchlist !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -right-1 z-10", children: metric.profile.isWatchlist === true ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$1, { className: "w-4 h-4 text-blue-300", title: "Watchlist" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef, { className: "w-4 h-4 text-yellow-400", title: "Portefeuille" }) }),
-                      metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10", title: "Données invalides", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3 text-white" }) })
+                      metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10", title: "Donnees invalides", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3 text-white" }) })
                     ]
                   }
                 ),
@@ -3270,11 +3270,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   metric.jpegy !== null && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1 pt-1 border-t border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[9px] text-gray-400 space-y-0.5 text-left", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source:" }),
-                      " P/E ÷ (Growth % + Yield %)"
+                      " P/E / (Growth % + Yield %)"
                     ] }),
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fournisseur:" }),
-                      " JSLAI™ - Métrique propriétaire ajustant le P/E par croissance et dividende."
+                      " JSLAITM - Metrique proprietaire ajustant le P/E par croissance et dividende."
                     ] })
                   ] }) })
                 ] }),
@@ -3284,7 +3284,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                 ] })
               ] }),
               comparisonMode && selectedForComparison.includes(metric.profile.id) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "ml-4 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold", children: selectedForComparison.indexOf(metric.profile.id) + 1 }),
-              metric.hasInvalidData ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-5 h-5 text-red-500 ml-2", title: "Données invalides" }) : metric.hasApprovedVersion && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-5 h-5 text-green-500 ml-2" })
+              metric.hasInvalidData ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-5 h-5 text-red-500 ml-2", title: "Donnees invalides" }) : metric.hasApprovedVersion && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$e, { className: "w-5 h-5 text-green-500 ml-2" })
             ]
           },
           metric.profile.id
@@ -3309,7 +3309,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               }
             },
             className: `p-1.5 sm:p-2 rounded cursor-pointer transition-all hover:scale-105 border ${currentId === metric.profile.id ? "border-blue-600 ring-2 ring-blue-300" : comparisonMode && selectedForComparison.includes(metric.profile.id) ? "border-purple-600 ring-2 ring-purple-300" : metric.hasInvalidData ? "border-red-300 border-dashed" : "border-gray-200"} ${metric.hasInvalidData ? "bg-red-50" : getReturnBgClass(metric.totalReturnPercent)} ${currentId === metric.profile.id ? "opacity-100" : metric.hasInvalidData ? "opacity-60" : "opacity-80"}`,
-            title: `${metric.profile.id}: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "Données invalides" : `${metric.totalReturnPercent.toFixed(1)}%`}`,
+            title: `${metric.profile.id}: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === void 0 ? "Donnees invalides" : `${metric.totalReturnPercent.toFixed(1)}%`}`,
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `flex flex-col items-center ${metric.hasInvalidData ? "text-gray-600" : "text-white"} text-[9px] relative`, children: [
               metric.hasInvalidData && /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-3 h-3 text-red-500 absolute -top-1 -left-1" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-0.5", children: [
@@ -3327,7 +3327,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$2, { className: "w-6 h-6 text-blue-600" }),
-          "Analyse Détaillée : ",
+          "Analyse Detaillee : ",
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-blue-600", children: currentId }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-normal text-gray-500 ml-2", children: [
             "(",
@@ -3340,7 +3340,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           {
             onClick: () => toggleSection("detailedAnalysis"),
             className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-            title: sectionsVisibility.detailedAnalysis ? "Réduire cette section" : "Agrandir cette section",
+            title: sectionsVisibility.detailedAnalysis ? "Reduire cette section" : "Agrandir cette section",
             children: sectionsVisibility.detailedAnalysis ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
           }
         )
@@ -3381,13 +3381,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 sm:gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: "📊 Positionnement JPEGY vs Rendement Total" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: " Positionnement JPEGY vs Rendement Total" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "button",
             {
               onClick: () => toggleSection("scatterPlot"),
               className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-              title: sectionsVisibility.scatterPlot ? "Réduire cette section" : "Agrandir cette section",
+              title: sectionsVisibility.scatterPlot ? "Reduire cette section" : "Agrandir cette section",
               children: sectionsVisibility.scatterPlot ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
             }
           )
@@ -3395,7 +3395,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500", children: [
             filteredMetrics.length,
-            " titre(s) affiché(s)"
+            " titre(s) affiche(s)"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 border border-gray-300 rounded-lg p-1 bg-white", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -3418,7 +3418,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   setPanJPEGY({ x: 0, y: 0 });
                 },
                 className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-                title: "Dézoomer (÷1.2)",
+                title: "Dezoomer (/1.2)",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4 text-gray-600" })
               }
             ),
@@ -3430,14 +3430,14 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   setPanJPEGY({ x: 0, y: 0 });
                 },
                 className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-                title: "Réinitialiser la vue",
+                title: "Reinitialiser la vue",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] })
         ] })
       ] }),
-      sectionsVisibility.scatterPlot && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre à afficher sur le graphique." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg", children: [
+      sectionsVisibility.scatterPlot && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre a afficher sur le graphique." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full", style: { minWidth: "100%" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           "svg",
           {
@@ -3571,7 +3571,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   y: chartHeight - 15,
                   textAnchor: "middle",
                   className: "text-sm font-bold fill-gray-800",
-                  children: "JPEGY (P/E ajusté pour croissance et rendement)"
+                  children: "JPEGY (P/E ajuste pour croissance et rendement)"
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -3582,7 +3582,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   textAnchor: "middle",
                   transform: `rotate(-90, 25, ${chartHeight / 2})`,
                   className: "text-sm font-bold fill-gray-800",
-                  children: "Rendement Total Projeté (5 ans, %) - Ratio 3:1"
+                  children: "Rendement Total Projete (5 ans, %) - Ratio 3:1"
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsx("g", { transform: `translate(${chartWidth / 2}, ${chartHeight - 5})`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -3592,13 +3592,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   y: 0,
                   textAnchor: "middle",
                   className: "text-[9px] fill-gray-500",
-                  children: "JPEGY = P/E ÷ (Growth % + Yield %) | Source: JSLAI™ (Jean-Sébastien)"
+                  children: "JPEGY = P/E / (Growth % + Yield %) | Source: JSLAITM (Jean-Sebastien)"
                 }
               ) }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("g", { transform: `translate(${chartWidth - 200}, ${padding + 20})`, children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: 0, y: 0, className: "text-xs font-semibold fill-gray-700", children: "Légende JPEGY:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: 0, y: 0, className: "text-xs font-semibold fill-gray-700", children: "Legende JPEGY:" }),
                 [
-                  { label: "Excellent (≤0.5)", color: "#86efac" },
+                  { label: "Excellent (<=0.5)", color: "#86efac" },
                   { label: "Bon (0.5-1.5)", color: "#16a34a" },
                   { label: "Moyen (1.5-1.75)", color: "#eab308" },
                   { label: "Faible (1.75-2.0)", color: "#f97316" },
@@ -3645,18 +3645,18 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           }
         ) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-700 space-y-1", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold mb-1", children: "📊 À propos de JPEGY :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold mb-1", children: " A propos de JPEGY :" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source de calcul:" }),
-            " P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)"
+            " P/E Actuel / (Taux de croissance EPS % + Rendement dividende %)"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Formule:" }),
-            " JPEGY = Prix Actuel / BPA ÷ (Taux de croissance annuel des bénéfices % + Rendement du dividende %)"
+            " JPEGY = Prix Actuel / BPA / (Taux de croissance annuel des benefices % + Rendement du dividende %)"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fournisseur:" }),
-            " Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes. Plus le ratio est bas, plus l'action est attractive."
+            " Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Le fournisseur etablit cette metrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des benefices et du rendement du dividende, permettant une evaluation plus nuancee de la valorisation d'une action en tenant compte de sa capacite de croissance et de sa distribution de dividendes. Plus le ratio est bas, plus l'action est attractive."
           ] })
         ] }) })
       ] }) })
@@ -3664,13 +3664,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 sm:gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: "📊 Positionnement Ratio 3:1 vs Rendement Total" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: " Positionnement Ratio 3:1 vs Rendement Total" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "button",
             {
               onClick: () => toggleSection("scatterPlotRatio31"),
               className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-              title: sectionsVisibility.scatterPlotRatio31 ? "Réduire cette section" : "Agrandir cette section",
+              title: sectionsVisibility.scatterPlotRatio31 ? "Reduire cette section" : "Agrandir cette section",
               children: sectionsVisibility.scatterPlotRatio31 ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
             }
           )
@@ -3678,7 +3678,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500", children: [
             filteredMetrics.length,
-            " titre(s) affiché(s)"
+            " titre(s) affiche(s)"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 border border-gray-300 rounded-lg p-1 bg-white", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -3699,7 +3699,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   setZoomRatio31((prev) => Math.max(prev / 1.2, 0.5));
                 },
                 className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-                title: "Dézoomer (÷1.2)\\n\\nUtilisez aussi la molette de la souris pour dézoomer.",
+                title: "Dezoomer (/1.2)\\n\\nUtilisez aussi la molette de la souris pour dezoomer.",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$3, { className: "w-4 h-4 text-gray-600" })
               }
             ),
@@ -3711,14 +3711,14 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   setPanRatio31({ x: 0, y: 0 });
                 },
                 className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-                title: "Réinitialiser la vue",
+                title: "Reinitialiser la vue",
                 children: /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$4, { className: "w-4 h-4 text-gray-600" })
               }
             )
           ] })
         ] })
       ] }),
-      sectionsVisibility.scatterPlotRatio31 && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre à afficher sur le graphique." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg", children: [
+      sectionsVisibility.scatterPlotRatio31 && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre a afficher sur le graphique." }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full", style: { minWidth: "100%" }, children: (() => {
           const validMetricsForRatio31Chart = filteredMetrics.filter(
             (m) => !m.hasInvalidData && m.totalReturnPercent >= -100 && m.totalReturnPercent <= 1e3 && m.ratio31 >= 0 && m.ratio31 <= 100 && isFinite(m.totalReturnPercent) && isFinite(m.ratio31)
@@ -3907,7 +3907,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                     textAnchor: "middle",
                     transform: `rotate(-90, 25, ${chartHeight / 2})`,
                     className: "text-sm font-bold fill-gray-800",
-                    children: "Rendement Total Projeté (5 ans, %)"
+                    children: "Rendement Total Projete (5 ans, %)"
                   }
                 ),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("g", { transform: `translate(${chartWidth / 2}, ${chartHeight - 5})`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -3917,15 +3917,15 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                     y: 0,
                     textAnchor: "middle",
                     className: "text-[9px] fill-gray-500",
-                    children: "Ratio 3:1 = Potentiel de Hausse (%) ÷ Risque de Baisse (%) | Source: JSLAI™"
+                    children: "Ratio 3:1 = Potentiel de Hausse (%) / Risque de Baisse (%) | Source: JSLAITM"
                   }
                 ) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("g", { transform: `translate(${chartWidth - 200}, ${padding + 20})`, children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: 0, y: 0, className: "text-xs font-semibold fill-gray-700", children: "Légende Ratio 3:1:" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: 0, y: 0, className: "text-xs font-semibold fill-gray-700", children: "Legende Ratio 3:1:" }),
                   [
-                    { label: "Favorable (≥3:1)", color: "#16a34a" },
+                    { label: "Favorable (>=3:1)", color: "#16a34a" },
                     { label: "Acceptable (1:1-3:1)", color: "#eab308" },
-                    { label: "Défavorable (<1:1)", color: "#dc2626" }
+                    { label: "Defavorable (<1:1)", color: "#dc2626" }
                   ].map((item, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("g", { transform: `translate(0, ${(idx + 1) * 18})`, children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: 8, cy: 0, r: 6, fill: item.color }),
                     /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: 20, y: 4, className: "text-[10px] fill-gray-600", children: item.label })
@@ -3968,31 +3968,31 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           );
         })() }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-700 space-y-1", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold mb-1", children: "📊 À propos du Ratio 3:1 :" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-semibold mb-1", children: " A propos du Ratio 3:1 :" }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source de calcul:" }),
-            " Potentiel de Hausse (%) ÷ Risque de Baisse (%)"
+            " Potentiel de Hausse (%) / Risque de Baisse (%)"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Formule:" }),
-            " Ratio 3:1 = ((Prix Projeté - Prix Actuel) / Prix Actuel × 100) ÷ ((Prix Actuel - Prix Plancher) / Prix Actuel × 100)"
+            " Ratio 3:1 = ((Prix Projete - Prix Actuel) / Prix Actuel x 100) / ((Prix Actuel - Prix Plancher) / Prix Actuel x 100)"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fournisseur:" }),
-            " Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en comparant le potentiel de hausse (gain potentiel si le prix atteint le prix projeté) au risque de baisse (perte potentielle jusqu'au prix plancher historique). Un ratio ≥ 3:1 indique que le potentiel de hausse est au moins 3 fois supérieur au risque de baisse, ce qui représente un bon rapport risque/rendement."
+            " Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Le fournisseur etablit cette metrique en comparant le potentiel de hausse (gain potentiel si le prix atteint le prix projete) au risque de baisse (perte potentielle jusqu'au prix plancher historique). Un ratio >= 3:1 indique que le potentiel de hausse est au moins 3 fois superieur au risque de baisse, ce qui represente un bon rapport risque/rendement."
           ] })
         ] }) })
       ] }) })
     ] }),
     filteredMetrics.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between mb-3 sm:mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 sm:gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: "📊 Distribution des Rendements Totaux" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: " Distribution des Rendements Totaux" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
             onClick: () => toggleSection("returnDistribution"),
             className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-            title: sectionsVisibility.returnDistribution ? "Réduire cette section" : "Agrandir cette section",
+            title: sectionsVisibility.returnDistribution ? "Reduire cette section" : "Agrandir cette section",
             children: sectionsVisibility.returnDistribution ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
           }
         )
@@ -4044,27 +4044,27 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           filteredMetrics.length > 0 ? (() => {
             const validReturns = filteredMetrics.map((m) => m.totalReturnPercent).filter((r) => r !== null && r !== void 0);
             if (validReturns.length === 0) return "N/A";
-            return `${(Math.min(...validReturns) ?? 0).toFixed(0)}% à ${(Math.max(...validReturns) ?? 0).toFixed(0)}%`;
+            return `${(Math.min(...validReturns) ?? 0).toFixed(0)}% a ${(Math.max(...validReturns) ?? 0).toFixed(0)}%`;
           })() : "N/A"
         ] })
       ] })
     ] }),
     filteredMetrics.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between mb-3 sm:mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 sm:gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: "📈 Visualisations Avancées" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: " Visualisations Avancees" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
             onClick: () => toggleSection("otherVisualizations"),
             className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-            title: sectionsVisibility.otherVisualizations ? "Réduire cette section" : "Agrandir cette section",
+            title: sectionsVisibility.otherVisualizations ? "Reduire cette section" : "Agrandir cette section",
             children: sectionsVisibility.otherVisualizations ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
           }
         )
       ] }) }),
       sectionsVisibility.otherVisualizations && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: "🔥 Performance par Secteur" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: " Performance par Secteur" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-3", children: "Rendement moyen, JPEGY moyen et nombre de titres par secteur" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: Array.from(new Set(filteredMetrics.map((m) => m.profile.info.sector))).map((sector) => {
             const sectorMetrics = filteredMetrics.filter((m) => m.profile.info.sector === sector);
@@ -4126,8 +4126,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           }) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: "🏆 Top 5 Performers" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-3", children: "Meilleurs rendements projetés" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: " Top 5 Performers" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-3", children: "Meilleurs rendements projetes" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: filteredMetrics.filter((m) => !m.hasInvalidData).sort((a, b) => b.totalReturnPercent - a.totalReturnPercent).slice(0, 5).map((metric, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-2 bg-gradient-to-r from-yellow-50 to-white rounded border-l-4 border-yellow-400", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-lg font-bold text-yellow-600", children: [
@@ -4140,14 +4140,14 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           ] }, metric.profile.id)) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: "⚠️ Distribution des Risques de Baisse" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: " Distribution des Risques de Baisse" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-3", children: "Classification par niveau de risque avec visualisation" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-end justify-between gap-3 h-24 border-b border-l border-gray-300 pb-2 pl-2 bg-gray-50 p-2 rounded", children: ["Faible", "Modéré", "Élevé"].map((level, idx) => {
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-end justify-between gap-3 h-24 border-b border-l border-gray-300 pb-2 pl-2 bg-gray-50 p-2 rounded", children: ["Faible", "Modere", "Eleve"].map((level, idx) => {
             const ranges = [[0, 20], [20, 50], [50, 100]];
             const count = filteredMetrics.filter(
               (m) => m.downsideRisk >= ranges[idx][0] && m.downsideRisk < ranges[idx][1]
             ).length;
-            const maxCount = Math.max(...["Faible", "Modéré", "Élevé"].map((_, i) => {
+            const maxCount = Math.max(...["Faible", "Modere", "Eleve"].map((_, i) => {
               const r = [[0, 20], [20, 50], [50, 100]];
               return filteredMetrics.filter(
                 (m) => m.downsideRisk >= r[i][0] && m.downsideRisk < r[i][1]
@@ -4169,7 +4169,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-bold text-gray-800", children: count })
             ] }, level);
           }) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: ["Faible", "Modéré", "Élevé"].map((level, idx) => {
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: ["Faible", "Modere", "Eleve"].map((level, idx) => {
             const ranges = [[0, 20], [20, 50], [50, 100]];
             const count = filteredMetrics.filter(
               (m) => m.downsideRisk >= ranges[idx][0] && m.downsideRisk < ranges[idx][1]
@@ -4199,7 +4199,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           }) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: "📊 Distribution Ratio 3:1 (Potentiel vs Risque)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: " Distribution Ratio 3:1 (Potentiel vs Risque)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-3", children: "Ratio hausse potentielle / risque de baisse" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-2", children: ["< 1:1", "1:1 - 3:1", "> 3:1"].map((range, idx) => {
             const ranges = [[0, 1], [1, 3], [3, 100]];
@@ -4223,8 +4223,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           }) })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200 md:col-span-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: "📈 Timeline de Performance (Triée par Rendement)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-3", children: "Barres horizontales classées par rendement décroissant" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4", children: " Timeline de Performance (Triee par Rendement)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-3", children: "Barres horizontales classees par rendement decroissant" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex gap-1.5 sm:gap-2 min-w-max pb-2", children: filteredMetrics.sort((a, b) => b.totalReturnPercent - a.totalReturnPercent).map((metric) => {
             const timelineBarStyle = {
               height: `${Math.max(Math.min((metric.totalReturnPercent + 50) / 200 * 100, 100), 5)}px`,
@@ -4255,19 +4255,19 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
     ] }),
     filteredMetrics.length > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between mb-3 sm:mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 sm:gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: "🔗 Matrice de Corrélation entre Métriques" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: " Matrice de Correlation entre Metriques" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "button",
           {
             onClick: () => toggleSection("correlationMatrix"),
             className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-            title: sectionsVisibility.correlationMatrix ? "Réduire cette section" : "Agrandir cette section",
+            title: sectionsVisibility.correlationMatrix ? "Reduire cette section" : "Agrandir cette section",
             children: sectionsVisibility.correlationMatrix ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
           }
         )
       ] }) }),
       sectionsVisibility.correlationMatrix && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-4", children: "Corrélations entre JPEGY, Rendement, Ratio 3:1, P/E, Yield et Croissance" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 mb-4", children: "Correlations entre JPEGY, Rendement, Ratio 3:1, P/E, Yield et Croissance" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 text-left font-bold text-gray-700 border-b border-gray-300" }),
@@ -4322,7 +4322,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                   {
                     className: "p-2 text-center font-semibold",
                     style: cellStyle,
-                    title: `Corrélation: ${(corr == null ? void 0 : corr.toFixed(3)) ?? "0.000"}`,
+                    title: `Correlation: ${(corr == null ? void 0 : corr.toFixed(3)) ?? "0.000"}`,
                     children: (corr == null ? void 0 : corr.toFixed(2)) ?? "0.00"
                   },
                   otherMetric
@@ -4334,26 +4334,26 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 flex items-center justify-center gap-4 text-xs", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-green-500 rounded" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Corrélation positive" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Correlation positive" })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-4 h-4 bg-red-500 rounded" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Corrélation négative" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600", children: "Correlation negative" })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-500", children: "Intensité = valeur absolue" })
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-500", children: "Intensite = valeur absolue" })
         ] })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-3 sm:mb-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 sm:gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: "📋 Tableau de Performance Détaillé" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base sm:text-lg md:text-xl font-bold text-gray-800", children: " Tableau de Performance Detaille" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "button",
             {
               onClick: () => toggleSection("detailedTable"),
               className: "p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help",
-              title: sectionsVisibility.detailedTable ? "Réduire cette section" : "Agrandir cette section",
+              title: sectionsVisibility.detailedTable ? "Reduire cette section" : "Agrandir cette section",
               children: sectionsVisibility.detailedTable ? /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$f, { className: "w-5 h-5 text-gray-600" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$g, { className: "w-5 h-5 text-gray-600" })
             }
           )
@@ -4370,7 +4370,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               className: "px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 sm:gap-2 flex-1 sm:flex-none",
               title: "Exporter en CSV",
               children: [
-                "📥 ",
+                " ",
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "Exporter" }),
                 " CSV"
               ]
@@ -4378,7 +4378,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
           )
         ] })
       ] }),
-      sectionsVisibility.detailedTable && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre ne correspond aux filtres sélectionnés." }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto -mx-3 sm:mx-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs sm:text-sm", style: { minWidth: "100%" }, children: [
+      sectionsVisibility.detailedTable && /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, { children: filteredMetrics.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 text-gray-500", children: "Aucun titre ne correspond aux filtres selectionnes." }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto -mx-3 sm:mx-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full text-xs sm:text-sm", style: { minWidth: "100%" }, children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { className: "bg-gradient-to-r from-slate-100 to-slate-50 sticky top-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "th",
@@ -4387,7 +4387,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               onClick: () => handleSort("ticker"),
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
                 "Ticker",
-                sortConfig.key === "ticker" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "↑" : "↓" })
+                sortConfig.key === "ticker" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "^" : "v" })
               ] })
             }
           ),
@@ -4395,11 +4395,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
             "th",
             {
               className: "p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm",
-              title: "JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield) - Source: P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %) - Fournisseur: Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Ajuste le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action.",
+              title: "JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield) - Source: P/E Actuel / (Taux de croissance EPS % + Rendement dividende %) - Fournisseur: Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Ajuste le ratio P/E traditionnel par la somme du taux de croissance des benefices et du rendement du dividende, permettant une evaluation plus nuancee de la valorisation d'une action.",
               onClick: () => handleSort("jpegy"),
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
                 "JPEGY",
-                sortConfig.key === "jpegy" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "↑" : "↓" })
+                sortConfig.key === "jpegy" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "^" : "v" })
               ] })
             }
           ),
@@ -4407,11 +4407,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
             "th",
             {
               className: "p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm",
-              title: "Rendement total projeté sur 5 ans",
+              title: "Rendement total projete sur 5 ans",
               onClick: () => handleSort("totalReturnPercent"),
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
                 "Rendement",
-                sortConfig.key === "totalReturnPercent" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "↑" : "↓" })
+                sortConfig.key === "totalReturnPercent" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "^" : "v" })
               ] })
             }
           ),
@@ -4423,13 +4423,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               onClick: () => handleSort("ratio31"),
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
                 "Ratio 3:1",
-                sortConfig.key === "ratio31" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "↑" : "↓" })
+                sortConfig.key === "ratio31" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "^" : "v" })
               ] })
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden md:table-cell", title: "Potentiel de hausse en %", children: "Hausse" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden md:table-cell", title: "Risque de baisse en %", children: "Baisse" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden lg:table-cell", title: "Ratio cours/bénéfice actuel", children: "P/E" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden lg:table-cell", title: "Ratio cours/benefice actuel", children: "P/E" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden lg:table-cell", title: "Rendement du dividende", children: "Yield" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "th",
@@ -4439,11 +4439,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               onClick: () => handleSort("historicalGrowth"),
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
                 "Croissance",
-                sortConfig.key === "historicalGrowth" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "↑" : "↓" })
+                sortConfig.key === "historicalGrowth" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "^" : "v" })
               ] })
             }
           ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 sm:p-3 text-center font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm", children: "Approuvé" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "p-2 sm:p-3 text-center font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm", children: "Approuve" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "th",
             {
@@ -4451,7 +4451,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
               onClick: () => handleSort("recommendation"),
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center gap-1", children: [
                 "Signal",
-                sortConfig.key === "recommendation" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "↑" : "↓" })
+                sortConfig.key === "recommendation" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: sortConfig.direction === "asc" ? "^" : "v" })
               ] })
             }
           )
@@ -4489,13 +4489,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1 text-[10px]", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Source de calcul:" }),
-                        " P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)"
+                        " P/E Actuel / (Taux de croissance EPS % + Rendement dividende %)"
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Formule:" }),
                         " JPEGY = ",
                         ((_c2 = metric.currentPE) == null ? void 0 : _c2.toFixed(2)) ?? "P/E",
-                        " ÷ (",
+                        " / (",
                         ((_d2 = metric.historicalGrowth) == null ? void 0 : _d2.toFixed(1)) ?? "Growth",
                         "% + ",
                         ((_e2 = metric.currentYield) == null ? void 0 : _e2.toFixed(2)) ?? "Yield",
@@ -4503,12 +4503,12 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ""}`,
                       ] }),
                       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                         /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Fournisseur:" }),
-                        " Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes."
+                        " Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Le fournisseur etablit cette metrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des benefices et du rendement du dividende, permettant une evaluation plus nuancee de la valorisation d'une action en tenant compte de sa capacite de croissance et de sa distribution de dividendes."
                       ] })
                     ] })
                   ] })
                 ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-400 flex items-center justify-end gap-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-4 h-4 text-orange-500", title: "JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ForwardRef$a, { className: "w-4 h-4 text-orange-500", title: "JPEGY non calculable: EPS invalide ou (Growth + Yield) <= 0.01%" }),
                   "N/A"
                 ] }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: `p-2 sm:p-3 text-right font-semibold text-xs sm:text-sm ${metric._isLoading || metric.hasInvalidData ? "text-gray-400" : getReturnTextClass(metric.totalReturnPercent)}`, children: metric._isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1 text-gray-400", children: [

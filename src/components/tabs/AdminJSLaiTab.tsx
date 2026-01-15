@@ -43,7 +43,7 @@ export const AdminJSLaiTab: React.FC<TabProps> = memo((props) => {
     const setLoadingCacheStatus = props.setLoadingCacheStatus || noop;
 
     const systemLogs = props.systemLogs ?? [];
-                // États pour Température et Longueur (chargés depuis localStorage)
+                // Etats pour Temperature et Longueur (charges depuis localStorage)
                 const [emmaTemperature, setEmmaTemperature] = useState(() => {
                     const saved = localStorage.getItem('emma-temperature');
                     return saved ? parseFloat(saved) : 0.3;
@@ -53,62 +53,62 @@ export const AdminJSLaiTab: React.FC<TabProps> = memo((props) => {
                     return saved ? parseInt(saved) : 4096;
                 });
 
-                // État pour le prompt système Emma (partagé avec AskEmmaTab via localStorage)
+                // Etat pour le prompt systeme Emma (partage avec AskEmmaTab via localStorage)
                 const [emmaPrompt, setEmmaPrompt] = useState(() => {
                     const saved = localStorage.getItem('emma-financial-prompt');
-                    return saved || `Tu es Emma, CFA® Level III, analyste financière senior avec 15+ ans expérience gestion portefeuille institutionnel.
+                    return saved || `Tu es Emma, CFA Level III, analyste financiere senior avec 15+ ans experience gestion portefeuille institutionnel.
 
-MISSION: Fournir analyses financières rigoureuses, factuelles, actionnables de niveau Bloomberg Terminal.
+MISSION: Fournir analyses financieres rigoureuses, factuelles, actionnables de niveau Bloomberg Terminal.
 
 ///
-DONNÉES DISPONIBLES (via outils dashboard):
-- Prix actions temps réel (FMP, Polygon, Twelve Data)
+DONNEES DISPONIBLES (via outils dashboard):
+- Prix actions temps reel (FMP, Polygon, Twelve Data)
 - Fondamentaux (ratios P/E, ROE, marges, cash flow)
-- Actualités financières (<24h, Finnhub, FMP)
+- Actualites financieres (<24h, Finnhub, FMP)
 - Indicateurs techniques (RSI, MACD, SMA)
-- Calendriers (earnings, événements économiques)
-- Watchlist utilisateur + tickers équipe
+- Calendriers (earnings, evenements economiques)
+- Watchlist utilisateur + tickers equipe
 ///
 
-CAPACITÉS PRINCIPALES:
-1. Analyses complètes CFA® (valorisation, fondamentaux, technique)
+CAPACITES PRINCIPALES:
+1. Analyses completes CFA (valorisation, fondamentaux, technique)
 2. Explications concepts financiers (DCF, Graham, Buffett, Lynch)
 3. Contexte macro et sectoriel (Fed, taux, inflation)
-4. Cadres décisionnels structurés (Porter's Five Forces, Moat analysis)
+4. Cadres decisionnels structures (Porter's Five Forces, Moat analysis)
 
 APPROCHE:
-- Priorité données RÉELLES via outils (prix, ratios, news)
-- Analyses chiffrées (minimum 8 ratios financiers)
+- Priorite donnees REELLES via outils (prix, ratios, news)
+- Analyses chiffrees (minimum 8 ratios financiers)
 - Comparaisons sectorielles + historique 3-5 ans
-- Sources citées (FMP, Bloomberg, FactSet)
+- Sources citees (FMP, Bloomberg, FactSet)
 
 STYLE:
 - Professionnel niveau CFA Institute
-- Factuel, précis, sans généralités vagues
-- Proactif: proposer analyses complémentaires
-- Pédagogique: expliquer ratios et concepts
-- Toujours en français
+- Factuel, precis, sans generalites vagues
+- Proactif: proposer analyses complementaires
+- Pedagogique: expliquer ratios et concepts
+- Toujours en francais
 
 CONTRAINTES:
-- ZÉRO mention limitations ("Je n'ai pas accès")
-- Commencer par ce que tu PEUX analyser avec données disponibles
-- Longueur: 200-400 mots (questions simples), PROFONDEUR MAXIMALE pour analyses complètes (aucune limite)
-- Vérifier cohérence données avant réponse finale
+- ZERO mention limitations ("Je n'ai pas acces")
+- Commencer par ce que tu PEUX analyser avec donnees disponibles
+- Longueur: 200-400 mots (questions simples), PROFONDEUR MAXIMALE pour analyses completes (aucune limite)
+- Verifier coherence donnees avant reponse finale
 - Disclaimer obligatoire si recommandations d'investissement`;
                 });
 
-                // État pour function calling (partagé avec AskEmmaTab via localStorage)
+                // Etat pour function calling (partage avec AskEmmaTab via localStorage)
                 const [useFunctionCalling, setUseFunctionCalling] = useState(() => {
                     const saved = localStorage.getItem('emma-use-function-calling');
                     return saved !== null ? saved === 'true' : true;
                 });
 
-                // État pour afficher/masquer les sections
+                // Etat pour afficher/masquer les sections
                 const [showEmmaConfig, setShowEmmaConfig] = useState(false);
                 const [showTickersManager, setShowTickersManager] = useState(false);
                 const [showRedirectsManager, setShowRedirectsManager] = useState(false);
                 
-                // États pour la gestion des tickers
+                // Etats pour la gestion des tickers
                 const [tickersList, setTickersList] = useState([]);
                 const [loadingTickers, setLoadingTickers] = useState(false);
                 const [tickerFilter, setTickerFilter] = useState({ source: 'all', is_active: 'true' });
@@ -131,7 +131,7 @@ CONTRAINTES:
                     notes: ''
                 });
 
-                // États pour la gestion des redirections
+                // Etats pour la gestion des redirections
                 const [redirectsList, setRedirectsList] = useState([]);
                 const [loadingRedirects, setLoadingRedirects] = useState(false);
                 const [editingRedirect, setEditingRedirect] = useState(null);
@@ -142,7 +142,7 @@ CONTRAINTES:
                     permanent: false
                 });
 
-                // Fonctions pour gérer les redirections
+                // Fonctions pour gerer les redirections
                 const fetchRedirects = async () => {
                     setLoadingRedirects(true);
                     try {
@@ -152,12 +152,12 @@ CONTRAINTES:
                             setRedirectsList(data.redirects || []);
                         } else {
                             const error = await response.json();
-                            console.error('Erreur récupération redirections:', error);
-                            alert(`❌ Erreur: ${error.error || 'Impossible de récupérer les redirections'}`);
+                            console.error('Erreur recuperation redirections:', error);
+                            alert(` Erreur: ${error.error || 'Impossible de recuperer les redirections'}`);
                         }
                     } catch (error) {
                         console.error('Erreur fetchRedirects:', error);
-                        alert('❌ Erreur lors de la récupération des redirections');
+                        alert(' Erreur lors de la recuperation des redirections');
                     } finally {
                         setLoadingRedirects(false);
                     }
@@ -165,7 +165,7 @@ CONTRAINTES:
 
                 const handleAddRedirect = async () => {
                     if (!newRedirect.source || !newRedirect.destination) {
-                        alert('❌ Veuillez remplir tous les champs');
+                        alert(' Veuillez remplir tous les champs');
                         return;
                     }
 
@@ -178,17 +178,17 @@ CONTRAINTES:
 
                         if (response.ok) {
                             const data = await response.json();
-                            alert(`✅ Redirection ${data.redirect.source} → ${data.redirect.destination} ajoutée avec succès`);
+                            alert(` Redirection ${data.redirect.source} → ${data.redirect.destination} ajoutee avec succes`);
                             setNewRedirect({ source: '', destination: '', permanent: false });
                             setShowAddRedirectForm(false);
                             fetchRedirects();
                         } else {
                             const error = await response.json();
-                            alert(`❌ Erreur: ${error.error || 'Impossible d\'ajouter la redirection'}`);
+                            alert(` Erreur: ${error.error || 'Impossible d\'ajouter la redirection'}`);
                         }
                     } catch (error) {
                         console.error('Erreur addRedirect:', error);
-                        alert('❌ Erreur lors de l\'ajout de la redirection');
+                        alert(' Erreur lors de l\'ajout de la redirection');
                     }
                 };
 
@@ -202,21 +202,21 @@ CONTRAINTES:
 
                         if (response.ok) {
                             const data = await response.json();
-                            alert(`✅ Redirection modifiée avec succès`);
+                            alert(` Redirection modifiee avec succes`);
                             setEditingRedirect(null);
                             fetchRedirects();
                         } else {
                             const error = await response.json();
-                            alert(`❌ Erreur: ${error.error || 'Impossible de modifier la redirection'}`);
+                            alert(` Erreur: ${error.error || 'Impossible de modifier la redirection'}`);
                         }
                     } catch (error) {
                         console.error('Erreur updateRedirect:', error);
-                        alert('❌ Erreur lors de la modification de la redirection');
+                        alert(' Erreur lors de la modification de la redirection');
                     }
                 };
 
                 const handleDeleteRedirect = async (source) => {
-                    if (!confirm(`Êtes-vous sûr de vouloir supprimer la redirection ${source} ?`)) {
+                    if (!confirm(`Etes-vous sur de vouloir supprimer la redirection ${source} ?`)) {
                         return;
                     }
 
@@ -229,15 +229,15 @@ CONTRAINTES:
 
                         if (response.ok) {
                             const data = await response.json();
-                            alert(`✅ Redirection ${source} supprimée avec succès`);
+                            alert(` Redirection ${source} supprimee avec succes`);
                             fetchRedirects();
                         } else {
                             const error = await response.json();
-                            alert(`❌ Erreur: ${error.error || 'Impossible de supprimer la redirection'}`);
+                            alert(` Erreur: ${error.error || 'Impossible de supprimer la redirection'}`);
                         }
                     } catch (error) {
                         console.error('Erreur deleteRedirect:', error);
-                        alert('❌ Erreur lors de la suppression de la redirection');
+                        alert(' Erreur lors de la suppression de la redirection');
                     }
                 };
 
@@ -279,49 +279,49 @@ CONTRAINTES:
                 };
 
                 const resetToOptimizedPrompt = () => {
-                    const optimizedPrompt = `Tu es Emma, CFA® Level III, analyste financière senior avec 15+ ans expérience gestion portefeuille institutionnel.
+                    const optimizedPrompt = `Tu es Emma, CFA Level III, analyste financiere senior avec 15+ ans experience gestion portefeuille institutionnel.
 
-MISSION: Fournir analyses financières rigoureuses, factuelles, actionnables de niveau Bloomberg Terminal.
+MISSION: Fournir analyses financieres rigoureuses, factuelles, actionnables de niveau Bloomberg Terminal.
 
 ///
-DONNÉES DISPONIBLES (via outils dashboard):
-- Prix actions temps réel (FMP, Polygon, Twelve Data)
+DONNEES DISPONIBLES (via outils dashboard):
+- Prix actions temps reel (FMP, Polygon, Twelve Data)
 - Fondamentaux (ratios P/E, ROE, marges, cash flow)
-- Actualités financières (<24h, Finnhub, FMP)
+- Actualites financieres (<24h, Finnhub, FMP)
 - Indicateurs techniques (RSI, MACD, SMA)
-- Calendriers (earnings, événements économiques)
-- Watchlist utilisateur + tickers équipe
+- Calendriers (earnings, evenements economiques)
+- Watchlist utilisateur + tickers equipe
 ///
 
-CAPACITÉS PRINCIPALES:
-1. Analyses complètes CFA® (valorisation, fondamentaux, technique)
+CAPACITES PRINCIPALES:
+1. Analyses completes CFA (valorisation, fondamentaux, technique)
 2. Explications concepts financiers (DCF, Graham, Buffett, Lynch)
 3. Contexte macro et sectoriel (Fed, taux, inflation)
-4. Cadres décisionnels structurés (Porter's Five Forces, Moat analysis)
+4. Cadres decisionnels structures (Porter's Five Forces, Moat analysis)
 
 APPROCHE:
-- Priorité données RÉELLES via outils (prix, ratios, news)
-- Analyses chiffrées (minimum 8 ratios financiers)
+- Priorite donnees REELLES via outils (prix, ratios, news)
+- Analyses chiffrees (minimum 8 ratios financiers)
 - Comparaisons sectorielles + historique 3-5 ans
-- Sources citées (FMP, Bloomberg, FactSet)
+- Sources citees (FMP, Bloomberg, FactSet)
 
 STYLE:
 - Professionnel niveau CFA Institute
-- Factuel, précis, sans généralités vagues
-- Proactif: proposer analyses complémentaires
-- Pédagogique: expliquer ratios et concepts
-- Toujours en français
+- Factuel, precis, sans generalites vagues
+- Proactif: proposer analyses complementaires
+- Pedagogique: expliquer ratios et concepts
+- Toujours en francais
 
 CONTRAINTES:
-- ZÉRO mention limitations ("Je n'ai pas accès")
-- Commencer par ce que tu PEUX analyser avec données disponibles
-- Longueur: 200-400 mots (questions simples), PROFONDEUR MAXIMALE pour analyses complètes (aucune limite)
-- Vérifier cohérence données avant réponse finale
+- ZERO mention limitations ("Je n'ai pas acces")
+- Commencer par ce que tu PEUX analyser avec donnees disponibles
+- Longueur: 200-400 mots (questions simples), PROFONDEUR MAXIMALE pour analyses completes (aucune limite)
+- Verifier coherence donnees avant reponse finale
 - Disclaimer obligatoire si recommandations d'investissement`;
                     handlePromptChange(optimizedPrompt);
                 };
 
-                // Fonctions pour gérer les tickers
+                // Fonctions pour gerer les tickers
                 const fetchTickers = useCallback(async () => {
                     setLoadingTickers(true);
                     try {
@@ -341,7 +341,7 @@ CONTRAINTES:
                             const data = await response.json();
                             setTickersList(data.tickers || []);
                         } else {
-                            console.error('Erreur récupération tickers:', await response.text());
+                            console.error('Erreur recuperation tickers:', await response.text());
                         }
                     } catch (error) {
                         console.error('Erreur fetchTickers:', error);
@@ -360,7 +360,7 @@ CONTRAINTES:
 
                         if (response.ok) {
                             const data = await response.json();
-                            alert(`✅ Ticker ${data.ticker.ticker} ajouté avec succès`);
+                            alert(` Ticker ${data.ticker.ticker} ajoute avec succes`);
                             setNewTicker({
                                 ticker: '',
                                 company_name: '',
@@ -381,11 +381,11 @@ CONTRAINTES:
                             fetchTickers();
                         } else {
                             const error = await response.json();
-                            alert(`❌ Erreur: ${error.error || 'Impossible d\'ajouter le ticker'}`);
+                            alert(` Erreur: ${error.error || 'Impossible d\'ajouter le ticker'}`);
                         }
                     } catch (error) {
                         console.error('Erreur addTicker:', error);
-                        alert('❌ Erreur lors de l\'ajout du ticker');
+                        alert(' Erreur lors de l\'ajout du ticker');
                     }
                 };
 
@@ -399,21 +399,21 @@ CONTRAINTES:
 
                         if (response.ok) {
                             const data = await response.json();
-                            alert(`✅ Ticker ${data.ticker.ticker} mis à jour avec succès`);
+                            alert(` Ticker ${data.ticker.ticker} mis a jour avec succes`);
                             setEditingTicker(null);
                             fetchTickers();
                         } else {
                             const error = await response.json();
-                            alert(`❌ Erreur: ${error.error || 'Impossible de mettre à jour le ticker'}`);
+                            alert(` Erreur: ${error.error || 'Impossible de mettre a jour le ticker'}`);
                         }
                     } catch (error) {
                         console.error('Erreur updateTicker:', error);
-                        alert('❌ Erreur lors de la mise à jour du ticker');
+                        alert(' Erreur lors de la mise a jour du ticker');
                     }
                 };
 
                 const handleDeleteTicker = async (tickerId, tickerSymbol, hardDelete = false) => {
-                    if (!confirm(`Êtes-vous sûr de vouloir ${hardDelete ? 'supprimer définitivement' : 'désactiver'} le ticker ${tickerSymbol} ?`)) {
+                    if (!confirm(`Etes-vous sur de vouloir ${hardDelete ? 'supprimer definitivement' : 'desactiver'} le ticker ${tickerSymbol} ?`)) {
                         return;
                     }
 
@@ -424,15 +424,15 @@ CONTRAINTES:
 
                         if (response.ok) {
                             const data = await response.json();
-                            alert(`✅ ${data.message}`);
+                            alert(` ${data.message}`);
                             fetchTickers();
                         } else {
                             const error = await response.json();
-                            alert(`❌ Erreur: ${error.error || 'Impossible de supprimer le ticker'}`);
+                            alert(` Erreur: ${error.error || 'Impossible de supprimer le ticker'}`);
                         }
                     } catch (error) {
                         console.error('Erreur deleteTicker:', error);
-                        alert('❌ Erreur lors de la suppression du ticker');
+                        alert(' Erreur lors de la suppression du ticker');
                     }
                 };
 
@@ -448,22 +448,22 @@ CONTRAINTES:
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>⚙️ Admin-JSLAI</h2>
+                        }`}> Admin-JSLAI</h2>
                     </div>
 
-                    {/* 📊 Gestion des Tickers Supabase - EN HAUT */}
+                    {/*  Gestion des Tickers Supabase - EN HAUT */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-green-900/20 to-gray-900 border-green-700' : 'bg-gradient-to-br from-green-50 to-gray-50 border-green-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4 cursor-pointer" onClick={() => setShowTickersManager(!showTickersManager)}>
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-green-300' : 'text-green-900'}`}>
-                                <Icon emoji="📊" size={20} />
+                                <Icon emoji="" size={20} />
                                 Gestion des Tickers Supabase
                             </h3>
                             <button className={`px-3 py-1 text-xs rounded transition-colors ${
                                 isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
                             }`}>
-                                {showTickersManager ? '▼ Masquer' : '▶ Afficher'}
+                                {showTickersManager ? ' Masquer' : ' Afficher'}
                             </button>
                         </div>
 
@@ -472,7 +472,7 @@ CONTRAINTES:
                                 {/* Filtres */}
                                 <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                     <div className="font-semibold mb-3 flex items-center gap-2">
-                                        <Icon emoji="🔍" size={16} />
+                                        <Icon emoji="" size={16} />
                                         Filtres
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
@@ -486,7 +486,7 @@ CONTRAINTES:
                                                 }`}
                                             >
                                                 <option value="all">Toutes</option>
-                                                <option value="team">Équipe</option>
+                                                <option value="team">Equipe</option>
                                                 <option value="watchlist">Watchlist</option>
                                                 <option value="manual">Manuel</option>
                                                 <option value="both">Les deux (team + watchlist)</option>
@@ -516,7 +516,7 @@ CONTRAINTES:
                                                 : isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
                                         }`}
                                     >
-                                        {loadingTickers ? '⏳ Chargement...' : '🔄 Actualiser'}
+                                        {loadingTickers ? ' Chargement...' : ' Actualiser'}
                                     </button>
                                 </div>
 
@@ -524,7 +524,7 @@ CONTRAINTES:
                                 <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                     <div className="flex justify-between items-center mb-3">
                                         <div className="font-semibold flex items-center gap-2">
-                                            <Icon emoji="📋" size={16} />
+                                            <Icon emoji="" size={16} />
                                             Liste des Tickers ({tickersList.length})
                                         </div>
                                         <button
@@ -536,7 +536,7 @@ CONTRAINTES:
                                                 isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                                             }`}
                                         >
-                                            {showAddForm ? '❌ Annuler' : '➕ Ajouter'}
+                                            {showAddForm ? ' Annuler' : ' Ajouter'}
                                         </button>
                                     </div>
 
@@ -643,12 +643,12 @@ CONTRAINTES:
                                                         }`}
                                                     >
                                                         <option value="manual">Manuel</option>
-                                                        <option value="team">Équipe</option>
+                                                        <option value="team">Equipe</option>
                                                         <option value="watchlist">Watchlist</option>
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <label className="block mb-1">Priorité</label>
+                                                    <label className="block mb-1">Priorite</label>
                                                     <input
                                                         type="number"
                                                         value={newTicker.priority}
@@ -730,7 +730,7 @@ CONTRAINTES:
                                                         : isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
                                                 }`}
                                             >
-                                                ✅ Ajouter le ticker
+                                                 Ajouter le ticker
                                             </button>
                                         </div>
                                     )}
@@ -744,7 +744,7 @@ CONTRAINTES:
                                             </div>
                                         ) : tickersList.length === 0 ? (
                                             <div className="text-center py-8 text-gray-500">
-                                                Aucun ticker trouvé avec ces filtres
+                                                Aucun ticker trouve avec ces filtres
                                             </div>
                                         ) : (
                                             <table className="w-full text-sm">
@@ -753,7 +753,7 @@ CONTRAINTES:
                                                         <th className="p-2 text-left">Ticker</th>
                                                         <th className="p-2 text-left">Entreprise</th>
                                                         <th className="p-2 text-left">Source</th>
-                                                        <th className="p-2 text-left">Priorité</th>
+                                                        <th className="p-2 text-left">Priorite</th>
                                                         <th className="p-2 text-left">Statut</th>
                                                         <th className="p-2 text-left">Actions</th>
                                                     </tr>
@@ -762,7 +762,7 @@ CONTRAINTES:
                                                     {tickersList.map((t) => (
                                                         <tr key={t.id} className={`border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
                                                             <td className="p-2 font-semibold">{t.ticker}</td>
-                                                            <td className="p-2">{t.company_name || '—'}</td>
+                                                            <td className="p-2">{t.company_name || '-'}</td>
                                                             <td className="p-2">
                                                                 <span className={`px-2 py-1 rounded text-xs ${
                                                                     t.source === 'team' ? 'bg-blue-500 text-white' :
@@ -778,7 +778,7 @@ CONTRAINTES:
                                                                 <span className={`px-2 py-1 rounded text-xs ${
                                                                     t.is_active ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
                                                                 }`}>
-                                                                    {t.is_active ? '✅ Actif' : '❌ Inactif'}
+                                                                    {t.is_active ? ' Actif' : ' Inactif'}
                                                                 </span>
                                                             </td>
                                                             <td className="p-2">
@@ -789,7 +789,7 @@ CONTRAINTES:
                                                                             isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                                                                         }`}
                                                                     >
-                                                                        {editingTicker?.id === t.id ? '❌ Annuler' : '✏️ Éditer'}
+                                                                        {editingTicker?.id === t.id ? ' Annuler' : ' Editer'}
                                                                     </button>
                                                                     <button
                                                                         onClick={() => handleDeleteTicker(t.id, t.ticker, false)}
@@ -797,7 +797,7 @@ CONTRAINTES:
                                                                             isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
                                                                         }`}
                                                                     >
-                                                                        🗑️ Supprimer
+                                                                         Supprimer
                                                                     </button>
                                                                 </div>
                                                             </td>
@@ -808,10 +808,10 @@ CONTRAINTES:
                                         )}
                                     </div>
 
-                                    {/* Formulaire d'édition (modal inline) */}
+                                    {/* Formulaire d'edition (modal inline) */}
                                     {editingTicker && (
                                         <div className={`mt-4 p-4 rounded border-2 ${isDarkMode ? 'bg-gray-900 border-yellow-600' : 'bg-yellow-50 border-yellow-300'}`}>
-                                            <h4 className="font-semibold mb-3">Éditer le ticker {editingTicker.ticker}</h4>
+                                            <h4 className="font-semibold mb-3">Editer le ticker {editingTicker.ticker}</h4>
                                             <div className="grid grid-cols-2 gap-3 text-sm">
                                                 <div>
                                                     <label className="block mb-1">Ticker</label>
@@ -905,13 +905,13 @@ CONTRAINTES:
                                                         }`}
                                                     >
                                                         <option value="manual">Manuel</option>
-                                                        <option value="team">Équipe</option>
+                                                        <option value="team">Equipe</option>
                                                         <option value="watchlist">Watchlist</option>
                                                         <option value="both">Les deux</option>
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <label className="block mb-1">Priorité</label>
+                                                    <label className="block mb-1">Priorite</label>
                                                     <input
                                                         type="number"
                                                         value={editingTicker.priority || 1}
@@ -987,7 +987,7 @@ CONTRAINTES:
                                                         isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
                                                     }`}
                                                 >
-                                                    ✅ Sauvegarder
+                                                     Sauvegarder
                                                 </button>
                                                 <button
                                                     onClick={() => setEditingTicker(null)}
@@ -995,7 +995,7 @@ CONTRAINTES:
                                                         isDarkMode ? 'bg-gray-600 hover:bg-gray-700 text-white' : 'bg-gray-500 hover:bg-gray-600 text-white'
                                                     }`}
                                                 >
-                                                    ❌ Annuler
+                                                     Annuler
                                                 </button>
                                             </div>
                                         </div>
@@ -1005,28 +1005,28 @@ CONTRAINTES:
                         )}
                     </div>
 
-                    {/* 🔀 Gestion des Redirections Vercel */}
+                    {/*  Gestion des Redirections Vercel */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4 cursor-pointer" onClick={() => setShowRedirectsManager(!showRedirectsManager)}>
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
-                                <Icon emoji="🔀" size={20} />
+                                <Icon emoji="" size={20} />
                                 Gestion des Redirections Vercel
                             </h3>
                             <button className={`px-3 py-1 text-xs rounded transition-colors ${
                                 isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                             }`}>
-                                {showRedirectsManager ? '▼ Masquer' : '▶ Afficher'}
+                                {showRedirectsManager ? ' Masquer' : ' Afficher'}
                             </button>
                         </div>
 
                         {showRedirectsManager && (
                             <div className="space-y-4">
-                                {/* En-tête avec bouton d'ajout */}
+                                {/* En-tete avec bouton d'ajout */}
                                 <div className="flex justify-between items-center">
                                     <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        {loadingRedirects ? 'Chargement...' : `${redirectsList.length} redirection(s) configurée(s)`}
+                                        {loadingRedirects ? 'Chargement...' : `${redirectsList.length} redirection(s) configuree(s)`}
                                     </div>
                                     <button
                                         onClick={() => {
@@ -1037,7 +1037,7 @@ CONTRAINTES:
                                             isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                                         }`}
                                     >
-                                        {showAddRedirectForm ? '❌ Annuler' : '➕ Ajouter une redirection'}
+                                        {showAddRedirectForm ? ' Annuler' : ' Ajouter une redirection'}
                                     </button>
                                 </div>
 
@@ -1062,7 +1062,7 @@ CONTRAINTES:
                                                 </div>
                                             </div>
                                             <div>
-                                                <label className="block mb-1">Destination (URL complète)</label>
+                                                <label className="block mb-1">Destination (URL complete)</label>
                                                 <input
                                                     type="text"
                                                     value={newRedirect.destination}
@@ -1092,7 +1092,7 @@ CONTRAINTES:
                                                     isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                                                 }`}
                                             >
-                                                ✅ Ajouter
+                                                 Ajouter
                                             </button>
                                             <button
                                                 onClick={() => {
@@ -1103,7 +1103,7 @@ CONTRAINTES:
                                                     isDarkMode ? 'bg-gray-600 hover:bg-gray-700 text-white' : 'bg-gray-500 hover:bg-gray-600 text-white'
                                                 }`}
                                             >
-                                                ❌ Annuler
+                                                 Annuler
                                             </button>
                                         </div>
                                     </div>
@@ -1116,7 +1116,7 @@ CONTRAINTES:
                                     </div>
                                 ) : redirectsList.length === 0 ? (
                                     <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Aucune redirection configurée
+                                        Aucune redirection configuree
                                     </div>
                                 ) : (
                                     <div className={`rounded border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
@@ -1163,7 +1163,7 @@ CONTRAINTES:
                                                                     }`}
                                                                     title="Tester la redirection"
                                                                 >
-                                                                    🧪 Tester
+                                                                     Tester
                                                                 </button>
                                                                 <button
                                                                     onClick={() => {
@@ -1175,7 +1175,7 @@ CONTRAINTES:
                                                                     }`}
                                                                     title="Modifier"
                                                                 >
-                                                                    ✏️ Modifier
+                                                                     Modifier
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDeleteRedirect(redirect.source)}
@@ -1184,7 +1184,7 @@ CONTRAINTES:
                                                                     }`}
                                                                     title="Supprimer"
                                                                 >
-                                                                    🗑️ Supprimer
+                                                                     Supprimer
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -1195,10 +1195,10 @@ CONTRAINTES:
                                     </div>
                                 )}
 
-                                {/* Formulaire d'édition (modal inline) */}
+                                {/* Formulaire d'edition (modal inline) */}
                                 {editingRedirect && (
                                     <div className={`mt-4 p-4 rounded border-2 ${isDarkMode ? 'bg-gray-900 border-yellow-600' : 'bg-yellow-50 border-yellow-300'}`}>
-                                        <h4 className="font-semibold mb-3">Éditer la redirection {editingRedirect.source}</h4>
+                                        <h4 className="font-semibold mb-3">Editer la redirection {editingRedirect.source}</h4>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                                             <div>
                                                 <label className="block mb-1">Source (chemin)</label>
@@ -1212,7 +1212,7 @@ CONTRAINTES:
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block mb-1">Destination (URL complète)</label>
+                                                <label className="block mb-1">Destination (URL complete)</label>
                                                 <input
                                                     type="text"
                                                     value={editingRedirect.destination}
@@ -1245,7 +1245,7 @@ CONTRAINTES:
                                                     isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                                                 }`}
                                             >
-                                                ✅ Sauvegarder
+                                                 Sauvegarder
                                             </button>
                                             <button
                                                 onClick={() => setEditingRedirect(null)}
@@ -1253,7 +1253,7 @@ CONTRAINTES:
                                                     isDarkMode ? 'bg-gray-600 hover:bg-gray-700 text-white' : 'bg-gray-500 hover:bg-gray-600 text-white'
                                                 }`}
                                             >
-                                                ❌ Annuler
+                                                 Annuler
                                             </button>
                                         </div>
                                     </div>
@@ -1261,8 +1261,8 @@ CONTRAINTES:
 
                                 {/* Note d'information */}
                                 <div className={`p-3 rounded text-xs ${isDarkMode ? 'bg-blue-900/30 border border-blue-700 text-blue-300' : 'bg-blue-50 border border-blue-200 text-blue-800'}`}>
-                                    <strong>ℹ️ Note:</strong> Les modifications sont sauvegardées directement dans <code className="px-1 py-0.5 rounded bg-black/10">vercel.json</code> via GitHub API. 
-                                    Le déploiement Vercel se fera automatiquement après le commit.
+                                    <strong>i Note:</strong> Les modifications sont sauvegardees directement dans <code className="px-1 py-0.5 rounded bg-black/10">vercel.json</code> via GitHub API. 
+                                    Le deploiement Vercel se fera automatiquement apres le commit.
                                 </div>
                             </div>
                         )}
@@ -1270,31 +1270,31 @@ CONTRAINTES:
 
                     <EmmaSmsPanel />
 
-                    {/* 🤖 Emma Configuration (nouveau - centralisé pour admin) */}
+                    {/*  Emma Configuration (nouveau - centralise pour admin) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4 cursor-pointer" onClick={() => setShowEmmaConfig(!showEmmaConfig)}>
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                <Icon emoji="🤖" size={20} />
-                                Emma Configuration (Prompts Optimisés)
-                                <span className="text-xs opacity-70">(partagé avec onglet Emma IA™)</span>
+                                <Icon emoji="" size={20} />
+                                Emma Configuration (Prompts Optimises)
+                                <span className="text-xs opacity-70">(partage avec onglet Emma IATM)</span>
                             </h3>
                             <button className={`px-3 py-1 text-xs rounded transition-colors ${
                                 isDarkMode ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-purple-500 hover:bg-purple-600 text-white'
                             }`}>
-                                {showEmmaConfig ? '▼ Masquer' : '▶ Afficher'}
+                                {showEmmaConfig ? ' Masquer' : ' Afficher'}
                             </button>
                         </div>
 
                         {showEmmaConfig && (
                             <div className="space-y-4">
-                                {/* Prompt Système */}
+                                {/* Prompt Systeme */}
                                 <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                     <div className="flex justify-between items-center mb-3">
                                         <label className={`font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                            <Icon emoji="📝" size={16} />
-                                            Prompt Système (Optimisé Hassid)
+                                            <Icon emoji="" size={16} />
+                                            Prompt Systeme (Optimise Hassid)
                                         </label>
                                         <div className="flex gap-2">
                                             <button
@@ -1303,7 +1303,7 @@ CONTRAINTES:
                                                     isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
                                                 }`}
                                             >
-                                                ✅ Restaurer prompt optimisé
+                                                 Restaurer prompt optimise
                                             </button>
                                             <span className={`px-3 py-1 text-xs rounded ${isDarkMode ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
                                                 {emmaPrompt.split(' ').length} mots (-85.6% vs original)
@@ -1316,20 +1316,20 @@ CONTRAINTES:
                                         className={`w-full h-64 p-3 rounded border font-mono text-sm ${
                                             isDarkMode ? 'bg-gray-900 border-gray-700 text-gray-200' : 'bg-white border-gray-300 text-gray-900'
                                         }`}
-                                        placeholder="Prompt système Emma..."
+                                        placeholder="Prompt systeme Emma..."
                                     />
                                     <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        💡 Prompt optimisé selon principes Hassid: layered structure, délimiteurs ///, contraintes en fin (recency effect)
+                                         Prompt optimise selon principes Hassid: layered structure, delimiteurs ///, contraintes en fin (recency effect)
                                     </div>
                                 </div>
 
-                                {/* Température */}
+                                {/* Temperature */}
                                 <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                     <label className={`block font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                        <Icon emoji="🌡️" size={16} />
-                                        Température: <span className="font-bold text-blue-600">{emmaTemperature.toFixed(2)}</span>
+                                        <Icon emoji="" size={16} />
+                                        Temperature: <span className="font-bold text-blue-600">{emmaTemperature.toFixed(2)}</span>
                                         <span className="text-xs font-normal opacity-70">
-                                            ({emmaTemperature <= 0.3 ? 'Précis/Factuel' : emmaTemperature <= 0.6 ? 'Équilibré' : 'Créatif'})
+                                            ({emmaTemperature <= 0.3 ? 'Precis/Factuel' : emmaTemperature <= 0.6 ? 'Equilibre' : 'Creatif'})
                                         </span>
                                     </label>
                                     <input
@@ -1342,16 +1342,16 @@ CONTRAINTES:
                                         className="w-full"
                                     />
                                     <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        <span>0.1 (Précis)</span>
-                                        <span>0.5 (Équilibré)</span>
-                                        <span>1.0 (Créatif)</span>
+                                        <span>0.1 (Precis)</span>
+                                        <span>0.5 (Equilibre)</span>
+                                        <span>1.0 (Creatif)</span>
                                     </div>
                                 </div>
 
                                 {/* Max Tokens */}
                                 <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                     <label className={`block font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                        <Icon emoji="📏" size={16} />
+                                        <Icon emoji="" size={16} />
                                         Longueur Max: <span className="font-bold text-blue-600">{emmaMaxTokens} tokens</span>
                                         <span className="text-xs font-normal opacity-70">
                                             (~{Math.round(emmaMaxTokens * 0.75)} mots)
@@ -1368,12 +1368,12 @@ CONTRAINTES:
                                     />
                                     <div className={`flex justify-between text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                         <span>1024</span>
-                                        <span>4096 (défaut)</span>
+                                        <span>4096 (defaut)</span>
                                         <span>8192</span>
                                         <span>16384</span>
                                     </div>
                                     <div className={`mt-2 text-xs ${isDarkMode ? 'text-yellow-400' : 'text-yellow-700'}`}>
-                                        ⚠️ Note: Analyses complètes SMS = max 2 parties (~3500 chars). Web/Email = profondeur maximale.
+                                         Note: Analyses completes SMS = max 2 parties (~3500 chars). Web/Email = profondeur maximale.
                                     </div>
                                 </div>
 
@@ -1381,8 +1381,8 @@ CONTRAINTES:
                                 <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                     <div className="flex items-center justify-between">
                                         <label className={`font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                            <Icon emoji="🔧" size={16} />
-                                            Function Calling (APIs temps réel)
+                                            <Icon emoji="" size={16} />
+                                            Function Calling (APIs temps reel)
                                         </label>
                                         <label className="relative inline-flex items-center cursor-pointer">
                                             <input
@@ -1393,55 +1393,55 @@ CONTRAINTES:
                                             />
                                             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
                                             <span className={`ml-3 text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
-                                                {useFunctionCalling ? 'Activé ✅' : 'Désactivé ❌'}
+                                                {useFunctionCalling ? 'Active ' : 'Desactive '}
                                             </span>
                                         </label>
                                     </div>
                                     <div className={`mt-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                         {useFunctionCalling
-                                            ? '✅ Emma utilise les APIs (FMP, Finnhub, etc.) pour données temps réel'
-                                            : '❌ Emma se base uniquement sur ses connaissances d\'entraînement'}
+                                            ? ' Emma utilise les APIs (FMP, Finnhub, etc.) pour donnees temps reel'
+                                            : ' Emma se base uniquement sur ses connaissances d\'entrainement'}
                                     </div>
                                 </div>
 
                                 {/* Info Synchronisation */}
                                 <div className={`p-3 rounded border-2 ${isDarkMode ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-300'}`}>
                                     <div className={`text-sm ${isDarkMode ? 'text-blue-200' : 'text-blue-900'}`}>
-                                        <Icon emoji="ℹ️" size={16} /> <strong>Synchronisation automatique:</strong> Tous les réglages sont partagés avec l'onglet "Emma IA™" via localStorage.
-                                        Les modifications ici s'appliquent immédiatement partout.
+                                        <Icon emoji="i" size={16} /> <strong>Synchronisation automatique:</strong> Tous les reglages sont partages avec l'onglet "Emma IATM" via localStorage.
+                                        Les modifications ici s'appliquent immediatement partout.
                                     </div>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* 🔍 Debug des Données (déplacé ici depuis Titres & nouvelles) */}
+                    {/*  Debug des Donnees (deplace ici depuis Titres & nouvelles) */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                            <Icon emoji="🔍" size={20} />
-                            Debug des Données
+                            <Icon emoji="" size={20} />
+                            Debug des Donnees
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-blue-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="📊" size={18} />
+                                    <Icon emoji="" size={18} />
                                     Stock Data
                                 </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
                                     Tickers: {tickers.length} ({tickers.join(', ')})
                                 </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Données chargées: {Object.keys(stockData).length}
+                                    Donnees chargees: {Object.keys(stockData).length}
                                 </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
-                                    Dernière MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
+                                    Derniere MAJ: {lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Jamais'}
                                 </div>
                             </div>
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-emerald-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="📰" size={18} />
+                                    <Icon emoji="" size={18} />
                                     News Data
                                 </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -1453,7 +1453,7 @@ CONTRAINTES:
                             </div>
                             <div className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded p-3 border`}>
                                 <div className="text-violet-600 font-medium mb-2 flex items-center gap-2">
-                                    <Icon emoji="🎯" size={18} />
+                                    <Icon emoji="" size={18} />
                                     Seeking Alpha
                                 </div>
                                 <div className={isDarkMode ? 'text-gray-200' : 'text-gray-700'}>
@@ -1466,13 +1466,13 @@ CONTRAINTES:
                         </div>
                     </div>
 
-                    {/* 📦 Gestion du Cache Supabase */}
+                    {/*  Gestion du Cache Supabase */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-blue-900/20 to-gray-900 border-blue-700' : 'bg-gradient-to-br from-blue-50 to-gray-50 border-blue-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
-                                <Icon emoji="📦" size={20} />
+                                <Icon emoji="" size={20} />
                                 Gestion du Cache Supabase
                             </h3>
                             <button
@@ -1485,7 +1485,7 @@ CONTRAINTES:
                                             setCacheStatus(data.status || {});
                                         }
                                     } catch (error) {
-                                        console.error('Erreur récupération statut cache:', error);
+                                        console.error('Erreur recuperation statut cache:', error);
                                     } finally {
                                         setLoadingCacheStatus(false);
                                     }
@@ -1497,21 +1497,21 @@ CONTRAINTES:
                                         : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white'
                                 }`}
                             >
-                                {loadingCacheStatus ? '⏳ Chargement...' : '🔄 Actualiser'}
+                                {loadingCacheStatus ? ' Chargement...' : ' Actualiser'}
                             </button>
                         </div>
 
-                        {/* Paramètres du Cache */}
+                        {/* Parametres du Cache */}
                         <div className={`space-y-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
-                                    <Icon emoji="⚙️" size={16} />
-                                    Paramètres du Cache
+                                    <Icon emoji="" size={16} />
+                                    Parametres du Cache
                                 </div>
                                 <div className="space-y-3">
                                     <div>
                                         <label className="block text-sm mb-2">
-                                            Durée du cache (heures): <span className="font-bold text-blue-600">{cacheSettings.maxAgeHours}h</span>
+                                            Duree du cache (heures): <span className="font-bold text-blue-600">{cacheSettings.maxAgeHours}h</span>
                                         </label>
                                         <input
                                             type="range"
@@ -1544,13 +1544,13 @@ CONTRAINTES:
                                             className="rounded"
                                         />
                                         <label htmlFor="refreshOnNavigation" className="text-sm">
-                                            Rafraîchir les données tickers lors de la navigation
+                                            Rafraichir les donnees tickers lors de la navigation
                                         </label>
                                     </div>
                                     {cacheSettings.refreshOnNavigation && (
                                         <div className="ml-6">
                                             <label className="block text-sm mb-2">
-                                                Intervalle de rafraîchissement (minutes): <span className="font-bold text-blue-600">{cacheSettings.refreshIntervalMinutes} min</span>
+                                                Intervalle de rafraichissement (minutes): <span className="font-bold text-blue-600">{cacheSettings.refreshIntervalMinutes} min</span>
                                             </label>
                                             <input
                                                 type="range"
@@ -1570,16 +1570,16 @@ CONTRAINTES:
                                 </div>
                             </div>
 
-                            {/* État du Cache */}
+                            {/* Etat du Cache */}
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-3 flex items-center gap-2">
-                                    <Icon emoji="📊" size={16} />
-                                    État du Cache
+                                    <Icon emoji="" size={16} />
+                                    Etat du Cache
                                 </div>
                                 <div className="space-y-2 text-xs">
                                     {Object.keys(cacheStatus).length === 0 ? (
                                         <div className={`text-center py-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                            Cliquez sur "Actualiser" pour voir l'état du cache
+                                            Cliquez sur "Actualiser" pour voir l'etat du cache
                                         </div>
                                     ) : (
                                         Object.entries(cacheStatus).map(([type, status]) => (
@@ -1595,12 +1595,12 @@ CONTRAINTES:
                                                             ? 'bg-yellow-500 text-white'
                                                             : 'bg-green-500 text-white'
                                                     }`}>
-                                                        {status.expired ? '⚠️ Expiré' : '✅ Valide'}
+                                                        {status.expired ? ' Expire' : ' Valide'}
                                                     </span>
                                                 </div>
                                                 {status.age_hours && (
                                                     <div className="mt-1 text-gray-600">
-                                                        Âge: {parseFloat(status.age_hours).toFixed(1)}h / {status.max_age_hours || cacheSettings.maxAgeHours}h max
+                                                        Age: {parseFloat(status.age_hours).toFixed(1)}h / {status.max_age_hours || cacheSettings.maxAgeHours}h max
                                                     </div>
                                                 )}
                                             </div>
@@ -1613,13 +1613,13 @@ CONTRAINTES:
                             <div className="flex gap-2">
                                 <button
                                     onClick={async () => {
-                                        if (confirm('Vider tout le cache Supabase ? Les données seront rechargées depuis les APIs.')) {
+                                        if (confirm('Vider tout le cache Supabase ? Les donnees seront rechargees depuis les APIs.')) {
                                             try {
                                                 const response = await fetch(`${API_BASE_URL}/api/supabase-daily-cache`, {
                                                     method: 'DELETE'
                                                 });
                                                 if (response.ok) {
-                                                    alert('Cache vidé avec succès');
+                                                    alert('Cache vide avec succes');
                                                     setCacheStatus({});
                                                 }
                                             } catch (error) {
@@ -1631,7 +1631,7 @@ CONTRAINTES:
                                         isDarkMode ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-500 hover:bg-red-600 text-white'
                                     }`}
                                 >
-                                    🗑️ Vider le Cache
+                                     Vider le Cache
                                 </button>
                                 <button
                                     onClick={() => {
@@ -1642,26 +1642,26 @@ CONTRAINTES:
                                         };
                                         setCacheSettings(defaultSettings);
                                         localStorage.setItem('cacheSettings', JSON.stringify(defaultSettings));
-                                        alert('Paramètres réinitialisés aux valeurs par défaut');
+                                        alert('Parametres reinitialises aux valeurs par defaut');
                                     }}
                                     className={`px-4 py-2 rounded text-sm font-semibold transition-colors ${
                                         isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'
                                     }`}
                                 >
-                                    🔄 Réinitialiser
+                                     Reinitialiser
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    {/* 📋 Logs Système - Nouveau */}
+                    {/*  Logs Systeme - Nouveau */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                <Icon emoji="📋" size={20} />
-                                Logs Système
+                                <Icon emoji="" size={20} />
+                                Logs Systeme
                             </h3>
                             <button
                                 onClick={() => setSystemLogs([])}
@@ -1697,13 +1697,13 @@ CONTRAINTES:
                         </div>
                     </div>
 
-                    {/* 🧠 Deep Think - Analyses Profondes */}
+                    {/*  Deep Think - Analyses Profondes */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-purple-900/20 to-gray-900 border-purple-700' : 'bg-gradient-to-br from-purple-50 to-gray-50 border-purple-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-900'}`}>
-                                <Icon emoji="🧠" size={20} />
+                                <Icon emoji="" size={20} />
                                 Deep Think
                             </h3>
                             <span className={`px-2 py-1 text-xs rounded ${isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'}`}>
@@ -1713,36 +1713,36 @@ CONTRAINTES:
                         <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
-                                    <Icon emoji="🎯" size={16} />
-                                    Statut du système
+                                    <Icon emoji="" size={16} />
+                                    Statut du systeme
                                 </div>
                                 <div className="text-xs space-y-1">
-                                    <div>• Gemini API: {typeof window !== 'undefined' ? '✅ Actif' : '⚠️ Vérification...'}</div>
-                                    <div>• Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? '✅ Opérationnel' : '⏸️ En attente'}</div>
-                                    <div>• Deep Analysis: {stockData && Object.keys(stockData).length > 0 ? '✅ Données disponibles' : '⚠️ Pas de données'}</div>
+                                    <div>- Gemini API: {typeof window !== 'undefined' ? ' Actif' : ' Verification...'}</div>
+                                    <div>- Emma Agent: {systemLogs.filter(l => l.text.includes('Emma')).length > 0 ? ' Operationnel' : ' En attente'}</div>
+                                    <div>- Deep Analysis: {stockData && Object.keys(stockData).length > 0 ? ' Donnees disponibles' : ' Pas de donnees'}</div>
                                 </div>
                             </div>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="font-semibold mb-1 flex items-center gap-2">
-                                    <Icon emoji="📊" size={16} />
-                                    Métriques
+                                    <Icon emoji="" size={16} />
+                                    Metriques
                                 </div>
                                 <div className="text-xs space-y-1">
-                                    <div>• Analyses effectuées: {systemLogs.filter(l => l.type === 'success').length}</div>
-                                    <div>• Requêtes API: {systemLogs.length}</div>
-                                    <div>• Dernière analyse: {systemLogs[0]?.timestamp || 'N/A'}</div>
+                                    <div>- Analyses effectuees: {systemLogs.filter(l => l.type === 'success').length}</div>
+                                    <div>- Requetes API: {systemLogs.length}</div>
+                                    <div>- Derniere analyse: {systemLogs[0]?.timestamp || 'N/A'}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* ⚠️ Violations & Diagnostics */}
+                    {/*  Violations & Diagnostics */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-red-900/20 to-gray-900 border-red-700' : 'bg-gradient-to-br from-red-50 to-gray-50 border-red-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-red-300' : 'text-red-900'}`}>
-                                <Icon emoji="⚠️" size={20} />
+                                <Icon emoji="" size={20} />
                                 Violations
                             </h3>
                             <span className={`px-2 py-1 text-xs rounded ${
@@ -1758,7 +1758,7 @@ CONTRAINTES:
                         }`}>
                             {systemLogs.filter(l => l.type === 'error').length === 0 ? (
                                 <div className={`text-center py-4 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
-                                    ✅ Aucune violation détectée - Système opérationnel
+                                     Aucune violation detectee - Systeme operationnel
                                 </div>
                             ) : (
                                 <div className="space-y-2">
@@ -1770,7 +1770,7 @@ CONTRAINTES:
                                             }`}
                                         >
                                             <div className="flex items-start gap-2">
-                                                <span className="text-red-500">⚠️</span>
+                                                <span className="text-red-500"></span>
                                                 <div className="flex-1">
                                                     <div className="font-semibold text-xs">[{log.timestamp}]</div>
                                                     <div className="mt-1">{log.text}</div>
@@ -1782,32 +1782,32 @@ CONTRAINTES:
                             )}
                         </div>
                         <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                            💡 <strong>Info:</strong> Les violations sont automatiquement trackées. Consultez les logs système ci-dessus pour plus de détails.
+                             <strong>Info:</strong> Les violations sont automatiquement trackees. Consultez les logs systeme ci-dessus pour plus de details.
                         </div>
                     </div>
 
-                    {/* 🎨 Mode Professionnel / Fun */}
+                    {/*  Mode Professionnel / Fun */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-indigo-900/20 to-gray-900 border-indigo-700' : 'bg-gradient-to-br from-indigo-50 to-gray-50 border-indigo-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-900'}`}>
-                                <Icon emoji="🎨" size={20} />
-                                Mode d'Affichage des Icônes
+                                <Icon emoji="" size={20} />
+                                Mode d'Affichage des Icones
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
                                 isProfessionalMode
                                     ? isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-200 text-blue-900'
                                     : isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-200 text-purple-900'
                             }`}>
-                                {isProfessionalMode ? '💼 Professionnel' : '🎉 Fun'}
+                                {isProfessionalMode ? ' Professionnel' : ' Fun'}
                             </div>
                         </div>
                         <div className={`space-y-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             <div className={`p-3 rounded ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-2">
-                                        <Icon emoji={isProfessionalMode ? "💼" : "🎉"} size={18} />
+                                        <Icon emoji={isProfessionalMode ? "" : ""} size={18} />
                                         <span className="font-semibold">
                                             {isProfessionalMode ? 'Mode Professionnel' : 'Mode Fun'}
                                         </span>
@@ -1830,7 +1830,7 @@ CONTRAINTES:
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <span>🎉</span>
+                                                <span></span>
                                                 Mode Fun
                                             </span>
                                         )}
@@ -1839,30 +1839,30 @@ CONTRAINTES:
                                 <div className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                     {isProfessionalMode ? (
                                         <>
-                                            <p className="mb-1">✅ Icônes professionnelles Iconoir activées</p>
-                                            <p>Les emojis sont remplacés par des icônes vectorielles modernes pour une apparence plus professionnelle.</p>
+                                            <p className="mb-1"> Icones professionnelles Iconoir activees</p>
+                                            <p>Les emojis sont remplaces par des icones vectorielles modernes pour une apparence plus professionnelle.</p>
                                         </>
                                     ) : (
                                         <>
-                                            <p className="mb-1">✅ Mode Fun avec emojis activé</p>
-                                            <p>Les icônes sont affichées sous forme d'emojis colorés pour une expérience plus décontractée.</p>
+                                            <p className="mb-1"> Mode Fun avec emojis active</p>
+                                            <p>Les icones sont affichees sous forme d'emojis colores pour une experience plus decontractee.</p>
                                         </>
                                     )}
                                 </div>
                             </div>
                             <div className={`p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800/50 text-gray-400' : 'bg-gray-50 text-gray-600'}`}>
-                                💡 <strong>Astuce:</strong> Le mode sélectionné est sauvegardé automatiquement et s'applique à tous les onglets du dashboard.
+                                 <strong>Astuce:</strong> Le mode selectionne est sauvegarde automatiquement et s'applique a tous les onglets du dashboard.
                             </div>
                         </div>
                     </div>
 
-                    {/* 🤖 Configuration Emma IA */}
+                    {/*  Configuration Emma IA */}
                     <div className={`rounded-lg p-4 border transition-colors duration-300 ${
                         isDarkMode ? 'bg-gradient-to-br from-emerald-900/20 to-gray-900 border-emerald-700' : 'bg-gradient-to-br from-emerald-50 to-gray-50 border-emerald-200'
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-emerald-300' : 'text-emerald-900'}`}>
-                                <Icon emoji="🤖" size={20} />
+                                <Icon emoji="" size={20} />
                                 Configuration Emma IA
                             </h3>
                             <div className={`px-3 py-1 rounded text-xs font-medium ${
@@ -1870,7 +1870,7 @@ CONTRAINTES:
                                     ? isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-200 text-green-900'
                                     : isDarkMode ? 'bg-red-900/50 text-red-300' : 'bg-red-200 text-red-900'
                             }`}>
-                                {emmaConnected ? '✅ Gemini Actif' : '❌ Gemini Inactif'}
+                                {emmaConnected ? ' Gemini Actif' : ' Gemini Inactif'}
                             </div>
                         </div>
                         <div className="flex flex-wrap gap-2 mb-4">
@@ -1882,7 +1882,7 @@ CONTRAINTES:
                                         : 'bg-purple-600 hover:bg-purple-700 text-white'
                                 }`}
                             >
-                                📝 Modifier Prompt
+                                 Modifier Prompt
                             </button>
                             <button
                                 onClick={() => setShowTemperatureEditor(!showTemperatureEditor)}
@@ -1892,7 +1892,7 @@ CONTRAINTES:
                                         : 'bg-gray-800 hover:bg-gray-700 text-white'
                                 }`}
                             >
-                                🌡️ Température
+                                 Temperature
                             </button>
                             <button
                                 onClick={() => setShowLengthEditor(!showLengthEditor)}
@@ -1902,20 +1902,20 @@ CONTRAINTES:
                                         : 'bg-green-600 hover:bg-green-700 text-white'
                                 }`}
                             >
-                                📏 Longueur Réponse
+                                 Longueur Reponse
                             </button>
                         </div>
                         
-                        {/* Sliders pour Température et Longueur */}
+                        {/* Sliders pour Temperature et Longueur */}
                         <div className={`space-y-4 ${isDarkMode ? 'bg-gray-800/50' : 'bg-white'} p-4 rounded-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                            {/* Slider Température */}
+                            {/* Slider Temperature */}
                             <div>
                                 <div className="flex items-center justify-between mb-2">
                                     <label className={`text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        🌡️ Température: <span className="font-bold text-blue-600">{emmaTemperature.toFixed(1)}</span>
+                                         Temperature: <span className="font-bold text-blue-600">{emmaTemperature.toFixed(1)}</span>
                                     </label>
                                     <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                        {emmaTemperature <= 0.3 ? 'Précis' : emmaTemperature <= 0.5 ? 'Équilibré' : emmaTemperature <= 0.7 ? 'Naturel' : 'Créatif'}
+                                        {emmaTemperature <= 0.3 ? 'Precis' : emmaTemperature <= 0.5 ? 'Equilibre' : emmaTemperature <= 0.7 ? 'Naturel' : 'Creatif'}
                                     </span>
                                 </div>
                                 <input
@@ -1945,10 +1945,10 @@ CONTRAINTES:
                             <div>
                                 <div className="flex items-center justify-between mb-2">
                                     <label className={`text-sm font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        📏 Longueur: <span className="font-bold text-green-600">{emmaMaxTokens}</span> tokens
+                                         Longueur: <span className="font-bold text-green-600">{emmaMaxTokens}</span> tokens
                                     </label>
                                     <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                        {emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Détaillé' : 'Très détaillé'}
+                                        {emmaMaxTokens <= 2048 ? 'Concis' : emmaMaxTokens <= 4096 ? 'Detaille' : 'Tres detaille'}
                                     </span>
                                 </div>
                                 <input
@@ -1976,7 +1976,7 @@ CONTRAINTES:
                         </div>
                         
                         <div className={`mt-3 p-2 rounded text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-600'}`}>
-                            💡 <strong>Info:</strong> Ces paramètres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquées immédiatement et sauvegardées dans localStorage.
+                             <strong>Info:</strong> Ces parametres affectent le comportement d'Emma IA dans l'onglet Ask Emma. Modifications appliquees immediatement et sauvegardees dans localStorage.
                         </div>
                     </div>
 
@@ -1986,7 +1986,7 @@ CONTRAINTES:
                     }`}>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold flex items-center gap-2 ${isDarkMode ? 'text-orange-300' : 'text-orange-900'}`}>
-                                <Icon emoji="🔐" size={20} />
+                                <Icon emoji="" size={20} />
                                 Configuration Scraping Seeking Alpha
                             </h3>
                         </div>
@@ -1995,7 +1995,7 @@ CONTRAINTES:
                             {/* Email */}
                             <div>
                                 <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    📧 Email:
+                                     Email:
                                 </label>
                                 <div className={`p-3 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
                                     mvilla@videotron.ca
@@ -2005,20 +2005,20 @@ CONTRAINTES:
                             {/* Mot de passe */}
                             <div>
                                 <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    🔑 Mot de passe:
+                                     Mot de passe:
                                 </label>
                                 <div className="flex items-center gap-2">
                                     <div className={`flex-1 p-3 rounded-lg border ${isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-300 text-gray-900'}`}>
-                                        <span id="seeking-alpha-password-display">••••••••</span>
+                                        <span id="seeking-alpha-password-display">--------</span>
                                     </div>
                                     <button
                                         onClick={() => {
                                             const display = document.getElementById('seeking-alpha-password-display');
                                             if (display) {
-                                                if (display.textContent === '••••••••') {
+                                                if (display.textContent === '--------') {
                                                     display.textContent = 'Mickey69';
                                                 } else {
-                                                    display.textContent = '••••••••';
+                                                    display.textContent = '--------';
                                                 }
                                             }
                                         }}
@@ -2028,20 +2028,20 @@ CONTRAINTES:
                                                 : 'bg-orange-500 hover:bg-orange-600 border-orange-400 text-white'
                                         }`}
                                     >
-                                        👁️
+                                        
                                     </button>
                                 </div>
                             </div>
                             
                             {/* Instructions */}
                             <div className={`mt-4 p-3 rounded-lg border ${isDarkMode ? 'bg-blue-900/20 border-blue-700 text-blue-200' : 'bg-blue-50 border-blue-200 text-blue-800'}`}>
-                                <div className="text-sm font-semibold mb-2">📋 Instructions d'utilisation:</div>
+                                <div className="text-sm font-semibold mb-2"> Instructions d'utilisation:</div>
                                 <ol className="text-xs space-y-1 list-decimal list-inside">
-                                    <li>Connectez-vous à Seeking Alpha avec les identifiants ci-dessus</li>
-                                    <li>Utilisez la section "ÉTAPE 1: SCRAPING BATCH" ci-dessous pour lancer le scraping</li>
-                                    <li>Pour chaque popup ouverte, appuyez sur F12, allez dans la Console, et collez le script généré</li>
-                                    <li>Les données sont automatiquement sauvegardées dans Supabase</li>
-                                    <li>Utilisez "ÉTAPE 2: ANALYSE BATCH PERPLEXITY" pour analyser les données scrapées</li>
+                                    <li>Connectez-vous a Seeking Alpha avec les identifiants ci-dessus</li>
+                                    <li>Utilisez la section "ETAPE 1: SCRAPING BATCH" ci-dessous pour lancer le scraping</li>
+                                    <li>Pour chaque popup ouverte, appuyez sur F12, allez dans la Console, et collez le script genere</li>
+                                    <li>Les donnees sont automatiquement sauvegardees dans Supabase</li>
+                                    <li>Utilisez "ETAPE 2: ANALYSE BATCH PERPLEXITY" pour analyser les donnees scrapees</li>
                                 </ol>
                             </div>
                         </div>
@@ -2056,7 +2056,7 @@ CONTRAINTES:
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="📊" size={20} className="mr-2 inline-block" />
+                        <Icon emoji="" size={20} className="mr-2 inline-block" />
                         Gestion des Stocks
                     </h3>
                         <div className="flex flex-wrap gap-2">
@@ -2077,9 +2077,9 @@ CONTRAINTES:
                     </div>
 
                     {/* Section Scraping Seeking Alpha */}
-                    {/* WORKFLOW EN 3 ÉTAPES CLAIRES */}
+                    {/* WORKFLOW EN 3 ETAPES CLAIRES */}
                     <div className="space-y-4">
-                        {/* ÉTAPE 1: SCRAPING BATCH */}
+                        {/* ETAPE 1: SCRAPING BATCH */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
                             isDarkMode
                                 ? 'bg-gradient-to-r from-gray-900/40 to-gray-800/40 border-gray-500/50'
@@ -2089,8 +2089,8 @@ CONTRAINTES:
                                 <h3 className={`text-xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 }`}>
-                                <Icon emoji="📊" size={20} className="mr-2 inline-block" />
-                                ÉTAPE 1: SCRAPING BATCH (25 tickers)
+                                <Icon emoji="" size={20} className="mr-2 inline-block" />
+                                ETAPE 1: SCRAPING BATCH (25 tickers)
                             </h3>
                                 <span className={`px-4 py-2 rounded-full text-sm font-bold ${
                                     scrapingStatus === 'idle' ? 'bg-gray-500 text-white' :
@@ -2098,10 +2098,10 @@ CONTRAINTES:
                                     scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
                                     'bg-red-500 text-white'
                                 }`}>
-                                    {scrapingStatus === 'idle' ? '⏸️ EN ATTENTE' :
-                                     scrapingStatus === 'running' ? '🔄 SCRAPING...' :
-                                     scrapingStatus === 'completed' ? '✅ TERMINÉ' :
-                                     '❌ ERREUR'}
+                                    {scrapingStatus === 'idle' ? ' EN ATTENTE' :
+                                     scrapingStatus === 'running' ? ' SCRAPING...' :
+                                     scrapingStatus === 'completed' ? ' TERMINE' :
+                                     ' ERREUR'}
                                 </span>
                             </div>
 
@@ -2125,41 +2125,41 @@ CONTRAINTES:
                                 <p className={`text-sm mb-3 font-semibold transition-colors duration-300 ${
                                     isDarkMode ? 'text-yellow-300' : 'text-yellow-800'
                                 }`}>
-                                    ⚠️ IMPORTANT: Connectez-vous AVANT de lancer le scraping!
+                                     IMPORTANT: Connectez-vous AVANT de lancer le scraping!
                                 </p>
                                 <ol className={`text-sm space-y-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    <li><strong>1.</strong> Cliquez "🔐 SE CONNECTER" → Login Seeking Alpha</li>
-                                    <li><strong>2.</strong> Cliquez "🚀 LANCER SCRAPING BATCH" → Toutes les popups s'ouvrent</li>
-                                    <li><strong>3.</strong> Pour CHAQUE popup: F12 → Console → Collez script → Entrée</li>
-                                    <li><strong>4.</strong> Fermez la popup après copie</li>
-                                    <li><strong>5.</strong> Les données sont auto-sauvegardées dans Supabase</li>
+                                    <li><strong>1.</strong> Cliquez " SE CONNECTER" → Login Seeking Alpha</li>
+                                    <li><strong>2.</strong> Cliquez " LANCER SCRAPING BATCH" → Toutes les popups s'ouvrent</li>
+                                    <li><strong>3.</strong> Pour CHAQUE popup: F12 → Console → Collez script → Entree</li>
+                                    <li><strong>4.</strong> Fermez la popup apres copie</li>
+                                    <li><strong>5.</strong> Les donnees sont auto-sauvegardees dans Supabase</li>
                                 </ol>
                             </div>
 
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => {
-                                        addScrapingLog('🔐 Ouverture de la page de connexion Seeking Alpha...', 'info');
+                                        addScrapingLog(' Ouverture de la page de connexion Seeking Alpha...', 'info');
                                         window.open('https://seekingalpha.com/account/login', '_blank');
-                                        addScrapingLog('✅ Connectez-vous, puis revenez ici', 'success');
+                                        addScrapingLog(' Connectez-vous, puis revenez ici', 'success');
                                     }}
                                     className="flex-1 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-bold text-lg shadow-lg"
                                 >
-                                    🔐 SE CONNECTER À SEEKING ALPHA
+                                     SE CONNECTER A SEEKING ALPHA
                                 </button>
                                 <button
                                     onClick={runSeekingAlphaScraper}
                                     disabled={scrapingStatus === 'running'}
                                     className="flex-1 px-6 py-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-lg hover:from-violet-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-lg shadow-lg"
                                 >
-                                    {scrapingStatus === 'running' ? '⏳ SCRAPING EN COURS...' : '🚀 LANCER SCRAPING BATCH'}
+                                    {scrapingStatus === 'running' ? ' SCRAPING EN COURS...' : ' LANCER SCRAPING BATCH'}
                                 </button>
                             </div>
                         </div>
 
-                        {/* ÉTAPE 2: ANALYSE PERPLEXITY */}
+                        {/* ETAPE 2: ANALYSE PERPLEXITY */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
                             isDarkMode
                                 ? 'bg-gradient-to-r from-pink-900/40 to-rose-900/40 border-pink-500/50'
@@ -2168,8 +2168,8 @@ CONTRAINTES:
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
-                            ÉTAPE 2: ANALYSE BATCH PERPLEXITY
+                            <Icon emoji="" size={20} className="mr-2 inline-block" />
+                            ETAPE 2: ANALYSE BATCH PERPLEXITY
                         </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
@@ -2178,57 +2178,57 @@ CONTRAINTES:
                                 <p className={`text-sm mb-3 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    📊 Cliquez pour analyser TOUTES les données scrapées en une seule fois:
+                                     Cliquez pour analyser TOUTES les donnees scrapees en une seule fois:
                                 </p>
                                 <ul className={`text-sm space-y-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    <li>✓ Récupère tous les raw scrapes depuis Supabase</li>
-                                    <li>✓ Analyse avec Perplexity AI en batch</li>
-                                    <li>✓ Formate en JSON structuré</li>
-                                    <li>✓ Sauvegarde dans seeking_alpha_analysis</li>
-                                    <li>✓ Affiche les résultats dans le tableau ci-dessous</li>
+                                    <li> Recupere tous les raw scrapes depuis Supabase</li>
+                                    <li> Analyse avec Perplexity AI en batch</li>
+                                    <li> Formate en JSON structure</li>
+                                    <li> Sauvegarde dans seeking_alpha_analysis</li>
+                                    <li> Affiche les resultats dans le tableau ci-dessous</li>
                                 </ul>
                             </div>
 
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🤖 Démarrage analyse Perplexity BATCH...', 'info');
+                                    addScrapingLog(' Demarrage analyse Perplexity BATCH...', 'info');
                                     try {
-                                        // Récupérer tous les raw scrapes depuis Supabase
-                                        addScrapingLog('📥 Récupération des données depuis Supabase...', 'info');
+                                        // Recuperer tous les raw scrapes depuis Supabase
+                                        addScrapingLog(' Recuperation des donnees depuis Supabase...', 'info');
                                         const response = await fetch('/api/seeking-alpha-scraping?type=raw&limit=100');
                                         const data = await response.json();
 
                                         if (data.success && data.data && data.data.length > 0) {
-                                            addScrapingLog(`✅ ${data.data.length} raw scrapes trouvés`, 'success');
+                                            addScrapingLog(` ${data.data.length} raw scrapes trouves`, 'success');
 
                                             for (const item of data.data) {
                                                 const ticker = item.ticker;
-                                                addScrapingLog(`🔄 Analyse de ${ticker} avec Perplexity...`, 'info');
+                                                addScrapingLog(` Analyse de ${ticker} avec Perplexity...`, 'info');
                                                 await analyzeWithPerplexityAndUpdate(ticker, {
                                                     fullText: item.raw_text,
                                                     url: item.url,
                                                     content: {}
                                                 });
                                             }
-                                            addScrapingLog('🎉 Analyse Perplexity terminée pour TOUS les tickers!', 'success');
-                                            addScrapingLog('💾 Résultats sauvegardés dans Supabase', 'success');
+                                            addScrapingLog(' Analyse Perplexity terminee pour TOUS les tickers!', 'success');
+                                            addScrapingLog(' Resultats sauvegardes dans Supabase', 'success');
                                         } else {
-                                            addScrapingLog('⚠️ Aucune donnée trouvée dans Supabase', 'warning');
-                                            addScrapingLog('💡 Effectuez d\'abord le scraping (Étape 1)', 'info');
+                                            addScrapingLog(' Aucune donnee trouvee dans Supabase', 'warning');
+                                            addScrapingLog(' Effectuez d\'abord le scraping (Etape 1)', 'info');
                                         }
                                     } catch (error) {
-                                        addScrapingLog(`❌ Erreur: ${error.message}`, 'error');
+                                        addScrapingLog(` Erreur: ${error.message}`, 'error');
                                     }
                                 }}
                                 className="w-full px-6 py-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all font-bold text-lg shadow-lg"
                             >
-                                🤖 ANALYSER TOUT AVEC PERPLEXITY ({tickers.length} tickers)
+                                 ANALYSER TOUT AVEC PERPLEXITY ({tickers.length} tickers)
                             </button>
                         </div>
 
-                        {/* ÉTAPE 3: RÉSULTATS */}
+                        {/* ETAPE 3: RESULTATS */}
                         <div className={`backdrop-blur-sm rounded-xl p-6 border-2 transition-colors duration-300 ${
                             isDarkMode
                                 ? 'bg-gradient-to-r from-emerald-900/40 to-teal-900/40 border-emerald-500/50'
@@ -2237,8 +2237,8 @@ CONTRAINTES:
                             <h3 className={`text-xl font-bold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="📊" size={20} className="mr-2 inline-block" />
-                            ÉTAPE 3: RÉSULTATS & AFFICHAGE
+                            <Icon emoji="" size={20} className="mr-2 inline-block" />
+                            ETAPE 3: RESULTATS & AFFICHAGE
                         </h3>
 
                             <div className={`mb-4 p-4 rounded-lg transition-colors duration-300 ${
@@ -2247,20 +2247,20 @@ CONTRAINTES:
                                 <p className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    Toutes les analyses apparaissent dans le tableau ci-dessous. Cliquez sur "RAFRAÎCHIR" pour recharger les dernières données depuis Supabase.
+                                    Toutes les analyses apparaissent dans le tableau ci-dessous. Cliquez sur "RAFRAICHIR" pour recharger les dernieres donnees depuis Supabase.
                                 </p>
                             </div>
 
                             <button
                                 onClick={async () => {
-                                    addScrapingLog('🔄 Rafraîchissement des données depuis Supabase...', 'info');
+                                    addScrapingLog(' Rafraichissement des donnees depuis Supabase...', 'info');
                                     await fetchSeekingAlphaData();
                                     await fetchSeekingAlphaStockData();
-                                    addScrapingLog('✅ Données rafraîchies!', 'success');
+                                    addScrapingLog(' Donnees rafraichies!', 'success');
                                 }}
                                 className="w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 transition-all font-bold text-lg shadow-lg"
                             >
-                                🔄 RAFRAÎCHIR LES DONNÉES DU TABLEAU
+                                 RAFRAICHIR LES DONNEES DU TABLEAU
                             </button>
                         </div>
                     </div>
@@ -2274,7 +2274,7 @@ CONTRAINTES:
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📋 Logs de Scraping</h3>
+                            }`}> Logs de Scraping</h3>
                             <div className={`max-h-64 overflow-y-auto space-y-2 ${
                                 isDarkMode ? 'bg-gray-800' : 'bg-white'
                             } rounded-lg p-4`}>
@@ -2295,7 +2295,7 @@ CONTRAINTES:
                         </div>
                     )}
 
-                    {/* Section État des Connexions & Diagnostic des APIs - FUSIONNÉE */}
+                    {/* Section Etat des Connexions & Diagnostic des APIs - FUSIONNEE */}
                     <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                         isDarkMode 
                             ? 'bg-gray-900 border-gray-700' 
@@ -2304,7 +2304,7 @@ CONTRAINTES:
                         <div className="flex justify-between items-center mb-4">
                             <h3 className={`text-lg font-semibold transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🔗 État des Connexions & Diagnostic des APIs</h3>
+                            }`}> Etat des Connexions & Diagnostic des APIs</h3>
                             <div className="flex gap-2">
                                 <button
                                     onClick={async () => {
@@ -2318,7 +2318,7 @@ CONTRAINTES:
                                             : 'bg-gray-800 text-white hover:bg-gray-700'
                                     }`}
                                 >
-                                    {healthCheckLoading ? 'Vérification...' : '🔄 Vérifier Toutes'}
+                                    {healthCheckLoading ? 'Verification...' : ' Verifier Toutes'}
                                 </button>
                             </div>
                         </div>
@@ -2341,8 +2341,8 @@ CONTRAINTES:
                                                 ? 'text-yellow-800'
                                                 : 'text-red-800'
                                         }`}>
-                                            {healthStatus.overall_status === 'healthy' ? '🟢' :
-                                             healthStatus.overall_status === 'degraded' ? '🟡' : '🔴'}
+                                            {healthStatus.overall_status === 'healthy' ? '' :
+                                             healthStatus.overall_status === 'degraded' ? '' : ''}
                                             Status Global: {healthStatus.overall_status.toUpperCase()}
                                         </h4>
                                         <p className={`text-sm ${
@@ -2352,7 +2352,7 @@ CONTRAINTES:
                                                 ? 'text-yellow-600'
                                                 : 'text-red-600'
                                         }`}>
-                                            {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs opérationnelles
+                                            {healthStatus.healthy_apis}/{healthStatus.total_apis} APIs operationnelles
                                             ({Math.round((healthStatus.healthy_apis / healthStatus.total_apis) * 100)}%)
                                         </p>
                                     </div>
@@ -2374,12 +2374,12 @@ CONTRAINTES:
                             </div>
                         )}
 
-                        {/* Liste détaillée des connexions */}
+                        {/* Liste detaillee des connexions */}
                         {Object.keys(apiStatus).length > 0 && (
                             <div className="space-y-3 mb-4">
                                 <h4 className={`text-sm font-semibold mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>Connexions détaillées:</h4>
+                                }`}>Connexions detaillees:</h4>
                                 {Object.entries(apiStatus).map(([api, status]) => (
                                     <div key={api} className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-300 ${
                                         isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
@@ -2428,7 +2428,7 @@ CONTRAINTES:
                                 <h4 className={`font-semibold mb-3 ${
                                     isDarkMode ? 'text-white' : 'text-blue-900'
                                 }`}>
-                                    💡 Recommandations
+                                     Recommandations
                                 </h4>
                                 <div className="space-y-2">
                                     {healthStatus.recommendations.map((rec, index) => (
@@ -2444,8 +2444,8 @@ CONTRAINTES:
                                                         rec.priority === 'high' ? 'text-green-800' :
                                                         'text-yellow-800'
                                                     }`}>
-                                                        {rec.priority === 'critical' ? '🚨' :
-                                                         rec.priority === 'high' ? '⚠️' : '💡'}
+                                                        {rec.priority === 'critical' ? '' :
+                                                         rec.priority === 'high' ? '' : ''}
                                                         {rec.message}
                                                     </p>
                                                     <p className="text-xs text-gray-600 mt-1">
@@ -2461,7 +2461,7 @@ CONTRAINTES:
 
                         {Object.keys(apiStatus).length === 0 && !healthStatus && (
                             <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                <p>Cliquez sur "🔄 Vérifier Toutes" pour diagnostiquer les connexions</p>
+                                <p>Cliquez sur " Verifier Toutes" pour diagnostiquer les connexions</p>
                             </div>
                         )}
                     </div>
@@ -2475,7 +2475,7 @@ CONTRAINTES:
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="🤖" size={20} className="mr-2 inline-block" />
+                        <Icon emoji="" size={20} className="mr-2 inline-block" />
                         Monitoring Emma AI
                     </h3>
                         <div className="space-y-4">
@@ -2484,13 +2484,13 @@ CONTRAINTES:
                                     isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
                                     <div className="text-purple-600 font-medium mb-2 flex items-center gap-2">
-                                        <Icon emoji="🧠" size={18} />
+                                        <Icon emoji="" size={18} />
                                         Emma Agent
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        Status: <span className="text-green-500">✅ Opérationnel</span>
+                                        Status: <span className="text-green-500"> Operationnel</span>
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -2501,26 +2501,26 @@ CONTRAINTES:
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                                     isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
-                                    <div className="text-blue-600 font-medium mb-2">📧 Briefings</div>
+                                    <div className="text-blue-600 font-medium mb-2"> Briefings</div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        Cron: <span className="text-green-500">✅ Actif</span>
+                                        Cron: <span className="text-green-500"> Actif</span>
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        Horaires: 7h20 • 11h50 • 16h20
+                                        Horaires: 7h20 - 11h50 - 16h20
                                     </div>
                                 </div>
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                                     isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
                                 }`}>
-                                    <div className="text-emerald-600 font-medium mb-2">🗄️ Supabase</div>
+                                    <div className="text-emerald-600 font-medium mb-2"> Supabase</div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>
-                                        Tables: 4 créées
+                                        Tables: 4 creees
                                     </div>
                                     <div className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -2542,17 +2542,17 @@ CONTRAINTES:
                                         }).then(response => response.json())
                                         .then(data => {
                                             if (data.success) {
-                                                showMessage('✅ Emma Agent opérationnel', 'success');
+                                                showMessage(' Emma Agent operationnel', 'success');
                                             } else {
-                                                showMessage('❌ Emma Agent erreur: ' + data.error, 'error');
+                                                showMessage(' Emma Agent erreur: ' + data.error, 'error');
                                             }
                                         }).catch(error => {
-                                            showMessage('❌ Erreur connexion Emma Agent', 'error');
+                                            showMessage(' Erreur connexion Emma Agent', 'error');
                                         });
                                     }}
                                     className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
                                 >
-                                    🧪 Tester Emma Agent
+                                     Tester Emma Agent
                                 </button>
                                 <button
                                     onClick={() => {
@@ -2560,17 +2560,17 @@ CONTRAINTES:
                                         .then(response => response.json())
                                         .then(data => {
                                             if (data.success) {
-                                                showMessage('✅ Emma Briefing opérationnel', 'success');
+                                                showMessage(' Emma Briefing operationnel', 'success');
                                             } else {
-                                                showMessage('❌ Emma Briefing erreur: ' + data.error, 'error');
+                                                showMessage(' Emma Briefing erreur: ' + data.error, 'error');
                                             }
                                         }).catch(error => {
-                                            showMessage('❌ Erreur connexion Emma Briefing', 'error');
+                                            showMessage(' Erreur connexion Emma Briefing', 'error');
                                         });
                                     }}
                                     className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
                                 >
-                                    📧 Tester Briefing
+                                     Tester Briefing
                                 </button>
                             </div>
                         </div>
@@ -2584,7 +2584,7 @@ CONTRAINTES:
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Gestion des Outils Emma</h3>
+                        }`}> Gestion des Outils Emma</h3>
                         <div className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
@@ -2593,25 +2593,25 @@ CONTRAINTES:
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                     }`}>
-                                    <Icon emoji="📊" size={18} className="mr-2 inline-block" />
+                                    <Icon emoji="" size={18} className="mr-2 inline-block" />
                                     Outils Financiers
                                 </h4>
                                     <div className="space-y-1 text-sm">
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Polygon Stock Price</div>
+                                        }`}>- Polygon Stock Price</div>
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• FMP Fundamentals</div>
+                                        }`}>- FMP Fundamentals</div>
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Finnhub News</div>
+                                        }`}>- Finnhub News</div>
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Twelve Data Technical</div>
+                                        }`}>- Twelve Data Technical</div>
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Alpha Vantage Ratios</div>
+                                        }`}>- Alpha Vantage Ratios</div>
                                     </div>
                                 </div>
                                 <div className={`p-4 rounded-lg border transition-colors duration-300 ${
@@ -2619,23 +2619,23 @@ CONTRAINTES:
                                 }`}>
                                     <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                         isDarkMode ? 'text-white' : 'text-gray-900'
-                                    }`}>🗄️ Outils Supabase</h4>
+                                    }`}> Outils Supabase</h4>
                                     <div className="space-y-1 text-sm">
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Watchlist Manager</div>
+                                        }`}>- Watchlist Manager</div>
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Team Tickers</div>
+                                        }`}>- Team Tickers</div>
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Economic Calendar</div>
+                                        }`}>- Economic Calendar</div>
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Earnings Calendar</div>
+                                        }`}>- Earnings Calendar</div>
                                         <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                        }`}>• Analyst Recommendations</div>
+                                        }`}>- Analyst Recommendations</div>
                                     </div>
                                 </div>
                             </div>
@@ -2652,18 +2652,18 @@ CONTRAINTES:
                                         }).then(response => response.json())
                                         .then(data => {
                                             if (data.success) {
-                                                showMessage('✅ Configuration des outils récupérée', 'success');
+                                                showMessage(' Configuration des outils recuperee', 'success');
                                                 console.log('Tools Config:', data.tools_config);
                                             } else {
-                                                showMessage('❌ Erreur récupération config', 'error');
+                                                showMessage(' Erreur recuperation config', 'error');
                                             }
                                         }).catch(error => {
-                                            showMessage('❌ Erreur connexion', 'error');
+                                            showMessage(' Erreur connexion', 'error');
                                         });
                                     }}
                                     className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
                                 >
-                                    ⚙️ Voir Configuration
+                                     Voir Configuration
                                 </button>
                             </div>
                         </div>
@@ -2679,7 +2679,7 @@ CONTRAINTES:
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                        <Icon emoji="⚙️" size={20} className="mr-2 inline-block" />
+                        <Icon emoji="" size={20} className="mr-2 inline-block" />
                         Configuration
                     </h3>
                         <div className="space-y-4">
@@ -2687,7 +2687,7 @@ CONTRAINTES:
                                 <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    Token GitHub (pour les mises à jour)
+                                    Token GitHub (pour les mises a jour)
                                 </label>
                                 <input
                                     type="password"
@@ -2706,7 +2706,7 @@ CONTRAINTES:
                                     onClick={() => setShowSettings(!showSettings)}
                                     className="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700 transition-colors"
                                 >
-                                    {showSettings ? 'Masquer' : 'Afficher'} les paramètres
+                                    {showSettings ? 'Masquer' : 'Afficher'} les parametres
                                 </button>
                             </div>
                         </div>

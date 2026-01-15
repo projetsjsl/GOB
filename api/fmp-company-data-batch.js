@@ -1,6 +1,6 @@
 /**
- * API Batch pour récupérer les données de plusieurs compagnies en une seule requête
- * Optimise les appels FMP en traitant plusieurs tickers en parallèle
+ * API Batch pour recuperer les donnees de plusieurs compagnies en une seule requete
+ * Optimise les appels FMP en traitant plusieurs tickers en parallele
  * 
  * GET /api/fmp-company-data-batch?symbols=AAPL,MSFT,GOOGL
  */
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'No valid symbols provided' });
     }
 
-    // Limiter à 10 symboles par requête pour éviter les timeouts
+    // Limiter a 10 symboles par requete pour eviter les timeouts
     const MAX_BATCH_SIZE = 10;
     if (symbolList.length > MAX_BATCH_SIZE) {
         return res.status(400).json({ 
@@ -52,7 +52,7 @@ export default async function handler(req, res) {
 
     try {
         // Pour chaque symbole, appeler l'API fmp-company-data existante
-        // On utilise Promise.allSettled pour gérer les erreurs individuellement
+        // On utilise Promise.allSettled pour gerer les erreurs individuellement
         const results = await Promise.allSettled(
             symbolList.map(async (symbol) => {
                 try {
@@ -93,7 +93,7 @@ export default async function handler(req, res) {
             })
         );
 
-        // Formater les résultats
+        // Formater les resultats
         const formattedResults = results.map((result, index) => {
             if (result.status === 'fulfilled') {
                 return result.value;

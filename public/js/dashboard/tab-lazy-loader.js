@@ -15,7 +15,7 @@
     }
     window.__tabLazyLoaderInitialized = true;
 
-    console.log('⚡ Tab Lazy Loader: Initialisation...');
+    console.log(' Tab Lazy Loader: Initialisation...');
 
     // Track which tabs have been loaded
     const loadedTabs = new Set();
@@ -48,7 +48,7 @@
         'marches-yield': '/js/dashboard/components/tabs/YieldCurveTab.js',
         'marches-nouvelles': '/js/dashboard/components/tabs/StocksNewsTab.js',
         'nouvelles': '/js/dashboard/components/tabs/StocksNewsTab.js',
-        'nouvelles-main': null, // NouvellesTab est déjà dans app-inline.js, pas besoin de charger
+        'nouvelles-main': null, // NouvellesTab est deja dans app-inline.js, pas besoin de charger
         
         // Titres tabs
         'stocks-news': '/js/dashboard/components/tabs/StocksNewsTab.js',
@@ -77,7 +77,7 @@
         'admin-settings': '/js/dashboard/components/tabs/PlusTab.js',
         'admin-jsla': '/js/dashboard/components/tabs/AdminJSLaiTab.js',
         
-        // Test tabs (InvestingCalendarTab fusionné dans MarketsEconomyTab)
+        // Test tabs (InvestingCalendarTab fusionne dans MarketsEconomyTab)
         'investing-calendar': '/js/dashboard/components/tabs/MarketsEconomyTab.js',
         'tests-calendar': '/js/dashboard/components/tabs/MarketsEconomyTab.js',
         'tests-roboweb': '/js/dashboard/components/tabs/GroupChatTab.js'
@@ -94,7 +94,7 @@
     function loadTabScript(tabId) {
         const scriptPath = TAB_SCRIPTS[tabId];
         
-        // Si scriptPath est null, le composant est déjà disponible (ex: dans app-inline.js)
+        // Si scriptPath est null, le composant est deja disponible (ex: dans app-inline.js)
         if (scriptPath === null) {
             console.log(`[LazyLoader] Tab ${tabId} already available (no script needed)`);
             return Promise.resolve();
@@ -117,7 +117,7 @@
 
         // Start loading
         loadingTabs.add(scriptPath);
-        console.log(`[LazyLoader] 📦 Loading tab script: ${scriptPath}`);
+        console.log(`[LazyLoader]  Loading tab script: ${scriptPath}`);
 
         const promise = new Promise((resolve, reject) => {
             const script = document.createElement('script');
@@ -134,14 +134,14 @@
                     }
                     loadedTabs.add(scriptPath);
                     loadingTabs.delete(scriptPath);
-                    console.log(`[LazyLoader] ✅ Loaded: ${scriptPath}`);
+                    console.log(`[LazyLoader]  Loaded: ${scriptPath}`);
                     resolve();
                 }, 500); // Increased from 100ms to 500ms for better Babel processing
             };
             
             script.onerror = (error) => {
                 loadingTabs.delete(scriptPath);
-                console.error(`[LazyLoader] ❌ Failed to load: ${scriptPath}`, error);
+                console.error(`[LazyLoader]  Failed to load: ${scriptPath}`, error);
                 reject(error);
             };
             
@@ -206,7 +206,7 @@
 
     // Preload essential tabs after page is interactive
     window.addEventListener('load', () => {
-        console.log('[LazyLoader] 🚀 Preloading essential tabs...');
+        console.log('[LazyLoader]  Preloading essential tabs...');
         
         // Stagger preloads to avoid blocking
         PRELOAD_TABS.forEach((tabId, index) => {
@@ -214,5 +214,5 @@
         });
     });
 
-    console.log('✅ Tab Lazy Loader: Ready');
+    console.log(' Tab Lazy Loader: Ready');
 })();

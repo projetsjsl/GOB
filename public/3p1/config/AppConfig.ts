@@ -25,7 +25,7 @@ export interface GuardrailConfig {
     };
 }
 
-// ✅ Valeurs par défaut (fallback si Supabase n'est pas disponible)
+//  Valeurs par defaut (fallback si Supabase n'est pas disponible)
 export const DEFAULT_CONFIG: GuardrailConfig = {
     growth: {
         min: -50,
@@ -77,7 +77,7 @@ export async function loadConfigFromSupabase(): Promise<GuardrailConfig> {
             returns: DEFAULT_CONFIG.returns // Pas encore dans Supabase
         };
     } catch (error) {
-        console.warn('⚠️ Impossible de charger la configuration depuis Supabase, utilisation des valeurs par défaut');
+        console.warn(' Impossible de charger la configuration depuis Supabase, utilisation des valeurs par defaut');
         return DEFAULT_CONFIG;
     }
 }
@@ -85,10 +85,10 @@ export async function loadConfigFromSupabase(): Promise<GuardrailConfig> {
 export const CONFIG_STORAGE_KEY = 'finance_pro_guardrails';
 
 export const loadConfig = async (): Promise<GuardrailConfig> => {
-    // ✅ Priorité 1: Charger depuis Supabase
+    //  Priorite 1: Charger depuis Supabase
     try {
         const supabaseConfig = await loadConfigFromSupabase();
-        // ✅ Priorité 2: Merger avec localStorage (pour overrides locaux)
+        //  Priorite 2: Merger avec localStorage (pour overrides locaux)
         try {
             const stored = localStorage.getItem(CONFIG_STORAGE_KEY);
             if (stored) {
@@ -101,7 +101,7 @@ export const loadConfig = async (): Promise<GuardrailConfig> => {
         return supabaseConfig;
     } catch (e) {
         console.warn('Failed to load guardrails config from Supabase, using localStorage fallback', e);
-        // ✅ Fallback: localStorage
+        //  Fallback: localStorage
         try {
             const stored = localStorage.getItem(CONFIG_STORAGE_KEY);
             if (stored) {

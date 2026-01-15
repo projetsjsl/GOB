@@ -5,7 +5,7 @@
 // The component will use the tab components loaded from window:
 // window.PlusTab, window.AdminJSLaiTab, etc.
 
-console.log('✅ Dashboard modules loaded successfully!');
+console.log(' Dashboard modules loaded successfully!');
 console.log('Available tabs:', {
     PlusTab: typeof window.PlusTab,
     AdminJSLaiTab: typeof window.AdminJSLaiTab,

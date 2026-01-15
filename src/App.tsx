@@ -5,7 +5,7 @@ import { logger } from '../lib/logger';
 // Import utils pour exposition globale
 import { IconoirIcon, ProfessionalModeSystem } from './utils/iconMapping';
 
-// Déclarations TypeScript pour bibliothèques CDN
+// Declarations TypeScript pour bibliotheques CDN
 interface ChartLibrary {
   [key: string]: unknown;
 }
@@ -25,19 +25,19 @@ const App: React.FC = () => {
     useEffect(() => {
         const win = window as WindowWithDashboard;
         
-        // Guard pour éviter le double-montage
+        // Guard pour eviter le double-montage
         if (win.__GOB_DASHBOARD_MOUNTED) {
-            logger.warn('⚠️ Dashboard déjà monté');
+            logger.warn(' Dashboard deja monte');
             return;
         }
         win.__GOB_DASHBOARD_MOUNTED = true;
 
-        // Exposer les utils globalement pour compatibilité
+        // Exposer les utils globalement pour compatibilite
         win.IconoirIcon = IconoirIcon;
         win.LucideIcon = IconoirIcon; // Backward compatibility
         win.ProfessionalModeSystem = ProfessionalModeSystem;
 
-        logger.info('✅ GOB Dashboard monté (Vite + React + TypeScript)');
+        logger.info(' GOB Dashboard monte (Vite + React + TypeScript)');
     }, []);
 
     // Rendu direct du dashboard - UI friendly, pas de loader

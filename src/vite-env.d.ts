@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-// Déclarations de types pour les bibliothèques CDN globales
+// Declarations de types pour les bibliotheques CDN globales
 declare global {
   interface Window {
     Chart: any;

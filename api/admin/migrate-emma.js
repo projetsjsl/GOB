@@ -1,7 +1,7 @@
 /**
- * API ENDPOINT: Migration Emma → Supabase
+ * API ENDPOINT: Migration Emma -> Supabase
  *
- * Exécute la migration des configurations Emma depuis les fichiers
+ * Execute la migration des configurations Emma depuis les fichiers
  * vers Supabase en utilisant les variables d'environnement Vercel
  *
  * Usage:
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
 
-    // Vérifier les variables d'environnement
+    // Verifier les variables d'environnement
     if (!supabaseUrl || !supabaseKey) {
         const missing = [];
         if (!supabaseUrl) missing.push('SUPABASE_URL');
@@ -38,7 +38,7 @@ export default async function handler(req, res) {
         return res.status(503).json({
             error: 'Variables d\'environnement manquantes',
             missing,
-            message: 'Configurez les variables dans Vercel → Settings → Environment Variables'
+            message: 'Configurez les variables dans Vercel -> Settings -> Environment Variables'
         });
     }
 
@@ -51,7 +51,7 @@ export default async function handler(req, res) {
     };
 
     /**
-     * Helper pour insérer/mettre à jour une config
+     * Helper pour inserer/mettre a jour une config
      */
     async function upsertConfig(section, key, value, type = 'string', description = '', category = '') {
         try {
@@ -89,13 +89,13 @@ export default async function handler(req, res) {
         // ========================================
         results.sections.prompts_cfa = { count: 0, total: 7 };
 
-        await upsertConfig('prompts', 'cfa_identity', CFA_SYSTEM_PROMPT.identity, 'string', 'Identité et qualifications Emma CFA', 'prompt') && results.sections.prompts_cfa.count++;
-        await upsertConfig('prompts', 'cfa_standards', CFA_SYSTEM_PROMPT.standards, 'string', 'Standards d\'excellence CFA®', 'prompt') && results.sections.prompts_cfa.count++;
+        await upsertConfig('prompts', 'cfa_identity', CFA_SYSTEM_PROMPT.identity, 'string', 'Identite et qualifications Emma CFA', 'prompt') && results.sections.prompts_cfa.count++;
+        await upsertConfig('prompts', 'cfa_standards', CFA_SYSTEM_PROMPT.standards, 'string', 'Standards d\'excellence CFA', 'prompt') && results.sections.prompts_cfa.count++;
         await upsertConfig('prompts', 'cfa_output_format', CFA_SYSTEM_PROMPT.outputFormat, 'string', 'Format de sortie Bloomberg Terminal', 'prompt') && results.sections.prompts_cfa.count++;
         await upsertConfig('prompts', 'cfa_product_guidance', CFA_SYSTEM_PROMPT.productTypeGuidance, 'string', 'Guidance par type de produit financier', 'prompt') && results.sections.prompts_cfa.count++;
-        await upsertConfig('prompts', 'cfa_perplexity_priority', CFA_SYSTEM_PROMPT.perplexityPriority, 'string', 'Priorité d\'utilisation Perplexity', 'prompt') && results.sections.prompts_cfa.count++;
-        await upsertConfig('prompts', 'cfa_sms_format', CFA_SYSTEM_PROMPT.smsFormat, 'string', 'Format SMS optimisé', 'prompt') && results.sections.prompts_cfa.count++;
-        await upsertConfig('prompts', 'cfa_quality_checklist', CFA_SYSTEM_PROMPT.qualityChecklist, 'string', 'Checklist qualité avant envoi', 'prompt') && results.sections.prompts_cfa.count++;
+        await upsertConfig('prompts', 'cfa_perplexity_priority', CFA_SYSTEM_PROMPT.perplexityPriority, 'string', 'Priorite d\'utilisation Perplexity', 'prompt') && results.sections.prompts_cfa.count++;
+        await upsertConfig('prompts', 'cfa_sms_format', CFA_SYSTEM_PROMPT.smsFormat, 'string', 'Format SMS optimise', 'prompt') && results.sections.prompts_cfa.count++;
+        await upsertConfig('prompts', 'cfa_quality_checklist', CFA_SYSTEM_PROMPT.qualityChecklist, 'string', 'Checklist qualite avant envoi', 'prompt') && results.sections.prompts_cfa.count++;
 
         // ========================================
         // Section 2: Prompts Intentions
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
             const intentPrompts = intentModule.INTENT_PROMPTS || intentModule.default;
 
             if (intentPrompts.comprehensive_analysis) {
-                await upsertConfig('prompts', 'intent_comprehensive_analysis', intentPrompts.comprehensive_analysis, 'string', 'Prompt pour analyses complètes', 'prompt') && results.sections.prompts_intentions.count++;
+                await upsertConfig('prompts', 'intent_comprehensive_analysis', intentPrompts.comprehensive_analysis, 'string', 'Prompt pour analyses completes', 'prompt') && results.sections.prompts_intentions.count++;
             }
             if (intentPrompts.stock_price) {
                 await upsertConfig('prompts', 'intent_stock_price', intentPrompts.stock_price, 'string', 'Prompt pour demandes de prix', 'prompt') && results.sections.prompts_intentions.count++;
@@ -116,7 +116,7 @@ export default async function handler(req, res) {
                 await upsertConfig('prompts', 'intent_fundamentals', intentPrompts.fundamentals, 'string', 'Prompt pour fondamentaux', 'prompt') && results.sections.prompts_intentions.count++;
             }
             if (intentPrompts.news) {
-                await upsertConfig('prompts', 'intent_news', intentPrompts.news, 'string', 'Prompt pour actualités', 'prompt') && results.sections.prompts_intentions.count++;
+                await upsertConfig('prompts', 'intent_news', intentPrompts.news, 'string', 'Prompt pour actualites', 'prompt') && results.sections.prompts_intentions.count++;
             }
             if (intentPrompts.comparative_analysis) {
                 await upsertConfig('prompts', 'intent_comparative_analysis', intentPrompts.comparative_analysis, 'string', 'Prompt pour analyses comparatives', 'prompt') && results.sections.prompts_intentions.count++;
@@ -153,11 +153,11 @@ export default async function handler(req, res) {
         results.sections.variables = { count: 0, total: 5 };
 
         const variables = {
-            max_tokens_default: { value: 4000, description: 'Nombre maximum de tokens par défaut' },
+            max_tokens_default: { value: 4000, description: 'Nombre maximum de tokens par defaut' },
             max_tokens_briefing: { value: 10000, description: 'Nombre maximum de tokens pour briefings' },
-            temperature: { value: 0.1, description: 'Température pour génération (0.0-1.0)' },
-            recency_default: { value: 'month', description: 'Filtre de récence par défaut', type: 'string' },
-            cache_duration_minutes: { value: 5, description: 'Durée du cache config en minutes' }
+            temperature: { value: 0.1, description: 'Temperature pour generation (0.0-1.0)' },
+            recency_default: { value: 'month', description: 'Filtre de recence par defaut', type: 'string' },
+            cache_duration_minutes: { value: 5, description: 'Duree du cache config en minutes' }
         };
 
         for (const [key, config] of Object.entries(variables)) {
@@ -170,11 +170,11 @@ export default async function handler(req, res) {
         results.sections.directives = { count: 0, total: 5 };
 
         const directives = {
-            allow_clarifications: { value: true, description: 'Permettre à Emma de poser des questions de clarification' },
-            adaptive_length: { value: true, description: 'Longueur de réponse adaptative selon complexité' },
-            require_sources: { value: true, description: 'Exiger citations de sources pour données factuelles' },
+            allow_clarifications: { value: true, description: 'Permettre a Emma de poser des questions de clarification' },
+            adaptive_length: { value: true, description: 'Longueur de reponse adaptative selon complexite' },
+            require_sources: { value: true, description: 'Exiger citations de sources pour donnees factuelles' },
             min_ratios_simple: { value: 1, description: 'Nombre minimum de ratios pour questions simples', type: 'number' },
-            min_ratios_comprehensive: { value: 8, description: 'Nombre minimum de ratios pour analyses complètes', type: 'number' }
+            min_ratios_comprehensive: { value: 8, description: 'Nombre minimum de ratios pour analyses completes', type: 'number' }
         };
 
         for (const [key, config] of Object.entries(directives)) {
@@ -188,16 +188,16 @@ export default async function handler(req, res) {
 
         const routing = {
             use_perplexity_only_keywords: {
-                value: ['fonds', 'quartile', 'macro', 'stratégie', 'crypto'],
-                description: 'Keywords déclenchant Perplexity seul (sans APIs)'
+                value: ['fonds', 'quartile', 'macro', 'strategie', 'crypto'],
+                description: 'Keywords declenchant Perplexity seul (sans APIs)'
             },
             require_apis_keywords: {
                 value: ['prix actuel', 'ratio exact', 'rsi', 'macd'],
-                description: 'Keywords nécessitant des APIs complémentaires'
+                description: 'Keywords necessitant des APIs complementaires'
             },
             intent_confidence_threshold: {
                 value: 0.7,
-                description: 'Seuil de confiance pour détection intention',
+                description: 'Seuil de confiance pour detection intention',
                 type: 'number'
             }
         };
@@ -207,7 +207,7 @@ export default async function handler(req, res) {
         }
 
         // ========================================
-        // Résumé final
+        // Resume final
         // ========================================
         const { count, error: countError } = await supabase
             .from('emma_system_config')
@@ -219,7 +219,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
             success: true,
-            message: 'Migration terminée',
+            message: 'Migration terminee',
             results
         });
 

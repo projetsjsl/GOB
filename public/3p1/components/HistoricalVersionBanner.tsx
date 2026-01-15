@@ -46,13 +46,13 @@ export const HistoricalVersionBanner: React.FC<HistoricalVersionBannerProps> = (
                                 ) : (
                                     <span className="flex items-center gap-2">
                                         <LockOpenIcon className="w-4 h-4" />
-                                        Version historique (v{snapshotVersion}) - Déverrouillée
+                                        Version historique (v{snapshotVersion}) - Deverrouillee
                                     </span>
                                 )}
                             </p>
                             <p className="text-xs text-yellow-700 mt-0.5">
                                 {formatDate(snapshotDate)}
-                                {!isLocked && ' • Les modifications seront sauvegardées sur cette ancienne version'}
+                                {!isLocked && ' - Les modifications seront sauvegardees sur cette ancienne version'}
                             </p>
                         </div>
                     </div>
@@ -66,13 +66,13 @@ export const HistoricalVersionBanner: React.FC<HistoricalVersionBannerProps> = (
                                     className="px-3 py-1.5 text-sm font-medium text-yellow-800 bg-white border border-yellow-300 rounded-md hover:bg-yellow-50 transition-colors flex items-center gap-1.5"
                                 >
                                     <LockOpenIcon className="w-4 h-4" />
-                                    Déverrouiller
+                                    Deverrouiller
                                 </button>
                                 <button
                                     onClick={onSaveAsNew}
                                     className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
                                 >
-                                    💾 Sauvegarder comme nouvelle
+                                     Sauvegarder comme nouvelle
                                 </button>
                             </>
                         ) : (
@@ -81,7 +81,7 @@ export const HistoricalVersionBanner: React.FC<HistoricalVersionBannerProps> = (
                                     onClick={onSaveAsNew}
                                     className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
                                 >
-                                    💾 Sauvegarder (ancienne version)
+                                     Sauvegarder (ancienne version)
                                 </button>
                             </>
                         )}
@@ -91,7 +91,7 @@ export const HistoricalVersionBanner: React.FC<HistoricalVersionBannerProps> = (
                             className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors flex items-center gap-1.5"
                         >
                             <ArrowUturnLeftIcon className="w-4 h-4" />
-                            Revenir à la version actuelle
+                            Revenir a la version actuelle
                         </button>
                     </div>
                 </div>
@@ -99,8 +99,8 @@ export const HistoricalVersionBanner: React.FC<HistoricalVersionBannerProps> = (
                 {/* Unlock Warning (shown when unlocking) */}
                 {!isLocked && (
                     <div className="mt-3 p-2 bg-yellow-100 border border-yellow-200 rounded text-xs text-yellow-800">
-                        ⚠️ Attention: Vous modifiez une version datée du {formatDate(snapshotDate)}.
-                        Les changements seront enregistrés sur cette ancienne version, pas la version actuelle.
+                         Attention: Vous modifiez une version datee du {formatDate(snapshotDate)}.
+                        Les changements seront enregistres sur cette ancienne version, pas la version actuelle.
                     </div>
                 )}
             </div>

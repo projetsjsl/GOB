@@ -1,149 +1,149 @@
 # Guide des Modifications Visuelles - 3p1
 
-## 📍 Où voir les modifications
+##  Ou voir les modifications
 
 **URL :** https://gobapps.com/3p1/dist/index.html
 
 ---
 
-## 1. 🎯 Section "Filtres et Tri" (Sidebar - Bas de page)
+## 1.  Section "Filtres et Tri" (Sidebar - Bas de page)
 
 ### Emplacement
-- **Où :** Dans la sidebar gauche, tout en bas
+- **Ou :** Dans la sidebar gauche, tout en bas
 - **Avant :** Section "Recherche Rapide" avec 6 boutons (Yahoo Finance, Google Finance, etc.)
 - **Maintenant :** Section "Filtres et Tri" avec filtres et menu de tri
 
 ### Ce que vous devriez voir :
 
 ```
-┌─────────────────────────────────────┐
-│  🔽 Filtres et Tri                  │
-├─────────────────────────────────────┤
-│  [Tous] [⭐ Portefeuille] [👁 Watch]│
-│                                      │
-│  ┌──────────────────────────────┐   │
-│  │ 📅 Date modif. (Récent)  ▼  │   │
-│  └──────────────────────────────┘   │
-└─────────────────────────────────────┘
+
+   Filtres et Tri                  
+
+  [Tous] [ Portefeuille] [ Watch]
+                                      
+     
+    Date modif. (Recent)       
+     
+
 ```
 
-### Détails visuels :
-- **Titre :** "Filtres et Tri" avec icône entonnoir (🔽)
+### Details visuels :
+- **Titre :** "Filtres et Tri" avec icone entonnoir ()
 - **3 boutons de filtre :**
-  - **"Tous"** : Bouton bleu (actif par défaut)
-  - **"⭐ Portefeuille"** : Bouton jaune avec étoile
-  - **"👁 Watchlist"** : Bouton bleu avec icône œil
-- **Menu déroulant de tri :**
+  - **"Tous"** : Bouton bleu (actif par defaut)
+  - **" Portefeuille"** : Bouton jaune avec etoile
+  - **" Watchlist"** : Bouton bleu avec icone il
+- **Menu deroulant de tri :**
   - Options disponibles :
-    - 📅 Date modif. (Récent)
-    - 📅 Date modif. (Ancien)
-    - 🔤 Alphabétique (A-Z)
-    - 🔤 Alphabétique (Z-A)
-    - ⭐ Recommandation
-    - 🏢 Secteur
+    -  Date modif. (Recent)
+    -  Date modif. (Ancien)
+    -  Alphabetique (A-Z)
+    -  Alphabetique (Z-A)
+    -  Recommandation
+    -  Secteur
 
 ### Comment tester :
-1. Cliquez sur "Portefeuille" → Seuls les tickers avec étoile jaune s'affichent
-2. Cliquez sur "Watchlist" → Seuls les tickers avec icône œil s'affichent
-3. Changez le tri → Les tickers se réorganisent selon l'option choisie
+1. Cliquez sur "Portefeuille" -> Seuls les tickers avec etoile jaune s'affichent
+2. Cliquez sur "Watchlist" -> Seuls les tickers avec icone il s'affichent
+3. Changez le tri -> Les tickers se reorganisent selon l'option choisie
 
 ---
 
-## 2. 📊 Bouton Rapports Visuels (Header)
+## 2.  Bouton Rapports Visuels (Header)
 
 ### Emplacement
-- **Où :** Dans le Header (en haut à droite), à côté du bouton ⚙️ Settings
-- **Icône :** 📊 (DocumentChartBarIcon)
+- **Ou :** Dans le Header (en haut a droite), a cote du bouton  Settings
+- **Icone :**  (DocumentChartBarIcon)
 
 ### Ce que vous devriez voir :
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  [Nom Ticker]                    [📊] [⚙️]        │
-└─────────────────────────────────────────────────────┘
+
+  [Nom Ticker]                    [] []        
+
 ```
 
-### Détails visuels :
-- **Bouton 📊** : Icône violette/indigo au survol
-- **Position :** Juste avant le bouton ⚙️ Settings
+### Details visuels :
+- **Bouton ** : Icone violette/indigo au survol
+- **Position :** Juste avant le bouton  Settings
 - **Couleur au survol :** Violet (hover:text-purple-600)
 
 ### Comment tester :
-1. Cliquez sur le bouton 📊
+1. Cliquez sur le bouton 
 2. Un panneau modal s'ouvre avec 4 onglets :
-   - 📊 Vue d'ensemble
-   - ⚠️ Qualité des Données
-   - ✅ Sanitisation
-   - 📈 Visualisation Complète
+   -  Vue d'ensemble
+   -  Qualite des Donnees
+   -  Sanitisation
+   -  Visualisation Complete
 
 ---
 
-## 3. 📈 Panneau de Rapports Visuels (Modal)
+## 3.  Panneau de Rapports Visuels (Modal)
 
 ### Emplacement
-- **Où :** S'ouvre en modal plein écran quand vous cliquez sur 📊
+- **Ou :** S'ouvre en modal plein ecran quand vous cliquez sur 
 
 ### Ce que vous devriez voir :
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  📊 Rapports Visuels et Analyse de Données    [X]  │
-│  AAPL - Apple Inc.                                  │
-├─────────────────────────────────────────────────────┤
-│  [📊 Vue] [⚠️ Qualité] [✅ Sanitisation] [📈 Full] │
-├─────────────────────────────────────────────────────┤
-│                                                     │
-│  ┌─────────────────────────────────────────────┐   │
-│  │  📊 Vue d'ensemble                         │   │
-│  │                                             │   │
-│  │  [Données Historiques] [Métriques Valides] │   │
-│  │  [Corrections]                              │   │
-│  │                                             │   │
-│  │  [📈 Qualité] [✅ Sanitisation] [📊 Full]  │   │
-│  └─────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────┘
+
+   Rapports Visuels et Analyse de Donnees    [X]  
+  AAPL - Apple Inc.                                  
+
+  [ Vue] [ Qualite] [ Sanitisation] [ Full] 
+
+                                                     
+     
+     Vue d'ensemble                            
+                                                  
+    [Donnees Historiques] [Metriques Valides]    
+    [Corrections]                                 
+                                                  
+    [ Qualite] [ Sanitisation] [ Full]     
+     
+
 ```
 
 ### Onglets disponibles :
 
-#### 📊 Vue d'ensemble
+####  Vue d'ensemble
 - 3 cartes statistiques :
-  - Données Historiques (nombre d'années)
-  - Métriques Valides (X / 4)
-  - Corrections (nombre de valeurs corrigées)
-- 3 grandes cartes cliquables pour accéder aux rapports détaillés
+  - Donnees Historiques (nombre d'annees)
+  - Metriques Valides (X / 4)
+  - Corrections (nombre de valeurs corrigees)
+- 3 grandes cartes cliquables pour acceder aux rapports detailles
 
-#### ⚠️ Qualité des Données
-- Graphique des Prix Cibles par Métrique (barres colorées)
-- Tableau des Métriques Aberrantes Détectées
-- Tableau des Métriques Valides
-- Graphique d'Évolution des Données Historiques
+####  Qualite des Donnees
+- Graphique des Prix Cibles par Metrique (barres colorees)
+- Tableau des Metriques Aberrantes Detectees
+- Tableau des Metriques Valides
+- Graphique d'Evolution des Donnees Historiques
 - Tableau des Valeurs Aberrantes Historiques
-- 3 cartes statistiques (Médiane, Écart-Type, Métriques Valides)
+- 3 cartes statistiques (Mediane, Ecart-Type, Metriques Valides)
 
-#### ✅ Rapport de Sanitisation
-- Graphique de comparaison Avant/Après (barres)
-- Tableau détaillé des corrections avec :
-  - Paramètre
+####  Rapport de Sanitisation
+- Graphique de comparaison Avant/Apres (barres)
+- Tableau detaille des corrections avec :
+  - Parametre
   - Valeur Originale (rouge)
-  - → (flèche)
-  - Valeur Sanitisée (vert)
+  - -> (fleche)
+  - Valeur Sanitisee (vert)
   - Changement et %
   - Raison
-- 4 cartes statistiques par catégorie
+- 4 cartes statistiques par categorie
 
-#### 📈 Visualisation Complète
+####  Visualisation Complete
 - 5 graphiques :
-  1. Données Financières Principales (EPS, CF, BV, DIV)
-  2. Évolution des Prix (High/Low/Avg)
+  1. Donnees Financieres Principales (EPS, CF, BV, DIV)
+  2. Evolution des Prix (High/Low/Avg)
   3. Ratios de Valorisation (P/E, P/CF, P/BV)
   4. Taux de Croissance Annuel
-  5. Corrélation Ratios vs Prix (scatter plot)
+  5. Correlation Ratios vs Prix (scatter plot)
 - 3 cartes statistiques (EPS, CF, BV)
 
 ---
 
-## 4. 🔍 Filtres dans la Sidebar
+## 4.  Filtres dans la Sidebar
 
 ### Comportement attendu :
 
@@ -152,81 +152,81 @@
 - Compteur en haut : "X" (nombre total)
 
 #### Filtre "Portefeuille"
-- Affiche uniquement les tickers avec ⭐ (étoile jaune)
-- Compteur mis à jour automatiquement
+- Affiche uniquement les tickers avec  (etoile jaune)
+- Compteur mis a jour automatiquement
 - Bouton devient jaune quand actif
 
 #### Filtre "Watchlist"
-- Affiche uniquement les tickers avec 👁️ (icône œil)
-- Compteur mis à jour automatiquement
+- Affiche uniquement les tickers avec  (icone il)
+- Compteur mis a jour automatiquement
 - Bouton devient bleu quand actif
 
 ---
 
-## 5. 🔄 Options de Tri
+## 5.  Options de Tri
 
 ### Comportement attendu :
 
-#### 📅 Date modif. (Récent)
-- Les tickers les plus récemment modifiés en premier
-- Ordre décroissant par date
+####  Date modif. (Recent)
+- Les tickers les plus recemment modifies en premier
+- Ordre decroissant par date
 
-#### 📅 Date modif. (Ancien)
-- Les tickers les plus anciennement modifiés en premier
+####  Date modif. (Ancien)
+- Les tickers les plus anciennement modifies en premier
 - Ordre croissant par date
 
-#### 🔤 Alphabétique (A-Z)
-- Tickers triés par symbole de A à Z
+####  Alphabetique (A-Z)
+- Tickers tries par symbole de A a Z
 - Ordre croissant
 
-#### 🔤 Alphabétique (Z-A)
-- Tickers triés par symbole de Z à A
-- Ordre décroissant
+####  Alphabetique (Z-A)
+- Tickers tries par symbole de Z a A
+- Ordre decroissant
 
-#### ⭐ Recommandation
-- Ordre : ACHAT (vert) → CONSERVER (jaune) → VENTE (rouge)
-- Basé sur le calcul automatique de recommandation
+####  Recommandation
+- Ordre : ACHAT (vert) -> CONSERVER (jaune) -> VENTE (rouge)
+- Base sur le calcul automatique de recommandation
 
-#### 🏢 Secteur
-- Tickers triés par secteur d'activité
-- Ordre alphabétique des secteurs
+####  Secteur
+- Tickers tries par secteur d'activite
+- Ordre alphabetique des secteurs
 
 ---
 
-## ✅ Checklist de Vérification
+##  Checklist de Verification
 
 - [ ] La section "Recherche Rapide" avec les liens externes a disparu
-- [ ] La section "Filtres et Tri" apparaît en bas de la sidebar
+- [ ] La section "Filtres et Tri" apparait en bas de la sidebar
 - [ ] Les 3 boutons de filtre fonctionnent (Tous, Portefeuille, Watchlist)
-- [ ] Le menu déroulant de tri fonctionne et réorganise les tickers
-- [ ] Le bouton 📊 apparaît dans le Header (à côté de ⚙️)
-- [ ] Le panneau de rapports s'ouvre au clic sur 📊
+- [ ] Le menu deroulant de tri fonctionne et reorganise les tickers
+- [ ] Le bouton  apparait dans le Header (a cote de )
+- [ ] Le panneau de rapports s'ouvre au clic sur 
 - [ ] Les 4 onglets du panneau de rapports sont accessibles
 - [ ] Les graphiques et tableaux s'affichent correctement
 
 ---
 
-## 🐛 Si vous ne voyez pas les modifications
+##  Si vous ne voyez pas les modifications
 
 1. **Vider le cache :**
    - Chrome/Edge : `Ctrl+Shift+R` (Windows) ou `Cmd+Shift+R` (Mac)
    - Firefox : `Ctrl+F5` ou `Cmd+Shift+R`
    - Safari : `Cmd+Option+R`
 
-2. **Navigation privée :**
-   - Ouvrir une fenêtre de navigation privée
+2. **Navigation privee :**
+   - Ouvrir une fenetre de navigation privee
    - Aller sur https://gobapps.com/3p1/dist/index.html
 
-3. **Vérifier la console :**
-   - Ouvrir les outils développeur (F12)
-   - Vérifier s'il y a des erreurs JavaScript
+3. **Verifier la console :**
+   - Ouvrir les outils developpeur (F12)
+   - Verifier s'il y a des erreurs JavaScript
 
-4. **Vérifier l'URL :**
-   - S'assurer d'être sur `/3p1/dist/index.html` et non `/3p1/index.html`
+4. **Verifier l'URL :**
+   - S'assurer d'etre sur `/3p1/dist/index.html` et non `/3p1/index.html`
 
 ---
 
-## 📝 Notes Techniques
+##  Notes Techniques
 
 - Les modifications sont dans `public/3p1/components/Sidebar.tsx`
 - Les composants de rapports sont dans :
@@ -234,6 +234,6 @@
   - `public/3p1/components/SanitizationReport.tsx`
   - `public/3p1/components/FullDataVisualization.tsx`
   - `public/3p1/components/ReportsPanel.tsx`
-- Le build a été effectué : `npm run build` dans `public/3p1/`
-- Les fichiers compilés sont dans `public/3p1/dist/assets/index.js`
+- Le build a ete effectue : `npm run build` dans `public/3p1/`
+- Les fichiers compiles sont dans `public/3p1/dist/assets/index.js`
 

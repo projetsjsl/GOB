@@ -43,25 +43,25 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
     const cleanText = (value: string | null | undefined) => {
         if (!value) return '';
         return value
-            .replace(/Ã©/g, 'é')
-            .replace(/Ã¨/g, 'è')
-            .replace(/Ã /g, 'à')
-            .replace(/Ã§/g, 'ç')
-            .replace(/Ã´/g, 'ô')
-            .replace(/Ã¢/g, 'â')
-            .replace(/Ã®/g, 'î')
-            .replace(/Ã¯/g, 'ï')
-            .replace(/Ã¹/g, 'ù')
-            .replace(/Ã»/g, 'û')
-            .replace(/Ã«/g, 'ë')
-            .replace(/Ã¤/g, 'ä')
-            .replace(/Ã¶/g, 'ö')
-            .replace(/Ã¼/g, 'ü')
-            .replace(/â€™/g, "'")
-            .replace(/â€œ/g, '“')
-            .replace(/â€�/g, '”')
-            .replace(/â€“/g, '–')
-            .replace(/â€”/g, '—');
+            .replace(/A/g, 'e')
+            .replace(/A /g, 'e')
+            .replace(/A /g, 'a')
+            .replace(/A/g, 'c')
+            .replace(/A /g, 'o')
+            .replace(/A/g, 'a')
+            .replace(/A/g, 'i')
+            .replace(/A /g, 'i')
+            .replace(/A1/g, 'u')
+            .replace(/A"/g, 'u')
+            .replace(/A"/g, 'e')
+            .replace(/A/g, 'a')
+            .replace(/A/g, 'o')
+            .replace(/A14/g, 'u')
+            .replace(/aEURTM/g, "'")
+            .replace(/aEUR/g, '"')
+            .replace(/aEUR/g, '"')
+            .replace(/aEUR"/g, '-')
+            .replace(/aEUR"/g, '-');
     };
 
     const getGradeColor = (grade?: string | number) => {
@@ -79,18 +79,18 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                     <div className="flex justify-between items-center">
                         <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Scrapping SA</h2>
+                        }`}> Scrapping SA</h2>
                         <div className="flex gap-2">
                             <span className={`text-sm transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
                             }`}>
-                                Outils d'administration déplacés vers l'onglet Admin-JSLAI
+                                Outils d'administration deplaces vers l'onglet Admin-JSLAI
                             </span>
                         </div>
                     </div>
 
 
-                    {/* Fiche détaillée du titre sélectionné */}
+                    {/* Fiche detaillee du titre selectionne */}
                     {selectedStock && (
                         <div className="seeking-alpha-card rounded-lg p-6 border border-gray-600">
                             <div className="flex justify-between items-start mb-4">
@@ -99,11 +99,11 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                     onClick={() => handleSelectStock(null)}
                                     className="text-blue-400 hover:text-blue-300"
                                 >
-                                    ✕ Fermer
+                                     Fermer
                                 </button>
                             </div>
                             
-                            {/* Fiche détaillée comme dans les images */}
+                            {/* Fiche detaillee comme dans les images */}
                             {(() => {
                                 const claudeData = seekingAlphaStockMap?.[selectedStock];
                                 const seekingAlphaItem = seekingAlphaStocks?.find(s => s.ticker === selectedStock);
@@ -125,18 +125,18 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                         onClick={() => handleSelectStock(null)}
                                                         className="text-white hover:text-gray-200 text-xl"
                                                     >
-                                                        ✕
+                                                        
                                                     </button>
                                                 </div>
                                             </div>
 
                                             {/* Contenu principal */}
                                             <div className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
-                                                {/* Métriques Clés */}
+                                                {/* Metriques Cles */}
                                                 <div>
                                                     <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
                                                         <div className="w-1 h-6 bg-green-600 mr-3"></div>
-                                                        Métriques Clés
+                                                        Metriques Cles
                                                     </h4>
                                                     <div className="grid grid-cols-3 gap-4">
                                                         <div className="bg-gray-50 rounded-lg p-4">
@@ -160,7 +160,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                             <div className="text-green-600 font-bold text-lg">{claudeData?.metrics?.dividendYield || 'N/A'}</div>
                                                         </div>
                                                         <div className="bg-gray-50 rounded-lg p-4">
-                                                            <div className="text-gray-600 text-sm">Fréquence</div>
+                                                            <div className="text-gray-600 text-sm">Frequence</div>
                                                             <div className="text-gray-800 font-bold text-lg">{claudeData?.metrics?.dividendFrequency || 'N/A'}</div>
                                                         </div>
                                                         <div className="bg-gray-50 rounded-lg p-4">
@@ -235,7 +235,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                 {claudeData?.strengths && (
                                                     <div className="bg-green-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-green-800 mb-4 flex items-center">
-                                                            <span className="mr-2">✅</span>
+                                                            <span className="mr-2"></span>
                                                             Points Positifs
                                                         </h4>
                                                         <div className="space-y-3">
@@ -248,17 +248,17 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                     </div>
                                                 )}
 
-                                                {/* Préoccupations */}
+                                                {/* Preoccupations */}
                                                 {claudeData?.concerns && (
                                                     <div className="bg-red-50 rounded-lg p-4">
                                                         <h4 className="text-lg font-bold text-red-800 mb-4 flex items-center">
-                                                            <span className="mr-2">⚠️</span>
-                                                            Préoccupations
+                                                            <span className="mr-2"></span>
+                                                            Preoccupations
                                                         </h4>
                                                         <div className="space-y-3">
                                                             {claudeData.concerns.map((concern, index) => (
                                                                 <div key={index} className="text-red-700 flex items-start">
-                                                                    <span className="mr-2">⚠️</span>
+                                                                    <span className="mr-2"></span>
                                                                     <span>{cleanText(concern)}</span>
                                                                 </div>
                                                             ))}
@@ -293,7 +293,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                             rel="noopener noreferrer"
                                                             className="inline-flex items-center px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
                                                         >
-                                                            Lire l'analyse complète sur Seeking Alpha →
+                                                            Lire l'analyse complete sur Seeking Alpha →
                                                         </a>
                                                     </div>
                                                 )}
@@ -313,7 +313,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                     return (
                                         <div className="mb-4">
                                             <h4 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                                                <Icon emoji="📈" size={20} />
+                                                <Icon emoji="" size={20} />
                                                 Analyse Seeking Alpha
                                             </h4>
                                             <div className="text-gray-200 text-sm leading-relaxed">
@@ -325,7 +325,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                 rel="noopener noreferrer"
                                                 className="inline-block mt-2 text-blue-300 hover:text-blue-200 underline"
                                             >
-                                                Lire l'analyse complète sur Seeking Alpha →
+                                                Lire l'analyse complete sur Seeking Alpha →
                                             </a>
                                         </div>
                                     );
@@ -333,12 +333,12 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                 return null;
                             })()}
                             
-                            {/* Données en temps réel */}
+                            {/* Donnees en temps reel */}
                             {stockData[selectedStock] && (
                                 <div className="mb-4">
                                     <h4 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                                        <Icon emoji="📊" size={20} />
-                                        Données Temps Réel
+                                        <Icon emoji="" size={20} />
+                                        Donnees Temps Reel
                                     </h4>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
                                         <div>
@@ -359,16 +359,16 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                         </div>
                     )}
 
-                    {/* Liste des tickers disponibles si aucune donnée Seeking Alpha */}
+                    {/* Liste des tickers disponibles si aucune donnee Seeking Alpha */}
                     {!selectedStock && (!seekingAlphaStocks || seekingAlphaStocks.length === 0) && tickers.length > 0 && (
                         <div className={`backdrop-blur-sm rounded-lg p-6 border transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800/50 border-gray-700' : 'bg-gray-50 border-gray-200'
                         }`}>
                             <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                📊 Tickers disponibles ({tickers.length})
+                                 Tickers disponibles ({tickers.length})
                             </h3>
                             <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                Cliquez sur un ticker pour voir ses détails ou lancez le scraper pour collecter les données Seeking Alpha.
+                                Cliquez sur un ticker pour voir ses details ou lancez le scraper pour collecter les donnees Seeking Alpha.
                             </p>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                                 {tickers.map((ticker) => (
@@ -401,8 +401,8 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
                             <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                                <Icon emoji="📈" size={20} />
-                                Analyses Complètes
+                                <Icon emoji="" size={20} />
+                                Analyses Completes
                             </h3>
                                 <div className="flex bg-gray-700 rounded-lg p-1">
                                     <button
@@ -413,7 +413,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                 : 'text-gray-300 hover:text-white'
                                         }`}
                                     >
-                                        📋 Liste
+                                         Liste
                                     </button>
                                     <button
                                         onClick={() => setSeekingAlphaViewMode('cards')}
@@ -423,7 +423,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                 : 'text-gray-300 hover:text-white'
                                         }`}
                                     >
-                                        🎴 Cartes
+                                         Cartes
                                     </button>
                                 </div>
                             </div>
@@ -432,7 +432,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                             {seekingAlphaViewMode === 'list' && (
                                 <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
                                     <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                                        <Icon emoji="📋" size={20} />
+                                        <Icon emoji="" size={20} />
                                         Vue Liste - Analyses
                                     </h4>
                                     <div className="overflow-x-auto">
@@ -458,7 +458,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                 const claudeData = seekingAlphaStockMap?.[stock.ticker];
                                 const parsedData = stock.parsedData;
                                                     
-                                                    // Priorité: Claude > Parsed
+                                                    // Priorite: Claude > Parsed
                                                     const price = claudeData?.metrics?.price || parsedData?.price || 'N/A';
                                                     const change = claudeData?.metrics?.priceChange || parsedData?.change || 'N/A';
                                                     const peRatio = claudeData?.metrics?.peRatio || parsedData?.peRatio || 'N/A';
@@ -603,7 +603,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                             </div>
                                         </div>
 
-                                        {/* Métriques clés */}
+                                        {/* Metriques cles */}
                                         <div className="space-y-3 mb-6">
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-gray-400">Market Cap</span>
@@ -656,7 +656,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                                     onClick={(e) => e.stopPropagation()}
                                                     className="block w-full px-4 py-2 bg-gray-800 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors text-center"
                                                 >
-                                                    📰 Lire sur Seeking Alpha →
+                                                     Lire sur Seeking Alpha →
                                                 </a>
                                             </div>
                                         )}
@@ -664,8 +664,8 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                         {/* Call to action */}
                                         <div className="text-center">
                                             <div className="flex items-center justify-center gap-2 text-gray-400 text-sm">
-                                                <span>👆</span>
-                                                <span>Cliquez pour le rapport détaillé</span>
+                                                <span></span>
+                                                <span>Cliquez pour le rapport detaille</span>
                                             </div>
                                         </div>
                                     </div>
@@ -684,7 +684,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                     }`}>
                         <h3 className={`text-lg font-semibold mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>🔧 Outils de Scraping</h3>
+                        }`}> Outils de Scraping</h3>
                         
                         {/* Statut du scraping */}
                         <div className="mb-4">
@@ -698,10 +698,10 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                                     scrapingStatus === 'completed' ? 'bg-green-500 text-white' :
                                     'bg-red-500 text-white'
                                 }`}>
-                                    {scrapingStatus === 'idle' ? '⏸️ En attente' :
-                                     scrapingStatus === 'running' ? '🔄 En cours' :
-                                     scrapingStatus === 'completed' ? '✅ Terminé' :
-                                     '❌ Erreur'}
+                                    {scrapingStatus === 'idle' ? ' En attente' :
+                                     scrapingStatus === 'running' ? ' En cours' :
+                                     scrapingStatus === 'completed' ? ' Termine' :
+                                     ' Erreur'}
                                 </span>
                         </div>
 
@@ -730,18 +730,18 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                         }`}>
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📖 Instructions de Scraping</h4>
+                            }`}> Instructions de Scraping</h4>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-blue-200' : 'text-blue-800'
                             }`}>
-                                <div>• <strong>Méthode 1:</strong> Cliquez sur "🚀 Lancer le Scraper" pour ouvrir les pages</div>
-                                <div>• <strong>Méthode 2:</strong> Cliquez sur "📋 Script F12" pour copier un script</div>
-                                <div>• <strong>Étapes:</strong> Ouvrez F12 → Console → Collez le script → Entrée</div>
-                                <div>• <strong>Résultat:</strong> Les données seront affichées et copiées automatiquement</div>
+                                <div>- <strong>Methode 1:</strong> Cliquez sur " Lancer le Scraper" pour ouvrir les pages</div>
+                                <div>- <strong>Methode 2:</strong> Cliquez sur " Script F12" pour copier un script</div>
+                                <div>- <strong>Etapes:</strong> Ouvrez F12 → Console → Collez le script → Entree</div>
+                                <div>- <strong>Resultat:</strong> Les donnees seront affichees et copiees automatiquement</div>
                             </div>
                         </div>
 
-                        {/* Aide pour les popups bloqués */}
+                        {/* Aide pour les popups bloques */}
                         <div className={`rounded-lg p-4 mb-4 transition-colors duration-300 ${
                             isDarkMode 
                                 ? 'bg-yellow-900/30' 
@@ -749,14 +749,14 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                         }`}>
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>🔧 Résolution des Popups Bloqués</h4>
+                            }`}> Resolution des Popups Bloques</h4>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-yellow-200' : 'text-yellow-800'
                             }`}>
-                                <div>• <strong>Chrome/Edge:</strong> Cliquez sur l'icône popup dans la barre d'adresse → "Toujours autoriser"</div>
-                                <div>• <strong>Firefox:</strong> Cliquez sur l'icône bouclier → "Désactiver la protection"</div>
-                                <div>• <strong>Safari:</strong> Safari → Préférences → Sites web → Pop-ups → Autoriser</div>
-                                <div>• <strong>Alternative:</strong> Utilisez le bouton "🌐 Ouvrir Seeking Alpha" ou le script F12</div>
+                                <div>- <strong>Chrome/Edge:</strong> Cliquez sur l'icone popup dans la barre d'adresse → "Toujours autoriser"</div>
+                                <div>- <strong>Firefox:</strong> Cliquez sur l'icone bouclier → "Desactiver la protection"</div>
+                                <div>- <strong>Safari:</strong> Safari → Preferences → Sites web → Pop-ups → Autoriser</div>
+                                <div>- <strong>Alternative:</strong> Utilisez le bouton " Ouvrir Seeking Alpha" ou le script F12</div>
                             </div>
                         </div>
 
@@ -769,16 +769,16 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                            <Icon emoji="🤖" size={18} className="mr-2 inline-block" />
+                            <Icon emoji="" size={18} className="mr-2 inline-block" />
                             Configuration des API
                         </h4>
                             <div className={`text-sm space-y-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-green-200' : 'text-green-800'
                             }`}>
-                                <div>• <strong>Claude API:</strong> Configurez ANTHROPIC_API_KEY pour l'analyse automatique</div>
-                                <div>• <strong>GitHub API:</strong> Configurez GITHUB_TOKEN pour la mise à jour des fichiers</div>
-                                <div>• <strong>Fonctionnalité:</strong> Scraping → Analyse Perplexity → Mise à jour JSON automatique</div>
-                                <div>• <strong>Bouton:</strong> "🤖 Analyser avec Claude" pour traiter les données existantes</div>
+                                <div>- <strong>Claude API:</strong> Configurez ANTHROPIC_API_KEY pour l'analyse automatique</div>
+                                <div>- <strong>GitHub API:</strong> Configurez GITHUB_TOKEN pour la mise a jour des fichiers</div>
+                                <div>- <strong>Fonctionnalite:</strong> Scraping → Analyse Perplexity → Mise a jour JSON automatique</div>
+                                <div>- <strong>Bouton:</strong> " Analyser avec Claude" pour traiter les donnees existantes</div>
                             </div>
                         </div>
 
@@ -790,7 +790,7 @@ export const ScrappingSATab: React.FC<TabProps> = (props) => {
                         }`}>
                             <h4 className={`font-medium mb-2 transition-colors duration-300 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                            }`}>📋 Logs de Scraping</h4>
+                            }`}> Logs de Scraping</h4>
                             {scrapingLogs.length === 0 ? (
                                 <div className={`text-sm transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-500'

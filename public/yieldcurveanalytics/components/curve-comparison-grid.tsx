@@ -65,7 +65,7 @@ const MaturityColumn = memo(function MaturityColumn({
           </div>
         </div>
       ) : (
-        <div className="text-[10px] text-gray-600">—</div>
+        <div className="text-[10px] text-gray-600">-</div>
       )}
 
       {/* CA Rate - LINE 2 with performance */}
@@ -84,14 +84,14 @@ const MaturityColumn = memo(function MaturityColumn({
           </div>
         </div>
       ) : (
-        <div className="text-[10px] text-gray-600">—</div>
+        <div className="text-[10px] text-gray-600">-</div>
       )}
 
       {/* Spread US-CA - LINE 3 */}
       {spread !== null && (
         <div className="flex justify-center items-center gap-1 text-[9px] text-emerald-400 font-semibold">
           <span>
-            Écart: {spread >= 0 ? "+" : ""}
+            Ecart: {spread >= 0 ? "+" : ""}
             {spread.toFixed(0)} pb
           </span>
           <span>{getChangeIcon(usChange - caChange)}</span>
@@ -130,8 +130,8 @@ export const CurveComparisonGrid = memo(function CurveComparisonGrid({
     <div className="space-y-3">
       {/* Title */}
       <div>
-        <h3 className="text-sm font-semibold">Courbes des Taux - Comparaison Complète</h3>
-        <p className="text-xs text-muted-foreground">Taux et variations du jour par maturité</p>
+        <h3 className="text-sm font-semibold">Courbes des Taux - Comparaison Complete</h3>
+        <p className="text-xs text-muted-foreground">Taux et variations du jour par maturite</p>
       </div>
 
       {/* Horizontal Grid */}
@@ -161,7 +161,7 @@ export const CurveComparisonGrid = memo(function CurveComparisonGrid({
       <div className="flex flex-wrap gap-4 text-[10px] text-muted-foreground">
         <div className="flex items-center gap-1.5">
           <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-          <span>États-Unis (FRED)</span>
+          <span>Etats-Unis (FRED)</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="h-2 w-2 rounded-full bg-red-500"></div>

@@ -118,7 +118,7 @@ const AnalystConsensusModal = ({ symbol, stockData, onClose }) => {
                     },
                     estimates: []
                 });
-                setError('Aucune donnée d\'analystes disponible pour ce symbole');
+                setError('Aucune donnee d\'analystes disponible pour ce symbole');
             }
 
         } catch (err) {
@@ -159,7 +159,7 @@ const AnalystConsensusModal = ({ symbol, stockData, onClose }) => {
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-white">Analyst Consensus</h2>
-                            <p className="text-gray-400 text-sm">{symbol} • Expert estimates & ratings</p>
+                            <p className="text-gray-400 text-sm">{symbol} - Expert estimates & ratings</p>
                         </div>
                     </div>
                     <button title="Action"
@@ -278,7 +278,7 @@ const AnalystConsensusModal = ({ symbol, stockData, onClose }) => {
                                 <div className="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
                                     <h3 className="text-lg font-bold text-white mb-4">Historical Estimates</h3>
                                     <p className="text-gray-400 text-center py-4">
-                                        Aucune donnée historique disponible pour ce symbole
+                                        Aucune donnee historique disponible pour ce symbole
                                     </p>
                                 </div>
                             )}

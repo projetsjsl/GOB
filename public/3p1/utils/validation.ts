@@ -242,7 +242,7 @@ export const validateProfile = (
 };
 
 /**
- * Cache pour les paramètres de validation (évite les appels API répétés)
+ * Cache pour les parametres de validation (evite les appels API repetes)
  */
 let validationSettingsCache: {
   settings: any;
@@ -252,10 +252,10 @@ let validationSettingsCache: {
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 /**
- * Charge les paramètres de validation depuis l'API (avec cache)
+ * Charge les parametres de validation depuis l'API (avec cache)
  */
 async function loadValidationSettingsWithCache(): Promise<any> {
-  // Vérifier le cache
+  // Verifier le cache
   if (validationSettingsCache && Date.now() - validationSettingsCache.timestamp < CACHE_DURATION) {
     return validationSettingsCache.settings;
   }
@@ -276,8 +276,8 @@ async function loadValidationSettingsWithCache(): Promise<any> {
     console.warn('Failed to load validation settings, using defaults:', error);
   }
 
-  // Retourner les valeurs par défaut (limites MODÉRÉES - baseline "balanced" sector)
-  // Note: KPIDashboard.tsx utilise des guardrails spécifiques par secteur
+  // Retourner les valeurs par defaut (limites MODEREES - baseline "balanced" sector)
+  // Note: KPIDashboard.tsx utilise des guardrails specifiques par secteur
   return {
     growth_min: -18.00,
     growth_max: 15.00,    // Moderate: balanced between value (10%) and growth (18%)
@@ -300,7 +300,7 @@ async function loadValidationSettingsWithCache(): Promise<any> {
 }
 
 /**
- * Invalide le cache des paramètres de validation
+ * Invalide le cache des parametres de validation
  */
 export function invalidateValidationSettingsCache() {
   validationSettingsCache = null;
@@ -308,16 +308,16 @@ export function invalidateValidationSettingsCache() {
 
 /**
  * SANITIZE ASSUMPTIONS - Corrige les valeurs aberrantes avant sauvegarde
- * Cette fonction doit être appelée AVANT chaque sauvegarde Supabase
+ * Cette fonction doit etre appelee AVANT chaque sauvegarde Supabase
  * 
- * Utilise les paramètres personnalisés depuis Supabase si disponibles,
- * sinon utilise les valeurs par défaut.
+ * Utilise les parametres personnalises depuis Supabase si disponibles,
+ * sinon utilise les valeurs par defaut.
  */
 export const sanitizeAssumptions = async (assumptions: Partial<Assumptions>): Promise<Assumptions> => {
-  // Charger les paramètres de validation (avec cache)
+  // Charger les parametres de validation (avec cache)
   const validationSettings = await loadValidationSettingsWithCache();
 
-  // Valeurs par défaut sécurisées
+  // Valeurs par defaut securisees
   const safeDefaults: Assumptions = {
     currentPrice: 0,
     currentDividend: 0,
@@ -350,7 +350,7 @@ export const sanitizeAssumptions = async (assumptions: Partial<Assumptions>): Pr
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   };
 
-  // Extraire les limites depuis les paramètres de validation
+  // Extraire les limites depuis les parametres de validation
   const growthMin = validationSettings.growth_min ?? -20;
   const growthMax = validationSettings.growth_max ?? 20;
   const growthPrecision = validationSettings.growth_precision ?? 2;
@@ -358,7 +358,7 @@ export const sanitizeAssumptions = async (assumptions: Partial<Assumptions>): Pr
   const yieldPrecision = validationSettings.yield_precision ?? 2;
 
   const sanitized: Assumptions = {
-    // Prix actuel: doit être > 0
+    // Prix actuel: doit etre > 0
     currentPrice: assumptions.currentPrice && assumptions.currentPrice > 0 && isFinite(assumptions.currentPrice)
       ? round(assumptions.currentPrice, 2)
       : safeDefaults.currentPrice,
@@ -368,13 +368,13 @@ export const sanitizeAssumptions = async (assumptions: Partial<Assumptions>): Pr
       ? round(assumptions.currentDividend, 4)
       : safeDefaults.currentDividend,
     
-    // Année de base: doit être récente
+    // Annee de base: doit etre recente
     baseYear: assumptions.baseYear && assumptions.baseYear >= 2015 && assumptions.baseYear <= new Date().getFullYear() + 1
       ? assumptions.baseYear
       : safeDefaults.baseYear,
     
-    // TAUX DE CROISSANCE: Utilise les limites personnalisées
-    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0)
+    // TAUX DE CROISSANCE: Utilise les limites personnalisees
+    //  CRITIQUE : Preserver undefined pour eviter les valeurs inventees (0)
     growthRateEPS: assumptions.growthRateEPS !== undefined 
       ? round(clamp(assumptions.growthRateEPS, growthMin, growthMax, safeDefaults.growthRateEPS)!, growthPrecision)
       : undefined,
@@ -391,8 +391,8 @@ export const sanitizeAssumptions = async (assumptions: Partial<Assumptions>): Pr
       ? round(clamp(assumptions.growthRateDiv, growthMin, growthMax, safeDefaults.growthRateDiv)!, growthPrecision)
       : undefined,
     
-    // RATIOS CIBLES: Utilise les limites personnalisées
-    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0)
+    // RATIOS CIBLES: Utilise les limites personnalisees
+    //  CRITIQUE : Preserver undefined pour eviter les valeurs inventees (0)
     targetPE: assumptions.targetPE !== undefined 
       ? round(clamp(assumptions.targetPE, validationSettings.target_pe_min ?? 5, validationSettings.target_pe_max ?? 50, safeDefaults.targetPE)!, ratioPrecision)
       : undefined,
@@ -406,49 +406,49 @@ export const sanitizeAssumptions = async (assumptions: Partial<Assumptions>): Pr
       ? round(clamp(assumptions.targetYield, validationSettings.target_yield_min ?? 0, validationSettings.target_yield_max ?? 15, safeDefaults.targetYield)!, yieldPrecision)
       : undefined,
     
-    // Autres paramètres
+    // Autres parametres
     requiredReturn: round(clamp(assumptions.requiredReturn, validationSettings.required_return_min ?? 5, validationSettings.required_return_max ?? 25, safeDefaults.requiredReturn), ratioPrecision),
     dividendPayoutRatio: round(clamp(assumptions.dividendPayoutRatio, validationSettings.dividend_payout_ratio_min ?? 0, validationSettings.dividend_payout_ratio_max ?? 100, safeDefaults.dividendPayoutRatio), ratioPrecision),
     
-    // Exclusions: préserver les valeurs booléennes
+    // Exclusions: preserver les valeurs booleennes
     excludeEPS: assumptions.excludeEPS ?? safeDefaults.excludeEPS,
     excludeCF: assumptions.excludeCF ?? safeDefaults.excludeCF,
     excludeBV: assumptions.excludeBV ?? safeDefaults.excludeBV,
     excludeDIV: assumptions.excludeDIV ?? safeDefaults.excludeDIV
   };
 
-  // Log si des corrections ont été faites
+  // Log si des corrections ont ete faites
   const corrections: string[] = [];
   
   if (assumptions.growthRateEPS !== undefined && assumptions.growthRateEPS !== sanitized.growthRateEPS) {
-    corrections.push(`growthRateEPS: ${assumptions.growthRateEPS} → ${sanitized.growthRateEPS}`);
+    corrections.push(`growthRateEPS: ${assumptions.growthRateEPS} -> ${sanitized.growthRateEPS}`);
   }
   if (assumptions.growthRateCF !== undefined && assumptions.growthRateCF !== sanitized.growthRateCF) {
-    corrections.push(`growthRateCF: ${assumptions.growthRateCF} → ${sanitized.growthRateCF}`);
+    corrections.push(`growthRateCF: ${assumptions.growthRateCF} -> ${sanitized.growthRateCF}`);
   }
   if (assumptions.targetPE !== undefined && assumptions.targetPE !== sanitized.targetPE) {
-    corrections.push(`targetPE: ${assumptions.targetPE} → ${sanitized.targetPE}`);
+    corrections.push(`targetPE: ${assumptions.targetPE} -> ${sanitized.targetPE}`);
   }
   if (assumptions.targetPCF !== undefined && assumptions.targetPCF !== sanitized.targetPCF) {
-    corrections.push(`targetPCF: ${assumptions.targetPCF} → ${sanitized.targetPCF}`);
+    corrections.push(`targetPCF: ${assumptions.targetPCF} -> ${sanitized.targetPCF}`);
   }
   if (assumptions.targetPBV !== undefined && assumptions.targetPBV !== sanitized.targetPBV) {
-    corrections.push(`targetPBV: ${assumptions.targetPBV} → ${sanitized.targetPBV}`);
+    corrections.push(`targetPBV: ${assumptions.targetPBV} -> ${sanitized.targetPBV}`);
   }
 
   if (corrections.length > 0) {
-    console.log(`🔧 Assumptions sanitized: ${corrections.join(', ')}`);
+    console.log(` Assumptions sanitized: ${corrections.join(', ')}`);
   }
 
   return sanitized;
 };
 
 /**
- * Version synchrone de sanitizeAssumptions (utilise les valeurs par défaut)
- * Pour compatibilité avec le code existant
+ * Version synchrone de sanitizeAssumptions (utilise les valeurs par defaut)
+ * Pour compatibilite avec le code existant
  */
 export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assumptions => {
-  // Valeurs par défaut sécurisées
+  // Valeurs par defaut securisees
   const safeDefaults: Assumptions = {
     currentPrice: 0,
     currentDividend: 0,
@@ -471,11 +471,11 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
   };
 
   // Helper pour limiter une valeur dans une plage
-  // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0) dans les profils squelettes
+  //  CRITIQUE : Preserver undefined pour eviter les valeurs inventees (0) dans les profils squelettes
   const clamp = (value: number | undefined | null, min: number, max: number, defaultVal: number): number | undefined => {
-    // ✅ Si undefined, retourner undefined (ne pas utiliser la valeur par défaut)
+    //  Si undefined, retourner undefined (ne pas utiliser la valeur par defaut)
     if (value === undefined) return undefined;
-    // ✅ Si null ou NaN, utiliser la valeur par défaut
+    //  Si null ou NaN, utiliser la valeur par defaut
     if (value === null || !isFinite(value)) return defaultVal;
     return Math.max(min, Math.min(value, max));
   };
@@ -485,8 +485,8 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
     return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
   };
 
-  // Utiliser les valeurs du cache si disponibles, sinon valeurs par défaut (limites MODÉRÉES)
-  // Note: KPIDashboard.tsx applique des guardrails spécifiques par secteur
+  // Utiliser les valeurs du cache si disponibles, sinon valeurs par defaut (limites MODEREES)
+  // Note: KPIDashboard.tsx applique des guardrails specifiques par secteur
   const settings = validationSettingsCache?.settings || {
     growth_min: -18,
     growth_max: 15,       // Moderate: balanced between value (10%) and growth (18%)
@@ -507,8 +507,8 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
     yield_precision: 2
   };
 
-  // ✅ CRITIQUE : Créer un objet avec undefined préservé, puis utiliser un cast pour le type
-  // Cela permet de préserver les undefined dans les profils squelettes sans casser le type Assumptions
+  //  CRITIQUE : Creer un objet avec undefined preserve, puis utiliser un cast pour le type
+  // Cela permet de preserver les undefined dans les profils squelettes sans casser le type Assumptions
   const sanitized: any = {
     currentPrice: assumptions.currentPrice && assumptions.currentPrice > 0 && isFinite(assumptions.currentPrice)
       ? round(assumptions.currentPrice, 2)
@@ -522,7 +522,7 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
       ? assumptions.baseYear
       : safeDefaults.baseYear,
     
-    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0) dans les profils squelettes
+    //  CRITIQUE : Preserver undefined pour eviter les valeurs inventees (0) dans les profils squelettes
     growthRateEPS: assumptions.growthRateEPS !== undefined 
       ? (() => { const clamped = clamp(assumptions.growthRateEPS, settings.growth_min, settings.growth_max, safeDefaults.growthRateEPS); return clamped !== undefined ? round(clamped, settings.growth_precision) : undefined; })()
       : undefined,
@@ -539,7 +539,7 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
       ? (() => { const clamped = clamp(assumptions.growthRateDiv, settings.growth_min, settings.growth_max, safeDefaults.growthRateDiv); return clamped !== undefined ? round(clamped, settings.growth_precision) : undefined; })()
       : undefined,
     
-    // ✅ CRITIQUE : Préserver undefined pour éviter les valeurs inventées (0)
+    //  CRITIQUE : Preserver undefined pour eviter les valeurs inventees (0)
     targetPE: assumptions.targetPE !== undefined 
       ? (() => { const clamped = clamp(assumptions.targetPE, settings.target_pe_min, settings.target_pe_max, safeDefaults.targetPE); return clamped !== undefined ? round(clamped, settings.ratio_precision) : undefined; })()
       : undefined,
@@ -562,9 +562,9 @@ export const sanitizeAssumptionsSync = (assumptions: Partial<Assumptions>): Assu
     excludeDIV: assumptions.excludeDIV ?? safeDefaults.excludeDIV
   };
 
-  // ✅ CRITIQUE : Utiliser un cast pour permettre les undefined temporairement
-  // Les valeurs undefined seront préservées et ne seront pas transformées en 0
-  // Le type Assumptions ne permet pas undefined, mais on utilise un cast pour la compatibilité
+  //  CRITIQUE : Utiliser un cast pour permettre les undefined temporairement
+  // Les valeurs undefined seront preservees et ne seront pas transformees en 0
+  // Le type Assumptions ne permet pas undefined, mais on utilise un cast pour la compatibilite
   return sanitized as Assumptions;
 };
 

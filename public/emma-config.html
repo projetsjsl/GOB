@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emma Config - Gestion Prompts & Variables</title>
-    <!-- 🔇 INTERCEPTION CONSOLE ERRORS (extensions, etc.) -->
+    <!--  INTERCEPTION CONSOLE ERRORS (extensions, etc.) -->
     
     <style>
         /* Preview formatting (remplace prose) */
@@ -50,83 +50,83 @@
         <div class="w-80 bg-white border-r border-gray-200 flex flex-col">
             <!-- Header Sidebar -->
             <div class="p-4 border-b border-gray-200">
-                <h1 class="text-xl font-bold text-gray-800">⚙️ Emma Config</h1>
-                <p class="text-xs text-gray-500 mt-1">Centre de configuration unifié</p>
+                <h1 class="text-xl font-bold text-gray-800"> Emma Config</h1>
+                <p class="text-xs text-gray-500 mt-1">Centre de configuration unifie</p>
 
                 <!-- ONGLETS PRINCIPAUX -->
                 <div class="mt-3 grid grid-cols-3 gap-1 rounded-lg bg-gray-100 p-1">
                     <button id="tabDashboard" onclick="switchMainTab('dashboard')" class="main-tab text-xs px-2 py-1.5 rounded-md bg-white shadow font-medium" title="Vue d'ensemble de tous les prompts">
-                        📊 Configuration
+                         Configuration
                     </button>
-                    <button id="tabPrompts" onclick="switchMainTab('prompts')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Gérer les prompts et instructions d'Emma">
-                        📝 Prompts
+                    <button id="tabPrompts" onclick="switchMainTab('prompts')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Gerer les prompts et instructions d'Emma">
+                         Prompts
                     </button>
                     <button id="tabDesign" onclick="switchMainTab('design')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Personnaliser le design des emails">
-                        🎨 Design
+                         Design
                     </button>
-                    <button id="tabSms" onclick="switchMainTab('sms')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Configurer les paramètres SMS">
-                        📱 SMS
+                    <button id="tabSms" onclick="switchMainTab('sms')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Configurer les parametres SMS">
+                         SMS
                     </button>
-                    <button id="tabEmail" onclick="switchMainTab('email')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Tester et gérer les emails">
-                        📧 Email
+                    <button id="tabEmail" onclick="switchMainTab('email')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Tester et gerer les emails">
+                         Email
                     </button>
-                    <button id="tabHelp" onclick="switchMainTab('help')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Mode d'emploi et intégration n8n">
-                        📖 Aide
+                    <button id="tabHelp" onclick="switchMainTab('help')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Mode d'emploi et integration n8n">
+                         Aide
                     </button>
-                    <button id="tabEmmaia" onclick="switchMainTab('emmaia')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Configuration des modèles IA pour les 4 chat modes">
-                        🤖 Emma IA
+                    <button id="tabEmmaia" onclick="switchMainTab('emmaia')" class="main-tab text-xs px-2 py-1.5 rounded-md text-gray-600 hover:bg-gray-50" title="Configuration des modeles IA pour les 4 chat modes">
+                         Emma IA
                     </button>
-                    <button id="tabBuilder" onclick="switchMainTab('builder')" class="main-tab text-xs px-2 py-1.5 rounded-md text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 font-medium" title="Éditeur Visuel Drag & Drop">
-                        🏗️ Builder
+                    <button id="tabBuilder" onclick="switchMainTab('builder')" class="main-tab text-xs px-2 py-1.5 rounded-md text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 font-medium" title="Editeur Visuel Drag & Drop">
+                         Builder
                     </button>
                 </div>
 
                 <!-- Recherche -->
                 <div class="mt-3">
-                    <input type="text" id="searchFilter" class="w-full text-xs px-2 py-1 border rounded" placeholder="🔍 Rechercher..." aria-label="Rechercher une configuration">
+                    <input type="text" id="searchFilter" class="w-full text-xs px-2 py-1 border rounded" placeholder=" Rechercher..." aria-label="Rechercher une configuration">
                 </div>
 
                 <!-- Filtres -->
                 <div class="mt-2 grid grid-cols-2 gap-2">
                     <select id="sectionFilter" class="text-xs px-2 py-1 border rounded" aria-label="Filtrer par section">
-                        <option value="">📂 Toutes sections</option>
-                        <option value="prompts">📝 Prompts</option>
-                        <option value="variables">⚙️ Variables</option>
-                        <option value="directives">🎯 Directives</option>
-                        <option value="routing">🧭 Routage</option>
+                        <option value=""> Toutes sections</option>
+                        <option value="prompts"> Prompts</option>
+                        <option value="variables"> Variables</option>
+                        <option value="directives"> Directives</option>
+                        <option value="routing"> Routage</option>
                     </select>
 
                     <select id="channelFilter" class="text-xs px-2 py-1 border rounded" aria-label="Filtrer par canal">
-                        <option value="">🌐 Tous canaux</option>
-                        <option value="web">💬 Web</option>
-                        <option value="sms">📱 SMS</option>
-                        <option value="email">📧 Email</option>
-                        <option value="messenger">💬 Messenger</option>
-                        <option value="multicanal">🌐 Multi</option>
+                        <option value=""> Tous canaux</option>
+                        <option value="web"> Web</option>
+                        <option value="sms"> SMS</option>
+                        <option value="email"> Email</option>
+                        <option value="messenger"> Messenger</option>
+                        <option value="multicanal"> Multi</option>
                     </select>
                 </div>
 
                 <!-- Tri -->
                 <div class="mt-2">
                     <select id="sortFilter" class="w-full text-xs px-2 py-1 border rounded" aria-label="Trier les configurations">
-                        <option value="name">🔤 Tri: Nom (A-Z)</option>
-                        <option value="name-desc">🔤 Tri: Nom (Z-A)</option>
-                        <option value="date">📅 Tri: Date (récent)</option>
-                        <option value="date-asc">📅 Tri: Date (ancien)</option>
-                        <option value="priority">⭐ Tri: Priorité</option>
+                        <option value="name"> Tri: Nom (A-Z)</option>
+                        <option value="name-desc"> Tri: Nom (Z-A)</option>
+                        <option value="date"> Tri: Date (recent)</option>
+                        <option value="date-asc"> Tri: Date (ancien)</option>
+                        <option value="priority"> Tri: Priorite</option>
                     </select>
                 </div>
 
                 <!-- Boutons actions -->
                 <div class="mt-3 flex gap-2">
                     <button id="refreshBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-2 rounded transition">
-                        🔄
+                        
                     </button>
                     <button id="addBtn" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-2 rounded transition">
-                        ➕
+                        
                     </button>
                     <button id="clearFilters" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white text-sm px-3 py-2 rounded transition">
-                        ✕
+                        
                     </button>
                 </div>
             </div>
@@ -139,7 +139,7 @@
             <!-- Liste des configs (scrollable) -->
             <div class="flex-1 overflow-y-auto" id="configList">
                 <div class="p-4 text-center text-gray-500">
-                    <p class="text-sm">⏳ Chargement...</p>
+                    <p class="text-sm"> Chargement...</p>
                 </div>
             </div>
 
@@ -152,38 +152,38 @@
             </div>
         </div>
 
-        <!-- Main Panel: Éditeur -->
+        <!-- Main Panel: Editeur -->
         <div class="flex-1 flex flex-col">
             <!-- Header Main -->
             <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
                 <div>
-                    <h2 id="editorTitle" class="text-2xl font-bold text-gray-800">Sélectionnez une configuration</h2>
+                    <h2 id="editorTitle" class="text-2xl font-bold text-gray-800">Selectionnez une configuration</h2>
                     <p id="editorSubtitle" class="text-sm text-gray-500 mt-1"></p>
                 </div>
                 <div class="flex gap-2">
                     <button id="saveBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition hidden">
-                        💾 Sauvegarder
+                         Sauvegarder
                     </button>
                     <button id="deleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition hidden">
-                        🗑️ Supprimer
+                         Supprimer
                     </button>
                 </div>
             </div>
 
             <!-- Editor Area -->
             <div class="flex-1 overflow-y-auto p-6">
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <!-- DASHBOARD TAB CONTENT - Vue d'ensemble des prompts          -->
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <div id="dashboardTabContent">
                     <div class="max-w-7xl mx-auto">
                         <!-- Header Dashboard -->
                         <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-lg p-6 mb-6">
                             <div class="flex items-start justify-between">
                                 <div>
-                                    <h2 class="text-3xl font-bold mb-2">📊 Configuration Emma</h2>
-                                    <p class="text-indigo-100">Vue d'ensemble complète de tous vos prompts et configurations</p>
-                                    <div class="mt-4 text-sm text-indigo-100" id="dashboardLastUpdate">Dernière mise à jour: Chargement...</div>
+                                    <h2 class="text-3xl font-bold mb-2"> Configuration Emma</h2>
+                                    <p class="text-indigo-100">Vue d'ensemble complete de tous vos prompts et configurations</p>
+                                    <div class="mt-4 text-sm text-indigo-100" id="dashboardLastUpdate">Derniere mise a jour: Chargement...</div>
                                 </div>
                                 <button onclick="reloadDashboard()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition flex items-center gap-2 font-medium">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,7 +203,7 @@
                                         <p class="text-3xl font-bold text-gray-800 mt-1" id="statTotalPrompts">0</p>
                                     </div>
                                     <div class="bg-blue-100 rounded-full p-3">
-                                        <span class="text-2xl">📝</span>
+                                        <span class="text-2xl"></span>
                                     </div>
                                 </div>
                             </div>
@@ -215,7 +215,7 @@
                                         <p class="text-3xl font-bold text-gray-800 mt-1" id="statBriefings">0</p>
                                     </div>
                                     <div class="bg-green-100 rounded-full p-3">
-                                        <span class="text-2xl">📧</span>
+                                        <span class="text-2xl"></span>
                                     </div>
                                 </div>
                             </div>
@@ -227,7 +227,7 @@
                                         <p class="text-3xl font-bold text-gray-800 mt-1" id="statSystemPrompts">0</p>
                                     </div>
                                     <div class="bg-purple-100 rounded-full p-3">
-                                        <span class="text-2xl">⚙️</span>
+                                        <span class="text-2xl"></span>
                                     </div>
                                 </div>
                             </div>
@@ -235,11 +235,11 @@
                             <div class="bg-white rounded-lg shadow p-5 border-l-4 border-orange-500">
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <p class="text-gray-500 text-sm font-medium">Dernière Modif</p>
+                                        <p class="text-gray-500 text-sm font-medium">Derniere Modif</p>
                                         <p class="text-lg font-bold text-gray-800 mt-1" id="statLastModified">-</p>
                                     </div>
                                     <div class="bg-orange-100 rounded-full p-3">
-                                        <span class="text-2xl">🕒</span>
+                                        <span class="text-2xl"></span>
                                     </div>
                                 </div>
                             </div>
@@ -249,9 +249,9 @@
                         <div class="bg-white rounded-lg shadow overflow-hidden mb-6">
                             <div class="bg-gradient-to-r from-teal-600 to-cyan-600 text-white p-4">
                                 <h3 class="text-xl font-bold flex items-center gap-2">
-                                    <span>🗺️</span> Architecture des Prompts
+                                    <span></span> Architecture des Prompts
                                 </h3>
-                                <p class="text-teal-100 text-sm mt-1">Schéma visuel des relations et hiérarchie</p>
+                                <p class="text-teal-100 text-sm mt-1">Schema visuel des relations et hierarchie</p>
                             </div>
                             <div class="p-6">
                                 <div id="promptsArchitecture" class="relative">
@@ -260,22 +260,22 @@
                             </div>
                         </div>
 
-                        <!-- Graphiques & Répartition -->
+                        <!-- Graphiques & Repartition -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <!-- Répartition par Catégorie -->
+                            <!-- Repartition par Categorie -->
                             <div class="bg-white rounded-lg shadow p-6">
                                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span>📊</span> Répartition par Catégorie
+                                    <span></span> Repartition par Categorie
                                 </h3>
                                 <div id="categoryChart" class="space-y-3">
                                     <!-- Dynamically populated -->
                                 </div>
                             </div>
 
-                            <!-- Répartition par Type -->
+                            <!-- Repartition par Type -->
                             <div class="bg-white rounded-lg shadow p-6">
                                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span>📈</span> Répartition par Type
+                                    <span></span> Repartition par Type
                                 </h3>
                                 <div id="typeChart" class="space-y-3">
                                     <!-- Dynamically populated -->
@@ -287,9 +287,9 @@
                         <div class="bg-white rounded-lg shadow overflow-hidden">
                             <div class="bg-gradient-to-r from-gray-700 to-gray-900 text-white p-4">
                                 <h3 class="text-xl font-bold flex items-center gap-2">
-                                    <span>📋</span> Inventaire Complet des Prompts
+                                    <span></span> Inventaire Complet des Prompts
                                 </h3>
-                                <p class="text-gray-300 text-sm mt-1">Tous les prompts avec détails et métadonnées</p>
+                                <p class="text-gray-300 text-sm mt-1">Tous les prompts avec details et metadonnees</p>
                             </div>
 
                             <!-- Filtres rapides -->
@@ -298,13 +298,13 @@
                                     Tous (<span id="filterCountAll">0</span>)
                                 </button>
                                 <button onclick="filterDashboard('prompt')" class="dashboard-filter-btn px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
-                                    📝 Prompts (<span id="filterCountPrompt">0</span>)
+                                     Prompts (<span id="filterCountPrompt">0</span>)
                                 </button>
                                 <button onclick="filterDashboard('briefing')" class="dashboard-filter-btn px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
-                                    📧 Briefings (<span id="filterCountBriefing">0</span>)
+                                     Briefings (<span id="filterCountBriefing">0</span>)
                                 </button>
                                 <button onclick="filterDashboard('system')" class="dashboard-filter-btn px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300">
-                                    ⚙️ System (<span id="filterCountSystem">0</span>)
+                                     System (<span id="filterCountSystem">0</span>)
                                 </button>
                             </div>
 
@@ -316,9 +316,9 @@
                                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Key</th>
                                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Description</th>
                                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Type</th>
-                                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Catégorie</th>
+                                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Categorie</th>
                                             <th class="px-4 py-3 text-left font-semibold text-gray-700">Taille</th>
-                                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Modifié</th>
+                                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Modifie</th>
                                             <th class="px-4 py-3 text-center font-semibold text-gray-700">Actions</th>
                                         </tr>
                                     </thead>
@@ -328,7 +328,7 @@
                                             <td colspan="7" class="px-4 py-8 text-center text-gray-500">
                                                 <div class="flex flex-col items-center gap-2">
                                                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                                                    <p>Chargement des données...</p>
+                                                    <p>Chargement des donnees...</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -337,13 +337,13 @@
                             </div>
                         </div>
 
-                        <!-- Briefings Programmés -->
+                        <!-- Briefings Programmes -->
                         <div class="mt-6 bg-white rounded-lg shadow overflow-hidden">
                             <div class="bg-gradient-to-r from-orange-600 to-red-600 text-white p-4">
                                 <h3 class="text-xl font-bold flex items-center gap-2">
-                                    <span>⏰</span> Briefings Programmés
+                                    <span></span> Briefings Programmes
                                 </h3>
-                                <p class="text-orange-100 text-sm mt-1">Horaires des briefings automatisés</p>
+                                <p class="text-orange-100 text-sm mt-1">Horaires des briefings automatises</p>
                             </div>
                             <div class="p-6">
                                 <div id="briefingSchedule" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -361,33 +361,33 @@
                         <svg class="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                        <p class="text-xl">Sélectionnez une configuration dans la liste</p>
-                        <p class="text-sm mt-2">ou créez-en une nouvelle</p>
+                        <p class="text-xl">Selectionnez une configuration dans la liste</p>
+                        <p class="text-sm mt-2">ou creez-en une nouvelle</p>
                     </div>
                 </div>
 
                 <div id="editorContent" class="hidden max-w-4xl mx-auto">
-                    <!-- ═══════════════════════════════════════════════════════════ -->
-                    <!-- HEADER - Indicateur clair du prompt en cours d'édition      -->
-                    <!-- ═══════════════════════════════════════════════════════════ -->
+                    <!--  -->
+                    <!-- HEADER - Indicateur clair du prompt en cours d'edition      -->
+                    <!--  -->
                     <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg p-6 mb-6 shadow-lg">
                         <div class="flex items-center justify-between">
                             <div class="flex-1">
                                 <div class="flex items-center gap-3 mb-2">
-                                    <span class="text-3xl">📝</span>
+                                    <span class="text-3xl"></span>
                                     <div>
-                                        <p class="text-sm text-indigo-200 font-medium">Édition en cours</p>
-                                        <h2 id="currentPromptTitle" class="text-2xl font-bold">Sélectionnez un prompt</h2>
+                                        <p class="text-sm text-indigo-200 font-medium">Edition en cours</p>
+                                        <h2 id="currentPromptTitle" class="text-2xl font-bold">Selectionnez un prompt</h2>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3 mt-3">
                                     <span id="currentPromptSection" class="px-3 py-1 bg-white/20 rounded-full text-sm font-medium">Section</span>
-                                    <span id="currentPromptKey" class="px-3 py-1 bg-white/20 rounded-full text-sm font-medium">Clé</span>
+                                    <span id="currentPromptKey" class="px-3 py-1 bg-white/20 rounded-full text-sm font-medium">Cle</span>
                                     <span id="currentPromptChannel" class="px-3 py-1 bg-white/10 rounded-full text-xs">Canal</span>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <p class="text-indigo-200 text-xs mb-1">Dernière modification</p>
+                                <p class="text-indigo-200 text-xs mb-1">Derniere modification</p>
                                 <p id="currentPromptUpdated" class="text-sm font-medium">-</p>
                             </div>
                         </div>
@@ -400,7 +400,7 @@
                             <input type="text" id="editSection" class="w-full px-3 py-2 border rounded-lg" readonly>
                         </div>
                         <div>
-                            <label for="editKey" class="block text-sm font-medium text-gray-700 mb-1">Clé</label>
+                            <label for="editKey" class="block text-sm font-medium text-gray-700 mb-1">Cle</label>
                             <input type="text" id="editKey" class="w-full px-3 py-2 border rounded-lg" readonly>
                         </div>
                     </div>
@@ -421,22 +421,22 @@
                             </select>
                         </div>
                         <div>
-                            <label for="editCategory" class="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+                            <label for="editCategory" class="block text-sm font-medium text-gray-700 mb-1">Categorie</label>
                             <input type="text" id="editCategory" class="w-full px-3 py-2 border rounded-lg" placeholder="prompt, variable, etc.">
                         </div>
                         <div>
                             <label for="editChannel" class="block text-sm font-medium text-gray-700 mb-1">Canal</label>
                             <select id="editChannel" class="w-full px-3 py-2 border rounded-lg">
                                 <option value="">Tous canaux</option>
-                                <option value="web">💬 Web</option>
-                                <option value="sms">📱 SMS</option>
-                                <option value="email">📧 Email</option>
-                                <option value="messenger">💬 Messenger</option>
-                                <option value="multicanal">🌐 Multicanal</option>
+                                <option value="web"> Web</option>
+                                <option value="sms"> SMS</option>
+                                <option value="email"> Email</option>
+                                <option value="messenger"> Messenger</option>
+                                <option value="multicanal"> Multicanal</option>
                             </select>
                         </div>
                         <div>
-                            <label for="editPriority" class="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
+                            <label for="editPriority" class="block text-sm font-medium text-gray-700 mb-1">Priorite</label>
                             <input type="number" id="editPriority" class="w-full px-3 py-2 border rounded-lg" value="0">
                         </div>
                     </div>
@@ -448,15 +448,15 @@
                             <div class="flex items-center gap-2">
                                 <!-- Badges canaux applicables -->
                                 <div id="channelBadges" class="flex gap-1">
-                                    <span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-700">💻 Web</span>
-                                    <span class="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700">📱 SMS</span>
-                                    <span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-700">📧 Email</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-700"> Web</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-green-100 text-green-700"> SMS</span>
+                                    <span class="px-2 py-0.5 text-xs rounded bg-purple-100 text-purple-700"> Email</span>
                                 </div>
                                 <!-- Mode Preview -->
-                                <select id="previewMode" class="text-xs px-2 py-1 border rounded bg-gray-50" aria-label="Mode de prévisualisation">
-                                    <option value="web">👁️ Preview: Web</option>
-                                    <option value="sms">👁️ Preview: SMS</option>
-                                    <option value="email">👁️ Preview: Email</option>
+                                <select id="previewMode" class="text-xs px-2 py-1 border rounded bg-gray-50" aria-label="Mode de previsualisation">
+                                    <option value="web"> Preview: Web</option>
+                                    <option value="sms"> Preview: SMS</option>
+                                    <option value="email"> Preview: Email</option>
                                 </select>
                             </div>
                         </div>
@@ -466,7 +466,7 @@
                             <!-- Colonne gauche: Code -->
                             <div class="border-r">
                                 <div class="bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600 border-b">
-                                    📝 Code / Prompt
+                                     Code / Prompt
                                 </div>
                                 <textarea id="editValue" rows="20" class="w-full px-3 py-2 font-mono text-sm border-0 resize-none focus:ring-0" placeholder="Entrez la valeur..."></textarea>
                             </div>
@@ -474,42 +474,42 @@
                             <!-- Colonne droite: Preview -->
                             <div class="bg-gray-50">
                                 <div class="bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600 border-b flex items-center justify-between">
-                                    <span>👁️ Preview <span id="previewModeLabel" class="text-blue-600">(Web)</span></span>
+                                    <span> Preview <span id="previewModeLabel" class="text-blue-600">(Web)</span></span>
                                     <span id="charCount" class="text-gray-400">0 chars</span>
                                 </div>
                                 <div id="previewArea" class="p-3 overflow-y-auto h-[480px]">
-                                    <p class="text-gray-400 italic">Le preview s'affiche ici en temps réel...</p>
+                                    <p class="text-gray-400 italic">Le preview s'affiche ici en temps reel...</p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Stats -->
                         <div class="flex justify-between text-xs text-gray-500 mt-2">
-                            <span>💡 Pour JSON: utilisez un format valide avec indentation</span>
+                            <span> Pour JSON: utilisez un format valide avec indentation</span>
                             <div class="flex gap-4">
-                                <span>📏 <span id="wordCount">0</span> mots</span>
-                                <span>📄 <span id="lineCount">0</span> lignes</span>
+                                <span> <span id="wordCount">0</span> mots</span>
+                                <span> <span id="lineCount">0</span> lignes</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- ═══════════════════════════════════════════════════════════ -->
-                    <!-- DESIGN SECTION - Design spécifique à ce prompt             -->
-                    <!-- ═══════════════════════════════════════════════════════════ -->
+                    <!--  -->
+                    <!-- DESIGN SECTION - Design specifique a ce prompt             -->
+                    <!--  -->
                     <div class="mt-6 border-t pt-6">
                         <button
                             onclick="document.getElementById('promptDesignSection').classList.toggle('hidden')"
                             class="flex items-center gap-2 text-lg font-semibold text-gray-700 hover:text-purple-600 transition-colors w-full"
                         >
-                            <span id="promptDesignToggleIcon">▶</span>
-                            🎨 Design de ce prompt
+                            <span id="promptDesignToggleIcon"></span>
+                             Design de ce prompt
                             <span class="text-xs font-normal text-gray-500 ml-2">(personnalisation visuelle)</span>
                         </button>
 
                         <div id="promptDesignSection" class="hidden mt-4 space-y-4 bg-gray-50 p-4 rounded-lg">
                             <!-- Couleurs -->
                             <div>
-                                <h4 class="font-semibold text-gray-700 mb-2">🎨 Couleurs</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> Couleurs</h4>
                                 <div class="grid grid-cols-5 gap-3">
                                     <div>
                                         <label for="promptDesignColorPrimary" class="block text-xs text-gray-600 mb-1">Primary</label>
@@ -536,7 +536,7 @@
 
                             <!-- Branding -->
                             <div>
-                                <h4 class="font-semibold text-gray-700 mb-2">🏷️ Branding</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> Branding</h4>
                                 <div class="grid grid-cols-2 gap-3">
                                     <div>
                                         <label for="promptDesignBrandingCompanyName" class="block text-xs text-gray-600 mb-1">Company Name</label>
@@ -544,7 +544,7 @@
                                     </div>
                                     <div>
                                         <label for="promptDesignBrandingTagline" class="block text-xs text-gray-600 mb-1">Tagline</label>
-                                        <input type="text" id="promptDesignBrandingTagline" value="Emma IA - Votre assistante financière" class="w-full px-3 py-2 border rounded text-sm">
+                                        <input type="text" id="promptDesignBrandingTagline" value="Emma IA - Votre assistante financiere" class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                     <div>
                                         <label for="promptDesignBrandingAvatarUrl" class="block text-xs text-gray-600 mb-1">Avatar URL</label>
@@ -559,7 +559,7 @@
 
                             <!-- Header Options -->
                             <div>
-                                <h4 class="font-semibold text-gray-700 mb-2">📋 Header</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> Header</h4>
                                 <div class="flex gap-4 text-sm">
                                     <label class="flex items-center gap-2">
                                         <input type="checkbox" id="promptDesignHeaderShowAvatar" checked class="rounded">
@@ -578,7 +578,7 @@
 
                             <!-- Footer Options -->
                             <div>
-                                <h4 class="font-semibold text-gray-700 mb-2">📄 Footer</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> Footer</h4>
                                 <div class="space-y-2">
                                     <div class="flex gap-4 text-sm">
                                         <label class="flex items-center gap-2">
@@ -592,14 +592,14 @@
                                     </div>
                                     <div>
                                         <label for="promptDesignFooterCopyright" class="block text-xs text-gray-600 mb-1">Copyright Text</label>
-                                        <input type="text" id="promptDesignFooterCopyright" value="© 2025 GOB Apps - Tous droits réservés" class="w-full px-3 py-2 border rounded text-sm">
+                                        <input type="text" id="promptDesignFooterCopyright" value=" 2025 GOB Apps - Tous droits reserves" class="w-full px-3 py-2 border rounded text-sm">
                                     </div>
                                 </div>
                             </div>
 
                             <!-- SMS Settings -->
                             <div class="border-t pt-4">
-                                <h4 class="font-semibold text-gray-700 mb-2">📱 SMS Settings</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> SMS Settings</h4>
                                 <div class="grid grid-cols-3 gap-3">
                                     <div>
                                         <label for="promptDesignSmsMaxSegments" class="block text-xs text-gray-600 mb-1">Max Segments</label>
@@ -619,7 +619,7 @@
 
                             <!-- Typography -->
                             <div class="border-t pt-4">
-                                <h4 class="font-semibold text-gray-700 mb-2">🔤 Typography</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> Typography</h4>
                                 <div class="grid grid-cols-3 gap-3">
                                     <div>
                                         <label for="promptDesignTypoFontFamily" class="block text-xs text-gray-600 mb-1">Font Family</label>
@@ -646,7 +646,7 @@
 
                             <!-- Layout & Spacing -->
                             <div class="border-t pt-4">
-                                <h4 class="font-semibold text-gray-700 mb-2">📐 Layout & Spacing</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> Layout & Spacing</h4>
                                 <div class="grid grid-cols-4 gap-3">
                                     <div>
                                         <label for="promptDesignLayoutBorderRadius" class="block text-xs text-gray-600 mb-1">Border Radius</label>
@@ -680,7 +680,7 @@
 
                             <!-- Advanced Colors -->
                             <div class="border-t pt-4">
-                                <h4 class="font-semibold text-gray-700 mb-2">🌈 Advanced Colors</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> Advanced Colors</h4>
                                 <div class="grid grid-cols-6 gap-3">
                                     <div>
                                         <label for="promptDesignColorBackground" class="block text-xs text-gray-600 mb-1">Background</label>
@@ -711,7 +711,7 @@
 
                             <!-- Custom Sections -->
                             <div class="border-t pt-4">
-                                <h4 class="font-semibold text-gray-700 mb-2">📦 Custom Sections</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> Custom Sections</h4>
                                 <div class="space-y-3">
                                     <div class="flex gap-4 text-sm">
                                         <label class="flex items-center gap-2">
@@ -746,40 +746,40 @@
 
                             <!-- Emojis & Icons -->
                             <div class="border-t pt-4">
-                                <h4 class="font-semibold text-gray-700 mb-2">😊 Emojis & Icons</h4>
+                                <h4 class="font-semibold text-gray-700 mb-2"> Emojis & Icons</h4>
                                 <div class="grid grid-cols-3 gap-3">
                                     <div>
                                         <label for="promptDesignEmojiHeader" class="block text-xs text-gray-600 mb-1">Header Emoji</label>
-                                        <input type="text" id="promptDesignEmojiHeader" value="📊" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
+                                        <input type="text" id="promptDesignEmojiHeader" value="" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
                                     </div>
                                     <div>
                                         <label for="promptDesignEmojiSuccess" class="block text-xs text-gray-600 mb-1">Success Emoji</label>
-                                        <input type="text" id="promptDesignEmojiSuccess" value="✅" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
+                                        <input type="text" id="promptDesignEmojiSuccess" value="" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
                                     </div>
                                     <div>
                                         <label for="promptDesignEmojiAlert" class="block text-xs text-gray-600 mb-1">Alert Emoji</label>
-                                        <input type="text" id="promptDesignEmojiAlert" value="⚠️" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
+                                        <input type="text" id="promptDesignEmojiAlert" value="" maxlength="2" class="w-full px-3 py-2 border rounded text-sm text-center text-2xl">
                                     </div>
                                 </div>
                             </div>
 
                             <button onclick="updatePreview()" class="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold">
-                                ↻ Actualiser Preview avec ce design
+                                 Actualiser Preview avec ce design
                             </button>
                         </div>
                         </div>
                     </div>
 
-                    <!-- ═══════════════════════════════════════════════════════════ -->
+                    <!--  -->
                     <!-- EMAIL DELIVERY SECTION - Configuration envoi email         -->
-                    <!-- ═══════════════════════════════════════════════════════════ -->
+                    <!--  -->
                     <div class="mt-6 border-t pt-6">
                         <button
                             onclick="document.getElementById('emailDeliverySection').classList.toggle('hidden'); toggleIcon('emailDeliveryToggleIcon')"
                             class="flex items-center gap-2 text-lg font-semibold text-gray-700 hover:text-indigo-600 transition-colors w-full"
                         >
-                            <span id="emailDeliveryToggleIcon">▶</span>
-                            📧 Destinataires Email & Planification
+                            <span id="emailDeliveryToggleIcon"></span>
+                             Destinataires Email & Planification
                             <span class="text-xs font-normal text-gray-500 ml-2">(configuration envoi automatique)</span>
                         </button>
 
@@ -790,12 +790,12 @@
                                     <div>
                                         <p class="text-xs text-gray-600 mb-1">Identifiant unique du prompt</p>
                                         <p class="font-mono text-sm font-semibold text-indigo-900" id="deliveryPromptId">-</p>
-                                        <p class="text-xs text-gray-500 mt-1">N° <span id="deliveryPromptNumber">-</span></p>
+                                        <p class="text-xs text-gray-500 mt-1">Ndeg <span id="deliveryPromptNumber">-</span></p>
                                     </div>
                                     <div>
                                         <label class="flex items-center gap-2 cursor-pointer">
                                             <input type="checkbox" id="deliveryEnabled" class="w-5 h-5 text-indigo-600 rounded">
-                                            <span class="text-sm font-semibold text-gray-700">Envoi activé</span>
+                                            <span class="text-sm font-semibold text-gray-700">Envoi active</span>
                                         </label>
                                     </div>
                                 </div>
@@ -805,7 +805,7 @@
                             <div>
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="font-semibold text-gray-800 flex items-center gap-2">
-                                        👥 Destinataires
+                                         Destinataires
                                         <span id="recipientsCount" class="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded-full">0</span>
                                     </h4>
                                     <button onclick="showAddRecipientForm()" class="px-3 py-1 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors">
@@ -813,7 +813,7 @@
                                     </button>
                                 </div>
 
-                                <!-- Formulaire ajout (caché par défaut) -->
+                                <!-- Formulaire ajout (cache par defaut) -->
                                 <div id="addRecipientForm" class="hidden bg-white rounded-lg p-4 mb-3 border border-indigo-300">
                                     <div class="grid grid-cols-2 gap-3 mb-3">
                                         <div>
@@ -822,12 +822,12 @@
                                         </div>
                                         <div>
                                             <label for="newRecipientName" class="block text-xs text-gray-600 mb-1">Nom</label>
-                                            <input type="text" id="newRecipientName" placeholder="Nom Prénom" class="w-full px-3 py-2 border rounded text-sm">
+                                            <input type="text" id="newRecipientName" placeholder="Nom Prenom" class="w-full px-3 py-2 border rounded text-sm">
                                         </div>
                                     </div>
                                     <div class="flex gap-2">
                                         <button onclick="addRecipient()" class="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors">
-                                            ✓ Ajouter
+                                             Ajouter
                                         </button>
                                         <button onclick="hideAddRecipientForm()" class="px-4 py-2 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400 transition-colors">
                                             Annuler
@@ -837,17 +837,17 @@
 
                                 <!-- Liste des emails -->
                                 <div id="recipientsList" class="space-y-2 bg-white rounded-lg p-3 min-h-[100px] max-h-[300px] overflow-y-auto">
-                                    <p class="text-gray-400 text-sm italic">Aucun destinataire configuré</p>
+                                    <p class="text-gray-400 text-sm italic">Aucun destinataire configure</p>
                                 </div>
                             </div>
 
                             <!-- Planification -->
                             <div>
-                                <h4 class="font-semibold text-gray-800 mb-3">⏰ Planification</h4>
+                                <h4 class="font-semibold text-gray-800 mb-3"> Planification</h4>
                                 <div class="bg-white rounded-lg p-4 space-y-3">
                                     <div class="grid grid-cols-3 gap-3">
                                         <div>
-                                            <label for="deliveryFrequency" class="block text-xs text-gray-600 mb-1">Fréquence</label>
+                                            <label for="deliveryFrequency" class="block text-xs text-gray-600 mb-1">Frequence</label>
                                             <select id="deliveryFrequency" class="w-full px-3 py-2 border rounded text-sm">
                                                 <option value="manual">Manuel</option>
                                                 <option value="daily">Quotidien</option>
@@ -910,20 +910,20 @@
                             <!-- Boutons d'action -->
                             <div class="flex gap-3">
                                 <button onclick="saveDeliveryConfig()" class="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold">
-                                    💾 Enregistrer la configuration
+                                     Enregistrer la configuration
                                 </button>
                                 <button onclick="sendBriefingNow()" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-lg">
-                                    📧 Envoyer Maintenant
+                                     Envoyer Maintenant
                                 </button>
                             </div>
                             <p class="text-xs text-gray-600 italic mt-2">
-                                ℹ️ "Envoyer Maintenant" génère le briefing et l'envoie immédiatement à tous les destinataires actifs (LIVE).
+                                i "Envoyer Maintenant" genere le briefing et l'envoie immediatement a tous les destinataires actifs (LIVE).
                             </p>
 
                             <!-- Info n8n -->
                             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                                 <p class="text-xs text-yellow-800">
-                                    <strong>💡 Info n8n:</strong> Cette configuration est automatiquement accessible dans vos workflows n8n via l'endpoint
+                                    <strong> Info n8n:</strong> Cette configuration est automatiquement accessible dans vos workflows n8n via l'endpoint
                                     <code class="bg-yellow-100 px-2 py-0.5 rounded">/api/prompt-delivery-config?prompt_id=<span id="deliveryPromptIdInfo">-</span></code>
                                 </p>
                             </div>
@@ -933,7 +933,7 @@
                     <!-- Metadata info -->
                     <div class="grid grid-cols-2 gap-4 text-xs text-gray-500 border-t pt-4 mt-6">
                         <div>
-                            <p>Dernière modification: <span id="editUpdatedAt">-</span></p>
+                            <p>Derniere modification: <span id="editUpdatedAt">-</span></p>
                             <p>Par: <span id="editUpdatedBy">-</span></p>
                         </div>
                         <div>
@@ -944,40 +944,40 @@
                 </div>
                 </div><!-- END promptsTabContent -->
 
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <!-- DESIGN TAB CONTENT - Configuration visuelle des emails      -->
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <div id="designTabContent" class="hidden max-w-4xl mx-auto">
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <!-- Header -->
                         <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6">
-                            <h2 class="text-2xl font-bold">🎨 Design des Emails</h2>
-                            <p class="text-purple-100 mt-1">Personnalisez l'apparence des emails envoyés par Emma</p>
+                            <h2 class="text-2xl font-bold"> Design des Emails</h2>
+                            <p class="text-purple-100 mt-1">Personnalisez l'apparence des emails envoyes par Emma</p>
                         </div>
 
                         <div class="p-6 space-y-8">
                             <!-- SECTION: Branding -->
                             <section class="border rounded-lg p-4">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">🏷️</span>
+                                    <span class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center"></span>
                                     Branding
                                 </h3>
                                 <div class="grid grid-cols-2 gap-6">
                                     <div>
                                         <label for="designAvatarUrl" class="block text-sm font-medium text-gray-700 mb-1">
                                             Avatar Emma
-                                            <span class="ml-1 text-gray-400 cursor-help" title="URL de l'image avatar d'Emma (64x64px recommandé)">ⓘ</span>
+                                            <span class="ml-1 text-gray-400 cursor-help" title="URL de l'image avatar d'Emma (64x64px recommande)">i</span>
                                         </label>
                                         <input type="url" id="designAvatarUrl" class="w-full px-3 py-2 border rounded-lg" placeholder="https://...">
-                                        <p class="text-xs text-gray-500 mt-1">Image affichée dans le header des emails</p>
+                                        <p class="text-xs text-gray-500 mt-1">Image affichee dans le header des emails</p>
                                     </div>
                                     <div>
                                         <label for="designLogoUrl" class="block text-sm font-medium text-gray-700 mb-1">
                                             Logo JSLai
-                                            <span class="ml-1 text-gray-400 cursor-help" title="URL du logo affiché dans le footer">ⓘ</span>
+                                            <span class="ml-1 text-gray-400 cursor-help" title="URL du logo affiche dans le footer">i</span>
                                         </label>
                                         <input type="url" id="designLogoUrl" class="w-full px-3 py-2 border rounded-lg" placeholder="https://...">
-                                        <p class="text-xs text-gray-500 mt-1">Logo affiché dans le pied de page</p>
+                                        <p class="text-xs text-gray-500 mt-1">Logo affiche dans le pied de page</p>
                                     </div>
                                     <div>
                                         <label for="designCompanyName" class="block text-sm font-medium text-gray-700 mb-1">Nom de l'entreprise</label>
@@ -985,7 +985,7 @@
                                     </div>
                                     <div>
                                         <label for="designTagline" class="block text-sm font-medium text-gray-700 mb-1">Slogan</label>
-                                        <input type="text" id="designTagline" class="w-full px-3 py-2 border rounded-lg" placeholder="Intelligence Financière...">
+                                        <input type="text" id="designTagline" class="w-full px-3 py-2 border rounded-lg" placeholder="Intelligence Financiere...">
                                     </div>
                                 </div>
                             </section>
@@ -993,7 +993,7 @@
                             <!-- SECTION: Couleurs -->
                             <section class="border rounded-lg p-4">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">🎨</span>
+                                    <span class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center"></span>
                                     Couleurs
                                 </h3>
                                 <div class="grid grid-cols-4 gap-4">
@@ -1005,10 +1005,10 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <label for="designColorPrimaryDark" class="block text-sm font-medium text-gray-700 mb-1">Primaire foncé</label>
+                                        <label for="designColorPrimaryDark" class="block text-sm font-medium text-gray-700 mb-1">Primaire fonce</label>
                                         <div class="flex gap-2">
                                             <input type="color" id="designColorPrimaryDark" class="w-12 h-10 rounded cursor-pointer" value="#4f46e5">
-                                            <input type="text" id="designColorPrimaryDarkText" class="flex-1 px-2 py-1 border rounded text-sm" value="#4f46e5" aria-label="Code couleur primaire foncé">
+                                            <input type="text" id="designColorPrimaryDarkText" class="flex-1 px-2 py-1 border rounded text-sm" value="#4f46e5" aria-label="Code couleur primaire fonce">
                                         </div>
                                     </div>
                                     <div>
@@ -1031,7 +1031,7 @@
                             <!-- SECTION: Header -->
                             <section class="border rounded-lg p-4">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">📧</span>
+                                    <span class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center"></span>
                                     Header des emails
                                 </h3>
                                 <div class="grid grid-cols-3 gap-4">
@@ -1045,7 +1045,7 @@
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <input type="checkbox" id="designShowEdition" class="w-4 h-4 rounded" checked>
-                                        <label for="designShowEdition" class="text-sm text-gray-700">Afficher l'édition</label>
+                                        <label for="designShowEdition" class="text-sm text-gray-700">Afficher l'edition</label>
                                     </div>
                                 </div>
                             </section>
@@ -1053,7 +1053,7 @@
                             <!-- SECTION: Footer -->
                             <section class="border rounded-lg p-4">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">📝</span>
+                                    <span class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"></span>
                                     Footer des emails
                                 </h3>
                                 <div class="space-y-4">
@@ -1069,11 +1069,11 @@
                                     </div>
                                     <div>
                                         <label for="designDisclaimer" class="block text-sm font-medium text-gray-700 mb-1">Texte de disclaimer</label>
-                                        <textarea id="designDisclaimer" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Ce briefing est généré automatiquement..."></textarea>
+                                        <textarea id="designDisclaimer" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Ce briefing est genere automatiquement..."></textarea>
                                     </div>
                                     <div>
                                         <label for="designCopyright" class="block text-sm font-medium text-gray-700 mb-1">Copyright</label>
-                                        <input type="text" id="designCopyright" class="w-full px-3 py-2 border rounded-lg" placeholder="© 2025 GOB Apps">
+                                        <input type="text" id="designCopyright" class="w-full px-3 py-2 border rounded-lg" placeholder=" 2025 GOB Apps">
                                     </div>
                                 </div>
                             </section>
@@ -1081,8 +1081,8 @@
                             <!-- PREVIEW -->
                             <section class="border rounded-lg p-4 bg-gray-50">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">👁️</span>
-                                    Aperçu en direct
+                                    <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"></span>
+                                    Apercu en direct
                                 </h3>
                                 <div id="designPreview" class="bg-white rounded-lg shadow-inner p-4 min-h-[300px]">
                                     <p class="text-gray-400 text-center">Le preview s'affichera ici...</p>
@@ -1092,17 +1092,17 @@
                             <!-- BOUTONS D'ACTION -->
                             <div class="flex justify-between items-center pt-4 border-t">
                                 <div class="flex gap-2">
-                                    <button onclick="resetDesignToDefaults()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2 group" title="Réinitialise tous les paramètres aux valeurs par défaut">
-                                        🔄 <span>Réinitialiser</span>
-                                        <span class="hidden group-hover:block absolute mt-12 ml-[-50px] bg-gray-800 text-white text-xs px-2 py-1 rounded">Revenir aux valeurs par défaut</span>
+                                    <button onclick="resetDesignToDefaults()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2 group" title="Reinitialise tous les parametres aux valeurs par defaut">
+                                         <span>Reinitialiser</span>
+                                        <span class="hidden group-hover:block absolute mt-12 ml-[-50px] bg-gray-800 text-white text-xs px-2 py-1 rounded">Revenir aux valeurs par defaut</span>
                                     </button>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button onclick="cancelDesignChanges()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2" title="Annuler les modifications non sauvegardées">
-                                        ❌ <span>Annuler</span>
+                                    <button onclick="cancelDesignChanges()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2" title="Annuler les modifications non sauvegardees">
+                                         <span>Annuler</span>
                                     </button>
-                                    <button onclick="saveDesignConfig()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition flex items-center gap-2" title="Sauvegarder les modifications - Appliqué immédiatement à tous les emails">
-                                        💾 <span>Sauvegarder</span>
+                                    <button onclick="saveDesignConfig()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition flex items-center gap-2" title="Sauvegarder les modifications - Applique immediatement a tous les emails">
+                                         <span>Sauvegarder</span>
                                     </button>
                                 </div>
                             </div>
@@ -1110,44 +1110,44 @@
                     </div>
                 </div>
 
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <!-- SMS TAB CONTENT - Configuration des SMS                     -->
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <div id="smsTabContent" class="hidden max-w-4xl mx-auto">
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <!-- Header -->
                         <div class="bg-gradient-to-r from-green-600 to-teal-600 text-white p-6">
-                            <h2 class="text-2xl font-bold">📱 Configuration SMS</h2>
-                            <p class="text-green-100 mt-1">Paramètres pour les messages SMS via Twilio</p>
+                            <h2 class="text-2xl font-bold"> Configuration SMS</h2>
+                            <p class="text-green-100 mt-1">Parametres pour les messages SMS via Twilio</p>
                         </div>
 
                         <div class="p-6 space-y-6">
-                            <!-- Paramètres SMS -->
+                            <!-- Parametres SMS -->
                             <section class="border rounded-lg p-4">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">⚙️</span>
-                                    Paramètres généraux
+                                    <span class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"></span>
+                                    Parametres generaux
                                 </h3>
                                 <div class="grid grid-cols-2 gap-6">
                                     <div>
                                         <label for="smsMaxSegments" class="block text-sm font-medium text-gray-700 mb-1">
                                             Segments max
-                                            <span class="ml-1 text-gray-400 cursor-help" title="Nombre maximum de segments SMS (1 segment = ~153 caractères)">ⓘ</span>
+                                            <span class="ml-1 text-gray-400 cursor-help" title="Nombre maximum de segments SMS (1 segment = ~153 caracteres)">i</span>
                                         </label>
                                         <input type="number" id="smsMaxSegments" class="w-full px-3 py-2 border rounded-lg" value="10" min="1" max="50">
-                                        <p class="text-xs text-gray-500 mt-1">Twilio gère automatiquement les multi-SMS</p>
+                                        <p class="text-xs text-gray-500 mt-1">Twilio gere automatiquement les multi-SMS</p>
                                     </div>
                                     <div>
                                         <label for="smsWarningThreshold" class="block text-sm font-medium text-gray-700 mb-1">
                                             Seuil d'avertissement
-                                            <span class="ml-1 text-gray-400 cursor-help" title="Affiche un avertissement au-delà de ce nombre de segments">ⓘ</span>
+                                            <span class="ml-1 text-gray-400 cursor-help" title="Affiche un avertissement au-dela de ce nombre de segments">i</span>
                                         </label>
                                         <input type="number" id="smsWarningThreshold" class="w-full px-3 py-2 border rounded-lg" value="5" min="1" max="20">
                                     </div>
                                     <div>
                                         <label for="smsSignature" class="block text-sm font-medium text-gray-700 mb-1">Signature</label>
                                         <input type="text" id="smsSignature" class="w-full px-3 py-2 border rounded-lg" value="- Emma IA">
-                                        <p class="text-xs text-gray-500 mt-1">Ajoutée à la fin de chaque SMS</p>
+                                        <p class="text-xs text-gray-500 mt-1">Ajoutee a la fin de chaque SMS</p>
                                     </div>
                                     <div class="flex flex-col justify-center gap-2">
                                         <div class="flex items-center gap-2">
@@ -1162,10 +1162,10 @@
                                 </div>
                             </section>
 
-                            <!-- Info coût -->
+                            <!-- Info cout -->
                             <section class="border rounded-lg p-4 bg-blue-50">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                                    <span>💰</span> Estimation des coûts Twilio
+                                    <span></span> Estimation des couts Twilio
                                 </h3>
                                 <p class="text-sm text-gray-600">Prix approximatif: <strong>~$0.0079 USD</strong> par segment SMS</p>
                                 <p class="text-xs text-gray-500 mt-1">10 segments = ~$0.08 USD par message</p>
@@ -1174,103 +1174,103 @@
                             <!-- BOUTONS D'ACTION -->
                             <div class="flex justify-end gap-2 pt-4 border-t">
                                 <button onclick="cancelSmsChanges()" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2" title="Annuler les modifications">
-                                    ❌ <span>Annuler</span>
+                                     <span>Annuler</span>
                                 </button>
-                                <button onclick="saveSmsConfig()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition flex items-center gap-2" title="Sauvegarder les paramètres SMS">
-                                    💾 <span>Sauvegarder</span>
+                                <button onclick="saveSmsConfig()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition flex items-center gap-2" title="Sauvegarder les parametres SMS">
+                                     <span>Sauvegarder</span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <!-- EMAIL TAB CONTENT - Testing and Management                  -->
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <div id="emailTabContent" class="hidden">
                     <!-- Dynamic content rendered by email-manager.js -->
                 </div>
 
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <!-- HELP TAB CONTENT - Mode d'emploi et documentation           -->
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <div id="helpTabContent" class="hidden max-w-5xl mx-auto">
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <!-- Header -->
                         <div class="bg-gradient-to-r from-blue-600 to-cyan-600 text-white p-6">
-                            <h2 class="text-2xl font-bold">📖 Mode d'Emploi Emma Config</h2>
-                            <p class="text-blue-100 mt-1">Guide complet pour gérer les prompts et intégrer avec n8n</p>
+                            <h2 class="text-2xl font-bold"> Mode d'Emploi Emma Config</h2>
+                            <p class="text-blue-100 mt-1">Guide complet pour gerer les prompts et integrer avec n8n</p>
                         </div>
 
                         <div class="p-6 space-y-6">
                             <!-- Navigation rapide -->
                             <nav class="bg-gray-50 rounded-lg p-4 border">
-                                <h3 class="font-semibold text-gray-800 mb-3">📑 Navigation Rapide</h3>
+                                <h3 class="font-semibold text-gray-800 mb-3"> Navigation Rapide</h3>
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                                    <a href="#help-add-prompt" class="text-blue-600 hover:underline">➕ Ajouter un Prompt</a>
-                                    <a href="#help-n8n-simple" class="text-blue-600 hover:underline">🔌 n8n Simple</a>
-                                    <a href="#help-n8n-briefing" class="text-blue-600 hover:underline">📧 n8n Briefing</a>
-                                    <a href="#help-api-ref" class="text-blue-600 hover:underline">📚 Référence API</a>
-                                    <a href="#help-examples" class="text-blue-600 hover:underline">💡 Exemples</a>
-                                    <a href="#help-troubleshoot" class="text-blue-600 hover:underline">🔧 Troubleshooting</a>
-                                    <a href="#help-sql" class="text-blue-600 hover:underline">🗄️ SQL Direct</a>
-                                    <a href="#help-vars" class="text-blue-600 hover:underline">🔑 Variables Env</a>
+                                    <a href="#help-add-prompt" class="text-blue-600 hover:underline"> Ajouter un Prompt</a>
+                                    <a href="#help-n8n-simple" class="text-blue-600 hover:underline"> n8n Simple</a>
+                                    <a href="#help-n8n-briefing" class="text-blue-600 hover:underline"> n8n Briefing</a>
+                                    <a href="#help-api-ref" class="text-blue-600 hover:underline"> Reference API</a>
+                                    <a href="#help-examples" class="text-blue-600 hover:underline"> Exemples</a>
+                                    <a href="#help-troubleshoot" class="text-blue-600 hover:underline"> Troubleshooting</a>
+                                    <a href="#help-sql" class="text-blue-600 hover:underline"> SQL Direct</a>
+                                    <a href="#help-vars" class="text-blue-600 hover:underline"> Variables Env</a>
                                 </div>
                             </nav>
 
-                            <!-- Section 0: Guide d'écriture des Prompts -->
+                            <!-- Section 0: Guide d'ecriture des Prompts -->
                             <section id="help-writing-prompts" class="border rounded-lg p-6 bg-indigo-50 border-indigo-200">
                                 <h3 class="text-xl font-bold text-indigo-900 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">✍️</span>
-                                    Guide d'Écriture des Prompts (Context Injection)
+                                    <span class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center"></span>
+                                    Guide d'Ecriture des Prompts (Context Injection)
                                 </h3>
 
                                 <div class="bg-white p-4 rounded-lg shadow-sm border border-indigo-100 mb-6">
-                                    <h4 class="font-bold text-indigo-800 mb-2">💡 Concept Important</h4>
+                                    <h4 class="font-bold text-indigo-800 mb-2"> Concept Important</h4>
                                     <p class="text-gray-700 text-sm mb-2">
-                                        Emma utilise un système de <strong>Context Injection</strong> automatique. Vous n'avez pas besoin d'utiliser de variables comme <code>{{ticker}}</code> ou <code>{{price}}</code>.
+                                        Emma utilise un systeme de <strong>Context Injection</strong> automatique. Vous n'avez pas besoin d'utiliser de variables comme <code>{{ticker}}</code> ou <code>{{price}}</code>.
                                     </p>
                                     <p class="text-gray-700 text-sm">
-                                        Écrivez simplement vos instructions au système. Emma reçoit automatiquement toutes les données pertinentes (prix, news, ratios) en préambule de votre prompt.
+                                        Ecrivez simplement vos instructions au systeme. Emma recoit automatiquement toutes les donnees pertinentes (prix, news, ratios) en preambule de votre prompt.
                                     </p>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <h4 class="font-bold text-gray-800 mb-3 border-b pb-1">📊 Données Injectées Automatiquement</h4>
+                                        <h4 class="font-bold text-gray-800 mb-3 border-b pb-1"> Donnees Injectees Automatiquement</h4>
                                         <ul class="space-y-2 text-sm text-gray-700">
                                             <li class="flex items-start gap-2">
-                                                <span class="text-green-500">✅</span>
-                                                <div><strong>Prix Temps Réel:</strong> Open, High, Low, Close, Volume</div>
+                                                <span class="text-green-500"></span>
+                                                <div><strong>Prix Temps Reel:</strong> Open, High, Low, Close, Volume</div>
                                             </li>
                                             <li class="flex items-start gap-2">
-                                                <span class="text-green-500">✅</span>
+                                                <span class="text-green-500"></span>
                                                 <div><strong>Fondamentaux:</strong> P/E, P/B, Market Cap, EPS, etc.</div>
                                             </li>
                                             <li class="flex items-start gap-2">
-                                                <span class="text-green-500">✅</span>
-                                                <div><strong>Actualités:</strong> Dernières 24h et majeures 7 jours</div>
+                                                <span class="text-green-500"></span>
+                                                <div><strong>Actualites:</strong> Dernieres 24h et majeures 7 jours</div>
                                             </li>
                                             <li class="flex items-start gap-2">
-                                                <span class="text-green-500">✅</span>
+                                                <span class="text-green-500"></span>
                                                 <div><strong>Technique:</strong> RSI, MACD, Moyennes Mobiles</div>
                                             </li>
                                             <li class="flex items-start gap-2">
-                                                <span class="text-green-500">✅</span>
-                                                <div><strong>Calendrier:</strong> Earnings à venir, événements éco</div>
+                                                <span class="text-green-500"></span>
+                                                <div><strong>Calendrier:</strong> Earnings a venir, evenements eco</div>
                                             </li>
                                         </ul>
                                     </div>
 
                                     <div>
-                                        <h4 class="font-bold text-gray-800 mb-3 border-b pb-1">📝 Exemple de Prompt Correct</h4>
+                                        <h4 class="font-bold text-gray-800 mb-3 border-b pb-1"> Exemple de Prompt Correct</h4>
                                         <div class="bg-gray-800 text-gray-300 p-3 rounded text-xs font-mono">
                                             <span class="text-gray-500">// Ne demandez pas "Quel est le prix de {{ticker}}"</span><br>
-                                            <span class="text-gray-500">// Donnez plutôt des instructions d'analyse :</span><br><br>
-                                            "Analyse le ticker fourni en utilisant les données de prix et les fondamentaux.<br><br>
-                                            1. Commence par une synthèse de la valorisation (P/E vs secteur).<br>
-                                            2. Identifie les niveaux techniques clés (Support/Résistance).<br>
-                                            3. Conclus avec une recommandation basée sur les news récentes."
+                                            <span class="text-gray-500">// Donnez plutot des instructions d'analyse :</span><br><br>
+                                            "Analyse le ticker fourni en utilisant les donnees de prix et les fondamentaux.<br><br>
+                                            1. Commence par une synthese de la valorisation (P/E vs secteur).<br>
+                                            2. Identifie les niveaux techniques cles (Support/Resistance).<br>
+                                            3. Conclus avec une recommandation basee sur les news recentes."
                                         </div>
                                     </div>
                                 </div>
@@ -1279,17 +1279,17 @@
                             <!-- Section 1: Ajouter un Prompt -->
                             <section id="help-add-prompt" class="border rounded-lg p-6">
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">➕</span>
+                                    <span class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"></span>
                                     Ajouter un Nouveau Prompt
                                 </h3>
 
                                 <div class="space-y-4">
                                     <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
-                                        <p class="font-semibold text-blue-900">Méthode Recommandée: Interface Web</p>
+                                        <p class="font-semibold text-blue-900">Methode Recommandee: Interface Web</p>
                                         <ol class="mt-2 space-y-2 text-sm text-blue-800">
-                                            <li>1️⃣ Cliquer sur l'onglet <strong>📝 Prompts</strong></li>
-                                            <li>2️⃣ Cliquer sur <strong>➕</strong> (bouton vert dans la sidebar)</li>
-                                            <li>3️⃣ Remplir le formulaire:
+                                            <li>1 Cliquer sur l'onglet <strong> Prompts</strong></li>
+                                            <li>2 Cliquer sur <strong></strong> (bouton vert dans la sidebar)</li>
+                                            <li>3 Remplir le formulaire:
                                                 <ul class="ml-4 mt-1 list-disc">
                                                     <li><strong>Key</strong>: Identifiant unique (ex: <code>my_custom_prompt</code>)</li>
                                                     <li><strong>Description</strong>: Description courte</li>
@@ -1298,12 +1298,12 @@
                                                     <li><strong>Value</strong>: Contenu de votre prompt</li>
                                                 </ul>
                                             </li>
-                                            <li>4️⃣ Cliquer <strong>💾 Sauvegarder</strong></li>
+                                            <li>4 Cliquer <strong> Sauvegarder</strong></li>
                                         </ol>
                                     </div>
 
                                     <div class="bg-gray-50 border-l-4 border-gray-500 p-4">
-                                        <p class="font-semibold text-gray-900">Méthode Alternative: SQL Direct</p>
+                                        <p class="font-semibold text-gray-900">Methode Alternative: SQL Direct</p>
                                         <p class="text-sm text-gray-700 mt-2">Pour ajouter en masse ou via script:</p>
                                         <pre class="mt-2 bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>INSERT INTO emma_config (key, value, description, type, category, updated_by)
 VALUES (
@@ -1317,7 +1317,7 @@ VALUES (
 ON CONFLICT (key) DO UPDATE SET
     value = EXCLUDED.value,
     updated_at = NOW();</code></pre>
-                                        <p class="text-xs text-gray-600 mt-2">💡 Exécuter dans Supabase SQL Editor</p>
+                                        <p class="text-xs text-gray-600 mt-2"> Executer dans Supabase SQL Editor</p>
                                     </div>
                                 </div>
                             </section>
@@ -1325,7 +1325,7 @@ ON CONFLICT (key) DO UPDATE SET
                             <!-- Section 2: n8n Simple -->
                             <section id="help-n8n-simple" class="border rounded-lg p-6 bg-gradient-to-br from-purple-50 to-pink-50">
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">🔌</span>
+                                    <span class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center"></span>
                                     Workflow n8n Simple (3 Nodes)
                                 </h3>
 
@@ -1335,12 +1335,12 @@ ON CONFLICT (key) DO UPDATE SET
                                             <div class="font-bold text-purple-700">1. Get Prompt</div>
                                             <div class="text-xs text-gray-600">HTTP Request</div>
                                         </div>
-                                        <div class="text-2xl text-purple-400">→</div>
+                                        <div class="text-2xl text-purple-400">-></div>
                                         <div class="flex-1 border-2 border-purple-300 rounded-lg p-3 text-center">
                                             <div class="font-bold text-purple-700">2. Call Gemini</div>
                                             <div class="text-xs text-gray-600">HTTP Request</div>
                                         </div>
-                                        <div class="text-2xl text-purple-400">→</div>
+                                        <div class="text-2xl text-purple-400">-></div>
                                         <div class="flex-1 border-2 border-purple-300 rounded-lg p-3 text-center">
                                             <div class="font-bold text-purple-700">3. Send Result</div>
                                             <div class="text-xs text-gray-600">Email/SMS</div>
@@ -1386,11 +1386,11 @@ return { analysis: response };</code></pre>
                                 </div>
                             </section>
 
-                            <!-- Section 3: n8n Briefing Automatisé -->
+                            <!-- Section 3: n8n Briefing Automatise -->
                             <section id="help-n8n-briefing" class="border rounded-lg p-6 bg-gradient-to-br from-orange-50 to-yellow-50">
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">📧</span>
-                                    Briefing Automatisé (Cron)
+                                    <span class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center"></span>
+                                    Briefing Automatise (Cron)
                                 </h3>
 
                                 <div class="bg-white rounded-lg p-4 mb-4">
@@ -1399,17 +1399,17 @@ return { analysis: response };</code></pre>
                                             <div class="font-bold text-orange-700 text-xs">Schedule Trigger</div>
                                             <div class="text-xs text-gray-600">Cron: 20 11 * * 1-5</div>
                                         </div>
-                                        <div class="text-xl text-orange-400">→</div>
+                                        <div class="text-xl text-orange-400">-></div>
                                         <div class="flex-1 min-w-[150px] border-2 border-orange-300 rounded-lg p-2 text-center">
                                             <div class="font-bold text-orange-700 text-xs">Get Config</div>
                                             <div class="text-xs text-gray-600">HTTP</div>
                                         </div>
-                                        <div class="text-xl text-orange-400">→</div>
+                                        <div class="text-xl text-orange-400">-></div>
                                         <div class="flex-1 min-w-[150px] border-2 border-orange-300 rounded-lg p-2 text-center">
                                             <div class="font-bold text-orange-700 text-xs">Generate</div>
                                             <div class="text-xs text-gray-600">Gemini</div>
                                         </div>
-                                        <div class="text-xl text-orange-400">→</div>
+                                        <div class="text-xl text-orange-400">-></div>
                                         <div class="flex-1 min-w-[150px] border-2 border-orange-300 rounded-lg p-2 text-center">
                                             <div class="font-bold text-orange-700 text-xs">Send Email</div>
                                             <div class="text-xs text-gray-600">Resend</div>
@@ -1430,17 +1430,17 @@ return { analysis: response };</code></pre>
                                         <h4 class="font-semibold text-orange-900 mb-2">Briefings Disponibles</h4>
                                         <div class="grid grid-cols-3 gap-3 text-sm">
                                             <div class="border rounded p-2">
-                                                <div class="font-semibold text-orange-700">🌅 Matin</div>
+                                                <div class="font-semibold text-orange-700"> Matin</div>
                                                 <div class="text-xs text-gray-600">7h20 AM</div>
                                                 <code class="text-xs bg-gray-100 px-1 rounded">briefing_morning</code>
                                             </div>
                                             <div class="border rounded p-2">
-                                                <div class="font-semibold text-orange-700">☀️ Midi</div>
+                                                <div class="font-semibold text-orange-700"> Midi</div>
                                                 <div class="text-xs text-gray-600">11h50 AM</div>
                                                 <code class="text-xs bg-gray-100 px-1 rounded">briefing_midday</code>
                                             </div>
                                             <div class="border rounded p-2">
-                                                <div class="font-semibold text-orange-700">🌙 Soirée</div>
+                                                <div class="font-semibold text-orange-700"> Soiree</div>
                                                 <div class="text-xs text-gray-600">16h20 PM</div>
                                                 <code class="text-xs bg-gray-100 px-1 rounded">briefing_evening</code>
                                             </div>
@@ -1449,11 +1449,11 @@ return { analysis: response };</code></pre>
                                 </div>
                             </section>
 
-                            <!-- Section 4: Référence API -->
+                            <!-- Section 4: Reference API -->
                             <section id="help-api-ref" class="border rounded-lg p-6">
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">📚</span>
-                                    Référence API
+                                    <span class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"></span>
+                                    Reference API
                                 </h3>
 
                                 <div class="space-y-3">
@@ -1463,7 +1463,7 @@ return { analysis: response };</code></pre>
                                     </div>
 
                                     <div class="border-l-4 border-green-500 pl-4">
-                                        <div class="font-semibold text-green-900">Récupérer un prompt spécifique</div>
+                                        <div class="font-semibold text-green-900">Recuperer un prompt specifique</div>
                                         <code class="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block">GET https://gobapps.com/api/admin/emma-config?key=intent_fundamentals</code>
                                     </div>
 
@@ -1473,7 +1473,7 @@ return { analysis: response };</code></pre>
                                     </div>
 
                                     <div class="border-l-4 border-orange-500 pl-4">
-                                        <div class="font-semibold text-orange-900">Créer/Mettre à jour un prompt</div>
+                                        <div class="font-semibold text-orange-900">Creer/Mettre a jour un prompt</div>
                                         <code class="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block">POST https://gobapps.com/api/admin/emma-config</code>
                                         <pre class="mt-2 bg-gray-800 text-green-400 p-2 rounded text-xs overflow-x-auto"><code>{
   "key": "my_prompt",
@@ -1489,39 +1489,39 @@ return { analysis: response };</code></pre>
                             <!-- Section 5: Exemples de Prompts -->
                             <section id="help-examples" class="border rounded-lg p-6 bg-gradient-to-br from-green-50 to-emerald-50">
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">💡</span>
+                                    <span class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center"></span>
                                     Exemples de Prompts
                                 </h3>
 
                                 <div class="space-y-4">
                                     <div class="bg-white rounded-lg p-4">
-                                        <h4 class="font-semibold text-green-900 mb-2">📊 Analyse Technique</h4>
+                                        <h4 class="font-semibold text-green-900 mb-2"> Analyse Technique</h4>
                                         <div class="text-xs mb-2"><strong>Key:</strong> <code class="bg-gray-100 px-2 py-1 rounded">intent_technical_analysis</code></div>
                                         <pre class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>Tu es Emma, analyste technique senior.
 
-🎯 OBJECTIF: Analyse technique complète
+ OBJECTIF: Analyse technique complete
 
-📊 INDICATEURS REQUIS:
-- RSI (14 jours) + interprétation
+ INDICATEURS REQUIS:
+- RSI (14 jours) + interpretation
 - MACD (12,26,9) + signal
 - Moyennes mobiles (20, 50, 200 jours)
 - Volume relatif vs moyenne 30 jours
-- Support/Résistance clés
-- Tendance: haussière/baissière/neutre</code></pre>
+- Support/Resistance cles
+- Tendance: haussiere/baissiere/neutre</code></pre>
                                     </div>
 
                                     <div class="bg-white rounded-lg p-4">
-                                        <h4 class="font-semibold text-green-900 mb-2">📰 Résumé News</h4>
+                                        <h4 class="font-semibold text-green-900 mb-2"> Resume News</h4>
                                         <div class="text-xs mb-2"><strong>Key:</strong> <code class="bg-gray-100 px-2 py-1 rounded">intent_news_summary</code></div>
-                                        <pre class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>Tu es Emma, analyste news financières.
+                                        <pre class="bg-gray-800 text-green-400 p-3 rounded text-xs overflow-x-auto"><code>Tu es Emma, analyste news financieres.
 
-🎯 OBJECTIF: Résumer actualités récentes (<24h)
+ OBJECTIF: Resumer actualites recentes (<24h)
 
-📰 STRUCTURE:
+ STRUCTURE:
 1. Titre principal (1 phrase)
-2. Points clés (3-5 bullets)
+2. Points cles (3-5 bullets)
 3. Impact potentiel sur le titre
-4. Sentiment: Positif/Négatif/Neutre</code></pre>
+4. Sentiment: Positif/Negatif/Neutre</code></pre>
                                     </div>
                                 </div>
                             </section>
@@ -1529,12 +1529,12 @@ return { analysis: response };</code></pre>
                             <!-- Section 6: Variables d'Environnement -->
                             <section id="help-vars" class="border rounded-lg p-6">
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">🔑</span>
+                                    <span class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center"></span>
                                     Variables d'Environnement n8n
                                 </h3>
 
                                 <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
-                                    <p class="font-semibold text-yellow-900 mb-2">À Configurer dans n8n → Settings → Variables</p>
+                                    <p class="font-semibold text-yellow-900 mb-2">A Configurer dans n8n -> Settings -> Variables</p>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
@@ -1560,29 +1560,29 @@ return { analysis: response };</code></pre>
                             <!-- Section 7: Troubleshooting -->
                             <section id="help-troubleshoot" class="border rounded-lg p-6 bg-red-50">
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">🔧</span>
+                                    <span class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center"></span>
                                     Troubleshooting
                                 </h3>
 
                                 <div class="space-y-3">
                                     <div class="bg-white rounded-lg p-4">
-                                        <h4 class="font-semibold text-red-900 mb-2">❌ "Cannot read property 'value' of undefined"</h4>
-                                        <p class="text-sm text-gray-700 mb-2"><strong>Problème:</strong> Mauvais chemin JSON ou prompt inexistant</p>
-                                        <p class="text-sm text-gray-700"><strong>Solution:</strong> Vérifier que le <code class="bg-gray-100 px-1 rounded">key</code> existe dans l'API</p>
+                                        <h4 class="font-semibold text-red-900 mb-2"> "Cannot read property 'value' of undefined"</h4>
+                                        <p class="text-sm text-gray-700 mb-2"><strong>Probleme:</strong> Mauvais chemin JSON ou prompt inexistant</p>
+                                        <p class="text-sm text-gray-700"><strong>Solution:</strong> Verifier que le <code class="bg-gray-100 px-1 rounded">key</code> existe dans l'API</p>
                                         <pre class="mt-2 bg-gray-800 text-green-400 p-2 rounded text-xs overflow-x-auto"><code>// Tester d'abord:
 curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                     </div>
 
                                     <div class="bg-white rounded-lg p-4">
-                                        <h4 class="font-semibold text-red-900 mb-2">❌ "API key not valid"</h4>
-                                        <p class="text-sm text-gray-700 mb-2"><strong>Problème:</strong> Variable d'environnement manquante dans n8n</p>
-                                        <p class="text-sm text-gray-700"><strong>Solution:</strong> Vérifier Settings → Variables → <code class="bg-gray-100 px-1 rounded">GEMINI_API_KEY</code></p>
+                                        <h4 class="font-semibold text-red-900 mb-2"> "API key not valid"</h4>
+                                        <p class="text-sm text-gray-700 mb-2"><strong>Probleme:</strong> Variable d'environnement manquante dans n8n</p>
+                                        <p class="text-sm text-gray-700"><strong>Solution:</strong> Verifier Settings -> Variables -> <code class="bg-gray-100 px-1 rounded">GEMINI_API_KEY</code></p>
                                     </div>
 
                                     <div class="bg-white rounded-lg p-4">
-                                        <h4 class="font-semibold text-red-900 mb-2">❌ Prompt retourne vide</h4>
-                                        <p class="text-sm text-gray-700 mb-2"><strong>Problème:</strong> Prompt pas encore dans Supabase</p>
-                                        <p class="text-sm text-gray-700"><strong>Solution:</strong> Exécuter <code class="bg-gray-100 px-1 rounded">supabase-setup-complete.sql</code> d'abord</p>
+                                        <h4 class="font-semibold text-red-900 mb-2"> Prompt retourne vide</h4>
+                                        <p class="text-sm text-gray-700 mb-2"><strong>Probleme:</strong> Prompt pas encore dans Supabase</p>
+                                        <p class="text-sm text-gray-700"><strong>Solution:</strong> Executer <code class="bg-gray-100 px-1 rounded">supabase-setup-complete.sql</code> d'abord</p>
                                     </div>
                                 </div>
                             </section>
@@ -1590,33 +1590,33 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                             <!-- Section 8: Ressources -->
                             <section class="border rounded-lg p-6 bg-gradient-to-br from-indigo-50 to-blue-50">
                                 <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">📚</span>
-                                    Ressources Complètes
+                                    <span class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center"></span>
+                                    Ressources Completes
                                 </h3>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div class="bg-white rounded-lg p-4 border-2 border-indigo-200">
-                                        <div class="font-semibold text-indigo-900 mb-1">📘 Guide Complet n8n</div>
+                                        <div class="font-semibold text-indigo-900 mb-1"> Guide Complet n8n</div>
                                         <code class="text-xs bg-gray-100 px-2 py-1 rounded">GUIDE-AJOUT-PROMPTS-N8N.md</code>
-                                        <p class="text-xs text-gray-600 mt-2">Workflows détaillés, exemples avancés</p>
+                                        <p class="text-xs text-gray-600 mt-2">Workflows detailles, exemples avances</p>
                                     </div>
 
                                     <div class="bg-white rounded-lg p-4 border-2 border-indigo-200">
-                                        <div class="font-semibold text-indigo-900 mb-1">⚡ Référence Rapide</div>
+                                        <div class="font-semibold text-indigo-900 mb-1"> Reference Rapide</div>
                                         <code class="text-xs bg-gray-100 px-2 py-1 rounded">QUICK-REF-N8N-PROMPTS.md</code>
                                         <p class="text-xs text-gray-600 mt-2">Templates copiables-collables</p>
                                     </div>
 
                                     <div class="bg-white rounded-lg p-4 border-2 border-indigo-200">
-                                        <div class="font-semibold text-indigo-900 mb-1">🗄️ Setup Supabase</div>
+                                        <div class="font-semibold text-indigo-900 mb-1"> Setup Supabase</div>
                                         <code class="text-xs bg-gray-100 px-2 py-1 rounded">GUIDE-EXECUTION-SQL.md</code>
                                         <p class="text-xs text-gray-600 mt-2">Restaurer les prompts manquants</p>
                                     </div>
 
                                     <div class="bg-white rounded-lg p-4 border-2 border-indigo-200">
-                                        <div class="font-semibold text-indigo-900 mb-1">📖 Documentation API</div>
+                                        <div class="font-semibold text-indigo-900 mb-1"> Documentation API</div>
                                         <code class="text-xs bg-gray-100 px-2 py-1 rounded">docs/api/DOCUMENTATION_APIs.md</code>
-                                        <p class="text-xs text-gray-600 mt-2">Référence complète des APIs</p>
+                                        <p class="text-xs text-gray-600 mt-2">Reference complete des APIs</p>
                                     </div>
                                 </div>
                             </section>
@@ -1625,51 +1625,51 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                     </div>
                 </div>
 
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <!-- EMMA IA TAB CONTENT - Model Configuration per Chat Mode     -->
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <div id="emmaiaTabContent" class="hidden max-w-5xl mx-auto">
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <!-- Header -->
                         <div class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white p-6">
-                            <h2 class="text-2xl font-bold">🤖 Configuration Modèles Emma IA</h2>
-                            <p class="text-purple-100 mt-1">Configurez les modèles IA et prompts pour chaque mode de chat</p>
+                            <h2 class="text-2xl font-bold"> Configuration Modeles Emma IA</h2>
+                            <p class="text-purple-100 mt-1">Configurez les modeles IA et prompts pour chaque mode de chat</p>
                         </div>
 
                         <div class="p-6 space-y-8">
-                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!--  -->
                             <!-- GLOBAL MODEL REGISTRY                               -->
-                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!--  -->
                             <section class="border rounded-lg p-6 bg-white shadow-sm">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                                        <span class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-xl">🗂️</span>
-                                        Registre des Modèles
+                                        <span class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-xl"></span>
+                                        Registre des Modeles
                                     </h3>
                                     <button onclick="createNewModel()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center gap-2">
-                                        ➕ Nouveau Modèle
+                                         Nouveau Modele
                                     </button>
                                 </div>
-                                <p class="text-sm text-gray-600 mb-4">Gérez la liste des modèles LLM disponibles pour toutes les applications.</p>
+                                <p class="text-sm text-gray-600 mb-4">Gerez la liste des modeles LLM disponibles pour toutes les applications.</p>
                                 
                                 <div id="modelsListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <!-- Populated by models-manager.js -->
                                     <div class="col-span-full text-center p-8 text-gray-400">
                                         <div class="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent rounded-full mb-2"></div>
-                                        <p>Chargement des modèles...</p>
+                                        <p>Chargement des modeles...</p>
                                     </div>
                                 </div>
                             </section>
-                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!--  -->
                             <!-- MODE SELECTION - User-friendly UI for dual-mode    -->
-                            <!-- ═══════════════════════════════════════════════════ -->
+                            <!--  -->
                             <section class="border-2 border-indigo-200 rounded-xl p-5 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
                                 <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-xl">🎛️</span>
+                                    <span class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-xl"></span>
                                     Mode de traitement Emma
                                     <span class="ml-2 px-2 py-0.5 bg-indigo-600 text-white text-xs rounded-full">NOUVEAU</span>
                                 </h3>
-                                <p class="text-sm text-gray-600 mb-4">Choisissez comment Emma traite vos demandes. Ce paramètre s'applique à toutes les applications.</p>
+                                <p class="text-sm text-gray-600 mb-4">Choisissez comment Emma traite vos demandes. Ce parametre s'applique a toutes les applications.</p>
                                 
                                 <!-- Mode Radio Cards -->
                                 <div class="grid grid-cols-3 gap-4 mb-4">
@@ -1678,15 +1678,15 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                         <input type="radio" name="emmaProcessingMode" value="external" class="hidden peer">
                                         <div class="peer-checked:border-green-500 peer-checked:bg-green-50 border-2 border-gray-200 rounded-xl p-4 hover:border-green-300 transition-all">
                                             <div class="text-center">
-                                                <div class="text-3xl mb-2">🌐</div>
+                                                <div class="text-3xl mb-2"></div>
                                                 <div class="font-bold text-gray-800">IA Externe</div>
-                                                <div class="text-xs text-gray-500 mt-1">API Emma complète</div>
+                                                <div class="text-xs text-gray-500 mt-1">API Emma complete</div>
                                             </div>
                                             <ul class="text-xs text-gray-600 mt-3 space-y-1">
-                                                <li>✅ Analyse financière avancée</li>
-                                                <li>✅ Accès données temps réel</li>
-                                                <li>✅ Réponses intelligentes</li>
-                                                <li>⚠️ Requiert connexion</li>
+                                                <li> Analyse financiere avancee</li>
+                                                <li> Acces donnees temps reel</li>
+                                                <li> Reponses intelligentes</li>
+                                                <li> Requiert connexion</li>
                                             </ul>
                                         </div>
                                     </label>
@@ -1696,15 +1696,15 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                         <input type="radio" name="emmaProcessingMode" value="local" class="hidden peer">
                                         <div class="peer-checked:border-amber-500 peer-checked:bg-amber-50 border-2 border-gray-200 rounded-xl p-4 hover:border-amber-300 transition-all">
                                             <div class="text-center">
-                                                <div class="text-3xl mb-2">🔒</div>
-                                                <div class="font-bold text-gray-800">Local / Privé</div>
-                                                <div class="text-xs text-gray-500 mt-1">Aucune donnée envoyée</div>
+                                                <div class="text-3xl mb-2"></div>
+                                                <div class="font-bold text-gray-800">Local / Prive</div>
+                                                <div class="text-xs text-gray-500 mt-1">Aucune donnee envoyee</div>
                                             </div>
                                             <ul class="text-xs text-gray-600 mt-3 space-y-1">
-                                                <li>✅ 100% confidentiel</li>
-                                                <li>✅ Fonctionne hors-ligne</li>
-                                                <li>✅ Réponses instantanées</li>
-                                                <li>⚠️ Capacités limitées</li>
+                                                <li> 100% confidentiel</li>
+                                                <li> Fonctionne hors-ligne</li>
+                                                <li> Reponses instantanees</li>
+                                                <li> Capacites limitees</li>
                                             </ul>
                                         </div>
                                     </label>
@@ -1714,15 +1714,15 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                         <input type="radio" name="emmaProcessingMode" value="auto" checked class="hidden peer">
                                         <div class="peer-checked:border-indigo-500 peer-checked:bg-indigo-50 border-2 border-gray-200 rounded-xl p-4 hover:border-indigo-300 transition-all">
                                             <div class="text-center">
-                                                <div class="text-3xl mb-2">🤖</div>
+                                                <div class="text-3xl mb-2"></div>
                                                 <div class="font-bold text-gray-800">Automatique</div>
-                                                <div class="text-xs text-gray-500 mt-1">Décision intelligente</div>
+                                                <div class="text-xs text-gray-500 mt-1">Decision intelligente</div>
                                             </div>
                                             <ul class="text-xs text-gray-600 mt-3 space-y-1">
-                                                <li>✅ Meilleur des 2 mondes</li>
-                                                <li>✅ Données sensibles = local</li>
-                                                <li>✅ Questions générales = IA</li>
-                                                <li>⭐ Recommandé</li>
+                                                <li> Meilleur des 2 mondes</li>
+                                                <li> Donnees sensibles = local</li>
+                                                <li> Questions generales = IA</li>
+                                                <li> Recommande</li>
                                             </ul>
                                         </div>
                                     </label>
@@ -1732,10 +1732,10 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                 <div class="flex items-center justify-between mt-4 pt-4 border-t border-indigo-200">
                                     <div id="emmaModeStatus" class="text-sm text-gray-500">
                                         Mode global: <strong id="emmaModeCurrentValue" class="text-indigo-600">Chargement...</strong>
-                                        <span class="text-xs text-gray-400 ml-2">(partagé avec tous les utilisateurs)</span>
+                                        <span class="text-xs text-gray-400 ml-2">(partage avec tous les utilisateurs)</span>
                                     </div>
                                     <button onclick="saveEmmaMode()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2">
-                                        🌐 Sauvegarder pour tous
+                                         Sauvegarder pour tous
                                     </button>
                                 </div>
                             </section>
@@ -1743,23 +1743,23 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                             <!-- Info box -->
                             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <p class="text-sm text-blue-800">
-                                    <strong>💡 Comment ça marche:</strong> Chaque mode de chat peut utiliser un modèle différent. 
-                                    Les modèles disponibles incluent Gemini, Perplexity, OpenAI et Claude.
-                                    Les paramètres sont sauvegardés dans le localStorage du navigateur.
+                                    <strong> Comment ca marche:</strong> Chaque mode de chat peut utiliser un modele different. 
+                                    Les modeles disponibles incluent Gemini, Perplexity, OpenAI et Claude.
+                                    Les parametres sont sauvegardes dans le localStorage du navigateur.
                                 </p>
                             </div>
 
                             <!-- SECTION: Recherchiste -->
                             <section class="border rounded-lg p-4 bg-gradient-to-br from-blue-50 to-cyan-50">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl">🔬</span>
+                                    <span class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-xl"></span>
                                     Recherchiste (Mode Recherche)
                                 </h3>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label for="emmaiaResearcherModel" class="block text-sm font-medium text-gray-700 mb-1">Modèle IA</label>
+                                        <label for="emmaiaResearcherModel" class="block text-sm font-medium text-gray-700 mb-1">Modele IA</label>
                                         <select id="emmaiaResearcherModel" class="w-full px-3 py-2 border rounded-lg">
-                                            <option value="sonar-pro">Perplexity Sonar Pro (défaut)</option>
+                                            <option value="sonar-pro">Perplexity Sonar Pro (defaut)</option>
                                             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                                             <option value="gemini-2.0-pro">Gemini 2.0 Pro</option>
                                             <option value="gpt-4o">OpenAI GPT-4o</option>
@@ -1769,7 +1769,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                     <div class="flex items-center gap-4">
                                         <label for="emmaiaResearcherGoogleSearch" class="flex items-center gap-2">
                                             <input type="checkbox" id="emmaiaResearcherGoogleSearch" checked class="rounded">
-                                            <span class="text-sm">🌐 Google Search (Grounding)</span>
+                                            <span class="text-sm"> Google Search (Grounding)</span>
                                         </label>
                                     </div>
                                     <div>
@@ -1777,23 +1777,23 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                         <input type="number" id="emmaiaResearcherTokens" class="w-full px-3 py-2 border rounded-lg" value="2000">
                                     </div>
                                     <div>
-                                        <label for="emmaiaResearcherTemp" class="block text-sm font-medium text-gray-700 mb-1">Température (0.0 - 1.0)</label>
+                                        <label for="emmaiaResearcherTemp" class="block text-sm font-medium text-gray-700 mb-1">Temperature (0.0 - 1.0)</label>
                                         <input type="number" id="emmaiaResearcherTemp" class="w-full px-3 py-2 border rounded-lg" value="0.2" step="0.1" min="0" max="1">
                                     </div>
                                 </div>
                             </section>
 
-                            <!-- SECTION: Rédactrice -->
+                            <!-- SECTION: Redactrice -->
                             <section class="border rounded-lg p-4 bg-gradient-to-br from-green-50 to-emerald-50">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-xl">✍️</span>
-                                    Rédactrice (Mode Écriture)
+                                    <span class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-xl"></span>
+                                    Redactrice (Mode Ecriture)
                                 </h3>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label for="emmaiaWriterModel" class="block text-sm font-medium text-gray-700 mb-1">Modèle IA</label>
+                                        <label for="emmaiaWriterModel" class="block text-sm font-medium text-gray-700 mb-1">Modele IA</label>
                                         <select id="emmaiaWriterModel" class="w-full px-3 py-2 border rounded-lg">
-                                            <option value="gemini-2.0-pro">Gemini 2.0 Pro (défaut)</option>
+                                            <option value="gemini-2.0-pro">Gemini 2.0 Pro (defaut)</option>
                                             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                                             <option value="gpt-4o">OpenAI GPT-4o</option>
                                             <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
@@ -1803,7 +1803,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                     <div class="flex items-center gap-4">
                                         <label for="emmaiaWriterGoogleSearch" class="flex items-center gap-2">
                                             <input type="checkbox" id="emmaiaWriterGoogleSearch" class="rounded">
-                                            <span class="text-sm">🌐 Google Search</span>
+                                            <span class="text-sm"> Google Search</span>
                                         </label>
                                     </div>
                                     <div>
@@ -1811,7 +1811,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                         <input type="number" id="emmaiaWriterTokens" class="w-full px-3 py-2 border rounded-lg" value="2500">
                                     </div>
                                     <div>
-                                        <label for="emmaiaWriterTemp" class="block text-sm font-medium text-gray-700 mb-1">Température</label>
+                                        <label for="emmaiaWriterTemp" class="block text-sm font-medium text-gray-700 mb-1">Temperature</label>
                                         <input type="number" id="emmaiaWriterTemp" class="w-full px-3 py-2 border rounded-lg" value="0.7" step="0.1" min="0" max="1">
                                     </div>
                                 </div>
@@ -1820,14 +1820,14 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                             <!-- SECTION: L'Avocat du Diable -->
                             <section class="border rounded-lg p-4 bg-gradient-to-br from-red-50 to-orange-50">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-xl">⚖️</span>
+                                    <span class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-xl"></span>
                                     L'Avocat du Diable (Mode Critique)
                                 </h3>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label for="emmaiaCriticModel" class="block text-sm font-medium text-gray-700 mb-1">Modèle IA</label>
+                                        <label for="emmaiaCriticModel" class="block text-sm font-medium text-gray-700 mb-1">Modele IA</label>
                                         <select id="emmaiaCriticModel" class="w-full px-3 py-2 border rounded-lg">
-                                            <option value="claude-3-5-sonnet">Claude 3.5 Sonnet (défaut)</option>
+                                            <option value="claude-3-5-sonnet">Claude 3.5 Sonnet (defaut)</option>
                                             <option value="claude-3-opus">Claude 3 Opus</option>
                                             <option value="gpt-4o">OpenAI GPT-4o</option>
                                             <option value="o1-preview">OpenAI o1 Preview</option>
@@ -1837,7 +1837,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                     <div class="flex items-center gap-4">
                                         <label for="emmaiaCriticGoogleSearch" class="flex items-center gap-2">
                                             <input type="checkbox" id="emmaiaCriticGoogleSearch" checked class="rounded">
-                                            <span class="text-sm">🌐 Google Search</span>
+                                            <span class="text-sm"> Google Search</span>
                                         </label>
                                     </div>
                                     <div>
@@ -1845,7 +1845,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                         <input type="number" id="emmaiaCriticTokens" class="w-full px-3 py-2 border rounded-lg" value="1500">
                                     </div>
                                     <div>
-                                        <label for="emmaiaCriticTemp" class="block text-sm font-medium text-gray-700 mb-1">Température</label>
+                                        <label for="emmaiaCriticTemp" class="block text-sm font-medium text-gray-700 mb-1">Temperature</label>
                                         <input type="number" id="emmaiaCriticTemp" class="w-full px-3 py-2 border rounded-lg" value="0.3" step="0.1" min="0" max="1">
                                     </div>
                                 </div>
@@ -1854,14 +1854,14 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                             <!-- SECTION: Emma Geek -->
                             <section class="border rounded-lg p-4 bg-gradient-to-br from-purple-50 to-pink-50">
                                 <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                    <span class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-xl">👩‍💻</span>
+                                    <span class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-xl"></span>
                                     Emma Geek (Mode Technique)
                                 </h3>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label for="emmaiaTechnicalModel" class="block text-sm font-medium text-gray-700 mb-1">Modèle IA</label>
+                                        <label for="emmaiaTechnicalModel" class="block text-sm font-medium text-gray-700 mb-1">Modele IA</label>
                                         <select id="emmaiaTechnicalModel" class="w-full px-3 py-2 border rounded-lg">
-                                            <option value="gemini-2.5-flash">Gemini 2.5 Flash (défaut)</option>
+                                            <option value="gemini-2.5-flash">Gemini 2.5 Flash (defaut)</option>
                                             <option value="gemini-2.5-thinking">Gemini 2.5 Thinking</option>
                                             <option value="gpt-4-turbo">OpenAI GPT-4 Turbo</option>
                                             <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
@@ -1871,7 +1871,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                     <div class="flex items-center gap-4">
                                         <label for="emmaiaTechnicalGoogleSearch" class="flex items-center gap-2">
                                             <input type="checkbox" id="emmaiaTechnicalGoogleSearch" class="rounded">
-                                            <span class="text-sm">🌐 Google Search</span>
+                                            <span class="text-sm"> Google Search</span>
                                         </label>
                                     </div>
                                     <div>
@@ -1879,7 +1879,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                         <input type="number" id="emmaiaTechnicalTokens" class="w-full px-3 py-2 border rounded-lg" value="3000">
                                     </div>
                                     <div>
-                                        <label for="emmaiaTechnicalTemp" class="block text-sm font-medium text-gray-700 mb-1">Température</label>
+                                        <label for="emmaiaTechnicalTemp" class="block text-sm font-medium text-gray-700 mb-1">Temperature</label>
                                         <input type="number" id="emmaiaTechnicalTemp" class="w-full px-3 py-2 border rounded-lg" value="0.1" step="0.1" min="0" max="1">
                                     </div>
                                 </div>
@@ -1888,18 +1888,18 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                             <!-- Save Button -->
                             <div class="flex gap-3 pt-4 border-t">
                                 <button onclick="saveEmmaIAConfigs()" class="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold">
-                                    💾 Sauvegarder les configurations
+                                     Sauvegarder les configurations
                                 </button>
                                 <button onclick="resetEmmaIAConfigs()" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
-                                    🔄 Réinitialiser
+                                     Reinitialiser
                                 </button>
                             </div>
 
                             <!-- API Keys Warning -->
                             <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                                <h4 class="font-semibold text-amber-800 mb-2">⚠️ Clés API requises</h4>
+                                <h4 class="font-semibold text-amber-800 mb-2"> Cles API requises</h4>
                                 <p class="text-sm text-amber-700">
-                                    Pour utiliser les modèles non-Gemini, assurez-vous que les variables d'environnement suivantes sont configurées:
+                                    Pour utiliser les modeles non-Gemini, assurez-vous que les variables d'environnement suivantes sont configurees:
                                 </p>
                                 <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
                                     <code class="bg-amber-100 px-2 py-1 rounded">PERPLEXITY_API_KEY</code>
@@ -1912,20 +1912,20 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                     </div>
                 </div>
 
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <!-- BUILDER TAB CONTENT - Drag & Drop Editor                    -->
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!--  -->
                 <div id="builderTabContent" class="hidden flex-col h-full absolute inset-0 bg-gray-50 z-10 mt-[65px]">
                     <!-- Toolbar -->
                     <div class="h-12 bg-white border-b flex items-center justify-between px-4 shadow-sm">
                         <div class="flex items-center gap-2">
-                            <span class="text-lg">🏗️</span>
+                            <span class="text-lg"></span>
                             <h3 class="font-bold text-gray-700">Visual Builder</h3>
-                            <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">Bêta</span>
+                            <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">Beta</span>
                         </div>
                         <div class="flex gap-2">
-                             <button class="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-700">👁️ Preview</button>
-                             <button class="text-xs px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 rounded text-white font-medium">💾 Sauvegarder</button>
+                             <button class="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-700"> Preview</button>
+                             <button class="text-xs px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 rounded text-white font-medium"> Sauvegarder</button>
                         </div>
                     </div>
 
@@ -1945,19 +1945,19 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                     <span class="text-sm font-medium">Texte</span>
                                 </div>
                                 <div class="draggable-item bg-white p-3 rounded border border-gray-200 cursor-grab hover:border-indigo-500 hover:shadow-md transition flex items-center gap-3 select-none" draggable="true" data-type="image">
-                                    <div class="w-8 h-8 rounded bg-purple-50 flex items-center justify-center text-purple-600 text-lg">📷</div>
+                                    <div class="w-8 h-8 rounded bg-purple-50 flex items-center justify-center text-purple-600 text-lg"></div>
                                     <span class="text-sm font-medium">Image</span>
                                 </div>
                                 <div class="draggable-item bg-white p-3 rounded border border-gray-200 cursor-grab hover:border-indigo-500 hover:shadow-md transition flex items-center gap-3 select-none" draggable="true" data-type="button">
-                                    <div class="w-8 h-8 rounded bg-green-50 flex items-center justify-center text-green-600 text-lg">🔘</div>
+                                    <div class="w-8 h-8 rounded bg-green-50 flex items-center justify-center text-green-600 text-lg"></div>
                                     <span class="text-sm font-medium">Bouton</span>
                                 </div>
                                 <div class="draggable-item bg-white p-3 rounded border border-gray-200 cursor-grab hover:border-indigo-500 hover:shadow-md transition flex items-center gap-3 select-none" draggable="true" data-type="divider">
-                                    <div class="w-8 h-8 rounded bg-orange-50 flex items-center justify-center text-orange-600 text-lg">➖</div>
-                                    <span class="text-sm font-medium">Séparateur</span>
+                                    <div class="w-8 h-8 rounded bg-orange-50 flex items-center justify-center text-orange-600 text-lg"></div>
+                                    <span class="text-sm font-medium">Separateur</span>
                                 </div>
                                  <div class="draggable-item bg-white p-3 rounded border border-gray-200 cursor-grab hover:border-indigo-500 hover:shadow-md transition flex items-center gap-3 select-none" draggable="true" data-type="spacer">
-                                    <div class="w-8 h-8 rounded bg-yellow-50 flex items-center justify-center text-yellow-600 text-lg">⬍</div>
+                                    <div class="w-8 h-8 rounded bg-yellow-50 flex items-center justify-center text-yellow-600 text-lg"></div>
                                     <span class="text-sm font-medium">Espaceur</span>
                                 </div>
                             </div>
@@ -1975,7 +1975,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                                 <!-- Drop Zone -->
                                 <div id="drop-zone" class="min-h-[600px] p-4 space-y-2">
                                     <div class="h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 bg-gray-50/50">
-                                        <p>Glissez et déposez des blocs ici pour construire votre email</p>
+                                        <p>Glissez et deposez des blocs ici pour construire votre email</p>
                                     </div>
                                 </div>
 
@@ -1988,12 +1988,12 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                         <!-- 3. PROPERTIES PANEL -->
                         <div class="w-80 bg-white border-l border-gray-200 flex flex-col shadow-sm z-20">
                             <div class="p-4 border-b bg-gray-50">
-                                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Propriétés</h3>
+                                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Proprietes</h3>
                             </div>
                             <div id="inspector-panel" class="p-6 overflow-y-auto flex-1">
                                 <div class="text-center text-gray-400 mt-20">
-                                    <div class="text-4xl mb-2">👆</div>
-                                    <p class="text-sm">Sélectionnez un bloc sur le canvas pour modifier ses propriétés</p>
+                                    <div class="text-4xl mb-2"></div>
+                                    <p class="text-sm">Selectionnez un bloc sur le canvas pour modifier ses proprietes</p>
                                 </div>
                             </div>
                         </div>
@@ -2005,14 +2005,14 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
     </div>
 
 
-    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  -->
     <!-- MODEL EDITOR MODAL                                          -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  -->
     <div id="modelEditModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto m-4">
             <div class="p-5 border-b flex justify-between items-center sticky top-0 bg-white z-10">
-                <h3 id="modelModalTitle" class="text-xl font-bold text-gray-800">Modifier Modèle</h3>
-                <button onclick="closeModelModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+                <h3 id="modelModalTitle" class="text-xl font-bold text-gray-800">Modifier Modele</h3>
+                <button onclick="closeModelModal()" class="text-gray-400 hover:text-gray-600"></button>
             </div>
             
             <div class="p-6 space-y-4" id="modelEditForm">
@@ -2050,7 +2050,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                 </div>
                 
                 <div>
-                     <label for="modelTemperature" class="block text-sm font-medium text-gray-700 mb-1">Temperature Défaut</label>
+                     <label for="modelTemperature" class="block text-sm font-medium text-gray-700 mb-1">Temperature Defaut</label>
                      <input type="number" id="modelTemperature" step="0.1" min="0" max="2" class="w-full px-3 py-2 border rounded-lg">
                 </div>
 
@@ -2072,27 +2072,27 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                 
                 <div class="flex items-center gap-2 pt-2">
                     <input type="checkbox" id="modelEnabled" class="w-4 h-4 text-indigo-600 rounded">
-                    <label for="modelEnabled" class="text-sm font-medium text-gray-700">Modèle Actif</label>
+                    <label for="modelEnabled" class="text-sm font-medium text-gray-700">Modele Actif</label>
                 </div>
             </div>
             
             <div class="p-5 border-t bg-gray-50 flex justify-between">
                 <button onclick="deleteModel()" class="text-red-600 hover:text-red-800 text-sm font-medium px-4 py-2 hover:bg-red-50 rounded transition">
-                    🗑️ Supprimer
+                     Supprimer
                 </button>
                 <div class="flex gap-2">
                     <button onclick="closeModelModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-100 transition text-sm">Annuler</button>
                     <button onclick="saveModel()" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-sm font-medium shadow-sm">
-                        💾 Sauvegarder
+                         Sauvegarder
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  -->
     <!-- EMMA MODE CONFIGURATION SCRIPT (GLOBAL VIA SUPABASE)        -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  -->
     <script>
         // Emma processing mode configuration - GLOBAL for all users
         const EMMA_MODE_CONFIG_KEY = 'emma_processing_mode';
@@ -2130,7 +2130,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                             radioBtn.checked = true;
                         }
                         updateModeLabel(savedMode);
-                        console.log('🌐 Emma mode loaded from Supabase (GLOBAL):', savedMode);
+                        console.log(' Emma mode loaded from Supabase (GLOBAL):', savedMode);
                         return savedMode;
                     }
                 }
@@ -2168,20 +2168,20 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
                     
                     // Show success notification
                     if (statusEl) {
-                        statusEl.innerHTML = `<span class="text-green-600 font-medium">✅ Mode "${getModeLabel(selectedMode)}" sauvegardé pour TOUS les utilisateurs!</span>`;
+                        statusEl.innerHTML = `<span class="text-green-600 font-medium"> Mode "${getModeLabel(selectedMode)}" sauvegarde pour TOUS les utilisateurs!</span>`;
                         setTimeout(() => {
                             statusEl.innerHTML = `Mode global: <strong class="text-indigo-600">${getModeLabel(selectedMode)}</strong>`;
                         }, 3000);
                     }
                     
-                    console.log('🌐 Emma mode saved to Supabase (GLOBAL):', selectedMode);
+                    console.log(' Emma mode saved to Supabase (GLOBAL):', selectedMode);
                 } else {
                     throw new Error('Supabase not initialized');
                 }
             } catch (err) {
                 console.error('Failed to save mode to Supabase:', err);
                 if (statusEl) {
-                    statusEl.innerHTML = `<span class="text-red-600 font-medium">❌ Erreur: ${err.message}</span>`;
+                    statusEl.innerHTML = `<span class="text-red-600 font-medium"> Erreur: ${err.message}</span>`;
                 }
             }
         }
@@ -2190,7 +2190,7 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
         function getModeLabel(mode) {
             const labels = {
                 'external': 'IA Externe',
-                'local': 'Local / Privé',
+                'local': 'Local / Prive',
                 'auto': 'Automatique'
             };
             return labels[mode] || mode;
@@ -2214,9 +2214,9 @@ curl https://gobapps.com/api/admin/emma-config?key=votre_key</code></pre>
         window.saveEmmaMode = saveEmmaMode;
     </script>
 
-    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  -->
     <!-- MODULAR JAVASCRIPT - Chargement via ES6 modules             -->
-    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!--  -->
     <script type="module">
         import { init } from './modules/emma-config/main.js';
         window.addEventListener('DOMContentLoaded', init);

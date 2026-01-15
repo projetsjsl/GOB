@@ -20,7 +20,7 @@ class ToastManager {
         if (!document.getElementById('toast-container')) {
             this.container = document.createElement('div');
             this.container.id = 'toast-container';
-            // BUG #A3 FIX: Toast positionné pour ne pas couvrir la navigation (z-index inférieur à nav)
+            // BUG #A3 FIX: Toast positionne pour ne pas couvrir la navigation (z-index inferieur a nav)
             this.container.style.cssText = `
                 position: fixed;
                 bottom: 24px;
@@ -130,17 +130,17 @@ class ToastManager {
         
         // Icon mapping
         const icons = {
-            success: '✓', // Or iconoir class if font is loaded
-            error: '✕',
-            warning: '⚠',
-            info: 'ℹ',
-            gold: '★'
+            success: '', // Or iconoir class if font is loaded
+            error: '',
+            warning: '',
+            info: 'i',
+            gold: ''
         };
 
         // If iconoir is loaded, use classes
         const iconHTML = document.querySelector('link[href*="iconoir"]') 
             ? `<i class="toast-icon iconoir-${this.getIconName(type)}"></i>`
-            : `<span class="toast-icon">${icons[type] || 'ℹ'}</span>`;
+            : `<span class="toast-icon">${icons[type] || 'i'}</span>`;
 
         toast.innerHTML = `
             ${iconHTML}
@@ -193,7 +193,7 @@ window.Toast = new ToastManager();
 
 // Test method
 window.testToast = () => {
-    window.Toast.show('Données sauvegardées avec succès', 'success', 'Succès');
+    window.Toast.show('Donnees sauvegardees avec succes', 'success', 'Succes');
     setTimeout(() => window.Toast.show('Erreur de connexion au serveur', 'error', 'Erreur'), 1000);
-    setTimeout(() => window.Toast.show('Mise à jour disponible', 'info', 'Info'), 2000);
+    setTimeout(() => window.Toast.show('Mise a jour disponible', 'info', 'Info'), 2000);
 };

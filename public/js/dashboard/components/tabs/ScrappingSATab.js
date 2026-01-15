@@ -39,7 +39,7 @@ const ScrappingSATab = (props = {}) => {
                  <h2 className={`text-2xl font-bold transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                 }`}>
-                    <Icon emoji="🕷️" size={24} className="mr-2 inline-block" />
+                    <Icon emoji="" size={24} className="mr-2 inline-block" />
                     Scraping Seeking Alpha
                 </h2>
                 <div className="flex gap-2">
@@ -47,14 +47,14 @@ const ScrappingSATab = (props = {}) => {
                         onClick={clearScrapingLogs}
                         className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
                     >
-                        🗑️ Effacer logs
+                         Effacer logs
                     </button>
                 </div>
             </div>
 
             {/* Status Card */}
             <div className={`rounded-lg shadow p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>État du Scraping</h3>
+                <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Etat du Scraping</h3>
                 <div className="flex items-center gap-4 mb-4">
                     <div className={`w-4 h-4 rounded-full ${
                         scrapingStatus === 'idle' ? 'bg-gray-400' :
@@ -73,24 +73,24 @@ const ScrappingSATab = (props = {}) => {
                     >
                         {scrapingStatus === 'running' ? (
                             <>
-                                <span className="animate-spin">⏳</span> Scraping en cours...
+                                <span className="animate-spin"></span> Scraping en cours...
                             </>
                         ) : (
                             <>
-                                🚀 Lancer le Scraper Automatique
+                                 Lancer le Scraper Automatique
                             </>
                         )}
                     </button>
                 </div>
                 <p className={`text-sm mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    Le scraper va ouvrir un nouvel onglet, collecter les données pour chaque ticker, et les sauvegarder automatiquement.
+                    Le scraper va ouvrir un nouvel onglet, collecter les donnees pour chaque ticker, et les sauvegarder automatiquement.
                     Gardez l'onglet du dashboard ouvert pendant le processus.
                 </p>
             </div>
 
             {/* Manual Script Generator */}
             <div className={`rounded-lg shadow p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Générateur de Script Manuel (F12)</h3>
+                <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Generateur de Script Manuel (F12)</h3>
                 <div className="flex gap-4 mb-4">
                     <input 
                         type="text" 
@@ -104,7 +104,7 @@ const ScrappingSATab = (props = {}) => {
                             if (!manualTicker) return;
                             const script = generateScrapingScript(manualTicker);
                             navigator.clipboard.writeText(script).then(() => {
-                                addScrapingLog(`📋 Script pour ${manualTicker} copié!`, 'success');
+                                addScrapingLog(` Script pour ${manualTicker} copie!`, 'success');
                             });
                         }}
                         className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
@@ -129,7 +129,7 @@ const ScrappingSATab = (props = {}) => {
                          }}
                          className="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors"
                     >
-                        Prévisualiser
+                        Previsualiser
                     </button>
                 </div>
                 <div className={`p-4 rounded text-sm font-mono ${isDarkMode ? 'bg-gray-900 text-gray-300' : 'bg-gray-100 text-gray-700'}`}>
@@ -137,9 +137,9 @@ const ScrappingSATab = (props = {}) => {
                     <ol className="list-decimal pl-5 space-y-1">
                         <li>Entrez un ticker et cliquez sur "Copier Script"</li>
                         <li>Cliquez sur "Ouvrir Page" pour aller sur Seeking Alpha</li>
-                        <li>Ouvrez la console développeur (F12 ou Clic Droit &gt; Inspecter &gt; Console)</li>
-                        <li>Collez le script (Ctrl+V) et appuyez sur Entrée</li>
-                        <li>Revenez ici, les données devraient apparaître dans les logs</li>
+                        <li>Ouvrez la console developpeur (F12 ou Clic Droit &gt; Inspecter &gt; Console)</li>
+                        <li>Collez le script (Ctrl+V) et appuyez sur Entree</li>
+                        <li>Revenez ici, les donnees devraient apparaitre dans les logs</li>
                     </ol>
                 </div>
             </div>
@@ -149,7 +149,7 @@ const ScrappingSATab = (props = {}) => {
                 <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
                     <h3 className="text-gray-200 font-mono text-sm">Console Logs</h3>
                     <span className="text-xs text-gray-500">
-                        {hiddenLogsCount > 0 ? `${displayedLogs.length} affichés / ${scrapingLogs.length}` : `${scrapingLogs.length} événements`}
+                        {hiddenLogsCount > 0 ? `${displayedLogs.length} affiches / ${scrapingLogs.length}` : `${scrapingLogs.length} evenements`}
                     </span>
                 </div>
                 <div className="p-4 h-96 overflow-y-auto font-mono text-sm space-y-1" id="scraping-console">
@@ -157,7 +157,7 @@ const ScrappingSATab = (props = {}) => {
                         <div className="text-gray-500 italic">En attente de logs...</div>
                     )}
                     {hiddenLogsCount > 0 && (
-                        <div className="text-xs text-gray-500 italic">Les anciens logs sont masqués pour éviter le freeze.</div>
+                        <div className="text-xs text-gray-500 italic">Les anciens logs sont masques pour eviter le freeze.</div>
                     )}
                     {displayedLogs.map((log, index) => (
                         <div key={index} className={`border-l-2 pl-2 ${
@@ -178,14 +178,14 @@ const ScrappingSATab = (props = {}) => {
              {/* Raw Data Preview */}
              {seekingAlphaData.stocks && seekingAlphaData.stocks.length > 0 && (
                 <div className={`rounded-lg shadow p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                    <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Données Récupérées ({seekingAlphaData.stocks.length})</h3>
+                    <h3 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Donnees Recuperees ({seekingAlphaData.stocks.length})</h3>
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-sm">
                             <thead>
                                 <tr className={isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}>
                                     <th className="p-2 text-left">Ticker</th>
                                     <th className="p-2 text-left">Date</th>
-                                    <th className="p-2 text-left">Données</th>
+                                    <th className="p-2 text-left">Donnees</th>
                                 </tr>
                             </thead>
                             <tbody className={isDarkMode ? 'text-gray-300' : 'text-gray-800'}>
@@ -218,7 +218,7 @@ const ScrappingSATab = (props = {}) => {
                                 <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                                 <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                <span className="ml-4 text-white font-semibold text-sm">Seeking Alpha - Prévisualisation</span>
+                                <span className="ml-4 text-white font-semibold text-sm">Seeking Alpha - Previsualisation</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <button
@@ -233,7 +233,7 @@ const ScrappingSATab = (props = {}) => {
                                     className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
                                     title="Fermer"
                                 >
-                                    ✕
+                                    
                                 </button>
                             </div>
                         </div>

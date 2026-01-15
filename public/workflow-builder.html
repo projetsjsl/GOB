@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔄 Workflow Builder - Emma Orchestrator</title>
+    <title> Workflow Builder - Emma Orchestrator</title>
     <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/themes.css">
     <style>
@@ -140,19 +140,19 @@
         <div class="max-w-full mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <h1 class="text-2xl font-bold flex items-center gap-2">
-                    <span>🔄</span> Workflow Builder
+                    <span></span> Workflow Builder
                 </h1>
                 <span class="px-3 py-1 bg-white/20 rounded-full text-sm">Emma Orchestrator</span>
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="runWorkflow()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition">
-                    <span>▶️</span> Run Workflow
+                    <span></span> Run Workflow
                 </button>
                 <button onclick="saveWorkflow()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition">
-                    <span>💾</span> Save
+                    <span></span> Save
                 </button>
                 <a href="/emma-config.html" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition">
-                    <span>⚙️</span> Config
+                    <span></span> Config
                 </a>
             </div>
         </div>
@@ -164,13 +164,13 @@
             <!-- Tabs -->
             <div class="flex border-b border-gray-200">
                 <button onclick="showPaletteTab('nodes')" id="tabNodes" class="flex-1 px-4 py-3 text-sm font-medium text-indigo-600 border-b-2 border-indigo-600">
-                    📦 Nodes
+                     Nodes
                 </button>
                 <button onclick="showPaletteTab('workflows')" id="tabWorkflows" class="flex-1 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">
-                    📋 Workflows
+                     Workflows
                 </button>
                 <button onclick="showPaletteTab('history')" id="tabHistory" class="flex-1 px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700">
-                    📜 History
+                     History
                 </button>
             </div>
 
@@ -187,7 +187,7 @@
                              ondragstart="dragNode(event, 'schedule')"
                              data-type="schedule">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">⏰</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-orange-800">Schedule</p>
                                     <p class="text-xs text-orange-600">Cron-based trigger</p>
@@ -200,7 +200,7 @@
                              ondragstart="dragNode(event, 'webhook')"
                              data-type="webhook">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">🌐</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-blue-800">Webhook</p>
                                     <p class="text-xs text-blue-600">HTTP trigger</p>
@@ -213,7 +213,7 @@
                              ondragstart="dragNode(event, 'manual')"
                              data-type="manual">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">👆</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-purple-800">Manual</p>
                                     <p class="text-xs text-purple-600">Click to trigger</p>
@@ -232,7 +232,7 @@
                              ondragstart="dragNode(event, 'emma-finance')"
                              data-type="emma-finance">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">📊</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-indigo-800">Emma Finance</p>
                                     <p class="text-xs text-indigo-600">Stock analysis</p>
@@ -245,7 +245,7 @@
                              ondragstart="dragNode(event, 'emma-critic')"
                              data-type="emma-critic">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">⚖️</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-red-800">Emma Critic</p>
                                     <p class="text-xs text-red-600">Risk analysis</p>
@@ -258,7 +258,7 @@
                              ondragstart="dragNode(event, 'emma-researcher')"
                              data-type="emma-researcher">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">🔬</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-teal-800">Emma Researcher</p>
                                     <p class="text-xs text-teal-600">Deep research</p>
@@ -271,7 +271,7 @@
                              ondragstart="dragNode(event, 'emma-writer')"
                              data-type="emma-writer">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">✍️</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-amber-800">Emma Writer</p>
                                     <p class="text-xs text-amber-600">Briefings & reports</p>
@@ -284,7 +284,7 @@
                              ondragstart="dragNode(event, 'emma-geek')"
                              data-type="emma-geek">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">📈</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-cyan-800">Emma Geek</p>
                                     <p class="text-xs text-cyan-600">Technical analysis</p>
@@ -303,7 +303,7 @@
                              ondragstart="dragNode(event, 'fmp-api')"
                              data-type="fmp-api">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">💹</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-green-800">FMP API</p>
                                     <p class="text-xs text-green-600">Market data</p>
@@ -316,7 +316,7 @@
                              ondragstart="dragNode(event, 'news-api')"
                              data-type="news-api">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">📰</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-blue-800">News API</p>
                                     <p class="text-xs text-blue-600">Financial news</p>
@@ -329,7 +329,7 @@
                              ondragstart="dragNode(event, 'supabase')"
                              data-type="supabase">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">🗄️</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-purple-800">Supabase</p>
                                     <p class="text-xs text-purple-600">Database</p>
@@ -348,7 +348,7 @@
                              ondragstart="dragNode(event, 'send-email')"
                              data-type="send-email">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">📧</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-pink-800">Send Email</p>
                                     <p class="text-xs text-pink-600">Via Resend</p>
@@ -361,7 +361,7 @@
                              ondragstart="dragNode(event, 'send-sms')"
                              data-type="send-sms">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">📱</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-green-800">Send SMS</p>
                                     <p class="text-xs text-green-600">Via Twilio</p>
@@ -374,7 +374,7 @@
                              ondragstart="dragNode(event, 'condition')"
                              data-type="condition">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">🔀</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-yellow-800">Condition</p>
                                     <p class="text-xs text-yellow-600">If/Then branch</p>
@@ -387,7 +387,7 @@
                              ondragstart="dragNode(event, 'transform')"
                              data-type="transform">
                             <div class="flex items-center gap-2">
-                                <span class="text-xl">🔧</span>
+                                <span class="text-xl"></span>
                                 <div>
                                     <p class="font-medium text-sm text-gray-800">Transform</p>
                                     <p class="text-xs text-gray-600">Data processing</p>
@@ -423,7 +423,7 @@
                 </div>
                 <div class="flex items-center gap-2 text-sm text-gray-500">
                     <span id="nodeCount">0 nodes</span>
-                    <span>•</span>
+                    <span>-</span>
                     <span id="lastSaved">Not saved</span>
                 </div>
             </div>
@@ -459,7 +459,7 @@
         <div id="propertiesPanel" class="w-96 bg-white border-l border-gray-200 flex flex-col hidden">
             <div class="p-4 border-b border-gray-200 bg-gray-50">
                 <h3 class="font-semibold text-gray-800 flex items-center gap-2">
-                    <span id="selectedNodeIcon">⚙️</span>
+                    <span id="selectedNodeIcon"></span>
                     <span id="selectedNodeTitle">Node Properties</span>
                 </h3>
             </div>
@@ -468,10 +468,10 @@
             </div>
             <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-between">
                 <button onclick="deleteSelectedNode()" class="text-red-600 hover:text-red-800 text-sm font-medium">
-                    🗑️ Delete Node
+                     Delete Node
                 </button>
                 <button onclick="duplicateSelectedNode()" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                    📋 Duplicate
+                     Duplicate
                 </button>
             </div>
         </div>
@@ -481,7 +481,7 @@
     <div id="executionConsole" class="h-48 bg-gray-900 text-gray-100 border-t border-gray-700 hidden">
         <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
             <h3 class="text-sm font-medium flex items-center gap-2">
-                <span>🖥️</span> Execution Console
+                <span></span> Execution Console
             </h3>
             <div class="flex items-center gap-2">
                 <button onclick="clearConsole()" class="text-xs text-gray-400 hover:text-white">Clear</button>
@@ -515,27 +515,27 @@
         // Node type configurations
         const nodeTypes = {
             // Triggers
-            'schedule': { color: 'orange', icon: '⏰', title: 'Schedule', category: 'trigger' },
-            'webhook': { color: 'blue', icon: '🌐', title: 'Webhook', category: 'trigger' },
-            'manual': { color: 'purple', icon: '👆', title: 'Manual Trigger', category: 'trigger' },
+            'schedule': { color: 'orange', icon: '', title: 'Schedule', category: 'trigger' },
+            'webhook': { color: 'blue', icon: '', title: 'Webhook', category: 'trigger' },
+            'manual': { color: 'purple', icon: '', title: 'Manual Trigger', category: 'trigger' },
             
             // AI Personas
-            'emma-finance': { color: 'indigo', icon: '📊', title: 'Emma Finance', category: 'ai' },
-            'emma-critic': { color: 'red', icon: '⚖️', title: 'Emma Critic', category: 'ai' },
-            'emma-researcher': { color: 'teal', icon: '🔬', title: 'Emma Researcher', category: 'ai' },
-            'emma-writer': { color: 'amber', icon: '✍️', title: 'Emma Writer', category: 'ai' },
-            'emma-geek': { color: 'cyan', icon: '📈', title: 'Emma Geek', category: 'ai' },
+            'emma-finance': { color: 'indigo', icon: '', title: 'Emma Finance', category: 'ai' },
+            'emma-critic': { color: 'red', icon: '', title: 'Emma Critic', category: 'ai' },
+            'emma-researcher': { color: 'teal', icon: '', title: 'Emma Researcher', category: 'ai' },
+            'emma-writer': { color: 'amber', icon: '', title: 'Emma Writer', category: 'ai' },
+            'emma-geek': { color: 'cyan', icon: '', title: 'Emma Geek', category: 'ai' },
             
             // Data Sources
-            'fmp-api': { color: 'green', icon: '💹', title: 'FMP API', category: 'data' },
-            'news-api': { color: 'blue', icon: '📰', title: 'News API', category: 'data' },
-            'supabase': { color: 'purple', icon: '🗄️', title: 'Supabase', category: 'data' },
+            'fmp-api': { color: 'green', icon: '', title: 'FMP API', category: 'data' },
+            'news-api': { color: 'blue', icon: '', title: 'News API', category: 'data' },
+            'supabase': { color: 'purple', icon: '', title: 'Supabase', category: 'data' },
             
             // Actions
-            'send-email': { color: 'pink', icon: '📧', title: 'Send Email', category: 'action' },
-            'send-sms': { color: 'green', icon: '📱', title: 'Send SMS', category: 'action' },
-            'condition': { color: 'yellow', icon: '🔀', title: 'Condition', category: 'logic' },
-            'transform': { color: 'gray', icon: '🔧', title: 'Transform', category: 'logic' }
+            'send-email': { color: 'pink', icon: '', title: 'Send Email', category: 'action' },
+            'send-sms': { color: 'green', icon: '', title: 'Send SMS', category: 'action' },
+            'condition': { color: 'yellow', icon: '', title: 'Condition', category: 'logic' },
+            'transform': { color: 'gray', icon: '', title: 'Transform', category: 'logic' }
         };
 
         // Color mappings for Tailwind
@@ -909,7 +909,7 @@
             }
             
             showConsole();
-            logToConsole('🚀 Starting workflow execution...', 'info');
+            logToConsole(' Starting workflow execution...', 'info');
             
             // Find trigger nodes
             const triggerNodes = Array.from(state.nodes.values()).filter(
@@ -917,7 +917,7 @@
             );
             
             if (triggerNodes.length === 0) {
-                logToConsole('⚠️ No trigger node found. Add a trigger to start the workflow.', 'warn');
+                logToConsole(' No trigger node found. Add a trigger to start the workflow.', 'warn');
                 return;
             }
             
@@ -926,7 +926,7 @@
                 await executeNode(nodeId, nodeData);
             }
             
-            logToConsole('✅ Workflow execution complete!', 'success');
+            logToConsole(' Workflow execution complete!', 'success');
             
             // Add to history
             addToHistory({
@@ -946,7 +946,7 @@
             statusEl.classList.add('status-running');
             nodeEl.classList.add('running');
             
-            logToConsole(`⏳ Executing: ${nodeData.config.title}`, 'info');
+            logToConsole(` Executing: ${nodeData.config.title}`, 'info');
             
             try {
                 // Simulate execution
@@ -955,7 +955,7 @@
                 // For AI nodes, call the orchestrator
                 if (nodeData.type.startsWith('emma-')) {
                     const persona = nodeData.type.replace('emma-', '');
-                    logToConsole(`  📡 Calling orchestrator with persona: ${persona}`, 'info');
+                    logToConsole(`   Calling orchestrator with persona: ${persona}`, 'info');
                     
                     // In real implementation:
                     // const result = await fetch('/api/orchestrator', {
@@ -963,7 +963,7 @@
                     //     body: JSON.stringify({ message: nodeData.data.message, persona })
                     // });
                     
-                    logToConsole(`  ✓ ${nodeData.config.title}: Response received`, 'success');
+                    logToConsole(`   ${nodeData.config.title}: Response received`, 'success');
                 }
                 
                 statusEl.classList.remove('status-running');
@@ -974,7 +974,7 @@
                 statusEl.classList.remove('status-running');
                 statusEl.classList.add('status-error');
                 nodeEl.classList.remove('running');
-                logToConsole(`  ✗ ${nodeData.config.title}: ${error.message}`, 'error');
+                logToConsole(`   ${nodeData.config.title}: ${error.message}`, 'error');
             }
         }
 
@@ -1047,7 +1047,7 @@
                             <span class="text-xs text-gray-500">${execution.timestamp.toLocaleTimeString()}</span>
                         </div>
                         <div class="text-xs text-gray-600">
-                            ${execution.nodes} nodes • ${execution.duration}ms
+                            ${execution.nodes} nodes - ${execution.duration}ms
                         </div>
                     </div>
                 </div>
@@ -1084,7 +1084,7 @@
             document.getElementById('workflowStatus').className = 'px-2 py-1 text-xs rounded-full bg-green-100 text-green-700';
             
             loadWorkflowsList();
-            logToConsole(`💾 Workflow saved: ${workflowData.name}`, 'success');
+            logToConsole(` Workflow saved: ${workflowData.name}`, 'success');
         }
 
         function loadWorkflowsList() {
@@ -1134,7 +1134,7 @@
             hidePlaceholder();
             updateConnections();
             
-            logToConsole(`📂 Loaded workflow: ${workflow.name}`, 'info');
+            logToConsole(` Loaded workflow: ${workflow.name}`, 'info');
         }
 
         // =========================================================
@@ -1152,7 +1152,7 @@
                 }
             });
             
-            console.log('🔄 Workflow Builder initialized');
+            console.log(' Workflow Builder initialized');
         });
     </script>
 </body>

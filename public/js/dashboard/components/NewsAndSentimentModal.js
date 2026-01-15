@@ -171,7 +171,7 @@ Provide a JSON response with:
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-white">News & Sentiment Analysis</h2>
-                            <p className="text-gray-400 text-sm">{symbol} • Real-time news with AI sentiment</p>
+                            <p className="text-gray-400 text-sm">{symbol} - Real-time news with AI sentiment</p>
                         </div>
                     </div>
                     <button title="Action"
@@ -343,7 +343,7 @@ Provide a JSON response with:
                 <div className="bg-gray-800/50 border-t border-gray-700 p-4 flex justify-between items-center">
                     <div className="text-sm text-gray-500">
                         <i className="iconoir-info-circle mr-1"></i>
-                        Sentiment powered by AI • News from FMP
+                        Sentiment powered by AI - News from FMP
                     </div>
                     <button
                         onClick={onClose}

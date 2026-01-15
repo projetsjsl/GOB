@@ -112,9 +112,9 @@ interface KPIDashboardProps {
   onSelect: (id: string) => void;
   onBulkSync?: () => void; // Optionnel : fonction pour synchroniser tous les tickers
   onSyncNA?: (tickers: string[]) => void; // Optionnel : fonction pour synchroniser uniquement les N/A
-  isBulkSyncing?: boolean; // Optionnel : état de la synchronisation
+  isBulkSyncing?: boolean; // Optionnel : etat de la synchronisation
   onUpdateProfile?: (id: string, newProfile: AnalysisProfile) => void;
-  onOpenSettings?: () => void; // Optionnel : fonction pour ouvrir le panneau de paramètres
+  onOpenSettings?: () => void; // Optionnel : fonction pour ouvrir le panneau de parametres
 }
 
 export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId, onSelect, onBulkSync, onSyncNA, isBulkSyncing = false, onUpdateProfile, onOpenSettings }) => {
@@ -139,21 +139,21 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   const [approvedVersions, setApprovedVersions] = useState<Set<string>>(new Set());
   const [isLoadingApprovedVersions, setIsLoadingApprovedVersions] = useState(false);
   
-  // États pour zoom et pan - Graphique JPEGY
+  // Etats pour zoom et pan - Graphique JPEGY
   const [zoomJPEGY, setZoomJPEGY] = useState(1);
   const [panJPEGY, setPanJPEGY] = useState({ x: 0, y: 0 });
   const [isPanningJPEGY, setIsPanningJPEGY] = useState(false);
   const [panStartJPEGY, setPanStartJPEGY] = useState({ x: 0, y: 0 });
   const svgJPEGYRef = useRef<SVGSVGElement>(null);
   
-  // États pour zoom et pan - Graphique Ratio 3:1
+  // Etats pour zoom et pan - Graphique Ratio 3:1
   const [zoomRatio31, setZoomRatio31] = useState(1);
   const [panRatio31, setPanRatio31] = useState({ x: 0, y: 0 });
   const [isPanningRatio31, setIsPanningRatio31] = useState(false);
   const [panStartRatio31, setPanStartRatio31] = useState({ x: 0, y: 0 });
   const svgRatio31Ref = useRef<SVGSVGElement>(null);
   
-  // États pour gérer la visibilité des sections (collapse/expand)
+  // Etats pour gerer la visibilite des sections (collapse/expand)
   const [sectionsVisibility, setSectionsVisibility] = useState<Record<string, boolean>>({
     globalStats: true,
     detailedAnalysis: true,
@@ -175,11 +175,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     }));
   };
 
-  // Calculer les métriques pour chaque profil
+  // Calculer les metriques pour chaque profil
   const profileMetrics = useMemo(() => {
     if (profiles.length === 0) return [];
     return profiles.map(profile => {
-      // ✅ CAS 1: Profil Squelette en cours de chargement
+      //  CAS 1: Profil Squelette en cours de chargement
       if (profile._isSkeleton) {
         return {
           profile,
@@ -201,7 +201,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         };
       }
 
-      // ✅ CAS 2: Données manquantes ou vides (Échec chargement)
+      //  CAS 2: Donnees manquantes ou vides (Echec chargement)
       if (!profile.data || profile.data.length === 0) {
         return {
           profile,
@@ -221,16 +221,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           volatility: null,
           _isLoading: false, // Pas de spinner
           hasInvalidData: true,
-          invalidReason: "Données manquantes ou échec chargement"
+          invalidReason: "Donnees manquantes ou echec chargement"
         };
       }
       
       const { recommendation, targetPrice } = calculateRecommendation(profile.data, profile.assumptions);
       
-      // VALIDATION: Vérifier que currentPrice est valide
-      const currentPrice = Math.max(profile.assumptions.currentPrice || 0, 0.01); // Minimum 0.01 pour éviter division par zéro
+      // VALIDATION: Verifier que currentPrice est valide
+      const currentPrice = Math.max(profile.assumptions.currentPrice || 0, 0.01); // Minimum 0.01 pour eviter division par zero
       if (currentPrice <= 0 || !isFinite(currentPrice)) {
-        // Retourner des valeurs par défaut si prix invalide
+        // Retourner des valeurs par defaut si prix invalide
         return {
           profile,
           recommendation,
@@ -254,25 +254,25 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       const baseYearData = profile.data.find(d => d.year === profile.assumptions.baseYear) || profile.data[profile.data.length - 1];
       const baseEPS = Math.max(baseYearData?.earningsPerShare || 0, 0);
       
-      // VALIDATION: Vérifier que baseEPS est valide (pas juste 0 par défaut)
+      // VALIDATION: Verifier que baseEPS est valide (pas juste 0 par defaut)
       const hasValidEPS = baseEPS > 0.01 && isFinite(baseEPS);
       
       const basePE = hasValidEPS && currentPrice > 0 ? currentPrice / baseEPS : 0;
-      // Limiter P/E à un maximum raisonnable (1000x)
+      // Limiter P/E a un maximum raisonnable (1000x)
       const safeBasePE = basePE > 0 && basePE <= 1000 ? basePE : 0;
       
-      // BUG #3P1-2 FIX: Validation pour éviter NaN quand currentPrice = 0
+      // BUG #3P1-2 FIX: Validation pour eviter NaN quand currentPrice = 0
       const baseYield = currentPrice > 0 && profile.assumptions.currentDividend >= 0 
         ? (profile.assumptions.currentDividend / currentPrice) * 100 
         : 0;
-      // Limiter yield à 0-50% (au-delà c'est suspect)
+      // Limiter yield a 0-50% (au-dela c'est suspect)
       const safeBaseYield = Math.max(0, Math.min(baseYield, 50));
       
       const growthPlusYield = (profile.assumptions.growthRateEPS || 0) + safeBaseYield;
       
       // JPEGY: (EPS_Growth + Dividend_Yield) / PE_Ratio
       // valider que growthPlusYield > 0.01 ET que basePE est valide
-      // Retourner null si impossible à calculer (au lieu de 0)
+      // Retourner null si impossible a calculer (au lieu de 0)
       let jpegy: number | null = null;
       if (growthPlusYield > 0.01 && safeBasePE > 0 && hasValidEPS) {
         const rawJPEGY = growthPlusYield / safeBasePE;
@@ -289,11 +289,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         div: Math.max(profile.assumptions.currentDividend || 0, 0)
       };
 
-      // ✅ GET SECTOR-BASED GUARDRAILS
+      //  GET SECTOR-BASED GUARDRAILS
       const sectorGuardrails = getSectorGuardrails(profile.info?.sector);
 
       const projectFutureValue = (current: number, rate: number, years: number): number => {
-        // Valider les entrées
+        // Valider les entrees
         if (current <= 0 || !isFinite(current) || !isFinite(rate)) return 0;
         // Limiter le taux de croissance selon le secteur
         const safeRate = Math.max(sectorGuardrails.growthMin, Math.min(rate, sectorGuardrails.growthMax));
@@ -343,14 +343,14 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       // Calculer les dividendes totaux avec validation stricte
       let totalDividends = 0;
       let currentD = Math.max(0, baseValues.div);
-      // Limiter les dividendes totaux à 10x le prix actuel (au-delà c'est aberrant)
+      // Limiter les dividendes totaux a 10x le prix actuel (au-dela c'est aberrant)
       const maxReasonableDividends = currentPrice * 10;
       for (let i = 0; i < 5; i++) {
         currentD = currentD * (1 + safeGrowthDiv / 100);
         if (isFinite(currentD) && currentD >= 0 && totalDividends + currentD <= maxReasonableDividends) {
           totalDividends += currentD;
         } else {
-          break; // Arrêter si on dépasse les limites
+          break; // Arreter si on depasse les limites
         }
       }
       // Limiter totalDividends au maximum raisonnable
@@ -358,12 +358,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
 
       // Calculer le rendement total avec validation selon le secteur
       const maxSectorReturn = sectorGuardrails.maxReturn;
-      let totalReturnPercent = -100; // Par défaut si pas de données valides
+      let totalReturnPercent = -100; // Par defaut si pas de donnees valides
       if (currentPrice > 0 && avgTargetPrice > 0 && isFinite(avgTargetPrice) && isFinite(totalDividends) && validTargets.length > 0) {
         const rawReturn = ((avgTargetPrice + totalDividends - currentPrice) / currentPrice) * 100;
         // Validation selon le secteur
         if (isFinite(rawReturn) && rawReturn >= -80 && rawReturn <= maxSectorReturn) {
-          // Vérifier que avgTargetPrice n'est pas aberrant selon le secteur
+          // Verifier que avgTargetPrice n'est pas aberrant selon le secteur
           if (avgTargetPrice <= currentPrice * sectorGuardrails.maxTargetMultiple && avgTargetPrice >= currentPrice * 0.3) {
             totalReturnPercent = rawReturn;
           } else {
@@ -374,13 +374,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           // Plafonner au maximum du secteur
           totalReturnPercent = maxSectorReturn;
         } else if (rawReturn < -80) {
-          // Plafonner à -80% (perte maximale réaliste)
+          // Plafonner a -80% (perte maximale realiste)
           totalReturnPercent = -80;
         } else {
           totalReturnPercent = rawReturn;
         }
       } else if (validTargets.length === 0) {
-        // Si aucune métrique valide, retourner -100% pour indiquer données manquantes
+        // Si aucune metrique valide, retourner -100% pour indiquer donnees manquantes
         totalReturnPercent = -100;
       }
 
@@ -400,18 +400,18 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       const upsidePotential = Math.max(-80, Math.min(maxSectorReturn, totalReturnPercent));
       const ratio31 = downsideRisk > 0.1 ? Math.max(0, Math.min(15, upsidePotential / downsideRisk)) : 0;
 
-      // Vérifier si version approuvée (vérifié via useEffect)
+      // Verifier si version approuvee (verifie via useEffect)
       const hasApprovedVersion = approvedVersions.has(profile.id);
       
-      // Calculer des métriques supplémentaires avec validation
-      const currentPE = isFinite(basePE) && basePE >= 0 ? Math.min(basePE, 1000) : 0; // Limiter P/E à 1000x max
+      // Calculer des metriques supplementaires avec validation
+      const currentPE = isFinite(basePE) && basePE >= 0 ? Math.min(basePE, 1000) : 0; // Limiter P/E a 1000x max
       const currentPCF = baseYearData?.cashFlowPerShare > 0 && isFinite(baseYearData.cashFlowPerShare)
         ? Math.min(currentPrice / baseYearData.cashFlowPerShare, 1000)
         : 0;
       const currentPBV = baseYearData?.bookValuePerShare > 0 && isFinite(baseYearData.bookValuePerShare)
         ? Math.min(currentPrice / baseYearData.bookValuePerShare, 100)
         : 0;
-      const currentYield = Math.max(0, Math.min(100, baseYield)); // Limiter yield à 0-100%
+      const currentYield = Math.max(0, Math.min(100, baseYield)); // Limiter yield a 0-100%
       
       // Calculer la croissance moyenne historique avec validation
       const validData = profile.data.filter(d => d.earningsPerShare > 0 && isFinite(d.earningsPerShare));
@@ -422,12 +422,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         const years = validData[validData.length - 1].year - validData[0].year;
         if (years > 0 && firstEPS > 0 && lastEPS > 0 && isFinite(firstEPS) && isFinite(lastEPS)) {
           const rawGrowth = (Math.pow(lastEPS / firstEPS, 1 / years) - 1) * 100;
-          // Limiter la croissance historique à -20% à +20% par an (réaliste et soutenable)
+          // Limiter la croissance historique a -20% a +20% par an (realiste et soutenable)
           historicalGrowth = Math.max(-20, Math.min(20, rawGrowth));
         }
       }
       
-      // Calculer la volatilité (écart-type des rendements historiques) avec validation
+      // Calculer la volatilite (ecart-type des rendements historiques) avec validation
       const priceChanges = [];
       for (let i = 1; i < validHistory.length; i++) {
         if (validHistory[i].priceHigh > 0 && validHistory[i-1].priceHigh > 0 
@@ -447,12 +447,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             return sum + (isFinite(diff) ? Math.pow(diff, 2) : 0);
           }, 0) / priceChanges.length
         : 0;
-      const volatility = isFinite(variance) && variance >= 0 ? Math.min(Math.sqrt(variance), 50) : 0; // Limiter à 50% (réaliste)
+      const volatility = isFinite(variance) && variance >= 0 ? Math.min(Math.sqrt(variance), 50) : 0; // Limiter a 50% (realiste)
 
-      // Détecter si les données sont suspectes ou invalides et identifier la cause
+      // Detecter si les donnees sont suspectes ou invalides et identifier la cause
       const invalidReason: string[] = [];
       
-      // Vérifier si c'est un profil "vide" (pas encore synchronisé depuis l'API)
+      // Verifier si c'est un profil "vide" (pas encore synchronise depuis l'API)
       const hasEmptyData = profile.data.length === 1 && 
         profile.data[0].earningsPerShare === 0 && 
         profile.data[0].cashFlowPerShare === 0 &&
@@ -461,13 +461,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         profile.assumptions.currentDividend === 0;
       
       if (hasEmptyData) {
-        invalidReason.push('⚠️ DONNÉES NON SYNCHRONISÉES - Cliquez sur "Synchroniser" dans l\'onglet Analysis pour charger les données réelles');
+        invalidReason.push(' DONNEES NON SYNCHRONISEES - Cliquez sur "Synchroniser" dans l\'onglet Analysis pour charger les donnees reelles');
       } else {
         if (currentPrice <= 0 || !isFinite(currentPrice)) {
           invalidReason.push('Prix actuel invalide ou manquant');
         }
         if (baseEPS === 0 && baseYearData) {
-          invalidReason.push('EPS de base = 0 (données historiques manquantes ou nulles)');
+          invalidReason.push('EPS de base = 0 (donnees historiques manquantes ou nulles)');
         }
         if (validTargets.length === 0) {
           const excludedMetrics = [];
@@ -476,15 +476,15 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           if (profile.assumptions.excludeBV) excludedMetrics.push('BV');
           if (profile.assumptions.excludeDIV) excludedMetrics.push('DIV');
           const excludedText = excludedMetrics.length > 0 ? ` (${excludedMetrics.join(', ')} exclus)` : '';
-          invalidReason.push(`Aucun ratio cible valide${excludedText} - Vérifiez les ratios cibles (P/E, P/CF, P/BV, Yield) et les données historiques`);
+          invalidReason.push(`Aucun ratio cible valide${excludedText} - Verifiez les ratios cibles (P/E, P/CF, P/BV, Yield) et les donnees historiques`);
         }
         if (jpegy === null) {
           const growthRate = (profile.assumptions.growthRateEPS != null && isFinite(profile.assumptions.growthRateEPS)) ? profile.assumptions.growthRateEPS.toFixed(2) : '0.00';
           const yieldValue = (baseYield != null && isFinite(baseYield)) ? baseYield.toFixed(2) : '0.00';
-          invalidReason.push(`JPEGY non calculable: Croissance EPS (${growthRate}%) + Yield (${yieldValue}%) trop faible (≤0.01%) ou EPS invalide - Ajustez la croissance, le dividende ou synchronisez les données`);
+          invalidReason.push(`JPEGY non calculable: Croissance EPS (${growthRate}%) + Yield (${yieldValue}%) trop faible (<=0.01%) ou EPS invalide - Ajustez la croissance, le dividende ou synchronisez les donnees`);
         }
         if (totalReturnPercent <= -99.9) {
-          invalidReason.push('Rendement impossible à calculer - Vérifiez le prix actuel et les ratios cibles');
+          invalidReason.push('Rendement impossible a calculer - Verifiez le prix actuel et les ratios cibles');
         }
       }
       
@@ -506,20 +506,20 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         currentYield,
         historicalGrowth,
         volatility,
-        hasInvalidData, // Nouveau flag pour indiquer données invalides
-        invalidReason: hasInvalidData ? invalidReason.join('; ') : undefined, // Raison de l'invalidité pour debug
-        isNotSynchronized: hasEmptyData // Flag spécial pour profils non synchronisés
+        hasInvalidData, // Nouveau flag pour indiquer donnees invalides
+        invalidReason: hasInvalidData ? invalidReason.join('; ') : undefined, // Raison de l'invalidite pour debug
+        isNotSynchronized: hasEmptyData // Flag special pour profils non synchronises
       };
     });
   }, [profiles, approvedVersions]);
 
-  // Charger les versions approuvées pour tous les profils (avec cache et optimisation)
+  // Charger les versions approuvees pour tous les profils (avec cache et optimisation)
   const approvedVersionsCacheRef = React.useRef<{ profileIds: string; approvedSet: Set<string>; timestamp: number } | null>(null);
   const APPROVED_VERSIONS_CACHE_TTL = 300000; // Cache valide pendant 5 minutes
   
   useEffect(() => {
     const loadApprovedVersions = async () => {
-      // Vérifier le cache
+      // Verifier le cache
       const now = Date.now();
       const currentProfileIds = profiles.map(p => p.id).sort().join(',');
 
@@ -527,13 +527,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           approvedVersionsCacheRef.current.profileIds === currentProfileIds &&
           (now - approvedVersionsCacheRef.current.timestamp) < APPROVED_VERSIONS_CACHE_TTL) {
         // Utiliser le cache
-        console.log('✅ KPI: Using cached approved versions');
+        console.log(' KPI: Using cached approved versions');
         setApprovedVersions(approvedVersionsCacheRef.current.approvedSet);
         setIsLoadingApprovedVersions(false);
         return;
       }
 
-      console.log(`📊 KPI: Loading approved versions for ${profiles.length} profiles...`);
+      console.log(` KPI: Loading approved versions for ${profiles.length} profiles...`);
       setIsLoadingApprovedVersions(true);
 
       // OPTIMIZED: Try bulk query first (fast path)
@@ -551,16 +551,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
 
           setApprovedVersions(approvedSet);
           setIsLoadingApprovedVersions(false);
-          console.log(`✅ KPI: Bulk load complete - ${approvedSet.size} approved tickers`);
+          console.log(` KPI: Bulk load complete - ${approvedSet.size} approved tickers`);
           return;
         }
       } catch (bulkError) {
-        console.warn('⚠️ KPI: Bulk query not available, skipping approved check for performance');
+        console.warn(' KPI: Bulk query not available, skipping approved check for performance');
       }
 
       // FALLBACK: Skip slow individual queries - just show data without approved status
       // This is a PERFORMANCE optimization - approved status is cosmetic only
-      console.log('⚡ KPI: Skipping slow approved check - showing all data immediately');
+      console.log(' KPI: Skipping slow approved check - showing all data immediately');
       setApprovedVersions(new Set());
       setIsLoadingApprovedVersions(false);
     };
@@ -573,7 +573,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     }
   }, [profiles]);
 
-  // Gérer les event listeners wheel pour le graphique JPEGY (non-passif pour permettre preventDefault)
+  // Gerer les event listeners wheel pour le graphique JPEGY (non-passif pour permettre preventDefault)
   useEffect(() => {
     const svg = svgJPEGYRef.current;
     if (!svg) return;
@@ -601,7 +601,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     };
   }, []);
 
-  // Gérer les event listeners wheel pour le graphique Ratio 3:1 (non-passif pour permettre preventDefault)
+  // Gerer les event listeners wheel pour le graphique Ratio 3:1 (non-passif pour permettre preventDefault)
   useEffect(() => {
     const svg = svgRatio31Ref.current;
     if (!svg) return;
@@ -629,7 +629,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     };
   }, []);
 
-  // Calculer les valeurs min/max réelles pour définir des filtres par défaut qui incluent tout
+  // Calculer les valeurs min/max reelles pour definir des filtres par defaut qui incluent tout
   const defaultFilterValues = useMemo(() => {
     if (profileMetrics.length === 0) {
       return {
@@ -647,10 +647,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     const jpegyValues = profileMetrics.map(m => m.jpegy).filter((j): j is number => j !== null);
     
     return {
-      minReturn: Math.floor(Math.min(...returns, -100)) - 10, // Marge de sécurité
-      maxReturn: Math.ceil(Math.max(...returns, 500)) + 10, // Marge de sécurité
+      minReturn: Math.floor(Math.min(...returns, -100)) - 10, // Marge de securite
+      maxReturn: Math.ceil(Math.max(...returns, 500)) + 10, // Marge de securite
       minJPEGY: jpegyValues.length > 0 ? Math.max(0, Math.floor(Math.min(...jpegyValues, 0))) : 0,
-      maxJPEGY: jpegyValues.length > 0 ? Math.ceil(Math.max(...jpegyValues, 10)) + 2 : 10, // Marge de sécurité
+      maxJPEGY: jpegyValues.length > 0 ? Math.ceil(Math.max(...jpegyValues, 10)) + 2 : 10, // Marge de securite
       sector: '',
       recommendation: 'all' as 'all' | Recommendation,
       source: 'all' as 'all' | 'portfolio' | 'watchlist'
@@ -703,7 +703,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     density: 'comfortable' as 'compact' | 'comfortable' | 'spacious'
   });
 
-  // Mettre à jour les filtres quand defaultFilterValues change (nouveaux profils chargés)
+  // Mettre a jour les filtres quand defaultFilterValues change (nouveaux profils charges)
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
@@ -714,7 +714,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   // Filtrer et trier les profils
   const filteredMetrics = useMemo(() => {
     const filtered = profileMetrics.filter(metric => {
-      // Filtre N/A en premier (priorité)
+      // Filtre N/A en premier (priorite)
       if (filters.showOnlyNA && !metric.hasInvalidData && metric.jpegy !== null) {
         return false;
       }
@@ -724,7 +724,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         return false;
       }
       
-      // Filtre approuvé
+      // Filtre approuve
       if (filters.showOnlyApproved && !metric.hasApprovedVersion) {
         return false;
       }
@@ -734,7 +734,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       // Filtrer JPEGY seulement si la valeur est calculable (non null)
       if (metric.jpegy !== null && (metric.jpegy < filters.minJPEGY || metric.jpegy > filters.maxJPEGY)) return false;
       
-      // Filtres par métrique supplémentaires
+      // Filtres par metrique supplementaires
       if (metric.ratio31 !== null && (metric.ratio31 < filters.minRatio31 || metric.ratio31 > filters.maxRatio31)) return false;
       if (metric.currentPE !== null && (metric.currentPE < filters.minPE || metric.currentPE > filters.maxPE)) return false;
       if (metric.currentYield !== null && (metric.currentYield < filters.minYield || metric.currentYield > filters.maxYield)) return false;
@@ -743,7 +743,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       
       if (filters.sector && metric.profile.info.sector.toLowerCase() !== filters.sector.toLowerCase()) return false;
       if (filters.recommendation !== 'all') {
-        // Mapping entre les valeurs du filtre et les valeurs réelles
+        // Mapping entre les valeurs du filtre et les valeurs reelles
         const filterMap: Record<string, string> = {
           'BUY': 'ACHAT',
           'HOLD': 'CONSERVER',
@@ -764,7 +764,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       return true;
     });
     
-    // Groupement (si activé)
+    // Groupement (si active)
     let grouped = filtered;
     if (filters.groupBy !== 'none') {
       const groups = new Map<string, typeof filtered>();
@@ -787,7 +787,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         }
         groups.get(key)!.push(metric);
       });
-      // Aplatir les groupes (on peut améliorer pour afficher par groupe)
+      // Aplatir les groupes (on peut ameliorer pour afficher par groupe)
       grouped = Array.from(groups.values()).flat();
     }
     
@@ -796,7 +796,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       let aValue: any = a[sortConfig.key as keyof typeof a];
       let bValue: any = b[sortConfig.key as keyof typeof b];
       
-      // Gérer les valeurs imbriquées
+      // Gerer les valeurs imbriquees
       if (sortConfig.key === 'ticker') {
         aValue = a.profile.id;
         bValue = b.profile.id;
@@ -829,7 +829,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         bValue = b.targetPrice ?? 0;
       }
       
-      // Gérer les valeurs null
+      // Gerer les valeurs null
       if (aValue === null || aValue === undefined) aValue = -Infinity;
       if (bValue === null || bValue === undefined) bValue = -Infinity;
       
@@ -854,10 +854,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     }));
   }, []);
 
-  // Définir handleExport APRÈS filteredMetrics pour éviter l'erreur d'initialisation
+  // Definir handleExport APRES filteredMetrics pour eviter l'erreur d'initialisation
   const handleExport = useCallback(() => {
     const csv = [
-      ['Ticker', 'Nom', 'Secteur', 'JPEGY', 'Rendement Total', 'Ratio 3:1', 'Potentiel Hausse', 'Risque Baisse', 'P/E', 'Yield', 'Croissance', 'Recommandation', 'Prix Actuel', 'Prix Cible', 'Prix Achat', 'Prix Vente', 'P/CF', 'P/BV', 'Volatilité'].join(','),
+      ['Ticker', 'Nom', 'Secteur', 'JPEGY', 'Rendement Total', 'Ratio 3:1', 'Potentiel Hausse', 'Risque Baisse', 'P/E', 'Yield', 'Croissance', 'Recommandation', 'Prix Actuel', 'Prix Cible', 'Prix Achat', 'Prix Vente', 'P/CF', 'P/BV', 'Volatilite'].join(','),
       ...filteredMetrics.map(m => [
         m.profile.id,
         `"${m.profile.info.name}"`,
@@ -888,7 +888,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     link.click();
   }, [filteredMetrics]);
 
-  // Raccourcis clavier (défini APRÈS handleExport)
+  // Raccourcis clavier (defini APRES handleExport)
   useKeyboardShortcuts({
     onSyncAll: onBulkSync,
     onSyncNA: () => {
@@ -908,8 +908,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   // Obtenir la couleur JPEGY (retourne null si JPEGY est null)
   const getJpegyColor = (jpegy: number | null): string | null => {
     if (jpegy === null) return null; // Pas de couleur si N/A
-    if (jpegy <= 0.5) return '#86efac'; // Vert pâle
-    if (jpegy <= 1.5) return '#16a34a'; // Vert foncé
+    if (jpegy <= 0.5) return '#86efac'; // Vert pale
+    if (jpegy <= 1.5) return '#16a34a'; // Vert fonce
     if (jpegy <= 1.75) return '#eab308'; // Jaune
     if (jpegy <= 2.0) return '#f97316'; // Orange
     return '#dc2626'; // Rouge
@@ -918,21 +918,21 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
   // Fonction pour obtenir la couleur du Ratio 3:1
   const getRatio31Color = (ratio: number | null): string | null => {
     if (ratio === null || !isFinite(ratio) || ratio < 0) return null;
-    if (ratio >= 3) return '#16a34a'; // Vert foncé (favorable ≥ 3:1)
-    if (ratio >= 1) return '#eab308'; // Jaune (acceptable 1:1 à 3:1)
-    return '#dc2626'; // Rouge (défavorable < 1:1)
+    if (ratio >= 3) return '#16a34a'; // Vert fonce (favorable >= 3:1)
+    if (ratio >= 1) return '#eab308'; // Jaune (acceptable 1:1 a 3:1)
+    return '#dc2626'; // Rouge (defavorable < 1:1)
   };
 
   // Obtenir la couleur du rendement
   const getReturnColor = (returnPercent: number | null | undefined): string => {
     if (returnPercent === null || returnPercent === undefined) return '#9ca3af'; // Gris pour N/A
-    if (returnPercent >= 50) return '#16a34a'; // Vert foncé
-    if (returnPercent >= 20) return '#86efac'; // Vert pâle
+    if (returnPercent >= 50) return '#16a34a'; // Vert fonce
+    if (returnPercent >= 20) return '#86efac'; // Vert pale
     if (returnPercent >= 0) return '#eab308'; // Jaune
     return '#dc2626'; // Rouge
   };
 
-  // Helpers pour Tailwind (classes CSS) pour éviter les styles inline
+  // Helpers pour Tailwind (classes CSS) pour eviter les styles inline
   const getReturnTextClass = (returnPercent: number | null | undefined): string => {
     if (returnPercent === null || returnPercent === undefined) return 'text-gray-400';
     if (returnPercent >= 50) return 'text-green-600';
@@ -981,23 +981,23 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     return 'fill-red-600';
   };
 
-  // Vérifier si on a des profils
+  // Verifier si on a des profils
   if (profiles.length === 0) {
     return (
       <div className="bg-white p-8 rounded-lg shadow border border-gray-200 text-center">
         <h3 className="text-xl font-bold text-gray-700 mb-4">Vue KPI Dashboard</h3>
         <p className="text-gray-500 mb-4">Aucun profil disponible pour afficher les KPI.</p>
-        <p className="text-sm text-gray-400">Ajoutez des tickers dans la sidebar de gauche pour voir les métriques.</p>
+        <p className="text-sm text-gray-400">Ajoutez des tickers dans la sidebar de gauche pour voir les metriques.</p>
       </div>
     );
   }
 
-  // Calculer les dimensions du graphique (après avoir vérifié qu'on a des profils)
+  // Calculer les dimensions du graphique (apres avoir verifie qu'on a des profils)
   const chartWidth = 900;
   const chartHeight = 700;
   const padding = 80;
   
-  // Calculer les échelles avec marges (seulement si on a des métriques filtrées VALIDES avec JPEGY calculable)
+  // Calculer les echelles avec marges (seulement si on a des metriques filtrees VALIDES avec JPEGY calculable)
   const validMetricsForChart = filteredMetrics.filter(m => 
     !m.hasInvalidData && 
     m.totalReturnPercent >= -100 && m.totalReturnPercent <= 1000 &&
@@ -1028,7 +1028,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
     return chartHeight - padding - (((returnPercent - minReturn) / range) * (chartHeight - 2 * padding));
   };
   
-  // Générer les ticks pour les axes
+  // Generer les ticks pour les axes
   const xTicks = [];
   const xTickCount = 10;
   for (let i = 0; i <= xTickCount; i++) {
@@ -1100,7 +1100,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-blue-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">
-              📊 Statistiques Globales du Portefeuille 
+               Statistiques Globales du Portefeuille 
               {globalStats.validCount < globalStats.count && (
                  <span className="ml-2 text-sm font-normal text-blue-600 animate-pulse">
                    (Chargement... {globalStats.validCount}/{globalStats.count})
@@ -1110,7 +1110,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             <button
               onClick={() => toggleSection('globalStats')}
               className="p-1.5 hover:bg-blue-100 rounded transition-colors cursor-help"
-              title={sectionsVisibility.globalStats ? "Réduire cette section" : "Agrandir cette section"}
+              title={sectionsVisibility.globalStats ? "Reduire cette section" : "Agrandir cette section"}
             >
               {sectionsVisibility.globalStats ? (
                 <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -1126,12 +1126,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               <div className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">
                 {globalStats.validCount > 0 ? (globalStats.avgReturn?.toFixed(1) ?? 'N/A') + '%' : <span className="text-sm font-normal text-gray-400">En attente...</span>}
               </div>
-              <div className="text-xs text-gray-400 mt-1">Médiane: {globalStats.validCount > 0 ? (globalStats.medianReturn?.toFixed(1) ?? 'N/A') + '%' : '-'}</div>
+              <div className="text-xs text-gray-400 mt-1">Mediane: {globalStats.validCount > 0 ? (globalStats.medianReturn?.toFixed(1) ?? 'N/A') + '%' : '-'}</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-              <div className="text-xs text-gray-500 mb-1">Écart-Type</div>
+              <div className="text-xs text-gray-500 mb-1">Ecart-Type</div>
               <div className="text-2xl font-bold text-purple-600">{globalStats.stdReturn !== null && globalStats.stdReturn !== undefined ? globalStats.stdReturn.toFixed(1) : 'N/A'}%</div>
-              <div className="text-xs text-gray-400 mt-1">Volatilité</div>
+              <div className="text-xs text-gray-400 mt-1">Volatilite</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
               <div className="text-xs text-gray-500 mb-1">Rendement Min</div>
@@ -1148,11 +1148,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   <div className={`text-2xl font-bold ${getJpegyTextClass(globalStats.avgJPEGY)}`}>
                     {globalStats.avgJPEGY?.toFixed(2) ?? 'N/A'}
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">Médiane: {(globalStats.medianJPEGY != null && isFinite(globalStats.medianJPEGY)) ? globalStats.medianJPEGY.toFixed(2) : 'N/A'}</div>
+                  <div className="text-xs text-gray-400 mt-1">Mediane: {(globalStats.medianJPEGY != null && isFinite(globalStats.medianJPEGY)) ? globalStats.medianJPEGY.toFixed(2) : 'N/A'}</div>
                   <div className="mt-2 pt-2 border-t border-gray-200">
                     <div className="text-[10px] text-gray-400 space-y-0.5">
-                      <div><strong>Source:</strong> P/E Actuel ÷ (Croissance EPS % + Yield %)</div>
-                      <div><strong>Fournisseur:</strong> Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Ajuste le P/E par la somme du taux de croissance et du rendement du dividende pour une évaluation nuancée de la valorisation.</div>
+                      <div><strong>Source:</strong> P/E Actuel / (Croissance EPS % + Yield %)</div>
+                      <div><strong>Fournisseur:</strong> Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Ajuste le P/E par la somme du taux de croissance et du rendement du dividende pour une evaluation nuancee de la valorisation.</div>
                     </div>
                   </div>
                 </>
@@ -1185,13 +1185,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border-2 border-purple-300">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2">
-              🔍 Mode Comparaison ({selectedForComparison.length} titre(s))
+               Mode Comparaison ({selectedForComparison.length} titre(s))
             </h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => toggleSection('comparison')}
                 className="p-1.5 hover:bg-purple-100 rounded transition-colors cursor-help"
-                title={sectionsVisibility.comparison ? "Réduire cette section" : "Agrandir cette section"}
+                title={sectionsVisibility.comparison ? "Reduire cette section" : "Agrandir cette section"}
               >
                 {sectionsVisibility.comparison ? (
                   <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -1224,7 +1224,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       onClick={() => setSelectedForComparison(prev => prev.filter(t => t !== ticker))}
                       className="text-red-500 hover:text-red-700 text-sm"
                     >
-                      ✕
+                      
                     </button>
                   </div>
                   <div className="space-y-2 text-sm">
@@ -1242,8 +1242,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                             </span>
                             <div className="mt-1 pt-1 border-t border-gray-200">
                               <div className="text-[9px] text-gray-400 space-y-0.5 text-left">
-                                <div><strong>Source:</strong> P/E ÷ (Growth % + Yield %)</div>
-                                <div><strong>Fournisseur:</strong> JSLAI™ - Métrique propriétaire ajustant le P/E par croissance et dividende.</div>
+                                <div><strong>Source:</strong> P/E / (Growth % + Yield %)</div>
+                                <div><strong>Fournisseur:</strong> JSLAITM - Metrique proprietaire ajustant le P/E par croissance et dividende.</div>
                               </div>
                             </div>
                           </>
@@ -1286,7 +1286,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       onClick={() => onSelect(ticker)}
                       className="w-full mt-3 px-3 py-2 bg-blue-500 text-white text-xs font-semibold rounded hover:bg-blue-600 transition-colors"
                     >
-                      Voir détails →
+                      Voir details ->
                     </button>
                   </div>
                 </div>
@@ -1297,7 +1297,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         </div>
       )}
 
-      {/* Filtres Améliorés */}
+      {/* Filtres Ameliores */}
         <div className={`bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border-2 transition-all ${
         (filters.minReturn !== -100 || filters.maxReturn !== 500 || filters.minJPEGY !== 0 || 
          filters.maxJPEGY !== 5 || filters.sector !== '' || filters.recommendation !== 'all')
@@ -1306,11 +1306,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
       }`}>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <h3 className="text-base sm:text-lg font-bold">🔍 Filtres de Screening</h3>
+            <h3 className="text-base sm:text-lg font-bold"> Filtres de Screening</h3>
             <button
               onClick={() => toggleSection('filters')}
               className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-              title={sectionsVisibility.filters ? "Réduire cette section" : "Agrandir cette section"}
+              title={sectionsVisibility.filters ? "Reduire cette section" : "Agrandir cette section"}
             >
               {sectionsVisibility.filters ? (
                 <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -1335,10 +1335,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   : 'bg-purple-100 hover:bg-purple-200 text-purple-700'
               }`}
               title={comparisonMode 
-                ? "Désactiver le Mode Comparaison\n\nCliquez pour désactiver le mode comparaison.\n\nEn mode comparaison, vous pouvez sélectionner jusqu'à 5 tickers pour les comparer côte à côte."
-                : "Activer le Mode Comparaison\n\nCliquez pour activer le mode comparaison.\n\nEn mode comparaison:\n• Sélectionnez jusqu'à 5 tickers (cliquez sur les tuiles)\n• Les tickers sélectionnés sont marqués avec un numéro\n• Comparez leurs métriques côte à côte\n\nUtile pour comparer plusieurs opportunités d'investissement."}
+                ? "Desactiver le Mode Comparaison\n\nCliquez pour desactiver le mode comparaison.\n\nEn mode comparaison, vous pouvez selectionner jusqu'a 5 tickers pour les comparer cote a cote."
+                : "Activer le Mode Comparaison\n\nCliquez pour activer le mode comparaison.\n\nEn mode comparaison:\n- Selectionnez jusqu'a 5 tickers (cliquez sur les tuiles)\n- Les tickers selectionnes sont marques avec un numero\n- Comparez leurs metriques cote a cote\n\nUtile pour comparer plusieurs opportunites d'investissement."}
             >
-              {comparisonMode ? '✕ Mode Comparaison' : '🔍 Mode Comparaison'}
+              {comparisonMode ? ' Mode Comparaison' : ' Mode Comparaison'}
             </button>
             <button
               onClick={() => setFilters({
@@ -1359,9 +1359,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 groupBy: 'none'
               })}
               className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
-              title="Réinitialiser tous les filtres\n\nRéinitialise tous les filtres actifs:\n• Rendement\n• JPEGY\n• Ratio 3:1\n• Recommandation\n• Secteur\n• Source\n\nAffiche tous les titres du portefeuille."
+              title="Reinitialiser tous les filtres\n\nReinitialise tous les filtres actifs:\n- Rendement\n- JPEGY\n- Ratio 3:1\n- Recommandation\n- Secteur\n- Source\n\nAffiche tous les titres du portefeuille."
             >
-              🔄 Réinitialiser
+               Reinitialiser
             </button>
             <button
               onClick={() => {
@@ -1371,7 +1371,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 setFilters(prev => ({ ...prev, minReturn: minReturn - 5, maxReturn: maxReturn + 5 }));
               }}
               className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 rounded transition-colors"
-              title="Zoom Top 10\n\nFiltre automatiquement pour afficher uniquement les 10 tickers avec le meilleur rendement total projeté.\n\nAjuste les filtres Min/Max de rendement pour encadrer ces 10 tickers."
+              title="Zoom Top 10\n\nFiltre automatiquement pour afficher uniquement les 10 tickers avec le meilleur rendement total projete.\n\nAjuste les filtres Min/Max de rendement pour encadrer ces 10 tickers."
             >
               Top 10
             </button>
@@ -1386,9 +1386,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 }
               }}
               className="px-2 sm:px-3 py-1 text-[10px] sm:text-xs bg-green-100 hover:bg-green-200 rounded transition-colors"
-              title="Sous-évalués (JPEGY ≤ 1.5)\n\nFiltre automatiquement pour afficher uniquement les tickers avec un JPEGY ≤ 1.5.\n\nJPEGY ≤ 1.5 indique une action sous-évaluée ou raisonnablement valorisée.\n\nAjuste automatiquement les filtres JPEGY Min/Max."
+              title="Sous-evalues (JPEGY <= 1.5)\n\nFiltre automatiquement pour afficher uniquement les tickers avec un JPEGY <= 1.5.\n\nJPEGY <= 1.5 indique une action sous-evaluee ou raisonnablement valorisee.\n\nAjuste automatiquement les filtres JPEGY Min/Max."
             >
-              Sous-évalués
+              Sous-evalues
             </button>
           </div>
         </div>
@@ -1396,7 +1396,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           <>
         <div className="mb-4 flex items-center justify-between">
           <div className="text-sm text-gray-600">
-            <span className="font-bold text-blue-600">{filteredMetrics.length}</span> titre(s) affiché(s) sur{' '}
+            <span className="font-bold text-blue-600">{filteredMetrics.length}</span> titre(s) affiche(s) sur{' '}
             <span className="font-semibold">{profileMetrics.length}</span> total
             {(filters.minReturn !== defaultFilterValues.minReturn || 
               filters.maxReturn !== defaultFilterValues.maxReturn || 
@@ -1405,10 +1405,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               filters.sector !== '' || 
               filters.recommendation !== 'all' ||
               filters.source !== 'all') && (
-              <span className="ml-2 text-xs text-blue-600">({profileMetrics.length - filteredMetrics.length} masqué(s))</span>
+              <span className="ml-2 text-xs text-blue-600">({profileMetrics.length - filteredMetrics.length} masque(s))</span>
             )}
             {isLoadingApprovedVersions && (
-              <span className="ml-2 text-xs text-gray-400">⏳ Vérification des versions approuvées...</span>
+              <span className="ml-2 text-xs text-gray-400"> Verification des versions approuvees...</span>
             )}
           </div>
         </div>
@@ -1416,7 +1416,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         {/* Filtres avec indicateurs visuels */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2.5 md:gap-3 lg:gap-4">
           <div>
-            <label htmlFor="filter-min-return" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projeté Minimum (%)\n\nFiltre les tickers avec un rendement total projeté supérieur ou égal à cette valeur.\n\nLe rendement total inclut:\n• Appréciation du prix (5 ans)\n• Dividendes cumulés (5 ans)\n\nPlage par défaut: -100% à +1000%">Rendement Min (%)</label>
+            <label htmlFor="filter-min-return" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projete Minimum (%)\n\nFiltre les tickers avec un rendement total projete superieur ou egal a cette valeur.\n\nLe rendement total inclut:\n- Appreciation du prix (5 ans)\n- Dividendes cumules (5 ans)\n\nPlage par defaut: -100% a +1000%">Rendement Min (%)</label>
             <input
               id="filter-min-return"
               type="number"
@@ -1427,11 +1427,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
                   : 'border-gray-300 focus:border-blue-400'
               }`}
-              title={`Filtre: Rendement Min = ${filters.minReturn}%\n\nAffiche uniquement les tickers avec un rendement total projeté ≥ ${filters.minReturn}%.\n\n${filters.minReturn !== defaultFilterValues.minReturn ? '✅ Filtre actif' : 'Filtre par défaut'}`}
+              title={`Filtre: Rendement Min = ${filters.minReturn}%\n\nAffiche uniquement les tickers avec un rendement total projete >= ${filters.minReturn}%.\n\n${filters.minReturn !== defaultFilterValues.minReturn ? ' Filtre actif' : 'Filtre par defaut'}`}
             />
           </div>
           <div>
-            <label htmlFor="filter-max-return" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projeté Maximum (%)\n\nFiltre les tickers avec un rendement total projeté inférieur ou égal à cette valeur.\n\nLe rendement total inclut:\n• Appréciation du prix (5 ans)\n• Dividendes cumulés (5 ans)\n\nPlage par défaut: -100% à +1000%">Rendement Max (%)</label>
+            <label htmlFor="filter-max-return" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Rendement Total Projete Maximum (%)\n\nFiltre les tickers avec un rendement total projete inferieur ou egal a cette valeur.\n\nLe rendement total inclut:\n- Appreciation du prix (5 ans)\n- Dividendes cumules (5 ans)\n\nPlage par defaut: -100% a +1000%">Rendement Max (%)</label>
             <input
               id="filter-max-return"
               type="number"
@@ -1442,11 +1442,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   ? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500' 
                   : 'border-gray-300 focus:border-blue-400'
               }`}
-              title={`Filtre: Rendement Max = ${filters.maxReturn}%\n\nAffiche uniquement les tickers avec un rendement total projeté ≤ ${filters.maxReturn}%.\n\n${filters.maxReturn !== defaultFilterValues.maxReturn ? '✅ Filtre actif' : 'Filtre par défaut'}`}
+              title={`Filtre: Rendement Max = ${filters.maxReturn}%\n\nAffiche uniquement les tickers avec un rendement total projete <= ${filters.maxReturn}%.\n\n${filters.maxReturn !== defaultFilterValues.maxReturn ? ' Filtre actif' : 'Filtre par defaut'}`}
             />
           </div>
           <div>
-            <label htmlFor="filter-min-jpegy" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Minimum\n\nFiltre les tickers avec un JPEGY supérieur ou égal à cette valeur.\n\nJPEGY = P/E ÷ (Croissance % + Yield %)\n\nPlage recommandée: 0.0 à 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Min</label>
+            <label htmlFor="filter-min-jpegy" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Minimum\n\nFiltre les tickers avec un JPEGY superieur ou egal a cette valeur.\n\nJPEGY = P/E / (Croissance % + Yield %)\n\nPlage recommandee: 0.0 a 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Min</label>
             <input
               id="filter-min-jpegy"
               type="number"
@@ -1458,11 +1458,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   ? 'border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500' 
                   : 'border-gray-300 focus:border-green-400'
               }`}
-              title={`Filtre: JPEGY Min = ${filters.minJPEGY}\n\nAffiche uniquement les tickers avec un JPEGY ≥ ${filters.minJPEGY}.\n\n${filters.minJPEGY !== defaultFilterValues.minJPEGY ? '✅ Filtre actif' : 'Filtre par défaut'}`}
+              title={`Filtre: JPEGY Min = ${filters.minJPEGY}\n\nAffiche uniquement les tickers avec un JPEGY >= ${filters.minJPEGY}.\n\n${filters.minJPEGY !== defaultFilterValues.minJPEGY ? ' Filtre actif' : 'Filtre par defaut'}`}
             />
           </div>
           <div>
-            <label htmlFor="filter-max-jpegy" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Maximum\n\nFiltre les tickers avec un JPEGY inférieur ou égal à cette valeur.\n\nJPEGY = P/E ÷ (Croissance % + Yield %)\n\nPlage recommandée: 0.0 à 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Max</label>
+            <label htmlFor="filter-max-jpegy" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="JPEGY Maximum\n\nFiltre les tickers avec un JPEGY inferieur ou egal a cette valeur.\n\nJPEGY = P/E / (Croissance % + Yield %)\n\nPlage recommandee: 0.0 a 5.0\n\nPlus le JPEGY est bas, plus l'action est attractive.">JPEGY Max</label>
             <input
               id="filter-max-jpegy"
               type="number"
@@ -1474,11 +1474,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   ? 'border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500' 
                   : 'border-gray-300 focus:border-green-400'
               }`}
-              title={`Filtre: JPEGY Max = ${filters.maxJPEGY}\n\nAffiche uniquement les tickers avec un JPEGY ≤ ${filters.maxJPEGY}.\n\n${filters.maxJPEGY !== defaultFilterValues.maxJPEGY ? '✅ Filtre actif' : 'Filtre par défaut'}`}
+              title={`Filtre: JPEGY Max = ${filters.maxJPEGY}\n\nAffiche uniquement les tickers avec un JPEGY <= ${filters.maxJPEGY}.\n\n${filters.maxJPEGY !== defaultFilterValues.maxJPEGY ? ' Filtre actif' : 'Filtre par defaut'}`}
             />
           </div>
           <div>
-            <label htmlFor="filter-sector" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Secteur\n\nFiltre les tickers par secteur d'activité.\n\nLaissez vide pour afficher tous les secteurs.\n\nLa recherche est insensible à la casse et cherche dans le nom du secteur.">Secteur</label>
+            <label htmlFor="filter-sector" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Secteur\n\nFiltre les tickers par secteur d'activite.\n\nLaissez vide pour afficher tous les secteurs.\n\nLa recherche est insensible a la casse et cherche dans le nom du secteur.">Secteur</label>
             <input
               id="filter-sector"
               type="text"
@@ -1486,17 +1486,17 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               onChange={(e) => setFilters({ ...filters, sector: e.target.value })}
               placeholder="Tous"
               className="w-full px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm"
-              title={`Filtre: Secteur = "${filters.sector || 'Tous'}"\n\n${filters.sector ? `Affiche uniquement les tickers du secteur contenant "${filters.sector}".` : 'Affiche tous les secteurs.'}\n\n${filters.sector ? '✅ Filtre actif' : 'Filtre par défaut'}`}
+              title={`Filtre: Secteur = "${filters.sector || 'Tous'}"\n\n${filters.sector ? `Affiche uniquement les tickers du secteur contenant "${filters.sector}".` : 'Affiche tous les secteurs.'}\n\n${filters.sector ? ' Filtre actif' : 'Filtre par defaut'}`}
             />
           </div>
           <div>
-            <label htmlFor="filter-recommendation" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Recommandation\n\nFiltre les tickers selon la recommandation calculée:\n\n• ACHAT: Prix actuel ≤ Limite d'achat\n• CONSERVER: Entre limite d'achat et vente\n• VENTE: Prix actuel ≥ Limite de vente\n\nSélectionnez 'Toutes' pour afficher toutes les recommandations.">Recommandation</label>
+            <label htmlFor="filter-recommendation" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1 cursor-help" title="Filtre par Recommandation\n\nFiltre les tickers selon la recommandation calculee:\n\n- ACHAT: Prix actuel <= Limite d'achat\n- CONSERVER: Entre limite d'achat et vente\n- VENTE: Prix actuel >= Limite de vente\n\nSelectionnez 'Toutes' pour afficher toutes les recommandations.">Recommandation</label>
             <select
               id="filter-recommendation"
               value={filters.recommendation}
               onChange={(e) => setFilters({ ...filters, recommendation: e.target.value as any })}
               className="w-full px-2 sm:px-2.5 md:px-3 py-1.5 sm:py-2 border border-gray-300 rounded text-xs sm:text-sm"
-              title={`Filtre: Recommandation = "${filters.recommendation === 'all' ? 'Toutes' : filters.recommendation}"\n\n${filters.recommendation !== 'all' ? `Affiche uniquement les tickers avec la recommandation "${filters.recommendation}".` : 'Affiche toutes les recommandations.'}\n\n${filters.recommendation !== 'all' ? '✅ Filtre actif' : 'Filtre par défaut'}`}
+              title={`Filtre: Recommandation = "${filters.recommendation === 'all' ? 'Toutes' : filters.recommendation}"\n\n${filters.recommendation !== 'all' ? `Affiche uniquement les tickers avec la recommandation "${filters.recommendation}".` : 'Affiche toutes les recommandations.'}\n\n${filters.recommendation !== 'all' ? ' Filtre actif' : 'Filtre par defaut'}`}
             >
               <option value="all">Toutes</option>
               <option value="ACHAT">Achat</option>
@@ -1505,7 +1505,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
             </select>
           </div>
           <div className="relative">
-            <label htmlFor="filter-source" className="flex text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2 items-center gap-1.5 sm:gap-2 cursor-help" title="Filtre par Source\n\nFiltre les tickers selon leur source:\n\n• ⭐ Portefeuille: Titres détenus actuellement\n• 👁️ Watchlist: Titres surveillés (non détenus)\n• Tous: Affiche les deux sources\n\nLe badge coloré indique le filtre actif.">
+            <label htmlFor="filter-source" className="flex text-[10px] sm:text-xs font-semibold text-gray-700 mb-1.5 sm:mb-2 items-center gap-1.5 sm:gap-2 cursor-help" title="Filtre par Source\n\nFiltre les tickers selon leur source:\n\n-  Portefeuille: Titres detenus actuellement\n-  Watchlist: Titres surveilles (non detenus)\n- Tous: Affiche les deux sources\n\nLe badge colore indique le filtre actif.">
               <span className="truncate">Source</span>
               {filters.source !== 'all' && (
                 <span className={`px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-full flex items-center gap-0.5 sm:gap-1 flex-shrink-0 ${
@@ -1539,33 +1539,33 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 }`}
               >
                 <option value="all">Tous (Portefeuille + Watchlist)</option>
-                <option value="portfolio">⭐ Portefeuille</option>
-                <option value="watchlist">👁️ Watchlist</option>
+                <option value="portfolio"> Portefeuille</option>
+                <option value="watchlist"> Watchlist</option>
               </select>
               {filters.source !== 'all' && (
                 <button
                   onClick={() => setFilters({ ...filters, source: 'all' })}
                   className="absolute right-6 sm:right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 text-xs"
-                  title="Réinitialiser le filtre Source\n\nRemet le filtre Source à 'Tous' (Portefeuille + Watchlist)."
+                  title="Reinitialiser le filtre Source\n\nRemet le filtre Source a 'Tous' (Portefeuille + Watchlist)."
                 >
-                  ✕
+                  
                 </button>
               )}
             </div>
           </div>
         </div>
         
-        {/* Filtres avancés supplémentaires */}
+        {/* Filtres avances supplementaires */}
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-semibold text-gray-700">Filtres avancés</h4>
+            <h4 className="text-sm font-semibold text-gray-700">Filtres avances</h4>
             <button
               onClick={() => setFilters(prev => ({ ...prev, showOnlyNA: !prev.showOnlyNA }))}
               className={`px-2 py-1 text-xs rounded transition-colors ${
                 filters.showOnlyNA ? 'bg-orange-500 text-white' : 'bg-gray-100 hover:bg-orange-100 text-gray-700'
               }`}
             >
-              {filters.showOnlyNA ? '✓ N/A uniquement' : 'Afficher N/A'}
+              {filters.showOnlyNA ? ' N/A uniquement' : 'Afficher N/A'}
             </button>
             <button
               onClick={() => setFilters(prev => ({ ...prev, showOnlyApproved: !prev.showOnlyApproved }))}
@@ -1573,7 +1573,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 filters.showOnlyApproved ? 'bg-green-500 text-white' : 'bg-gray-100 hover:bg-green-100 text-gray-700'
               }`}
             >
-              {filters.showOnlyApproved ? '✓ Approuvés uniquement' : 'Approuvés'}
+              {filters.showOnlyApproved ? ' Approuves uniquement' : 'Approuves'}
             </button>
             <button
               onClick={() => setFilters(prev => ({ ...prev, showOnlySkeleton: !prev.showOnlySkeleton }))}
@@ -1581,7 +1581,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 filters.showOnlySkeleton ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-blue-100 text-gray-700'
               }`}
             >
-              {filters.showOnlySkeleton ? '✓ Squelettes uniquement' : 'Squelettes'}
+              {filters.showOnlySkeleton ? ' Squelettes uniquement' : 'Squelettes'}
             </button>
           </div>
           
@@ -1658,9 +1658,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               />
             </div>
             
-            {/* Volatilité */}
+            {/* Volatilite */}
             <div>
-              <label htmlFor="filter-volatility-min" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilité Min (%)</label>
+              <label htmlFor="filter-volatility-min" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilite Min (%)</label>
               <input
                 id="filter-volatility-min"
                 type="number"
@@ -1671,7 +1671,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
               />
             </div>
             <div>
-              <label htmlFor="filter-volatility-max" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilité Max (%)</label>
+              <label htmlFor="filter-volatility-max" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Volatilite Max (%)</label>
               <input
                 id="filter-volatility-max"
                 type="number"
@@ -1729,7 +1729,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           <h4 className="text-sm font-semibold text-gray-700 mb-3">Options d'affichage</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div>
-              <label htmlFor="display-density" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Densité</label>
+              <label htmlFor="display-density" className="block text-[10px] sm:text-xs font-semibold text-gray-600 mb-1">Densite</label>
               <select
                 id="display-density"
                 value={displayOptions.density}
@@ -1790,16 +1790,16 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         )}
       </div>
 
-      {/* Matrice à carreaux Améliorée avec Vues Multiples */}
+      {/* Matrice a carreaux Amelioree avec Vues Multiples */}
       <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 sm:gap-3">
-              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">🎯 Matrice de Performance</h3>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800"> Matrice de Performance</h3>
               <button
                 onClick={() => toggleSection('performanceMatrix')}
                 className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-                title={sectionsVisibility.performanceMatrix ? "Réduire cette section" : "Agrandir cette section"}
+                title={sectionsVisibility.performanceMatrix ? "Reduire cette section" : "Agrandir cette section"}
               >
                 {sectionsVisibility.performanceMatrix ? (
                   <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -1808,10 +1808,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 )}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Cliquez sur un carreau pour sélectionner le titre</p>
+            <p className="text-xs text-gray-500 mt-1">Cliquez sur un carreau pour selectionner le titre</p>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
-            {/* Sélecteur de vue */}
+            {/* Selecteur de vue */}
             <div className="flex items-center gap-0.5 sm:gap-1 bg-gray-100 rounded-lg p-0.5 sm:p-1">
               <button
                 onClick={() => setMatrixView('grid')}
@@ -1820,9 +1820,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
-                title="Vue grille\n\nAffiche les tickers dans une grille de tuiles colorées.\n\nChaque tuile montre:\n• Symbole du ticker\n• Rendement total projeté\n• JPEGY\n• Icônes (Portefeuille/Watchlist)\n\nLes couleurs indiquent le rendement (vert = élevé, rouge = faible)."
+                title="Vue grille\n\nAffiche les tickers dans une grille de tuiles colorees.\n\nChaque tuile montre:\n- Symbole du ticker\n- Rendement total projete\n- JPEGY\n- Icones (Portefeuille/Watchlist)\n\nLes couleurs indiquent le rendement (vert = eleve, rouge = faible)."
               >
-                ⬜ Grille
+                 Grille
               </button>
               <button
                 onClick={() => setMatrixView('list')}
@@ -1831,9 +1831,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
-                title="Vue liste détaillée\n\nAffiche les tickers dans un tableau détaillé.\n\nColonnes:\n• Symbole\n• Nom\n• Rendement Total\n• JPEGY\n• Ratio 3:1\n• P/E, P/CF, P/BV, Yield\n• Recommandation\n• Secteur\n\nCliquez sur une ligne pour voir l'analyse complète."
+                title="Vue liste detaillee\n\nAffiche les tickers dans un tableau detaille.\n\nColonnes:\n- Symbole\n- Nom\n- Rendement Total\n- JPEGY\n- Ratio 3:1\n- P/E, P/CF, P/BV, Yield\n- Recommandation\n- Secteur\n\nCliquez sur une ligne pour voir l'analyse complete."
               >
-                ☰ Liste
+                 Liste
               </button>
               <button
                 onClick={() => setMatrixView('compact')}
@@ -1842,15 +1842,15 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
-                title="Vue compacte (matrice)\n\nAffiche les tickers dans une matrice compacte.\n\nChaque case montre:\n• Symbole du ticker\n• Rendement total projeté\n• JPEGY\n\nIdéal pour une vue d'ensemble rapide de tous les tickers.\n\nLes cases sont colorées selon le rendement."
+                title="Vue compacte (matrice)\n\nAffiche les tickers dans une matrice compacte.\n\nChaque case montre:\n- Symbole du ticker\n- Rendement total projete\n- JPEGY\n\nIdeal pour une vue d'ensemble rapide de tous les tickers.\n\nLes cases sont colorees selon le rendement."
               >
-                ▦ Compacte
+                 Compacte
               </button>
             </div>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 md:gap-4 text-[10px] sm:text-xs">
               <div className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-600"></div>
-                <span className="text-gray-600">≥50%</span>
+                <span className="text-gray-600">>=50%</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-300"></div>
@@ -1871,11 +1871,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
           <>
         {filteredMetrics.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            Aucun titre ne correspond aux filtres sélectionnés.
+            Aucun titre ne correspond aux filtres selectionnes.
           </div>
         ) : (
           <>
-            {/* Avertissement pour les données invalides */}
+            {/* Avertissement pour les donnees invalides */}
             {filteredMetrics.some(m => m.hasInvalidData) && (
               <div className={`mb-4 p-3 border-l-4 rounded-r ${
                 filteredMetrics.some(m => m.isNotSynchronized) 
@@ -1895,12 +1895,12 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   }`}>
                     <strong>
                       {filteredMetrics.some(m => m.isNotSynchronized) 
-                        ? '⚠️ Action requise:' 
+                        ? ' Action requise:' 
                         : 'Attention:'}
-                    </strong> {filteredMetrics.filter(m => m.hasInvalidData).length} titre(s) ont des données invalides ou manquantes. 
+                    </strong> {filteredMetrics.filter(m => m.hasInvalidData).length} titre(s) ont des donnees invalides ou manquantes. 
                     {filteredMetrics.some(m => m.isNotSynchronized) && (
                       <div className="font-semibold block mt-1 space-y-2">
-                        <p>La plupart nécessitent une synchronisation depuis l'API.</p>
+                        <p>La plupart necessitent une synchronisation depuis l'API.</p>
                         {onBulkSync ? (
                           <button
                             onClick={onBulkSync}
@@ -1915,13 +1915,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                         )}
                       </div>
                     )}
-                    Ces tickers sont marqués avec <ExclamationTriangleIcon className="w-4 h-4 inline text-red-500" /> et affichent "N/A".
+                    Ces tickers sont marques avec <ExclamationTriangleIcon className="w-4 h-4 inline text-red-500" /> et affichent "N/A".
                     <details className="mt-2">
-                      <summary className="cursor-pointer font-semibold hover:opacity-80">Voir les détails par ticker</summary>
+                      <summary className="cursor-pointer font-semibold hover:opacity-80">Voir les details par ticker</summary>
                       <ul className="mt-2 space-y-1 ml-4 list-disc">
                         {filteredMetrics.filter(m => m.hasInvalidData).map(metric => (
                           <li key={metric.profile.id} className="text-xs">
-                            <strong>{metric.profile.id}:</strong> {metric.invalidReason || 'Données invalides'}
+                            <strong>{metric.profile.id}:</strong> {metric.invalidReason || 'Donnees invalides'}
                           </li>
                         ))}
                       </ul>
@@ -1941,13 +1941,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 <button
                   onClick={() => setShowGuideDialog(true)}
                   className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded flex items-center gap-1 transition-colors"
-                  title="Ouvrir le guide complet pour réduire les N/A"
+                  title="Ouvrir le guide complet pour reduire les N/A"
                 >
                   <BookOpenIcon className="w-3 h-3" />
                   Guide
                 </button>
                 <span className="text-xs text-gray-400 hidden sm:inline" title="Raccourcis clavier disponibles">
-                  ⌨️ Ctrl+Shift+F: Filtre N/A | Ctrl+Shift+E: Export | Ctrl+Shift+D: Sync critères
+                   Ctrl+Shift+F: Filtre N/A | Ctrl+Shift+E: Export | Ctrl+Shift+D: Sync criteres
                 </span>
               </div>
               <div className="flex gap-2 flex-wrap">
@@ -1955,10 +1955,10 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   <button
                     onClick={onOpenSettings}
                     className="px-3 py-1 text-xs rounded transition-colors bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 flex items-center gap-1"
-                    title="⚙️ Configuration Complète : Guardrails, Validation, Ajustements\n\nOuvre le panneau de configuration unifié pour gérer tous les paramètres de l'application.\n\n🛡️ Guardrails (Limites d'affichage):\n• Limites de croissance (min/max pour toutes les métriques)\n• Limites de ratios (P/E, P/CF, P/BV min/max)\n• Multiplicateur maximum raisonnable pour les projections\n• Contrôlent l'affichage des graphiques et tableaux\n• Stockés dans localStorage (navigateur)\n• Affectent uniquement l'affichage, pas les calculs\n\n✅ Validation (Paramètres de sanitisation):\n• Limites de croissance par métrique (EPS, CF, BV, DIV)\n• Limites de ratios cibles (P/E, P/CF, P/BV, Yield)\n• Précision des calculs (décimales)\n• Automatisation de la sanitisation lors de la sync FMP\n• Cohérence des données\n• Stockés dans Supabase (partagés entre utilisateurs)\n• Affectent les calculs et la sauvegarde\n\n📊 Ajustements:\n• Paramètres généraux de l'application\n• Comportement par défaut\n• Options d'affichage\n\n💡 Impact:\n• Les Guardrails affectent l'affichage uniquement\n• La Validation affecte les calculs et la sauvegarde\n• Les changements sont appliqués immédiatement\n• Les paramètres sont persistants (localStorage ou Supabase)"
+                    title=" Configuration Complete : Guardrails, Validation, Ajustements\n\nOuvre le panneau de configuration unifie pour gerer tous les parametres de l'application.\n\n Guardrails (Limites d'affichage):\n- Limites de croissance (min/max pour toutes les metriques)\n- Limites de ratios (P/E, P/CF, P/BV min/max)\n- Multiplicateur maximum raisonnable pour les projections\n- Controlent l'affichage des graphiques et tableaux\n- Stockes dans localStorage (navigateur)\n- Affectent uniquement l'affichage, pas les calculs\n\n Validation (Parametres de sanitisation):\n- Limites de croissance par metrique (EPS, CF, BV, DIV)\n- Limites de ratios cibles (P/E, P/CF, P/BV, Yield)\n- Precision des calculs (decimales)\n- Automatisation de la sanitisation lors de la sync FMP\n- Coherence des donnees\n- Stockes dans Supabase (partages entre utilisateurs)\n- Affectent les calculs et la sauvegarde\n\n Ajustements:\n- Parametres generaux de l'application\n- Comportement par defaut\n- Options d'affichage\n\n Impact:\n- Les Guardrails affectent l'affichage uniquement\n- La Validation affecte les calculs et la sauvegarde\n- Les changements sont appliques immediatement\n- Les parametres sont persistants (localStorage ou Supabase)"
                   >
                     <Cog6ToothIcon className="w-3 h-3" />
-                    Paramètres
+                    Parametres
                   </button>
                 )}
                 <button
@@ -1971,8 +1971,8 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                       : 'bg-gray-100 hover:bg-orange-100 hover:text-orange-600 text-gray-700'
                   }`}
                   title={filters.showOnlyNA 
-                    ? "👁️ Afficher tous les tickers\n\nDésactive le filtre N/A pour voir tous les tickers de votre portefeuille et watchlist.\n\n📊 Affichage:\n• Tous les tickers (valides et avec N/A)\n• Métriques complètes pour les tickers valides\n• Indicateurs N/A pour les tickers incomplets\n\n⌨️ Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)" 
-                    : "⚠️ Afficher uniquement les tickers avec N/A\n\nFiltre pour ne voir que les tickers avec des données invalides ou manquantes.\n\n🔍 Utilité:\n• Identifier rapidement les tickers nécessitant une synchronisation\n• Voir quels tickers ont des problèmes de données\n• Faciliter le nettoyage et la maintenance\n• Permet de synchroniser uniquement les tickers problématiques\n\n📊 Indicateurs N/A:\n• Prix actuel invalide ou manquant\n• Données historiques incomplètes\n• Métriques impossibles à calculer\n• Tickers non synchronisés depuis FMP\n\n⌨️ Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)"}
+                    ? " Afficher tous les tickers\n\nDesactive le filtre N/A pour voir tous les tickers de votre portefeuille et watchlist.\n\n Affichage:\n- Tous les tickers (valides et avec N/A)\n- Metriques completes pour les tickers valides\n- Indicateurs N/A pour les tickers incomplets\n\n Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)" 
+                    : " Afficher uniquement les tickers avec N/A\n\nFiltre pour ne voir que les tickers avec des donnees invalides ou manquantes.\n\n Utilite:\n- Identifier rapidement les tickers necessitant une synchronisation\n- Voir quels tickers ont des problemes de donnees\n- Faciliter le nettoyage et la maintenance\n- Permet de synchroniser uniquement les tickers problematiques\n\n Indicateurs N/A:\n- Prix actuel invalide ou manquant\n- Donnees historiques incompletes\n- Metriques impossibles a calculer\n- Tickers non synchronises depuis FMP\n\n Raccourci: Ctrl+Shift+F (Cmd+Shift+F sur Mac)"}
                   aria-label={filters.showOnlyNA ? "Afficher tous les tickers" : "Afficher uniquement les tickers avec N/A"}
                   aria-pressed={filters.showOnlyNA ? "true" : "false"}
                   tabIndex={0}
@@ -1989,7 +1989,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     }}
                     disabled={isBulkSyncing}
                     className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1"
-                    title={`🔄 Synchroniser uniquement les ${filteredMetrics.length} ticker(s) avec N/A\n\nSynchronise uniquement les tickers affichés (ceux avec des données invalides ou manquantes).\n\n⚡ Avantages:\n• Plus rapide que de synchroniser tous les tickers\n• Cible uniquement les tickers problématiques\n• Économise les appels API FMP\n• Permet de corriger rapidement les données manquantes\n\n📊 Processus:\n• Récupère les données FMP Premium pour chaque ticker\n• Met à jour les données historiques (30 ans)\n• Recalcule les hypothèses automatiquement\n• Préserve les modifications manuelles existantes\n• Sauvegarde un snapshot avant et après la sync\n\n⏱️ Durée:\n• Environ 2-3 secondes par ticker\n• Traitement en batch (3 tickers en parallèle)\n• Barre de progression affichée\n\n💡 Astuce:\n• Utilisez ce bouton après avoir filtré les N/A\n• Plus efficace que 'Sync Warehouse (Deep)' si vous avez beaucoup de tickers`}
+                    title={` Synchroniser uniquement les ${filteredMetrics.length} ticker(s) avec N/A\n\nSynchronise uniquement les tickers affiches (ceux avec des donnees invalides ou manquantes).\n\n Avantages:\n- Plus rapide que de synchroniser tous les tickers\n- Cible uniquement les tickers problematiques\n- Economise les appels API FMP\n- Permet de corriger rapidement les donnees manquantes\n\n Processus:\n- Recupere les donnees FMP Premium pour chaque ticker\n- Met a jour les donnees historiques (30 ans)\n- Recalcule les hypotheses automatiquement\n- Preserve les modifications manuelles existantes\n- Sauvegarde un snapshot avant et apres la sync\n\n Duree:\n- Environ 2-3 secondes par ticker\n- Traitement en batch (3 tickers en parallele)\n- Barre de progression affichee\n\n Astuce:\n- Utilisez ce bouton apres avoir filtre les N/A\n- Plus efficace que 'Sync Warehouse (Deep)' si vous avez beaucoup de tickers`}
                   >
                     <ArrowPathIcon className={`w-3 h-3 ${isBulkSyncing ? 'animate-spin' : ''}`} />
                     Sync N/A ({filteredMetrics.length})
@@ -2014,13 +2014,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                           naTickers: result.naTickers || []
                         });
                         
-                        // Si des tickers N/A sont trouvés, proposer de les synchroniser
+                        // Si des tickers N/A sont trouves, proposer de les synchroniser
                         if (result.naTickers && result.naTickers.length > 0 && onSyncNA) {
                           const shouldSync = confirm(
-                            `Analyse terminée:\n\n` +
-                            `✅ Tickers valides: ${result.validTickers}\n` +
-                            `⚠️ Tickers avec N/A: ${result.naTickers.length}\n` +
-                            `❌ Erreurs: ${result.errorTickers}\n\n` +
+                            `Analyse terminee:\n\n` +
+                            ` Tickers valides: ${result.validTickers}\n` +
+                            ` Tickers avec N/A: ${result.naTickers.length}\n` +
+                            ` Erreurs: ${result.errorTickers}\n\n` +
                             `Voulez-vous synchroniser automatiquement les ${result.naTickers.length} tickers avec N/A ?`
                           );
                           
@@ -2028,7 +2028,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                             onSyncNA(result.naTickers);
                           }
                         } else if (result.naTickers && result.naTickers.length === 0) {
-                          alert(`✅ Excellent! Aucun ticker avec N/A trouvé.\n\nTous les ${result.validTickers} tickers ont des données valides.`);
+                          alert(` Excellent! Aucun ticker avec N/A trouve.\n\nTous les ${result.validTickers} tickers ont des donnees valides.`);
                         }
                       } else {
                         alert(`Erreur: ${result.error || 'Erreur inconnue'}`);
@@ -2042,7 +2042,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   }}
                   disabled={isBulkSyncing || isAnalyzingNA}
                   className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded transition-colors flex items-center gap-1"
-                  title="🔍 Analyser les tickers avec N/A\n\nAnalyse tous les tickers de votre portefeuille et watchlist pour identifier ceux avec des données invalides ou manquantes.\n\n📊 Résultats de l'analyse:\n• Nombre total de tickers analysés\n• Nombre de tickers valides (données complètes)\n• Nombre de tickers avec N/A (données manquantes)\n• Nombre d'erreurs rencontrées\n• Liste des tickers problématiques\n\n⚡ Fonctionnalités:\n• Analyse rapide via l'API backend\n• Limite de 200 tickers par analyse\n• Propose automatiquement de synchroniser les N/A\n• Affiche un résumé détaillé\n\n💡 Utilisation:\n• Cliquez pour lancer l'analyse\n• Attendez quelques secondes\n• Si des N/A sont trouvés, vous pouvez les synchroniser automatiquement\n• Plus efficace que de vérifier manuellement chaque ticker"
+                  title=" Analyser les tickers avec N/A\n\nAnalyse tous les tickers de votre portefeuille et watchlist pour identifier ceux avec des donnees invalides ou manquantes.\n\n Resultats de l'analyse:\n- Nombre total de tickers analyses\n- Nombre de tickers valides (donnees completes)\n- Nombre de tickers avec N/A (donnees manquantes)\n- Nombre d'erreurs rencontrees\n- Liste des tickers problematiques\n\n Fonctionnalites:\n- Analyse rapide via l'API backend\n- Limite de 200 tickers par analyse\n- Propose automatiquement de synchroniser les N/A\n- Affiche un resume detaille\n\n Utilisation:\n- Cliquez pour lancer l'analyse\n- Attendez quelques secondes\n- Si des N/A sont trouves, vous pouvez les synchroniser automatiquement\n- Plus efficace que de verifier manuellement chaque ticker"
                 >
                   <ArrowPathIcon className={`w-3 h-3 ${isAnalyzingNA ? 'animate-spin' : ''}`} />
                   {isAnalyzingNA ? 'Analyse...' : 'Auto-Sync N/A'}
@@ -2050,9 +2050,9 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                 {naAnalysisResult && (
                   <div className="px-3 py-1 text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded border border-blue-200 dark:border-blue-800">
                     {naAnalysisResult.na > 0 ? (
-                      <span>⚠️ {naAnalysisResult.na} N/A trouvés</span>
+                      <span> {naAnalysisResult.na} N/A trouves</span>
                     ) : (
-                      <span>✅ Tous valides</span>
+                      <span> Tous valides</span>
                     )}
                   </div>
                 )}
@@ -2060,7 +2060,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                   onClick={() => {
                     const sorted = [...filteredMetrics].sort((a, b) => b.totalReturnPercent - a.totalReturnPercent);
                     const top10 = sorted.slice(0, 10);
-                    // Scroll vers le premier élément (optimisé avec requestAnimationFrame)
+                    // Scroll vers le premier element (optimise avec requestAnimationFrame)
                     requestAnimationFrame(() => {
                       requestAnimationFrame(() => {
                         const firstEl = document.querySelector(`[data-ticker="${top10[0]?.profile.id}"]`);
@@ -2069,7 +2069,7 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                     });
                   }}
                   className="px-3 py-1 text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-600 text-gray-700 rounded transition-colors"
-                  title="Zoom Top 10\n\nFait défiler automatiquement vers les 10 meilleurs tickers (par rendement total projeté).\n\nUtile pour se concentrer rapidement sur les meilleures opportunités."
+                  title="Zoom Top 10\n\nFait defiler automatiquement vers les 10 meilleurs tickers (par rendement total projete).\n\nUtile pour se concentrer rapidement sur les meilleures opportunites."
                 >
                   Zoom Top 10
                 </button>
@@ -2104,13 +2104,13 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
                         : 'border-gray-200'
                     } ${getReturnBgClass(metric.totalReturnPercent)} ${currentId === metric.profile.id ? 'opacity-100' : 'opacity-85'}`}
                     title={`${metric.profile.info.name || metric.profile.id}
-Rendement: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A (données invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
+Rendement: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'N/A (donnees invalides)' : `${metric.totalReturnPercent.toFixed(1)}%`}
 JPEGY: ${metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(2) : 'N/A (non calculable)'}
 Ratio 3:1: ${metric.hasInvalidData || metric.ratio31 === null || metric.ratio31 === undefined ? 'N/A' : metric.ratio31.toFixed(2)}
 P/E: ${metric.currentPE !== null && metric.currentPE !== undefined ? metric.currentPE.toFixed(1) : 'N/A'}x
 Secteur: ${metric.profile.info.sector}
-${metric.hasApprovedVersion ? '✓ Version approuvée' : ''}
-${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
+${metric.hasApprovedVersion ? ' Version approuvee' : ''}
+${metric.invalidReason ? ` ${metric.invalidReason}` : ''}`}
                   >
                     <div className="flex flex-col items-center justify-center h-full text-white relative">
                       {comparisonMode && selectedForComparison.includes(metric.profile.id) && (
@@ -2119,7 +2119,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         </div>
                       )}
                       {metric.hasInvalidData && (
-                        <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10" title="Données invalides ou manquantes">
+                        <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10" title="Donnees invalides ou manquantes">
                           <ExclamationTriangleIcon className="w-3 h-3 text-white" />
                         </div>
                       )}
@@ -2145,7 +2145,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         ) : (
                           <>JPEGY: {metric.jpegy !== null && metric.jpegy !== undefined ? metric.jpegy.toFixed(1) : <span className="text-white/50">N/A</span>}</>
                         )}
-                        {!((metric as any)._isLoading) && metric.jpegy === null && <span className="ml-1 text-red-200">⚠️</span>}
+                        {!((metric as any)._isLoading) && metric.jpegy === null && <span className="ml-1 text-red-200"></span>}
                       </div>
                       {metric.hasApprovedVersion && !metric.hasInvalidData && (
                         <CheckCircleIcon className="w-4 h-4 mt-1 text-white" />
@@ -2201,7 +2201,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                           </div>
                         )}
                         {metric.hasInvalidData && (
-                          <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10" title="Données invalides">
+                          <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center z-10" title="Donnees invalides">
                             <ExclamationTriangleIcon className="w-3 h-3 text-white" />
                           </div>
                         )}
@@ -2234,8 +2234,8 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         {metric.jpegy !== null && (
                           <div className="mt-1 pt-1 border-t border-gray-200">
                             <div className="text-[9px] text-gray-400 space-y-0.5 text-left">
-                              <div><strong>Source:</strong> P/E ÷ (Growth % + Yield %)</div>
-                              <div><strong>Fournisseur:</strong> JSLAI™ - Métrique propriétaire ajustant le P/E par croissance et dividende.</div>
+                              <div><strong>Source:</strong> P/E / (Growth % + Yield %)</div>
+                              <div><strong>Fournisseur:</strong> JSLAITM - Metrique proprietaire ajustant le P/E par croissance et dividende.</div>
                             </div>
                           </div>
                         )}
@@ -2258,7 +2258,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       </div>
                     )}
                     {metric.hasInvalidData ? (
-                      <ExclamationTriangleIcon className="w-5 h-5 text-red-500 ml-2" title="Données invalides" />
+                      <ExclamationTriangleIcon className="w-5 h-5 text-red-500 ml-2" title="Donnees invalides" />
                     ) : metric.hasApprovedVersion && (
                       <CheckCircleIcon className="w-5 h-5 text-green-500 ml-2" />
                     )}
@@ -2297,7 +2297,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         ? 'border-red-300 border-dashed'
                         : 'border-gray-200'
                     } ${metric.hasInvalidData ? 'bg-red-50' : getReturnBgClass(metric.totalReturnPercent)} ${currentId === metric.profile.id ? 'opacity-100' : (metric.hasInvalidData ? 'opacity-60' : 'opacity-80')}`}
-                    title={`${metric.profile.id}: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'Données invalides' : `${metric.totalReturnPercent.toFixed(1)}%`}`}
+                    title={`${metric.profile.id}: ${metric.hasInvalidData || metric.totalReturnPercent === null || metric.totalReturnPercent === undefined ? 'Donnees invalides' : `${metric.totalReturnPercent.toFixed(1)}%`}`}
                   >
                     <div className={`flex flex-col items-center ${metric.hasInvalidData ? 'text-gray-600' : 'text-white'} text-[9px] relative`}>
                       {metric.hasInvalidData && (
@@ -2325,13 +2325,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
         )}
       </div>
 
-      {/* Section Analyse Détaillée (Visible uniquement si un ticker est sélectionné) */}
+      {/* Section Analyse Detaillee (Visible uniquement si un ticker est selectionne) */}
       {currentId && profiles.find(p => p.id === currentId) && (
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-blue-200 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2">
               <MagnifyingGlassPlusIcon className="w-6 h-6 text-blue-600" />
-              Analyse Détaillée : <span className="text-blue-600">{currentId}</span>
+              Analyse Detaillee : <span className="text-blue-600">{currentId}</span>
               <span className="text-sm font-normal text-gray-500 ml-2">
                 ({profiles.find(p => p.id === currentId)?.info?.name || 'Inconnu'})
               </span>
@@ -2339,7 +2339,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
             <button
               onClick={() => toggleSection('detailedAnalysis')}
               className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-              title={sectionsVisibility.detailedAnalysis ? "Réduire cette section" : "Agrandir cette section"}
+              title={sectionsVisibility.detailedAnalysis ? "Reduire cette section" : "Agrandir cette section"}
             >
               {sectionsVisibility.detailedAnalysis ? (
                 <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -2387,15 +2387,15 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
         </div>
       )}
 
-      {/* Graphique X/Y Amélioré */}
+      {/* Graphique X/Y Ameliore */}
       <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Positionnement JPEGY vs Rendement Total</h3>
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800"> Positionnement JPEGY vs Rendement Total</h3>
             <button
               onClick={() => toggleSection('scatterPlot')}
               className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-              title={sectionsVisibility.scatterPlot ? "Réduire cette section" : "Agrandir cette section"}
+              title={sectionsVisibility.scatterPlot ? "Reduire cette section" : "Agrandir cette section"}
             >
               {sectionsVisibility.scatterPlot ? (
                 <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -2406,9 +2406,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
           <div className="flex items-center gap-2">
             <div className="text-xs text-gray-500">
-              {filteredMetrics.length} titre(s) affiché(s)
+              {filteredMetrics.length} titre(s) affiche(s)
             </div>
-            {/* Contrôles de zoom et pan */}
+            {/* Controles de zoom et pan */}
             <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1 bg-white">
               <button
                 onClick={() => {
@@ -2426,7 +2426,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   setPanJPEGY({ x: 0, y: 0 });
                 }}
                 className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-                title="Dézoomer (÷1.2)"
+                title="Dezoomer (/1.2)"
               >
                 <MagnifyingGlassMinusIcon className="w-4 h-4 text-gray-600" />
               </button>
@@ -2436,7 +2436,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   setPanJPEGY({ x: 0, y: 0 });
                 }}
                 className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-                title="Réinitialiser la vue"
+                title="Reinitialiser la vue"
               >
                 <ArrowsPointingOutIcon className="w-4 h-4 text-gray-600" />
               </button>
@@ -2447,7 +2447,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           <>
         {filteredMetrics.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            Aucun titre à afficher sur le graphique.
+            Aucun titre a afficher sur le graphique.
           </div>
         ) : (
           <div className="overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg">
@@ -2575,7 +2575,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 textAnchor="middle" 
                 className="text-sm font-bold fill-gray-800"
               >
-                JPEGY (P/E ajusté pour croissance et rendement)
+                JPEGY (P/E ajuste pour croissance et rendement)
               </text>
               <text
                 x={25}
@@ -2584,7 +2584,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 transform={`rotate(-90, 25, ${chartHeight / 2})`}
                 className="text-sm font-bold fill-gray-800"
               >
-                Rendement Total Projeté (5 ans, %) - Ratio 3:1
+                Rendement Total Projete (5 ans, %) - Ratio 3:1
               </text>
               
               {/* Note explicative JPEGY sous le graphique */}
@@ -2595,15 +2595,15 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   textAnchor="middle" 
                   className="text-[9px] fill-gray-500"
                 >
-                  JPEGY = P/E ÷ (Growth % + Yield %) | Source: JSLAI™ (Jean-Sébastien)
+                  JPEGY = P/E / (Growth % + Yield %) | Source: JSLAITM (Jean-Sebastien)
                 </text>
               </g>
               
-              {/* Légende JPEGY */}
+              {/* Legende JPEGY */}
               <g transform={`translate(${chartWidth - 200}, ${padding + 20})`}>
-                <text x={0} y={0} className="text-xs font-semibold fill-gray-700">Légende JPEGY:</text>
+                <text x={0} y={0} className="text-xs font-semibold fill-gray-700">Legende JPEGY:</text>
                 {[
-                  { label: 'Excellent (≤0.5)', color: '#86efac' },
+                  { label: 'Excellent (<=0.5)', color: '#86efac' },
                   { label: 'Bon (0.5-1.5)', color: '#16a34a' },
                   { label: 'Moyen (1.5-1.75)', color: '#eab308' },
                   { label: 'Faible (1.75-2.0)', color: '#f97316' },
@@ -2616,11 +2616,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 ))}
               </g>
 
-              {/* Points - EXCLURE les données invalides du graphique */}
+              {/* Points - EXCLURE les donnees invalides du graphique */}
               {filteredMetrics
-                .filter(metric => !metric.hasInvalidData) // Exclure complètement les données invalides
+                .filter(metric => !metric.hasInvalidData) // Exclure completement les donnees invalides
                 .map((metric) => {
-                  // Validation supplémentaire: exclure les valeurs aberrantes même si hasInvalidData est false
+                  // Validation supplementaire: exclure les valeurs aberrantes meme si hasInvalidData est false
                   // Exclure les points avec JPEGY null ou valeurs aberrantes
                   if (metric.jpegy === null || 
                       metric.totalReturnPercent > 1000 || metric.totalReturnPercent < -100 || 
@@ -2665,10 +2665,10 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
             {/* Note explicative JPEGY sous le graphique */}
             <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="text-xs text-gray-700 space-y-1">
-                <div className="font-semibold mb-1">📊 À propos de JPEGY :</div>
-                <div><strong>Source de calcul:</strong> P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
-                <div><strong>Formule:</strong> JPEGY = Prix Actuel / BPA ÷ (Taux de croissance annuel des bénéfices % + Rendement du dividende %)</div>
-                <div><strong>Fournisseur:</strong> Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes. Plus le ratio est bas, plus l'action est attractive.</div>
+                <div className="font-semibold mb-1"> A propos de JPEGY :</div>
+                <div><strong>Source de calcul:</strong> P/E Actuel / (Taux de croissance EPS % + Rendement dividende %)</div>
+                <div><strong>Formule:</strong> JPEGY = Prix Actuel / BPA / (Taux de croissance annuel des benefices % + Rendement du dividende %)</div>
+                <div><strong>Fournisseur:</strong> Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Le fournisseur etablit cette metrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des benefices et du rendement du dividende, permettant une evaluation plus nuancee de la valorisation d'une action en tenant compte de sa capacite de croissance et de sa distribution de dividendes. Plus le ratio est bas, plus l'action est attractive.</div>
               </div>
             </div>
           </div>
@@ -2681,11 +2681,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
       <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Positionnement Ratio 3:1 vs Rendement Total</h3>
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800"> Positionnement Ratio 3:1 vs Rendement Total</h3>
             <button
               onClick={() => toggleSection('scatterPlotRatio31')}
               className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-              title={sectionsVisibility.scatterPlotRatio31 ? "Réduire cette section" : "Agrandir cette section"}
+              title={sectionsVisibility.scatterPlotRatio31 ? "Reduire cette section" : "Agrandir cette section"}
             >
               {sectionsVisibility.scatterPlotRatio31 ? (
                 <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -2696,9 +2696,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
           <div className="flex items-center gap-2">
             <div className="text-xs text-gray-500">
-              {filteredMetrics.length} titre(s) affiché(s)
+              {filteredMetrics.length} titre(s) affiche(s)
             </div>
-            {/* Contrôles de zoom et pan */}
+            {/* Controles de zoom et pan */}
             <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1 bg-white">
               <button
                 onClick={() => {
@@ -2714,7 +2714,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   setZoomRatio31(prev => Math.max(prev / 1.2, 0.5));
                 }}
                 className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-                title="Dézoomer (÷1.2)\n\nUtilisez aussi la molette de la souris pour dézoomer."
+                title="Dezoomer (/1.2)\n\nUtilisez aussi la molette de la souris pour dezoomer."
               >
                 <MagnifyingGlassMinusIcon className="w-4 h-4 text-gray-600" />
               </button>
@@ -2724,7 +2724,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   setPanRatio31({ x: 0, y: 0 });
                 }}
                 className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-                title="Réinitialiser la vue"
+                title="Reinitialiser la vue"
               >
                 <ArrowsPointingOutIcon className="w-4 h-4 text-gray-600" />
               </button>
@@ -2735,13 +2735,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           <>
         {filteredMetrics.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            Aucun titre à afficher sur le graphique.
+            Aucun titre a afficher sur le graphique.
           </div>
         ) : (
           <div className="overflow-x-auto bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg">
             <div className="w-full" style={{ minWidth: '100%' }}>
               {(() => {
-                // Calculer les échelles pour Ratio 3:1
+                // Calculer les echelles pour Ratio 3:1
                 const validMetricsForRatio31Chart = filteredMetrics.filter(m => 
                   !m.hasInvalidData && 
                   m.totalReturnPercent >= -100 && m.totalReturnPercent <= 1000 &&
@@ -2772,7 +2772,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                   return chartHeight - padding - (((returnPercent - minReturnRatio31) / range) * (chartHeight - 2 * padding));
                 };
                 
-                // Générer les ticks pour les axes Ratio 3:1
+                // Generer les ticks pour les axes Ratio 3:1
                 const xTicksRatio31 = [];
                 const xTickCountRatio31 = 10;
                 for (let i = 0; i <= xTickCountRatio31; i++) {
@@ -2842,7 +2842,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       />
                     ))}
                     
-                    {/* Ligne de référence à 3:1 */}
+                    {/* Ligne de reference a 3:1 */}
                     {maxRatio31 >= 3 && minRatio31 <= 3 && (
                       <line
                         x1={xScaleRatio31(3)}
@@ -2934,7 +2934,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       transform={`rotate(-90, 25, ${chartHeight / 2})`}
                       className="text-sm font-bold fill-gray-800"
                     >
-                      Rendement Total Projeté (5 ans, %)
+                      Rendement Total Projete (5 ans, %)
                     </text>
                     
                     {/* Note explicative Ratio 3:1 sous le graphique */}
@@ -2945,17 +2945,17 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         textAnchor="middle" 
                         className="text-[9px] fill-gray-500"
                       >
-                        Ratio 3:1 = Potentiel de Hausse (%) ÷ Risque de Baisse (%) | Source: JSLAI™
+                        Ratio 3:1 = Potentiel de Hausse (%) / Risque de Baisse (%) | Source: JSLAITM
                       </text>
                     </g>
                     
-                    {/* Légende Ratio 3:1 */}
+                    {/* Legende Ratio 3:1 */}
                     <g transform={`translate(${chartWidth - 200}, ${padding + 20})`}>
-                      <text x={0} y={0} className="text-xs font-semibold fill-gray-700">Légende Ratio 3:1:</text>
+                      <text x={0} y={0} className="text-xs font-semibold fill-gray-700">Legende Ratio 3:1:</text>
                       {[
-                        { label: 'Favorable (≥3:1)', color: '#16a34a' },
+                        { label: 'Favorable (>=3:1)', color: '#16a34a' },
                         { label: 'Acceptable (1:1-3:1)', color: '#eab308' },
-                        { label: 'Défavorable (<1:1)', color: '#dc2626' }
+                        { label: 'Defavorable (<1:1)', color: '#dc2626' }
                       ].map((item, idx) => (
                         <g key={idx} transform={`translate(0, ${(idx + 1) * 18})`}>
                           <circle cx={8} cy={0} r={6} fill={item.color} />
@@ -2964,11 +2964,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                       ))}
                     </g>
 
-                    {/* Points - EXCLURE les données invalides du graphique */}
+                    {/* Points - EXCLURE les donnees invalides du graphique */}
                     {filteredMetrics
-                      .filter(metric => !metric.hasInvalidData) // Exclure complètement les données invalides
+                      .filter(metric => !metric.hasInvalidData) // Exclure completement les donnees invalides
                       .map((metric) => {
-                        // Validation supplémentaire: exclure les valeurs aberrantes
+                        // Validation supplementaire: exclure les valeurs aberrantes
                         if (metric.ratio31 < 0 || metric.ratio31 > 100 || 
                             metric.totalReturnPercent > 1000 || metric.totalReturnPercent < -100 || 
                             !isFinite(metric.totalReturnPercent) || !isFinite(metric.ratio31)) {
@@ -3012,10 +3012,10 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
             {/* Note explicative Ratio 3:1 sous le graphique */}
             <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div className="text-xs text-gray-700 space-y-1">
-                <div className="font-semibold mb-1">📊 À propos du Ratio 3:1 :</div>
-                <div><strong>Source de calcul:</strong> Potentiel de Hausse (%) ÷ Risque de Baisse (%)</div>
-                <div><strong>Formule:</strong> Ratio 3:1 = ((Prix Projeté - Prix Actuel) / Prix Actuel × 100) ÷ ((Prix Actuel - Prix Plancher) / Prix Actuel × 100)</div>
-                <div><strong>Fournisseur:</strong> Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en comparant le potentiel de hausse (gain potentiel si le prix atteint le prix projeté) au risque de baisse (perte potentielle jusqu'au prix plancher historique). Un ratio ≥ 3:1 indique que le potentiel de hausse est au moins 3 fois supérieur au risque de baisse, ce qui représente un bon rapport risque/rendement.</div>
+                <div className="font-semibold mb-1"> A propos du Ratio 3:1 :</div>
+                <div><strong>Source de calcul:</strong> Potentiel de Hausse (%) / Risque de Baisse (%)</div>
+                <div><strong>Formule:</strong> Ratio 3:1 = ((Prix Projete - Prix Actuel) / Prix Actuel x 100) / ((Prix Actuel - Prix Plancher) / Prix Actuel x 100)</div>
+                <div><strong>Fournisseur:</strong> Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Le fournisseur etablit cette metrique en comparant le potentiel de hausse (gain potentiel si le prix atteint le prix projete) au risque de baisse (perte potentielle jusqu'au prix plancher historique). Un ratio >= 3:1 indique que le potentiel de hausse est au moins 3 fois superieur au risque de baisse, ce qui represente un bon rapport risque/rendement.</div>
               </div>
             </div>
           </div>
@@ -3029,11 +3029,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2 sm:gap-3">
-              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📊 Distribution des Rendements Totaux</h3>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800"> Distribution des Rendements Totaux</h3>
               <button
                 onClick={() => toggleSection('returnDistribution')}
                 className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-                title={sectionsVisibility.returnDistribution ? "Réduire cette section" : "Agrandir cette section"}
+                title={sectionsVisibility.returnDistribution ? "Reduire cette section" : "Agrandir cette section"}
               >
                 {sectionsVisibility.returnDistribution ? (
                   <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -3048,7 +3048,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           <div className="flex items-end justify-between gap-2 h-64 border-b border-l border-gray-300 pb-2 pl-2">
             {(() => {
               if (filteredMetrics.length === 0) return null;
-              // Créer des bins pour la distribution
+              // Creer des bins pour la distribution
               const minReturn = Math.min(...filteredMetrics.map(m => m.totalReturnPercent));
               const maxReturn = Math.max(...filteredMetrics.map(m => m.totalReturnPercent));
               const binCount = 12;
@@ -3095,7 +3095,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                 ? (() => {
                     const validReturns = filteredMetrics.map(m => m.totalReturnPercent).filter((r): r is number => r !== null && r !== undefined);
                     if (validReturns.length === 0) return 'N/A';
-                    return `${(Math.min(...validReturns) ?? 0).toFixed(0)}% à ${(Math.max(...validReturns) ?? 0).toFixed(0)}%`;
+                    return `${(Math.min(...validReturns) ?? 0).toFixed(0)}% a ${(Math.max(...validReturns) ?? 0).toFixed(0)}%`;
                   })()
                 : 'N/A'
             }
@@ -3105,16 +3105,16 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
         </div>
       )}
 
-      {/* 5 Autres Idées de Visualisation */}
+      {/* 5 Autres Idees de Visualisation */}
       {filteredMetrics.length > 0 && (
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2 sm:gap-3">
-              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📈 Visualisations Avancées</h3>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800"> Visualisations Avancees</h3>
               <button
                 onClick={() => toggleSection('otherVisualizations')}
                 className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-                title={sectionsVisibility.otherVisualizations ? "Réduire cette section" : "Agrandir cette section"}
+                title={sectionsVisibility.otherVisualizations ? "Reduire cette section" : "Agrandir cette section"}
               >
                 {sectionsVisibility.otherVisualizations ? (
                   <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -3127,9 +3127,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           {sectionsVisibility.otherVisualizations && (
             <>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-        {/* Idée 1: Heatmap de Secteurs Amélioré */}
+        {/* Idee 1: Heatmap de Secteurs Ameliore */}
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">🔥 Performance par Secteur</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4"> Performance par Secteur</h3>
           <div className="text-xs text-gray-500 mb-3">
             Rendement moyen, JPEGY moyen et nombre de titres par secteur
           </div>
@@ -3209,15 +3209,15 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
         </div>
 
-        {/* Idée 2: Top Performers Amélioré */}
+        {/* Idee 2: Top Performers Ameliore */}
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">🏆 Top 5 Performers</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4"> Top 5 Performers</h3>
           <div className="text-xs text-gray-500 mb-3">
-            Meilleurs rendements projetés
+            Meilleurs rendements projetes
           </div>
           <div className="space-y-2">
             {filteredMetrics
-              .filter(m => !m.hasInvalidData) // Exclure les données invalides du Top 5
+              .filter(m => !m.hasInvalidData) // Exclure les donnees invalides du Top 5
               .sort((a, b) => b.totalReturnPercent - a.totalReturnPercent)
               .slice(0, 5)
               .map((metric, idx) => (
@@ -3234,20 +3234,20 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
         </div>
 
-        {/* Idée 3: Distribution des Risques Amélioré avec Graphique */}
+        {/* Idee 3: Distribution des Risques Ameliore avec Graphique */}
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">⚠️ Distribution des Risques de Baisse</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4"> Distribution des Risques de Baisse</h3>
           <div className="text-xs text-gray-500 mb-3">
             Classification par niveau de risque avec visualisation
           </div>
           <div className="mb-4">
             <div className="flex items-end justify-between gap-3 h-24 border-b border-l border-gray-300 pb-2 pl-2 bg-gray-50 p-2 rounded">
-              {['Faible', 'Modéré', 'Élevé'].map((level, idx) => {
+              {['Faible', 'Modere', 'Eleve'].map((level, idx) => {
                 const ranges = [[0, 20], [20, 50], [50, 100]];
                 const count = filteredMetrics.filter(m => 
                   m.downsideRisk >= ranges[idx][0] && m.downsideRisk < ranges[idx][1]
                 ).length;
-                const maxCount = Math.max(...['Faible', 'Modéré', 'Élevé'].map((_, i) => {
+                const maxCount = Math.max(...['Faible', 'Modere', 'Eleve'].map((_, i) => {
                   const r = [[0, 20], [20, 50], [50, 100]];
                   return filteredMetrics.filter(m => 
                     m.downsideRisk >= r[i][0] && m.downsideRisk < r[i][1]
@@ -3273,7 +3273,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
             </div>
           </div>
           <div className="space-y-2">
-            {['Faible', 'Modéré', 'Élevé'].map((level, idx) => {
+            {['Faible', 'Modere', 'Eleve'].map((level, idx) => {
               const ranges = [[0, 20], [20, 50], [50, 100]];
               const count = filteredMetrics.filter(m => 
                 m.downsideRisk >= ranges[idx][0] && m.downsideRisk < ranges[idx][1]
@@ -3309,9 +3309,9 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
         </div>
 
-        {/* Idée 4: Ratio 3:1 Distribution Amélioré */}
+        {/* Idee 4: Ratio 3:1 Distribution Ameliore */}
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">📊 Distribution Ratio 3:1 (Potentiel vs Risque)</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4"> Distribution Ratio 3:1 (Potentiel vs Risque)</h3>
           <div className="text-xs text-gray-500 mb-3">
             Ratio hausse potentielle / risque de baisse
           </div>
@@ -3340,11 +3340,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           </div>
         </div>
 
-        {/* Idée 5: Timeline de Performance Amélioré */}
+        {/* Idee 5: Timeline de Performance Ameliore */}
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200 md:col-span-2">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4">📈 Timeline de Performance (Triée par Rendement)</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 mb-3 sm:mb-4"> Timeline de Performance (Triee par Rendement)</h3>
           <div className="text-xs text-gray-500 mb-3">
-            Barres horizontales classées par rendement décroissant
+            Barres horizontales classees par rendement decroissant
           </div>
           <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0">
             <div className="flex gap-1.5 sm:gap-2 min-w-max pb-2">
@@ -3381,16 +3381,16 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
         </div>
       )}
 
-      {/* Matrice de Corrélation */}
+      {/* Matrice de Correlation */}
       {filteredMetrics.length > 1 && (
         <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <div className="flex items-center gap-2 sm:gap-3">
-              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">🔗 Matrice de Corrélation entre Métriques</h3>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800"> Matrice de Correlation entre Metriques</h3>
               <button
                 onClick={() => toggleSection('correlationMatrix')}
                 className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-                title={sectionsVisibility.correlationMatrix ? "Réduire cette section" : "Agrandir cette section"}
+                title={sectionsVisibility.correlationMatrix ? "Reduire cette section" : "Agrandir cette section"}
               >
                 {sectionsVisibility.correlationMatrix ? (
                   <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -3403,7 +3403,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           {sectionsVisibility.correlationMatrix && (
             <>
           <div className="text-xs text-gray-500 mb-4">
-            Corrélations entre JPEGY, Rendement, Ratio 3:1, P/E, Yield et Croissance
+            Correlations entre JPEGY, Rendement, Ratio 3:1, P/E, Yield et Croissance
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
@@ -3469,15 +3469,15 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         const corr = calculateCorrelation(metric, otherMetric);
                         const intensity = Math.abs(corr);
                         const color = corr > 0 
-                          ? `rgba(34, 197, 94, ${intensity})` // Vert pour corrélation positive
-                          : `rgba(239, 68, 68, ${intensity})`; // Rouge pour corrélation négative
+                          ? `rgba(34, 197, 94, ${intensity})` // Vert pour correlation positive
+                          : `rgba(239, 68, 68, ${intensity})`; // Rouge pour correlation negative
                         const cellStyle: React.CSSProperties = { backgroundColor: color, color: intensity > 0.5 ? 'white' : 'black' };
                         return (
                           <td 
                             key={otherMetric} 
                             className="p-2 text-center font-semibold"
                             style={cellStyle}
-                            title={`Corrélation: ${corr?.toFixed(3) ?? '0.000'}`}
+                            title={`Correlation: ${corr?.toFixed(3) ?? '0.000'}`}
                           >
                             {corr?.toFixed(2) ?? '0.00'}
                           </td>
@@ -3492,28 +3492,28 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           <div className="mt-4 flex items-center justify-center gap-4 text-xs">
             <div className="flex items-center gap-1">
               <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-gray-600">Corrélation positive</span>
+              <span className="text-gray-600">Correlation positive</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-4 h-4 bg-red-500 rounded"></div>
-              <span className="text-gray-600">Corrélation négative</span>
+              <span className="text-gray-600">Correlation negative</span>
             </div>
-            <div className="text-gray-500">Intensité = valeur absolue</div>
+            <div className="text-gray-500">Intensite = valeur absolue</div>
           </div>
             </>
           )}
         </div>
       )}
 
-      {/* Tableau détaillé Amélioré */}
+      {/* Tableau detaille Ameliore */}
       <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg border border-gray-200">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-3 sm:mb-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">📋 Tableau de Performance Détaillé</h3>
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800"> Tableau de Performance Detaille</h3>
             <button
               onClick={() => toggleSection('detailedTable')}
               className="p-1.5 hover:bg-gray-100 rounded transition-colors cursor-help"
-              title={sectionsVisibility.detailedTable ? "Réduire cette section" : "Agrandir cette section"}
+              title={sectionsVisibility.detailedTable ? "Reduire cette section" : "Agrandir cette section"}
             >
               {sectionsVisibility.detailedTable ? (
                 <ChevronUpIcon className="w-5 h-5 text-gray-600" />
@@ -3531,7 +3531,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
               className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1 sm:gap-2 flex-1 sm:flex-none"
               title="Exporter en CSV"
             >
-              📥 <span className="hidden sm:inline">Exporter</span> CSV
+               <span className="hidden sm:inline">Exporter</span> CSV
             </button>
           </div>
         </div>
@@ -3539,7 +3539,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
           <>
         {filteredMetrics.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            Aucun titre ne correspond aux filtres sélectionnés.
+            Aucun titre ne correspond aux filtres selectionnes.
           </div>
         ) : (
           <div className="overflow-x-auto -mx-3 sm:mx-0">
@@ -3553,31 +3553,31 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     <div className="flex items-center gap-1">
                       Ticker
                       {sortConfig.key === 'ticker' && (
-                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                        <span>{sortConfig.direction === 'asc' ? '^' : 'v'}</span>
                       )}
                     </div>
                   </th>
                   <th 
                     className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm" 
-                    title="JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield) - Source: P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %) - Fournisseur: Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Ajuste le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action."
+                    title="JPEGY (Jean-Sebastien's P/E Adjusted for Growth & Yield) - Source: P/E Actuel / (Taux de croissance EPS % + Rendement dividende %) - Fournisseur: Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Ajuste le ratio P/E traditionnel par la somme du taux de croissance des benefices et du rendement du dividende, permettant une evaluation plus nuancee de la valorisation d'une action."
                     onClick={() => handleSort('jpegy')}
                   >
                     <div className="flex items-center justify-end gap-1">
                       JPEGY
                       {sortConfig.key === 'jpegy' && (
-                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                        <span>{sortConfig.direction === 'asc' ? '^' : 'v'}</span>
                       )}
                     </div>
                   </th>
                   <th 
                     className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm" 
-                    title="Rendement total projeté sur 5 ans"
+                    title="Rendement total projete sur 5 ans"
                     onClick={() => handleSort('totalReturnPercent')}
                   >
                     <div className="flex items-center justify-end gap-1">
                       Rendement
                       {sortConfig.key === 'totalReturnPercent' && (
-                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                        <span>{sortConfig.direction === 'asc' ? '^' : 'v'}</span>
                       )}
                     </div>
                   </th>
@@ -3589,13 +3589,13 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     <div className="flex items-center justify-end gap-1">
                       Ratio 3:1
                       {sortConfig.key === 'ratio31' && (
-                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                        <span>{sortConfig.direction === 'asc' ? '^' : 'v'}</span>
                       )}
                     </div>
                   </th>
                   <th className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden md:table-cell" title="Potentiel de hausse en %">Hausse</th>
                   <th className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden md:table-cell" title="Risque de baisse en %">Baisse</th>
-                  <th className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden lg:table-cell" title="Ratio cours/bénéfice actuel">P/E</th>
+                  <th className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden lg:table-cell" title="Ratio cours/benefice actuel">P/E</th>
                   <th className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm hidden lg:table-cell" title="Rendement du dividende">Yield</th>
                   <th 
                     className="p-2 sm:p-3 text-right font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm hidden lg:table-cell" 
@@ -3605,11 +3605,11 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     <div className="flex items-center justify-end gap-1">
                       Croissance
                       {sortConfig.key === 'historicalGrowth' && (
-                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                        <span>{sortConfig.direction === 'asc' ? '^' : 'v'}</span>
                       )}
                     </div>
                   </th>
-                  <th className="p-2 sm:p-3 text-center font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm">Approuvé</th>
+                  <th className="p-2 sm:p-3 text-center font-bold text-gray-700 border-b border-gray-300 text-xs sm:text-sm">Approuve</th>
                   <th 
                     className="p-2 sm:p-3 text-center font-bold text-gray-700 border-b border-gray-300 cursor-pointer hover:bg-slate-200 transition-colors text-xs sm:text-sm"
                     onClick={() => handleSort('recommendation')}
@@ -3617,7 +3617,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                     <div className="flex items-center justify-center gap-1">
                       Signal
                       {sortConfig.key === 'recommendation' && (
-                        <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                        <span>{sortConfig.direction === 'asc' ? '^' : 'v'}</span>
                       )}
                     </div>
                   </th>
@@ -3659,15 +3659,15 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
                         <div className="absolute right-0 top-full mt-1 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
                           <div className="font-semibold mb-1">JPEGY: {metric.jpegy?.toFixed(2) ?? 'N/A'}</div>
                           <div className="space-y-1 text-[10px]">
-                            <div><strong>Source de calcul:</strong> P/E Actuel ÷ (Taux de croissance EPS % + Rendement dividende %)</div>
-                            <div><strong>Formule:</strong> JPEGY = {metric.currentPE?.toFixed(2) ?? 'P/E'} ÷ ({metric.historicalGrowth?.toFixed(1) ?? 'Growth'}% + {metric.currentYield?.toFixed(2) ?? 'Yield'}%)</div>
-                            <div><strong>Fournisseur:</strong> Métrique propriétaire JSLAI™ développée par Jean-Sébastien. Le fournisseur établit cette métrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des bénéfices et du rendement du dividende, permettant une évaluation plus nuancée de la valorisation d'une action en tenant compte de sa capacité de croissance et de sa distribution de dividendes.</div>
+                            <div><strong>Source de calcul:</strong> P/E Actuel / (Taux de croissance EPS % + Rendement dividende %)</div>
+                            <div><strong>Formule:</strong> JPEGY = {metric.currentPE?.toFixed(2) ?? 'P/E'} / ({metric.historicalGrowth?.toFixed(1) ?? 'Growth'}% + {metric.currentYield?.toFixed(2) ?? 'Yield'}%)</div>
+                            <div><strong>Fournisseur:</strong> Metrique proprietaire JSLAITM developpee par Jean-Sebastien. Le fournisseur etablit cette metrique en ajustant le ratio P/E traditionnel par la somme du taux de croissance des benefices et du rendement du dividende, permettant une evaluation plus nuancee de la valorisation d'une action en tenant compte de sa capacite de croissance et de sa distribution de dividendes.</div>
                           </div>
                         </div>
                       </div>
                     ) : (
                       <span className="text-gray-400 flex items-center justify-end gap-1">
-                        <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" title="JPEGY non calculable: EPS invalide ou (Growth + Yield) ≤ 0.01%" />
+                        <ExclamationTriangleIcon className="w-4 h-4 text-orange-500" title="JPEGY non calculable: EPS invalide ou (Growth + Yield) <= 0.01%" />
                         N/A
                       </span>
                     )}
@@ -3752,7 +3752,7 @@ ${metric.invalidReason ? `⚠️ ${metric.invalidReason}` : ''}`}
         )}
       </div>
 
-      {/* Dialog de sélection de synchronisation */}
+      {/* Dialog de selection de synchronisation */}
       <SyncSelectionDialog
         isOpen={showSyncDialog}
         profiles={profiles}

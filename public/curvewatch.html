@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22></text></svg>">
     
     <!-- Tailwind CSS -->
     <link rel="stylesheet" href="/css/tailwind.css">
@@ -267,7 +267,7 @@
             React.useEffect(() => {
                 const init = async () => {
                     try {
-                        console.log("🚀 CurveWatch: Starting initialization...");
+                        console.log(" CurveWatch: Starting initialization...");
                         
                         // Load main component
                         await window.V0Integration.loadV0Component(
@@ -284,10 +284,10 @@
                         }
                         
                         setReady(true);
-                        console.log("✅ CurveWatch: Ready");
+                        console.log(" CurveWatch: Ready");
                         
                     } catch (err) {
-                        console.error("❌ CurveWatch: Init failed", err);
+                        console.error(" CurveWatch: Init failed", err);
                         setError(err.message);
                         
                         const loader = document.getElementById('initial-loader');
@@ -301,14 +301,14 @@
             if (error) {
                 return (
                     <div className="error-container">
-                        <div className="error-icon">⚠️</div>
-                        <h2 className="error-title">Échec de l'initialisation</h2>
+                        <div className="error-icon"></div>
+                        <h2 className="error-title">Echec de l'initialisation</h2>
                         <p className="error-message">{error}</p>
                         <button 
                             className="error-button"
                             onClick={() => window.location.reload()}
                         >
-                            Réessayer
+                            Reessayer
                         </button>
                     </div>
                 );
@@ -323,15 +323,15 @@
                         <button 
                             onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
                             className="px-3 py-1.5 text-[11px] font-semibold rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
-                            aria-label="Changer le thème"
+                            aria-label="Changer le theme"
                         >
-                            {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+                            {theme === 'dark' ? ' Light' : ' Dark'}
                         </button>
                         <a 
                             href="/" 
                             className="px-3 py-1.5 text-[11px] font-semibold rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all"
                         >
-                            ← Retour Dashboard
+                            <- Retour Dashboard
                         </a>
                     </div>
                     

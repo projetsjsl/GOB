@@ -1,12 +1,12 @@
 /**
- * Script de correction INLINE - À coller directement dans la console du navigateur
- * Corrige immédiatement tous les problèmes d'affichage
+ * Script de correction INLINE - A coller directement dans la console du navigateur
+ * Corrige immediatement tous les problemes d'affichage
  */
 
 (function() {
     'use strict';
     
-    console.log('🔧 Application des corrections du calculateur de retraite...');
+    console.log(' Application des corrections du calculateur de retraite...');
     
     // 1. INJECTER LE CSS DIRECTEMENT
     const style = document.createElement('style');
@@ -70,13 +70,13 @@
     if (oldStyle) oldStyle.remove();
     
     document.head.appendChild(style);
-    console.log('✅ Styles CSS injectés');
+    console.log(' Styles CSS injectes');
     
     // 2. CORRIGER TOUTES LES VALEURS UNDEFINED
     function fixUndefined() {
         let fixedCount = 0;
         
-        // Parcourir tous les nœuds texte
+        // Parcourir tous les nuds texte
         const walker = document.createTreeWalker(
             document.body,
             NodeFilter.SHOW_TEXT,
@@ -96,8 +96,8 @@
             const originalText = textNode.textContent;
             let replacement = 'Non calculable';
             
-            // Détecter le contexte
-            if (originalText.includes('Âge') || originalText.includes('âge') || originalText.includes('ans')) {
+            // Detecter le contexte
+            if (originalText.includes('Age') || originalText.includes('age') || originalText.includes('ans')) {
                 replacement = 'N/A';
             } else if (originalText.includes('$') || originalText.includes('montant') || originalText.includes('Montant')) {
                 replacement = '$0';
@@ -116,7 +116,7 @@
             }
         });
         
-        console.log(`✅ ${fixedCount} valeur(s) "undefined" corrigée(s)`);
+        console.log(` ${fixedCount} valeur(s) "undefined" corrigee(s)`);
         return fixedCount;
     }
     
@@ -126,7 +126,7 @@
         let visibleCount = 0;
         
         cards.forEach(card => {
-            // Forcer la visibilité
+            // Forcer la visibilite
             card.style.display = 'block';
             card.style.visibility = 'visible';
             card.style.opacity = '1';
@@ -135,25 +135,25 @@
             visibleCount++;
         });
         
-        console.log(`✅ ${visibleCount} section(s) rendue(s) visible(s)`);
+        console.log(` ${visibleCount} section(s) rendue(s) visible(s)`);
         return visibleCount;
     }
     
-    // 4. CORRIGER LES SECTIONS COUPÉES
+    // 4. CORRIGER LES SECTIONS COUPEES
     function fixTruncatedSections() {
         const cards = document.querySelectorAll('.card, .recommendation-card, .chart-card, .result-card');
         
         cards.forEach(card => {
-            // S'assurer que le contenu n'est pas coupé
+            // S'assurer que le contenu n'est pas coupe
             card.style.overflow = 'visible';
             card.style.textOverflow = 'clip';
             card.style.whiteSpace = 'normal';
             card.style.wordWrap = 'break-word';
             
-            // Vérifier si le texte est coupé
+            // Verifier si le texte est coupe
             const text = card.textContent || '';
-            if (text.includes('Écart (surplus/dé') || text.endsWith('dé')) {
-                // Le texte semble coupé, essayer de trouver le parent complet
+            if (text.includes('Ecart (surplus/de') || text.endsWith('de')) {
+                // Le texte semble coupe, essayer de trouver le parent complet
                 let parent = card.parentElement;
                 while (parent && parent !== document.body) {
                     if (parent.textContent && parent.textContent.length > text.length) {
@@ -167,10 +167,10 @@
             }
         });
         
-        console.log('✅ Sections coupées corrigées');
+        console.log(' Sections coupees corrigees');
     }
     
-    // EXÉCUTER TOUTES LES CORRECTIONS
+    // EXECUTER TOUTES LES CORRECTIONS
     const undefinedFixed = fixUndefined();
     const visibleFixed = ensureVisibility();
     fixTruncatedSections();
@@ -199,16 +199,16 @@
         characterData: true
     });
     
-    console.log('✅ Observer activé pour détecter les nouvelles valeurs undefined');
-    console.log('🎉 Corrections appliquées avec succès!');
-    console.log(`📊 Résumé: ${undefinedFixed} undefined corrigés, ${visibleFixed} sections rendues visibles`);
+    console.log(' Observer active pour detecter les nouvelles valeurs undefined');
+    console.log(' Corrections appliquees avec succes!');
+    console.log(` Resume: ${undefinedFixed} undefined corriges, ${visibleFixed} sections rendues visibles`);
     
     // Exposer une fonction globale pour re-corriger
     window.fixRetirementNow = function() {
         fixUndefined();
         ensureVisibility();
         fixTruncatedSections();
-        console.log('🔧 Correction manuelle appliquée');
+        console.log(' Correction manuelle appliquee');
     };
     
     return {

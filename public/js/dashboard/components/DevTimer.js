@@ -8,7 +8,7 @@ const DEFAULT_CONFIG = {
     enabled: true,
     durationMinutes: 20,
     title: 'Sprint IA en cours',
-    emoji: '👨‍💻',
+    emoji: '',
     showTimer: true,
     gradient: 'from-purple-600 to-blue-600',
     position: 'bottom-right', // bottom-right, bottom-left, top-right, top-left
@@ -144,7 +144,7 @@ window.DevTimer = function() {
             config.showTimer && React.createElement('span', { 
                 className: 'font-bold text-xl',
                 title: isPaused ? 'Click to resume' : 'Click to pause'
-            }, isPaused ? '⏸ ' + formatTime(timeLeft) : formatTime(timeLeft))
+            }, isPaused ? ' ' + formatTime(timeLeft) : formatTime(timeLeft))
         ),
         // Close button
         config.showCloseButton && React.createElement(
@@ -153,7 +153,7 @@ window.DevTimer = function() {
                 onClick: (e) => { e.stopPropagation(); setIsVisible(false); },
                 className: 'ml-2 text-white/50 hover:text-white transition-colors'
             },
-            '✕'
+            ''
         )
     );
 };
@@ -196,16 +196,16 @@ window.DevTimerConfigPanel = function({ isDarkMode = false }) {
         React.createElement('div', { className: 'flex items-center justify-between mb-4' },
             React.createElement('h3', { 
                 className: `text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}` 
-            }, '⏱️ Configuration Overlay "IA en cours"'),
+            }, ' Configuration Overlay "IA en cours"'),
             React.createElement('div', { className: 'flex gap-2' },
                 React.createElement('button', {
                     onClick: handlePreview,
                     className: 'px-3 py-1 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600'
-                }, '👁 Prévisualiser'),
+                }, ' Previsualiser'),
                 React.createElement('button', {
                     onClick: handleReset,
                     className: 'px-3 py-1 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600'
-                }, '↺ Réinitialiser')
+                }, ' Reinitialiser')
             )
         ),
 
@@ -244,13 +244,13 @@ window.DevTimerConfigPanel = function({ isDarkMode = false }) {
                     value: config.emoji,
                     onChange: (e) => handleChange('emoji', e.target.value),
                     className: inputClass,
-                    placeholder: '👨‍💻'
+                    placeholder: ''
                 })
             ),
 
             // Duration
             React.createElement('div', null,
-                React.createElement('label', { className: labelClass }, 'Durée (minutes)'),
+                React.createElement('label', { className: labelClass }, 'Duree (minutes)'),
                 React.createElement('input', {
                     type: 'number',
                     value: config.durationMinutes,
@@ -302,7 +302,7 @@ window.DevTimerConfigPanel = function({ isDarkMode = false }) {
                 },
                     Object.entries(GRADIENT_PRESETS).map(([key, value]) =>
                         React.createElement('option', { key, value }, 
-                            key.replace('_', ' → ').replace(/^\w/, c => c.toUpperCase())
+                            key.replace('_', ' -> ').replace(/^\w/, c => c.toUpperCase())
                         )
                     )
                 )
@@ -310,7 +310,7 @@ window.DevTimerConfigPanel = function({ isDarkMode = false }) {
 
             // Custom Logo URL
             React.createElement('div', { className: 'col-span-2' },
-                React.createElement('label', { className: labelClass }, 'URL Logo personnalisé (optionnel)'),
+                React.createElement('label', { className: labelClass }, 'URL Logo personnalise (optionnel)'),
                 React.createElement('input', {
                     type: 'text',
                     value: config.customLogo || '',
@@ -361,7 +361,7 @@ window.DevTimerConfigPanel = function({ isDarkMode = false }) {
                         ? 'bg-green-500 text-white' 
                         : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`
-            }, saved ? '✓ Sauvegardé!' : '💾 Sauvegarder')
+            }, saved ? ' Sauvegarde!' : ' Sauvegarder')
         )
     );
 };

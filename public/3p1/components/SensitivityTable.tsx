@@ -8,7 +8,7 @@ interface SensitivityTableProps {
 }
 
 export const SensitivityTable: React.FC<SensitivityTableProps> = ({ baseEPS, baseGrowth, basePE }) => {
-  // Vérifier que les valeurs de base sont définies - protection complète contre undefined
+  // Verifier que les valeurs de base sont definies - protection complete contre undefined
   const safeBaseGrowth = (baseGrowth != null && baseGrowth !== undefined && isFinite(baseGrowth)) ? baseGrowth : 0;
   const safeBasePE = (basePE != null && basePE !== undefined && isFinite(basePE)) ? basePE : 0;
   const safeBaseEPS = (baseEPS != null && baseEPS !== undefined && isFinite(baseEPS)) ? baseEPS : 0;
@@ -19,7 +19,7 @@ export const SensitivityTable: React.FC<SensitivityTableProps> = ({ baseEPS, bas
 
   return (
     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 print-break-inside-avoid">
-      <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Matrice de Sensibilité (Prix Cible 5 ans)</h3>
+      <h3 className="text-sm font-bold text-gray-500 uppercase mb-3">Matrice de Sensibilite (Prix Cible 5 ans)</h3>
       <div className="overflow-x-auto">
         <table className="w-full text-xs text-center">
           <thead>
@@ -60,7 +60,7 @@ export const SensitivityTable: React.FC<SensitivityTableProps> = ({ baseEPS, bas
         </table>
       </div>
       <p className="text-[10px] text-gray-400 mt-2 text-center italic">
-          Axe vertical : P/E Cible · Axe horizontal : Croissance BPA
+          Axe vertical : P/E Cible  Axe horizontal : Croissance BPA
       </p>
     </div>
   );

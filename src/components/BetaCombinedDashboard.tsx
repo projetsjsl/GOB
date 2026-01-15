@@ -28,8 +28,8 @@ export const BetaCombinedDashboard: React.FC = () => {
     const [activeTab, setActiveTab] = useState<TabName>('stocks-news');
     const [isDarkMode, setIsDarkMode] = useState(true);
 
-    // États pour les données
-    const [tickers, setTickers] = useState<string[]>([]); // Vide au départ, chargé depuis Supabase
+    // Etats pour les donnees
+    const [tickers, setTickers] = useState<string[]>([]); // Vide au depart, charge depuis Supabase
     const [stockData, setStockData] = useState<Record<string, StockData>>({});
     const [newsData, setNewsData] = useState<NewsArticle[]>([]);
     const [tickerLatestNews, setTickerLatestNews] = useState<Record<string, NewsArticle[]>>({});
@@ -83,11 +83,11 @@ export const BetaCombinedDashboard: React.FC = () => {
     // Fonction utilitaire: Emma populate watchlist (placeholder) - memoized
     const emmaPopulateWatchlist = useCallback(async () => {
         if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') {
-            console.log('Emma populate watchlist appelé');
+            console.log('Emma populate watchlist appele');
         }
     }, []);
 
-    // Fonction: charger les news générales - memoized
+    // Fonction: charger les news generales - memoized
     const fetchNews = useCallback(async (context: string = 'general', limit: number = 20) => {
         try {
             const response = await fetch(`${API_BASE_URL}/api/news?context=${context}&limit=${limit}`);
@@ -105,7 +105,7 @@ export const BetaCombinedDashboard: React.FC = () => {
                 return [];
             }
         } catch (error) {
-            console.error('❌ Erreur chargement news:', error);
+            console.error(' Erreur chargement news:', error);
             return [];
         }
     }, [API_BASE_URL]);
@@ -116,7 +116,7 @@ export const BetaCombinedDashboard: React.FC = () => {
         return primary?.title || primary?.text || primary?.url || '';
     }, []);
 
-    // Fonction: charger les news spécifiques pour chaque ticker - memoized
+    // Fonction: charger les news specifiques pour chaque ticker - memoized
     const fetchLatestNewsForTickers = useCallback(async () => {
         if (tickers.length === 0) {
             return;
@@ -167,7 +167,7 @@ export const BetaCombinedDashboard: React.FC = () => {
                 });
             }
         } catch (error) {
-            console.error('❌ Erreur chargement news tickers:', error);
+            console.error(' Erreur chargement news tickers:', error);
         }
     }, [tickers, API_BASE_URL, extractMoveReason]);
 
@@ -191,12 +191,12 @@ export const BetaCombinedDashboard: React.FC = () => {
             }
             return [];
         } catch (error) {
-            console.error('❌ Erreur rechargement watchlist:', error);
+            console.error(' Erreur rechargement watchlist:', error);
             return [];
         }
     }, [teamTickers.length]);
 
-    // Fonction: rafraîchir tous les stocks - memoized
+    // Fonction: rafraichir tous les stocks - memoized
     const refreshAllStocks = useCallback(async () => {
         if (tickers.length === 0) {
             return;
@@ -223,20 +223,20 @@ export const BetaCombinedDashboard: React.FC = () => {
             setStockData(newStockData);
             setLastUpdate(new Date());
         } catch (error) {
-            console.error('❌ Erreur rafraîchissement stocks:', error);
+            console.error(' Erreur rafraichissement stocks:', error);
         } finally {
             setLoading(false);
         }
     }, [tickers, fetchStockData]);
 
-    // Effet: charger watchlist depuis Supabase puis les données
+    // Effet: charger watchlist depuis Supabase puis les donnees
     useEffect(() => {
         let isMounted = true;
 
         const loadInitialData = async () => {
             setLoading(true);
             try {
-                // ✅ FIX: Charger les news en premier si l'onglet Nouvelles est actif
+                //  FIX: Charger les news en premier si l'onglet Nouvelles est actif
                 if (activeTab === 'nouvelles' && newsData.length === 0) {
                     await fetchNews('general', 100);
                 }
@@ -251,7 +251,7 @@ export const BetaCombinedDashboard: React.FC = () => {
                     if (tickersFromSupabase.length > 0) {
                         setTickers(tickersFromSupabase);
 
-                        // 2. Charger données pour ces tickers
+                        // 2. Charger donnees pour ces tickers
                         const promises = tickersFromSupabase.map((ticker: string) => fetchStockData(ticker));
                         const results = await Promise.all(promises);
 
@@ -273,12 +273,12 @@ export const BetaCombinedDashboard: React.FC = () => {
                         setStockData(newStockData);
                         setLastUpdate(new Date());
 
-                        // 3. Charger les news générales (si pas déjà fait)
+                        // 3. Charger les news generales (si pas deja fait)
                         if (newsData.length === 0) {
                             await fetchNews('general', 100);
                         }
 
-                        // 4. Charger les news spécifiques aux tickers (use requestIdleCallback for better perf)
+                        // 4. Charger les news specifiques aux tickers (use requestIdleCallback for better perf)
                         if ('requestIdleCallback' in window) {
                             requestIdleCallback(() => {
                                 if (isMounted) fetchLatestNewsForTickers();
@@ -290,14 +290,14 @@ export const BetaCombinedDashboard: React.FC = () => {
                         }
                     }
                 } else if (isMounted) {
-                    // Fallback: tickers par défaut si Supabase échoue
+                    // Fallback: tickers par defaut si Supabase echoue
                     const defaultTickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'];
                     setTickers(defaultTickers);
                 }
 
                 if (isMounted) setInitialLoadComplete(true);
             } catch (error) {
-                console.error('❌ Erreur chargement initial:', error);
+                console.error(' Erreur chargement initial:', error);
                 if (isMounted) {
                     setTickers(['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']);
                     setInitialLoadComplete(true);
@@ -314,17 +314,17 @@ export const BetaCombinedDashboard: React.FC = () => {
         return () => { isMounted = false; };
     }, [fetchStockData, fetchNews, fetchLatestNewsForTickers, initialLoadComplete]);
 
-    // ✅ FIX: Charger les news quand l'onglet Nouvelles devient actif
+    //  FIX: Charger les news quand l'onglet Nouvelles devient actif
     useEffect(() => {
         if (activeTab === 'nouvelles' && newsData.length === 0 && !loading && initialLoadComplete) {
-            console.log('📰 Onglet Nouvelles actif, chargement des news...');
+            console.log(' Onglet Nouvelles actif, chargement des news...');
             fetchNews('general', 100).catch(err => {
                 console.error('Erreur chargement news pour onglet Nouvelles:', err);
             });
         }
     }, [activeTab, newsData.length, loading, initialLoadComplete, fetchNews]);
 
-    // Effet: charger les news spécifiques aux tickers quand la liste change (debounced)
+    // Effet: charger les news specifiques aux tickers quand la liste change (debounced)
     useEffect(() => {
         if (!initialLoadComplete || tickers.length === 0) return;
 
@@ -518,7 +518,7 @@ export const BetaCombinedDashboard: React.FC = () => {
                         onClick={() => setIsDarkMode(!isDarkMode)}
                         className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
                     >
-                        {isDarkMode ? '☀️ Light' : '🌙 Dark'}
+                        {isDarkMode ? ' Light' : ' Dark'}
                     </button>
                 </div>
             </header>
@@ -527,20 +527,20 @@ export const BetaCombinedDashboard: React.FC = () => {
             <nav className="bg-gray-800 border-b border-gray-700 px-4">
                 <div className="flex gap-2 overflow-x-auto">
                     {[
-                        { id: 'stocks-news' as TabName, label: '📊 Stocks & News' },
-                        { id: 'finance-pro' as TabName, label: '💹 Finance Pro' },
-                        { id: 'nouvelles' as TabName, label: '📰 Nouvelles' },
-                        { id: 'intellistocks' as TabName, label: '🧠 IntelliStocks' },
-                        { id: 'email-briefings' as TabName, label: '📧 Briefings' },
-                        { id: 'watchlist' as TabName, label: '⭐ Watchlist' },
-                        { id: 'economic-calendar' as TabName, label: '📅 Calendar' },
-                        { id: 'yield-curve' as TabName, label: '📈 Yield Curve' },
-                        { id: 'advanced-analysis' as TabName, label: '🔬 Analyse Pro' },
-                        { id: 'ask-emma' as TabName, label: '🤖 Emma IA™' },
-                        { id: 'emma-config' as TabName, label: '🛠️ Emma Config' },
-                        { id: 'testonly' as TabName, label: '🧪 Test Only' },
-                        { id: 'admin-jslai' as TabName, label: '⚙️ Admin' },
-                        { id: 'plus' as TabName, label: '➕ Plus' }
+                        { id: 'stocks-news' as TabName, label: ' Stocks & News' },
+                        { id: 'finance-pro' as TabName, label: ' Finance Pro' },
+                        { id: 'nouvelles' as TabName, label: ' Nouvelles' },
+                        { id: 'intellistocks' as TabName, label: ' IntelliStocks' },
+                        { id: 'email-briefings' as TabName, label: ' Briefings' },
+                        { id: 'watchlist' as TabName, label: ' Watchlist' },
+                        { id: 'economic-calendar' as TabName, label: ' Calendar' },
+                        { id: 'yield-curve' as TabName, label: ' Yield Curve' },
+                        { id: 'advanced-analysis' as TabName, label: ' Analyse Pro' },
+                        { id: 'ask-emma' as TabName, label: ' Emma IATM' },
+                        { id: 'emma-config' as TabName, label: ' Emma Config' },
+                        { id: 'testonly' as TabName, label: ' Test Only' },
+                        { id: 'admin-jslai' as TabName, label: ' Admin' },
+                        { id: 'plus' as TabName, label: ' Plus' }
                     ].map(tab => (
                         <button
                             key={tab.id}

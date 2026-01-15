@@ -80,60 +80,60 @@
 </head>
 <body>
     <div class="test-container">
-        <h1>🚀 Test GOD MODE - Dashboard Grid Layout</h1>
+        <h1> Test GOD MODE - Dashboard Grid Layout</h1>
         
         <div class="instructions">
-            <h3>📋 Instructions</h3>
+            <h3> Instructions</h3>
             <ol>
                 <li>Ouvrez le dashboard dans un nouvel onglet: <a href="/beta-combined-dashboard.html" target="_blank" style="color: #8b5cf6;">beta-combined-dashboard.html</a></li>
                 <li>Ouvrez la console du navigateur (F12)</li>
                 <li>Copiez-collez le code ci-dessous dans la console</li>
-                <li>Appuyez sur Entrée pour exécuter les tests</li>
+                <li>Appuyez sur Entree pour executer les tests</li>
             </ol>
         </div>
 
         <div class="instructions">
-            <h3>💻 Code à copier dans la console</h3>
+            <h3> Code a copier dans la console</h3>
             <div class="code-block" id="testCode">
                 // Charger le script de test
                 const script = document.createElement('script');
                 script.src = '/js/dashboard/test-god-mode-console.js';
                 document.head.appendChild(script);
                 
-                // Attendre le chargement puis exécuter
+                // Attendre le chargement puis executer
                 script.onload = () => {
                     setTimeout(() => {
                         runGodModeTests(3); // 3 boucles
                     }, 1000);
                 };
             </div>
-            <button onclick="copyCode()">📋 Copier le code</button>
+            <button onclick="copyCode()"> Copier le code</button>
         </div>
 
         <div class="instructions">
-            <h3>🔍 Tests effectués</h3>
+            <h3> Tests effectues</h3>
             <ul>
-                <li>✅ React et ReactDOM chargés</li>
-                <li>✅ React Grid Layout disponible</li>
-                <li>✅ BetaCombinedDashboard exposé</li>
-                <li>✅ DashboardGridWrapper chargé</li>
-                <li>✅ Toggle Vue Onglets/Grille présent</li>
-                <li>✅ Mode grille actif par défaut</li>
-                <li>✅ Grille rendue correctement</li>
-                <li>✅ Widgets visibles</li>
-                <li>✅ Toggle fonctionnel</li>
-                <li>✅ Mode édition disponible</li>
-                <li>✅ LocalStorage accessible</li>
-                <li>✅ Composants RGL chargés</li>
+                <li> React et ReactDOM charges</li>
+                <li> React Grid Layout disponible</li>
+                <li> BetaCombinedDashboard expose</li>
+                <li> DashboardGridWrapper charge</li>
+                <li> Toggle Vue Onglets/Grille present</li>
+                <li> Mode grille actif par defaut</li>
+                <li> Grille rendue correctement</li>
+                <li> Widgets visibles</li>
+                <li> Toggle fonctionnel</li>
+                <li> Mode edition disponible</li>
+                <li> LocalStorage accessible</li>
+                <li> Composants RGL charges</li>
             </ul>
         </div>
 
         <div id="status" class="status" style="display: none;"></div>
 
         <div class="instructions">
-            <h3>📊 Résultats</h3>
-            <p>Les résultats seront affichés dans la console du navigateur.</p>
-            <p>Vous pouvez aussi vérifier: <code>window.__GOD_MODE_TEST_RESULTS</code></p>
+            <h3> Resultats</h3>
+            <p>Les resultats seront affiches dans la console du navigateur.</p>
+            <p>Vous pouvez aussi verifier: <code>window.__GOD_MODE_TEST_RESULTS</code></p>
         </div>
     </div>
 
@@ -144,7 +144,7 @@
                 const status = document.getElementById('status');
                 status.style.display = 'block';
                 status.className = 'status success';
-                status.textContent = '✅ Code copié dans le presse-papiers!';
+                status.textContent = ' Code copie dans le presse-papiers!';
                 setTimeout(() => {
                     status.style.display = 'none';
                 }, 3000);

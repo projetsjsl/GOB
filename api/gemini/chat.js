@@ -3,44 +3,44 @@
 // Version avec Function Calling (selon doc officielle Google)
 // ============================================================================
 //
-// 🛡️  GUARDRAILS DE PROTECTION - CONFIGURATION CRITIQUE 🛡️
+//   GUARDRAILS DE PROTECTION - CONFIGURATION CRITIQUE 
 // ============================================================================
-// ⚠️  ATTENTION : Ce fichier contient la configuration validée pour Emma
-// ⚠️  Toute modification peut casser le chatbot de production
-// ⚠️  Toujours tester en local avant de déployer
+//   ATTENTION : Ce fichier contient la configuration validee pour Emma
+//   Toute modification peut casser le chatbot de production
+//   Toujours tester en local avant de deployer
 //
-// ✅ CONFIGURATION VALIDÉE (Testée le 15/10/2025) :
-// - Modèle: gemini-1.5-flash-latest (quota plus élevé que gemini-2.0-flash-exp)
+//  CONFIGURATION VALIDEE (Testee le 15/10/2025) :
+// - Modele: gemini-1.5-flash-latest (quota plus eleve que gemini-2.0-flash-exp)
 // - SDK: @google/generative-ai (PAS @google/genai)
-// - Function Calling: Activé pour interactions avancées
-// - Safety Settings: Configurés pour Emma (professionnel)
-// - Temperature: 0.7 (équilibre créativité/précision)
+// - Function Calling: Active pour interactions avancees
+// - Safety Settings: Configures pour Emma (professionnel)
+// - Temperature: 0.7 (equilibre creativite/precision)
 //
-// 🔒 VARIABLES D'ENVIRONNEMENT REQUISES :
-// - GEMINI_API_KEY (AI...) : ✅ Configurée
+//  VARIABLES D'ENVIRONNEMENT REQUISES :
+// - GEMINI_API_KEY (AI...) :  Configuree
 //
-// ❌ INTERDICTIONS ABSOLUES :
-// - Modifier le modèle sans test (gemini-1.5-flash-latest)
+//  INTERDICTIONS ABSOLUES :
+// - Modifier le modele sans test (gemini-1.5-flash-latest)
 // - Changer le SDK (doit rester @google/generative-ai)
 // - Modifier les safety settings sans validation
-// - Désactiver Function Calling sans test
-// - Changer la température sans test
+// - Desactiver Function Calling sans test
+// - Changer la temperature sans test
 //
-// 🔄 POUR BASCULER ENTRE LES VERSIONS :
+//  POUR BASCULER ENTRE LES VERSIONS :
 // 1. Version AVEC Function Calling (actuelle) : Laissez le code tel quel
 // 2. Version SANS Function Calling : 
 //    - Commentez la section "VERSION AVEC FUNCTION CALLING"
-//    - Décommentez la section "VERSION SANS SDK" 
+//    - Decommentez la section "VERSION SANS SDK" 
 //    - Supprimez l'import des functions en haut
 //    - Supprimez le traitement des function calls
 //
-// 📚 Référence : https://ai.google.dev/gemini-api/docs/function-calling
+//  Reference : https://ai.google.dev/gemini-api/docs/function-calling
 // ============================================================================
 
-// TEMPORAIREMENT DÉSACTIVÉ - Import cause FUNCTION_INVOCATION_FAILED sur Vercel
+// TEMPORAIREMENT DESACTIVE - Import cause FUNCTION_INVOCATION_FAILED sur Vercel
 // import { functionDeclarations, executeFunction } from '../../lib/gemini/functions.js';
 
-// ✅ Import du retry handler pour gestion rate limiting Gemini
+//  Import du retry handler pour gestion rate limiting Gemini
 import { geminiFetchWithRetry } from '../../lib/utils/gemini-retry.js';
 import { getAllModels } from '../../lib/llm-registry.js';
 
@@ -50,16 +50,16 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' });
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Methode non autorisee' });
 
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
-    console.error('❌ GEMINI_API_KEY manquante');
+    console.error(' GEMINI_API_KEY manquante');
     return res.status(503).json({
-      error: 'Configuration de la clé API Gemini manquante',
+      error: 'Configuration de la cle API Gemini manquante',
       suggestions: [
-        'Vérifiez que la clé API Gemini est configurée dans Vercel',
-        'Contactez l\'administrateur pour configurer la clé API',
+        'Verifiez que la cle API Gemini est configuree dans Vercel',
+        'Contactez l\'administrateur pour configurer la cle API',
         'Consultez la documentation de configuration'
       ],
       technical: 'GEMINI_API_KEY not configured',
@@ -71,57 +71,57 @@ export default async function handler(req, res) {
   try {
     let { messages = [], temperature = 0.3, maxTokens = 4096, systemPrompt, message } = req.body || {};
 
-    // Compatibilité: accepter payload simple { message: "..." }
+    // Compatibilite: accepter payload simple { message: "..." }
     if ((!Array.isArray(messages) || messages.length === 0) && typeof message === 'string' && message.trim()) {
       messages = [{ role: 'user', content: message.trim() }];
     }
 
     if (!Array.isArray(messages) || messages.length === 0) {
-      console.error('❌ Messages invalides:', { messages, message });
+      console.error(' Messages invalides:', { messages, message });
       return res.status(400).json({ error: 'messages requis (array) ou message (string)' });
     }
 
-    console.log('✅ Messages valides reçus:', messages.length, 'messages');
+    console.log(' Messages valides recus:', messages.length, 'messages');
 
-    // Charger le prompt personnalisé d'Emma (OPTIMISÉ selon principes Hassid)
-    const emmaPrompt = systemPrompt || `Tu es Emma, CFA® Level III, analyste financière senior avec 15+ ans expérience gestion portefeuille institutionnel.
+    // Charger le prompt personnalise d'Emma (OPTIMISE selon principes Hassid)
+    const emmaPrompt = systemPrompt || `Tu es Emma, CFA Level III, analyste financiere senior avec 15+ ans experience gestion portefeuille institutionnel.
 
-MISSION: Fournir analyses financières rigoureuses, factuelles, actionnables de niveau Bloomberg Terminal.
+MISSION: Fournir analyses financieres rigoureuses, factuelles, actionnables de niveau Bloomberg Terminal.
 
 ///
-DONNÉES DISPONIBLES (via outils dashboard):
-- Prix actions temps réel (FMP, Polygon, Twelve Data)
+DONNEES DISPONIBLES (via outils dashboard):
+- Prix actions temps reel (FMP, Polygon, Twelve Data)
 - Fondamentaux (ratios P/E, ROE, marges, cash flow)
-- Actualités financières (<24h, Finnhub, FMP)
+- Actualites financieres (<24h, Finnhub, FMP)
 - Indicateurs techniques (RSI, MACD, SMA)
-- Calendriers (earnings, événements économiques)
-- Watchlist utilisateur + tickers équipe
+- Calendriers (earnings, evenements economiques)
+- Watchlist utilisateur + tickers equipe
 ///
 
-CAPACITÉS PRINCIPALES:
-1. Analyses complètes CFA® (valorisation, fondamentaux, technique)
+CAPACITES PRINCIPALES:
+1. Analyses completes CFA (valorisation, fondamentaux, technique)
 2. Explications concepts financiers (DCF, Graham, Buffett, Lynch)
 3. Contexte macro et sectoriel (Fed, taux, inflation)
-4. Cadres décisionnels structurés (Porter's Five Forces, Moat analysis)
+4. Cadres decisionnels structures (Porter's Five Forces, Moat analysis)
 
 APPROCHE:
-- Priorité données RÉELLES via outils (prix, ratios, news)
-- Analyses chiffrées (minimum 8 ratios financiers)
+- Priorite donnees REELLES via outils (prix, ratios, news)
+- Analyses chiffrees (minimum 8 ratios financiers)
 - Comparaisons sectorielles + historique 3-5 ans
-- Sources citées (FMP, Bloomberg, FactSet)
+- Sources citees (FMP, Bloomberg, FactSet)
 
 STYLE:
 - Professionnel niveau CFA Institute
-- Factuel, précis, sans généralités vagues
-- Proactif: proposer analyses complémentaires
-- Pédagogique: expliquer ratios et concepts
-- Toujours en français
+- Factuel, precis, sans generalites vagues
+- Proactif: proposer analyses complementaires
+- Pedagogique: expliquer ratios et concepts
+- Toujours en francais
 
 CONTRAINTES:
-- ZÉRO mention limitations ("Je n'ai pas accès")
-- Commencer par ce que tu PEUX analyser avec données disponibles
-- Longueur: 200-400 mots (questions simples), PROFONDEUR MAXIMALE pour analyses complètes (aucune limite)
-- Vérifier cohérence données avant réponse finale
+- ZERO mention limitations ("Je n'ai pas acces")
+- Commencer par ce que tu PEUX analyser avec donnees disponibles
+- Longueur: 200-400 mots (questions simples), PROFONDEUR MAXIMALE pour analyses completes (aucune limite)
+- Verifier coherence donnees avant reponse finale
 - Disclaimer obligatoire si recommandations d'investissement`;
 
 
@@ -133,13 +133,13 @@ CONTRAINTES:
     }
 
     // ========================================
-    // VERSION AVEC FUNCTION CALLING - EN COMMENTAIRE (PROBLÈME DE DÉPLOIEMENT)
+    // VERSION AVEC FUNCTION CALLING - EN COMMENTAIRE (PROBLEME DE DEPLOIEMENT)
     // ========================================
     /*
-    console.log('🔧 Appel API Gemini avec Function Calling');
-    console.log('📦 Modèle: gemini-2.0-flash-exp');
-    console.log('🛠️ Fonctions disponibles:', functionDeclarations.length);
-    console.log('📤 Envoi de la requête...');
+    console.log(' Appel API Gemini avec Function Calling');
+    console.log(' Modele: gemini-2.0-flash-exp');
+    console.log(' Fonctions disponibles:', functionDeclarations.length);
+    console.log(' Envoi de la requete...');
     
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
     
@@ -156,7 +156,7 @@ CONTRAINTES:
           functionDeclarations: functionDeclarations
         }],
         generationConfig: {
-          temperature: 0, // Température basse pour des appels de fonction déterministes (selon doc Google)
+          temperature: 0, // Temperature basse pour des appels de fonction deterministes (selon doc Google)
           topK: 20,
           topP: 0.8,
           maxOutputTokens: maxTokens,
@@ -177,13 +177,13 @@ CONTRAINTES:
     // Default to gemini-2.0-flash-exp if no active model found
     const selectedModel = googleModels.length > 0 ? googleModels[0] : { model_id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash Exp Fallback' };
 
-    console.log(`🔧 Appel API Gemini REST directe (sans SDK)`);
-    console.log(`📦 Modèle sélectionné: ${selectedModel.model_id} (${selectedModel.name})`);
-    console.log('📤 Envoi de la requête...');
+    console.log(` Appel API Gemini REST directe (sans SDK)`);
+    console.log(` Modele selectionne: ${selectedModel.model_id} (${selectedModel.name})`);
+    console.log(' Envoi de la requete...');
 
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel.model_id}:generateContent?key=${GEMINI_API_KEY}`;
 
-    // ✅ Utiliser geminiFetchWithRetry pour gestion automatique du rate limiting (429)
+    //  Utiliser geminiFetchWithRetry pour gestion automatique du rate limiting (429)
     const response = await geminiFetchWithRetry(apiUrl, {
       method: 'POST',
       headers: {
@@ -207,16 +207,16 @@ CONTRAINTES:
       logRetries: true
     });
 
-    console.log('📡 Réponse reçue, status:', response.status);
+    console.log(' Reponse recue, status:', response.status);
 
     const data = await response.json();
-    console.log('✅ Données parsées avec succès');
+    console.log(' Donnees parsees avec succes');
 
     // ========================================
-    // TRAITEMENT DES FUNCTION CALLS - EN COMMENTAIRE (PROBLÈME DE DÉPLOIEMENT)
+    // TRAITEMENT DES FUNCTION CALLS - EN COMMENTAIRE (PROBLEME DE DEPLOIEMENT)
     // ========================================
     /*
-    // Vérifier s'il y a des function calls à exécuter (selon doc officielle Google)
+    // Verifier s'il y a des function calls a executer (selon doc officielle Google)
     if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
       const parts = data.candidates[0].content.parts;
       
@@ -224,35 +224,35 @@ CONTRAINTES:
       const functionCalls = parts.filter(part => part.functionCall);
       
       if (functionCalls.length > 0) {
-        console.log('🛠️ Function calls détectés:', functionCalls.length);
+        console.log(' Function calls detectes:', functionCalls.length);
         
-        // Exécuter les function calls
+        // Executer les function calls
         const functionResults = [];
         for (const functionCall of functionCalls) {
           try {
-            console.log(`🔧 Exécution de ${functionCall.functionCall.name} avec args:`, functionCall.functionCall.args);
+            console.log(` Execution de ${functionCall.functionCall.name} avec args:`, functionCall.functionCall.args);
             const result = await executeFunction(functionCall.functionCall.name, functionCall.functionCall.args);
             functionResults.push({
               name: functionCall.functionCall.name,
               response: result
             });
-            console.log(`✅ ${functionCall.functionCall.name} exécuté avec succès`);
+            console.log(` ${functionCall.functionCall.name} execute avec succes`);
           } catch (error) {
-            console.error(`❌ Erreur lors de l'exécution de ${functionCall.functionCall.name}:`, error);
+            console.error(` Erreur lors de l'execution de ${functionCall.functionCall.name}:`, error);
             
             // Messages d'erreur plus informatifs pour les function calls
-            let functionErrorMessage = `Erreur lors de l'exécution de ${functionCall.functionCall.name}`;
+            let functionErrorMessage = `Erreur lors de l'execution de ${functionCall.functionCall.name}`;
             let functionErrorDetails = error.message;
             
             if (functionErrorDetails.includes('404') || functionErrorDetails.includes('Not Found')) {
               functionErrorMessage = `Service ${functionCall.functionCall.name} temporairement indisponible`;
-              functionErrorDetails = 'Le service de données financières rencontre des difficultés temporaires';
+              functionErrorDetails = 'Le service de donnees financieres rencontre des difficultes temporaires';
             } else if (functionErrorDetails.includes('timeout')) {
-              functionErrorMessage = `Délai d'attente dépassé pour ${functionCall.functionCall.name}`;
-              functionErrorDetails = 'La requête a pris trop de temps à traiter';
+              functionErrorMessage = `Delai d'attente depasse pour ${functionCall.functionCall.name}`;
+              functionErrorDetails = 'La requete a pris trop de temps a traiter';
             } else if (functionErrorDetails.includes('network') || functionErrorDetails.includes('fetch')) {
-              functionErrorMessage = `Problème de connexion pour ${functionCall.functionCall.name}`;
-              functionErrorDetails = 'Impossible de récupérer les données en temps réel';
+              functionErrorMessage = `Probleme de connexion pour ${functionCall.functionCall.name}`;
+              functionErrorDetails = 'Impossible de recuperer les donnees en temps reel';
             }
             
             functionResults.push({
@@ -260,18 +260,18 @@ CONTRAINTES:
               response: { 
                 error: functionErrorMessage,
                 details: functionErrorDetails,
-                suggestion: 'Les données peuvent être temporairement indisponibles. Réessayez dans quelques instants.'
+                suggestion: 'Les donnees peuvent etre temporairement indisponibles. Reessayez dans quelques instants.'
               }
             });
           }
         }
 
-        // Construire le message avec les résultats des fonctions
+        // Construire le message avec les resultats des fonctions
         const functionResultsText = functionResults.map(fr => 
-          `Résultat de ${fr.name}: ${JSON.stringify(fr.response, null, 2)}`
+          `Resultat de ${fr.name}: ${JSON.stringify(fr.response, null, 2)}`
         ).join('\n\n');
 
-        // Faire un deuxième appel à Gemini avec les résultats des fonctions
+        // Faire un deuxieme appel a Gemini avec les resultats des fonctions
         const followUpPayload = {
           contents: [
             {
@@ -284,13 +284,13 @@ CONTRAINTES:
             {
               parts: [
                 {
-                  text: `Voici les résultats des fonctions exécutées:\n\n${functionResultsText}\n\nMaintenant, fournis une réponse complète en intégrant ces données réelles dans ton analyse. Ne mentionne pas que tu as utilisé des fonctions - présente directement les données récupérées.`
+                  text: `Voici les resultats des fonctions executees:\n\n${functionResultsText}\n\nMaintenant, fournis une reponse complete en integrant ces donnees reelles dans ton analyse. Ne mentionne pas que tu as utilise des fonctions - presente directement les donnees recuperees.`
                 }
               ]
             }
           ],
           generationConfig: {
-            temperature: 0.3, // Température normale pour la réponse finale
+            temperature: 0.3, // Temperature normale pour la reponse finale
             topK: 20,
             topP: 0.8,
             maxOutputTokens: maxTokens,
@@ -310,7 +310,7 @@ CONTRAINTES:
           const followUpData = await followUpResponse.json();
           if (followUpData.candidates && followUpData.candidates[0] && followUpData.candidates[0].content) {
             const finalResponse = followUpData.candidates[0].content.parts[0].text;
-            console.log('✅ Réponse finale avec données intégrées générée');
+            console.log(' Reponse finale avec donnees integrees generee');
             
             return res.status(200).json({
               response: finalResponse,
@@ -327,23 +327,23 @@ CONTRAINTES:
     // ========================================
     // VERSION SIMPLE SANS FUNCTION CALLS (FALLBACK)
     // ========================================
-    // Si pas de function calls, retourner la réponse normale
+    // Si pas de function calls, retourner la reponse normale
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     if (!text) {
-      console.error('❌ Pas de texte dans la réponse:', JSON.stringify(data));
-      throw new Error('Aucune réponse générée par Gemini');
+      console.error(' Pas de texte dans la reponse:', JSON.stringify(data));
+      throw new Error('Aucune reponse generee par Gemini');
     }
 
-    console.log('✅ Texte extrait, longueur:', text.length);
+    console.log(' Texte extrait, longueur:', text.length);
 
-    // Ajouter des sources génériques
+    // Ajouter des sources generiques
     const sourcesAddition = `
 
 ---
 **Sources:**
-• [Gemini AI](https://ai.google.dev/) - Analyse et réponse générée par l'IA
-• [Connaissances d'entraînement](https://ai.google.dev/gemini-api/docs) - Données jusqu'en 2024`;
+- [Gemini AI](https://ai.google.dev/) - Analyse et reponse generee par l'IA
+- [Connaissances d'entrainement](https://ai.google.dev/gemini-api/docs) - Donnees jusqu'en 2024`;
 
     return res.status(200).json({
       response: text + sourcesAddition,
@@ -352,69 +352,69 @@ CONTRAINTES:
     });
 
   } catch (e) {
-    console.error('❌ Erreur dans le handler Gemini:', e);
+    console.error(' Erreur dans le handler Gemini:', e);
     console.error('Stack trace:', e?.stack);
 
-    // Messages d'erreur améliorés et plus informatifs
-    let errorMessage = 'Erreur de connexion à l\'API Gemini.';
+    // Messages d'erreur ameliores et plus informatifs
+    let errorMessage = 'Erreur de connexion a l\'API Gemini.';
     let suggestions = [];
     let technicalDetails = String(e?.message || e);
 
     // Analyser le type d'erreur pour donner des suggestions pertinentes
     if (technicalDetails.includes('GEMINI_API_KEY')) {
-      errorMessage = 'Configuration de la clé API Gemini manquante.';
+      errorMessage = 'Configuration de la cle API Gemini manquante.';
       suggestions = [
-        'Vérifiez que la clé API Gemini est configurée dans Vercel',
-        'Contactez l\'administrateur pour configurer la clé API'
+        'Verifiez que la cle API Gemini est configuree dans Vercel',
+        'Contactez l\'administrateur pour configurer la cle API'
       ];
     } else if (technicalDetails.includes('quota') || technicalDetails.includes('limit')) {
       errorMessage = 'Limite de quota API Gemini atteinte.';
       suggestions = [
-        'Attendez quelques minutes avant de réessayer',
+        'Attendez quelques minutes avant de reessayer',
         'Le quota se renouvelle automatiquement'
       ];
     } else if (technicalDetails.includes('network') || technicalDetails.includes('fetch')) {
-      errorMessage = 'Problème de connexion réseau.';
+      errorMessage = 'Probleme de connexion reseau.';
       suggestions = [
-        'Vérifiez votre connexion internet',
-        'Réessayez dans quelques instants'
+        'Verifiez votre connexion internet',
+        'Reessayez dans quelques instants'
       ];
     } else if (technicalDetails.includes('timeout')) {
-      errorMessage = 'Délai d\'attente dépassé.';
+      errorMessage = 'Delai d\'attente depasse.';
       suggestions = [
-        'La requête a pris trop de temps à traiter',
-        'Réessayez avec une question plus simple'
+        'La requete a pris trop de temps a traiter',
+        'Reessayez avec une question plus simple'
       ];
     } else if (technicalDetails.includes('400') || technicalDetails.includes('Bad Request')) {
-      errorMessage = 'Requête invalide envoyée à l\'API.';
+      errorMessage = 'Requete invalide envoyee a l\'API.';
       suggestions = [
-        'Vérifiez le format de votre message',
-        'Évitez les caractères spéciaux ou les messages trop longs'
+        'Verifiez le format de votre message',
+        'Evitez les caracteres speciaux ou les messages trop longs'
       ];
     } else if (technicalDetails.includes('401') || technicalDetails.includes('Unauthorized')) {
-      errorMessage = 'Clé API Gemini invalide ou expirée.';
+      errorMessage = 'Cle API Gemini invalide ou expiree.';
       suggestions = [
-        'Vérifiez la configuration de la clé API',
-        'Contactez l\'administrateur système'
+        'Verifiez la configuration de la cle API',
+        'Contactez l\'administrateur systeme'
       ];
     } else if (technicalDetails.includes('429') || technicalDetails.includes('Too Many Requests')) {
-      errorMessage = 'Trop de requêtes simultanées.';
+      errorMessage = 'Trop de requetes simultanees.';
       suggestions = [
-        'Attendez quelques secondes avant de réessayer',
-        'Évitez de poser plusieurs questions en même temps'
+        'Attendez quelques secondes avant de reessayer',
+        'Evitez de poser plusieurs questions en meme temps'
       ];
     } else if (technicalDetails.includes('500') || technicalDetails.includes('Internal Server Error')) {
       errorMessage = 'Erreur interne du serveur Gemini.';
       suggestions = [
-        'Le service Gemini rencontre des difficultés temporaires',
-        'Réessayez dans quelques minutes'
+        'Le service Gemini rencontre des difficultes temporaires',
+        'Reessayez dans quelques minutes'
       ];
     } else {
-      // Erreur générique avec suggestions générales
+      // Erreur generique avec suggestions generales
       suggestions = [
-        'Vérifiez votre connexion internet',
-        'Réessayez dans quelques instants',
-        'Si le problème persiste, contactez le support'
+        'Verifiez votre connexion internet',
+        'Reessayez dans quelques instants',
+        'Si le probleme persiste, contactez le support'
       ];
     }
 

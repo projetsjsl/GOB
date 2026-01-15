@@ -140,7 +140,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       const isReady = !!(LineChart && ResponsiveContainer);
       if (isReady && !rechartsReady) {
         if (debugMode) {
-          console.log('✅ Recharts detected and ready:', {
+          console.log(' Recharts detected and ready:', {
             hasRecharts: !!window.Recharts,
             hasGlobalRecharts: typeof Recharts !== 'undefined',
             hasLineChart: !!LineChart,
@@ -154,7 +154,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       
       // Debug info if not ready
       if (debugMode) {
-        console.log('🔍 Recharts check:', {
+        console.log(' Recharts check:', {
           hasRecharts: !!window.Recharts,
           hasGlobalRecharts: typeof Recharts !== 'undefined',
           hasLineChart: !!LineChart,
@@ -182,7 +182,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     // If not available, it means the bundle failed to load
     const timeout = setTimeout(() => {
       if (!rechartsReady && debugMode) {
-        console.error('❌ Recharts bundle not loaded - check /js/recharts-bundle.js');
+        console.error(' Recharts bundle not loaded - check /js/recharts-bundle.js');
       }
     }, 3000);
 
@@ -351,7 +351,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     const fail = (message) => {
       const error = new Error(message);
       error.details = details;
-      console.error('❌ CurveWatch: Invalid response', { contextLabel, ...details });
+      console.error(' CurveWatch: Invalid response', { contextLabel, ...details });
       throw error;
     };
 
@@ -391,7 +391,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         }
         const delay = 250 * Math.pow(2, attempt);
         if (debugMode) {
-          console.warn(`🔁 CurveWatch retry (${contextLabel}) in ${delay}ms`);
+          console.warn(` CurveWatch retry (${contextLabel}) in ${delay}ms`);
         }
         await new Promise(resolve => setTimeout(resolve, delay));
         attempt += 1;
@@ -428,7 +428,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   // Fetch current yield curve data
   const fetchCurrentData = useCallback(async () => {
     if (debugMode) {
-      console.log('🔍 CurveWatch: Starting fetchCurrentData');
+      console.log(' CurveWatch: Starting fetchCurrentData');
     }
 
     if (inflightRef.current.current) return;
@@ -439,9 +439,9 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       assertPayloadShape(result, 'current');
 
       if (debugMode) {
-        console.log('📊 CurveWatch: API Response:', result);
-        console.log('📊 CurveWatch: US Data:', result.data?.us);
-        console.log('📊 CurveWatch: Canada Data:', result.data?.canada);
+        console.log(' CurveWatch: API Response:', result);
+        console.log(' CurveWatch: US Data:', result.data?.us);
+        console.log(' CurveWatch: Canada Data:', result.data?.canada);
       }
 
       setCurrentData({
@@ -453,10 +453,10 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       hasCurrentDataRef.current = !!(result.data?.us || result.data?.canada);
 
       if (debugMode) {
-        console.log('✅ CurveWatch: Current data updated successfully');
+        console.log(' CurveWatch: Current data updated successfully');
       }
     } catch (err) {
-      console.error('❌ CurveWatch: Error fetching current data:', err);
+      console.error(' CurveWatch: Error fetching current data:', err);
       const message = formatCurveWatchError(err, 'current');
       if (hasCurrentDataRef.current) {
         setNonBlockingError(message);
@@ -471,7 +471,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   // Fetch historical data
   const fetchHistoricalData = useCallback(async (period) => {
     if (debugMode) {
-      console.log('🔍 CurveWatch: Starting fetchHistoricalData for period:', period);
+      console.log(' CurveWatch: Starting fetchHistoricalData for period:', period);
     }
 
     const requestId = historyRequestIdRef.current + 1;
@@ -484,9 +484,9 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       if (requestId !== historyRequestIdRef.current) return;
 
       if (debugMode) {
-        console.log('📊 CurveWatch: Historical API Response:', result);
-        console.log('📊 CurveWatch: Historical US Data:', result.history?.us?.length, 'items');
-        console.log('📊 CurveWatch: Historical Canada Data:', result.history?.canada?.length, 'items');
+        console.log(' CurveWatch: Historical API Response:', result);
+        console.log(' CurveWatch: Historical US Data:', result.history?.us?.length, 'items');
+        console.log(' CurveWatch: Historical Canada Data:', result.history?.canada?.length, 'items');
       }
 
       setHistoricalData({
@@ -494,7 +494,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         canada: result.history?.canada || []
       });
     } catch (err) {
-      console.error('❌ CurveWatch: Error fetching historical data:', err);
+      console.error(' CurveWatch: Error fetching historical data:', err);
       const message = formatCurveWatchError(err, 'historical');
       setNonBlockingError(prev => prev || message);
     } finally {
@@ -506,14 +506,14 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   const fetchCompareData = useCallback(async (date) => {
     if (!date) {
       if (debugMode) {
-        console.log('🔍 CurveWatch: Clearing compare data (no date provided)');
+        console.log(' CurveWatch: Clearing compare data (no date provided)');
       }
       setCompareData(null);
       return;
     }
 
     if (debugMode) {
-      console.log('🔍 CurveWatch: Starting fetchCompareData for date:', date);
+      console.log(' CurveWatch: Starting fetchCompareData for date:', date);
     }
 
     const requestId = compareRequestIdRef.current + 1;
@@ -526,9 +526,9 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       if (requestId !== compareRequestIdRef.current) return;
 
       if (debugMode) {
-        console.log('📊 CurveWatch: Compare API Response:', result);
-        console.log('📊 CurveWatch: Compare US Data:', result.data?.us);
-        console.log('📊 CurveWatch: Compare Canada Data:', result.data?.canada);
+        console.log(' CurveWatch: Compare API Response:', result);
+        console.log(' CurveWatch: Compare US Data:', result.data?.us);
+        console.log(' CurveWatch: Compare Canada Data:', result.data?.canada);
       }
 
       setCompareData({
@@ -537,7 +537,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
         date
       });
     } catch (err) {
-      console.error('❌ CurveWatch: Error fetching compare data:', err);
+      console.error(' CurveWatch: Error fetching compare data:', err);
       setCompareData(null);
       const message = formatCurveWatchError(err, 'compare');
       setNonBlockingError(prev => prev || message);
@@ -550,7 +550,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   useEffect(() => {
     const loadData = async () => {
       if (debugMode) {
-        console.log('🔍 CurveWatch: Starting initial data load');
+        console.log(' CurveWatch: Starting initial data load');
       }
 
       setLoading(true);
@@ -561,7 +561,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       setLoading(false);
 
       if (debugMode) {
-        console.log('✅ CurveWatch: Initial data load completed');
+        console.log(' CurveWatch: Initial data load completed');
       }
     };
     loadData();
@@ -570,7 +570,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   // Fetch compare data when date changes
   useEffect(() => {
     if (debugMode) {
-      console.log('🔍 CurveWatch: Compare date changed to:', compareDate);
+      console.log(' CurveWatch: Compare date changed to:', compareDate);
     }
     fetchCompareData(compareDate);
   }, [compareDate, fetchCompareData, debugMode]);
@@ -578,19 +578,19 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   // Refresh data periodically (every 5 minutes)
   useEffect(() => {
     if (debugMode) {
-      console.log('🔄 CurveWatch: Setting up auto-refresh interval');
+      console.log(' CurveWatch: Setting up auto-refresh interval');
     }
 
     const interval = setInterval(() => {
       if (debugMode) {
-        console.log('🔄 CurveWatch: Auto-refresh triggered');
+        console.log(' CurveWatch: Auto-refresh triggered');
       }
       fetchCurrentData();
     }, 5 * 60 * 1000);
 
     return () => {
       if (debugMode) {
-        console.log('🔄 CurveWatch: Cleaning up auto-refresh interval');
+        console.log(' CurveWatch: Cleaning up auto-refresh interval');
       }
       clearInterval(interval);
     };
@@ -599,13 +599,13 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   // Transform rates array to chart data
   const getChartData = useCallback(() => {
     if (debugMode) {
-      console.log('📊 CurveWatch: getChartData called with currentData:', currentData);
-      console.log('📊 CurveWatch: compareData:', compareData);
+      console.log(' CurveWatch: getChartData called with currentData:', currentData);
+      console.log(' CurveWatch: compareData:', compareData);
     }
 
     if (!currentData.us && !currentData.canada) {
       if (debugMode) {
-        console.log('📊 CurveWatch: No current data available, returning empty array');
+        console.log(' CurveWatch: No current data available, returning empty array');
       }
       return [];
     }
@@ -619,7 +619,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       const canadaCompare = compareData?.canada?.rates?.find(r => r.maturity === maturity);
 
       if (debugMode && (usRate || canadaRate)) {
-        console.log(`📊 CurveWatch: Maturity ${maturity} - US: ${usRate?.rate || 'null'}, CA: ${canadaRate?.rate || 'null'}`);
+        console.log(` CurveWatch: Maturity ${maturity} - US: ${usRate?.rate || 'null'}, CA: ${canadaRate?.rate || 'null'}`);
       }
 
       return {
@@ -635,7 +635,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     }).filter(d => d.us !== null || d.canada !== null);
 
     if (debugMode) {
-      console.log('📊 CurveWatch: Final chart data:', chartData);
+      console.log(' CurveWatch: Final chart data:', chartData);
     }
 
     return chartData;
@@ -644,12 +644,12 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   // Get spread history data
   const getSpreadHistoryData = useCallback(() => {
     if (debugMode) {
-      console.log('📊 CurveWatch: getSpreadHistoryData called with historicalData:', historicalData);
+      console.log(' CurveWatch: getSpreadHistoryData called with historicalData:', historicalData);
     }
 
     if (!historicalData.us.length) {
       if (debugMode) {
-        console.log('📊 CurveWatch: No historical data available, returning empty array');
+        console.log(' CurveWatch: No historical data available, returning empty array');
       }
       return [];
     }
@@ -661,7 +661,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
     })).filter(d => d.spread !== null);
 
     if (debugMode) {
-      console.log('📊 CurveWatch: Final spread history data:', spreadData);
+      console.log(' CurveWatch: Final spread history data:', spreadData);
     }
 
     return spreadData;
@@ -678,7 +678,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   // Function to test API calls directly
   const testApiCall = useCallback(async () => {
     if (debugMode) {
-      console.log('🔍 Testing API call directly...');
+      console.log(' Testing API call directly...');
     }
 
     try {
@@ -686,29 +686,29 @@ window.CurveWatchContainer = ({ embedded = false }) => {
       const data = await response.json();
 
       if (debugMode) {
-        console.log('✅ API Test Response:', data);
-        console.log('✅ API Test - US Data Structure:', data.data?.us);
-        console.log('✅ API Test - Canada Data Structure:', data.data?.canada);
+        console.log(' API Test Response:', data);
+        console.log(' API Test - US Data Structure:', data.data?.us);
+        console.log(' API Test - Canada Data Structure:', data.data?.canada);
 
         // Validate data structure
         if (data.data?.us?.rates) {
-          console.log('✅ US rates structure OK:', data.data.us.rates.length, 'items');
-          console.log('✅ Sample US rate:', data.data.us.rates[0]);
+          console.log(' US rates structure OK:', data.data.us.rates.length, 'items');
+          console.log(' Sample US rate:', data.data.us.rates[0]);
         } else {
-          console.warn('⚠️ US rates structure invalid:', data.data?.us);
+          console.warn(' US rates structure invalid:', data.data?.us);
         }
 
         if (data.data?.canada?.rates) {
-          console.log('✅ Canada rates structure OK:', data.data.canada.rates.length, 'items');
-          console.log('✅ Sample Canada rate:', data.data.canada.rates[0]);
+          console.log(' Canada rates structure OK:', data.data.canada.rates.length, 'items');
+          console.log(' Sample Canada rate:', data.data.canada.rates[0]);
         } else {
-          console.warn('⚠️ Canada rates structure invalid:', data.data?.canada);
+          console.warn(' Canada rates structure invalid:', data.data?.canada);
         }
       }
 
       return data;
     } catch (error) {
-      console.error('❌ API Test Error:', error);
+      console.error(' API Test Error:', error);
       return null;
     }
   }, [debugMode]);
@@ -858,7 +858,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
           onClick={fetchCurrentData}
           style={{ marginTop: '8px', padding: '8px 16px', cursor: 'pointer' }}
         >
-          Réessayer
+          Reessayer
         </button>
         {/* Debug controls */}
         <div style={{ marginTop: '10px', display: 'flex', gap: '10px' }}>
@@ -885,8 +885,8 @@ window.CurveWatchContainer = ({ embedded = false }) => {
   const spreadData = getSpreadHistoryData();
 
   if (debugMode) {
-    console.log('📊 Final chart data passed to YieldCurveChart:', chartData);
-    console.log('📊 Final spread data passed to SpreadChart:', spreadData);
+    console.log(' Final chart data passed to YieldCurveChart:', chartData);
+    console.log(' Final spread data passed to SpreadChart:', spreadData);
   }
 
   return (
@@ -914,7 +914,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
               borderRadius: '4px'
             }}
           >
-            Réessayer
+            Reessayer
           </button>
         </div>
       )}
@@ -966,7 +966,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
           marginBottom: '12px'
         }}>
           <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '8px', color: colors.text }}>
-            🐞 Debug Panel
+             Debug Panel
           </div>
 
           {/* API Call Log */}
@@ -977,7 +977,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
             <div style={{ maxHeight: '100px', overflowY: 'auto', fontSize: '10px', color: colors.textMuted }}>
               {apiCallLog.slice(-5).map((log, i) => (
                 <div key={i} style={{ marginBottom: '2px' }}>
-                  {log.status === 'pending' ? '⏳' : log.status === 'error' ? '❌' : '✅'}
+                  {log.status === 'pending' ? '' : log.status === 'error' ? '' : ''}
                   {log.url} - {log.status} {log.response && `(${log.response})`}
                 </div>
               ))}
@@ -1016,10 +1016,10 @@ window.CurveWatchContainer = ({ embedded = false }) => {
                         canada: parsed.data?.canada || null
                       });
                       setError(null);
-                      console.log('✅ Manual data loaded:', parsed);
+                      console.log(' Manual data loaded:', parsed);
                     }
                   } catch (err) {
-                    console.error('❌ Error parsing manual data:', err);
+                    console.error(' Error parsing manual data:', err);
                     setError('Invalid JSON format');
                   }
                 }}
@@ -1087,7 +1087,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
                     canada: mockData.data.canada
                   });
                   setError(null);
-                  console.log('✅ Sample mock data loaded');
+                  console.log(' Sample mock data loaded');
                 }}
                 style={{
                   padding: '4px 8px',
@@ -1282,7 +1282,7 @@ window.CurveWatchContainer = ({ embedded = false }) => {
           Sources: {currentData.us?.source || 'N/A'} (US), {currentData.canada?.source || 'N/A'} (CA)
         </span>
         <span>
-          Dernière mise à jour: {currentData.us?.date || 'N/A'}
+          Derniere mise a jour: {currentData.us?.date || 'N/A'}
         </span>
       </div>
     </div>

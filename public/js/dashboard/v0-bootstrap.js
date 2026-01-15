@@ -1,7 +1,7 @@
 /**
  * GOB Dashboard - V0 Bootstrap v3
  * Premium UI Components & Analytics Functions
- * ═══════════════════════════════════════════════════════════════════
+ * 
  */
 
 (function() {
@@ -10,14 +10,14 @@
     if (window.__v0BootstrapV3) return;
     window.__v0BootstrapV3 = true;
 
-    console.log('🚀 GOB V0 Bootstrap v3: Initializing...');
+    console.log(' GOB V0 Bootstrap v3: Initializing...');
 
     const React = window.React;
     const { createElement: h, forwardRef, useState, useRef, useEffect } = React;
 
-    // ═══════════════════════════════════════════════════════════════════
+    // 
     // DESIGN TOKENS
-    // ═══════════════════════════════════════════════════════════════════
+    // 
     const colors = {
         bg: {
             primary: '#09090b',
@@ -45,9 +45,9 @@
         }
     };
 
-    // ═══════════════════════════════════════════════════════════════════
+    // 
     // UI COMPONENTS - Premium Shadcn Mocks
-    // ═══════════════════════════════════════════════════════════════════
+    // 
     const UI = {
         
         // Button Component - Enhanced with clear visual feedback
@@ -242,19 +242,19 @@
                 className: `flex h-10 w-full items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-800/50 focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all ${isOpen ? 'ring-2 ring-blue-500/30 border-blue-500/50' : ''} ${className}`
             }, 
                 childrenWithValue,
-                h('span', { className: `ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}` }, '▾')
+                h('span', { className: `ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}` }, '')
             );
         },
 
         SelectValue: (props) => {
             // Map values to display labels
             const valueLabels = {
-                'linear': 'Linéaire',
+                'linear': 'Lineaire',
                 'cubic-spline': 'Spline Cubique',
                 'nelson-siegel': 'Nelson-Siegel',
                 'monotone-cubic': 'Monotone Cubique',
             };
-            const displayValue = valueLabels[props.value] || props.value || props.placeholder || 'Sélectionner...';
+            const displayValue = valueLabels[props.value] || props.value || props.placeholder || 'Selectionner...';
             return h('span', { className: 'truncate' }, displayValue);
         },
 
@@ -373,9 +373,9 @@
         window[name] = component;
     });
 
-    // ═══════════════════════════════════════════════════════════════════
+    // 
     // ANALYTICS FUNCTIONS
-    // ═══════════════════════════════════════════════════════════════════
+    // 
     
     window.isValidYield = (value) => {
         return value !== null && value !== undefined && !isNaN(value) && isFinite(value) && value > 0;
@@ -499,9 +499,9 @@
         };
     };
 
-    // ═══════════════════════════════════════════════════════════════════
+    // 
     // INTERPOLATION FUNCTIONS
-    // ═══════════════════════════════════════════════════════════════════
+    // 
 
     window.linearInterpolation = (points, targetDays) => {
         if (!points || points.length === 0) return [];
@@ -581,5 +581,5 @@
         return window.maturityToMonths(maturity) * 30;
     };
 
-    console.log('✅ GOB V0 Bootstrap v3: Ready');
+    console.log(' GOB V0 Bootstrap v3: Ready');
 })();

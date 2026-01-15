@@ -1,12 +1,12 @@
 /**
- * API endpoint pour récupérer les actualités financières
+ * API endpoint pour recuperer les actualites financieres
  * Sources hyper fiables:
- * 1. Finviz (scraping) - Agrège Bloomberg, WSJ, Reuters, CNBC, MarketWatch, etc.
- * 2. Gemini avec Google Search (actualités de l'heure et du jour) - Gratuit et à jour
+ * 1. Finviz (scraping) - Agrege Bloomberg, WSJ, Reuters, CNBC, MarketWatch, etc.
+ * 2. Gemini avec Google Search (actualites de l'heure et du jour) - Gratuit et a jour
  * 3. FMP (Financial Modeling Prep) - Bloomberg, WSJ, Reuters, CNBC, MarketWatch, Yahoo Finance, Forbes, Fortune
  * 4. Finnhub - Bloomberg, WSJ, Reuters, CNBC, MarketWatch, etc.
- * Traduit en français via Gemini API
- * Toutes les heures sont converties en heure de Montréal (Eastern Time)
+ * Traduit en francais via Gemini API
+ * Toutes les heures sont converties en heure de Montreal (Eastern Time)
  */
 
 export default async function handler(req, res) {
@@ -24,12 +24,12 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Paramètres de requête
+        // Parametres de requete
         const { type = 'all', limit = 30 } = req.query;
-        const newsLimit = Math.min(parseInt(limit, 10) || 30, 50); // Max 50 actualités
+        const newsLimit = Math.min(parseInt(limit, 10) || 30, 50); // Max 50 actualites
         
-        // Récupérer les actualités depuis plusieurs sources fiables en parallèle
-        // Utiliser Gemini avec Google Search au lieu de Perplexity (gratuit et moins sur-sollicité)
+        // Recuperer les actualites depuis plusieurs sources fiables en parallele
+        // Utiliser Gemini avec Google Search au lieu de Perplexity (gratuit et moins sur-sollicite)
         const [finvizNews, geminiNews, fmpNews, finnhubNews] = await Promise.allSettled([
             fetchFinvizNews(),
             fetchGeminiNews(type, newsLimit),
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
             fetchFinnhubNews(type, newsLimit)
         ]);
 
-        // Combiner les actualités
+        // Combiner les actualites
         let allNews = [];
         
         if (finvizNews.status === 'fulfilled' && finvizNews.value.length > 0) {
@@ -56,17 +56,17 @@ export default async function handler(req, res) {
             allNews = [...allNews, ...finnhubNews.value];
         }
 
-        // Dédupliquer par headline (normalisé)
+        // Dedupliquer par headline (normalise)
         const uniqueNews = deduplicateNews(allNews);
         
-        // Trier par timestamp (plus récent en premier)
+        // Trier par timestamp (plus recent en premier)
         uniqueNews.sort((a, b) => {
             const timeA = parseTime(a.time);
             const timeB = parseTime(b.time);
             return timeB - timeA;
         });
 
-        // Limiter selon le paramètre limit
+        // Limiter selon le parametre limit
         const limitedNews = uniqueNews.slice(0, newsLimit);
         
         // Translate news items to French
@@ -89,7 +89,7 @@ export default async function handler(req, res) {
         console.error('Erreur News API:', error);
         return res.status(500).json({
             success: false,
-            error: error.message || 'Erreur lors de la récupération des actualités',
+            error: error.message || 'Erreur lors de la recuperation des actualites',
             timestamp: new Date().toISOString()
         });
     }
@@ -130,7 +130,7 @@ async function fetchFMPNews(type = 'all', limit = 30) {
     const FMP_API_KEY = process.env.FMP_API_KEY;
     
     if (!FMP_API_KEY) {
-        console.warn('FMP_API_KEY non configurée, skip FMP news');
+        console.warn('FMP_API_KEY non configuree, skip FMP news');
         return [];
     }
 
@@ -161,7 +161,7 @@ async function fetchFMPNews(type = 'all', limit = 30) {
         for (const item of data.slice(0, limit)) {
             if (!item.title || item.title.length < 10) continue;
             
-            // Détecter le type depuis le titre
+            // Detecter le type depuis le titre
             const detectedType = detectNewsType(item.title);
             
             // Extraire la source (FMP fournit parfois le site source)
@@ -212,12 +212,12 @@ async function fetchFinnhubNews(type = 'all', limit = 30, retryCount = 0) {
     const RETRY_DELAY_MS = 1000;
 
     if (!FINNHUB_API_KEY) {
-        console.warn('FINNHUB_API_KEY non configurée, skip Finnhub news');
+        console.warn('FINNHUB_API_KEY non configuree, skip Finnhub news');
         return [];
     }
 
     try {
-        // Mapper le type vers la catégorie Finnhub
+        // Mapper le type vers la categorie Finnhub
         const categoryMap = {
             'all': 'general',
             'market': 'general',
@@ -246,11 +246,11 @@ async function fetchFinnhubNews(type = 'all', limit = 30, retryCount = 0) {
         if (response.status === 429) {
             if (retryCount < MAX_RETRIES) {
                 const delay = RETRY_DELAY_MS * Math.pow(2, retryCount);
-                console.warn(`⚠️ Finnhub rate limited (429), retrying in ${delay}ms...`);
+                console.warn(` Finnhub rate limited (429), retrying in ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 return fetchFinnhubNews(type, limit, retryCount + 1);
             }
-            console.warn('⚠️ Finnhub rate limit exceeded, skipping source');
+            console.warn(' Finnhub rate limit exceeded, skipping source');
             return [];
         }
 
@@ -269,7 +269,7 @@ async function fetchFinnhubNews(type = 'all', limit = 30, retryCount = 0) {
         for (const item of data.slice(0, limit)) {
             if (!item.headline || item.headline.length < 10) continue;
             
-            // Détecter le type depuis le headline
+            // Detecter le type depuis le headline
             const detectedType = detectNewsType(item.headline);
             
             // Extraire la source (Finnhub fournit la source)
@@ -311,43 +311,43 @@ async function fetchFinnhubNews(type = 'all', limit = 30, retryCount = 0) {
 }
 
 /**
- * Fetch news from Gemini with Google Search (actualités de l'heure et du jour)
- * Remplace Perplexity pour éviter la sur-sollicitation
+ * Fetch news from Gemini with Google Search (actualites de l'heure et du jour)
+ * Remplace Perplexity pour eviter la sur-sollicitation
  */
 async function fetchGeminiNews(type = 'all', limit = 30) {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     
     if (!GEMINI_API_KEY) {
-        console.warn('GEMINI_API_KEY non configurée, skip Gemini news');
+        console.warn('GEMINI_API_KEY non configuree, skip Gemini news');
         return [];
     }
 
     try {
         // Construire le prompt selon le type
         const typePrompts = {
-            'all': 'toutes les actualités financières et économiques',
-            'market': 'actualités de marché (stocks, indices, trading)',
-            'economy': 'actualités économiques (Fed, inflation, GDP, emploi)',
-            'stocks': 'actualités sur les actions et entreprises',
-            'crypto': 'actualités sur les cryptomonnaies et blockchain',
-            'forex': 'actualités sur le marché des changes (forex)',
-            'commodities': 'actualités sur les matières premières (pétrole, or, etc.)',
-            'earnings': 'actualités sur les résultats d\'entreprises (earnings)',
-            'ipo': 'actualités sur les introductions en bourse (IPO)',
-            'mergers': 'actualités sur les fusions et acquisitions (M&A)'
+            'all': 'toutes les actualites financieres et economiques',
+            'market': 'actualites de marche (stocks, indices, trading)',
+            'economy': 'actualites economiques (Fed, inflation, GDP, emploi)',
+            'stocks': 'actualites sur les actions et entreprises',
+            'crypto': 'actualites sur les cryptomonnaies et blockchain',
+            'forex': 'actualites sur le marche des changes (forex)',
+            'commodities': 'actualites sur les matieres premieres (petrole, or, etc.)',
+            'earnings': 'actualites sur les resultats d\'entreprises (earnings)',
+            'ipo': 'actualites sur les introductions en bourse (IPO)',
+            'mergers': 'actualites sur les fusions et acquisitions (M&A)'
         };
         
         const typeDescription = typePrompts[type] || typePrompts['all'];
         const newsCount = Math.min(limit, 30);
         
-        const prompt = `Utilise Google Search pour trouver les ${newsCount} principales ${typeDescription} de l'heure et du jour d'aujourd'hui. Pour chaque actualité, fournis:
+        const prompt = `Utilise Google Search pour trouver les ${newsCount} principales ${typeDescription} de l'heure et du jour d'aujourd'hui. Pour chaque actualite, fournis:
 1. Le titre (headline) en anglais
 2. L'heure approximative (format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures")
 3. La source (Bloomberg, Reuters, MarketWatch, CNBC, WSJ, FT, etc.)
 4. Le type de nouvelle (market, economy, stocks, crypto, forex, commodities, earnings, ipo, mergers, other)
-5. L'URL complète de l'article (si disponible)
+5. L'URL complete de l'article (si disponible)
 
-Format de réponse (une actualité par ligne):
+Format de reponse (une actualite par ligne):
 [Heure] | [Titre] | [Source] | [Type] | [URL]
 
 Exemple:
@@ -355,7 +355,7 @@ Aujourd'hui, 11:15 AM | Tech rally and Bitcoin surge lift US stocks as traders e
 Aujourd'hui, 10:45 AM | Federal Reserve signals potential rate cuts as inflation cools | Reuters | economy | https://www.reuters.com/fed-rate-cuts
 Aujourd'hui, 09:30 AM | Apple reports record Q4 earnings, beats expectations | Bloomberg | earnings | https://www.bloomberg.com/apple-earnings
 
-Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement les actualités, sans explication supplémentaire.`;
+Si l'URL n'est pas disponible, utilise "N/A" a la place. Retourne uniquement les actualites, sans explication supplementaire.`;
 
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
         
@@ -369,7 +369,7 @@ Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement le
                     parts: [{ text: prompt }]
                 }],
                 tools: [{
-                    googleSearchRetrieval: {} // Active Google Search pour données à jour
+                    googleSearchRetrieval: {} // Active Google Search pour donnees a jour
                 }],
                 generationConfig: {
                     temperature: 0.3,
@@ -390,7 +390,7 @@ Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement le
         const data = await response.json();
         const content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         
-        // Parse Gemini response (même format que Perplexity)
+        // Parse Gemini response (meme format que Perplexity)
         return parsePerplexityNews(content);
         
     } catch (error) {
@@ -400,43 +400,43 @@ Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement le
 }
 
 /**
- * Fetch news from Perplexity (actualités de l'heure et du jour)
- * @deprecated Utiliser fetchGeminiNews à la place pour éviter la sur-sollicitation
+ * Fetch news from Perplexity (actualites de l'heure et du jour)
+ * @deprecated Utiliser fetchGeminiNews a la place pour eviter la sur-sollicitation
  */
 async function fetchPerplexityNews(type = 'all', limit = 30) {
     const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
     
     if (!PERPLEXITY_API_KEY) {
-        console.warn('PERPLEXITY_API_KEY non configurée, skip Perplexity news');
+        console.warn('PERPLEXITY_API_KEY non configuree, skip Perplexity news');
         return [];
     }
 
     try {
         // Construire le prompt selon le type
         const typePrompts = {
-            'all': 'toutes les actualités financières et économiques',
-            'market': 'actualités de marché (stocks, indices, trading)',
-            'economy': 'actualités économiques (Fed, inflation, GDP, emploi)',
-            'stocks': 'actualités sur les actions et entreprises',
-            'crypto': 'actualités sur les cryptomonnaies et blockchain',
-            'forex': 'actualités sur le marché des changes (forex)',
-            'commodities': 'actualités sur les matières premières (pétrole, or, etc.)',
-            'earnings': 'actualités sur les résultats d\'entreprises (earnings)',
-            'ipo': 'actualités sur les introductions en bourse (IPO)',
-            'mergers': 'actualités sur les fusions et acquisitions (M&A)'
+            'all': 'toutes les actualites financieres et economiques',
+            'market': 'actualites de marche (stocks, indices, trading)',
+            'economy': 'actualites economiques (Fed, inflation, GDP, emploi)',
+            'stocks': 'actualites sur les actions et entreprises',
+            'crypto': 'actualites sur les cryptomonnaies et blockchain',
+            'forex': 'actualites sur le marche des changes (forex)',
+            'commodities': 'actualites sur les matieres premieres (petrole, or, etc.)',
+            'earnings': 'actualites sur les resultats d\'entreprises (earnings)',
+            'ipo': 'actualites sur les introductions en bourse (IPO)',
+            'mergers': 'actualites sur les fusions et acquisitions (M&A)'
         };
         
         const typeDescription = typePrompts[type] || typePrompts['all'];
         const newsCount = Math.min(limit, 30);
         
-        const prompt = `Liste les ${newsCount} principales ${typeDescription} de l'heure et du jour d'aujourd'hui. Pour chaque actualité, fournis:
+        const prompt = `Liste les ${newsCount} principales ${typeDescription} de l'heure et du jour d'aujourd'hui. Pour chaque actualite, fournis:
 1. Le titre (headline) en anglais
 2. L'heure approximative (format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures")
 3. La source (Bloomberg, Reuters, MarketWatch, CNBC, WSJ, FT, etc.)
 4. Le type de nouvelle (market, economy, stocks, crypto, forex, commodities, earnings, ipo, mergers, other)
-5. L'URL complète de l'article (si disponible)
+5. L'URL complete de l'article (si disponible)
 
-Format de réponse (une actualité par ligne):
+Format de reponse (une actualite par ligne):
 [Heure] | [Titre] | [Source] | [Type] | [URL]
 
 Exemple:
@@ -444,7 +444,7 @@ Aujourd'hui, 11:15 AM | Tech rally and Bitcoin surge lift US stocks as traders e
 Aujourd'hui, 10:45 AM | Federal Reserve signals potential rate cuts as inflation cools | Reuters | economy | https://www.reuters.com/fed-rate-cuts
 Aujourd'hui, 09:30 AM | Apple reports record Q4 earnings, beats expectations | Bloomberg | earnings | https://www.bloomberg.com/apple-earnings
 
-Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement les actualités, sans explication supplémentaire.`;
+Si l'URL n'est pas disponible, utilise "N/A" a la place. Retourne uniquement les actualites, sans explication supplementaire.`;
 
         const response = await fetch('https://api.perplexity.ai/chat/completions', {
             method: 'POST',
@@ -457,7 +457,7 @@ Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement le
                 messages: [
                     {
                         role: 'system',
-                        content: 'Tu es un assistant spécialisé dans les actualités financières. Tu fournis des informations factuelles et récentes.'
+                        content: 'Tu es un assistant specialise dans les actualites financieres. Tu fournis des informations factuelles et recentes.'
                     },
                     {
                         role: 'user',
@@ -466,7 +466,7 @@ Si l'URL n'est pas disponible, utilise "N/A" à la place. Retourne uniquement le
                 ],
                 max_tokens: 2000,
                 temperature: 0.3,
-                search_recency_filter: 'hour' // Actualités de l'heure
+                search_recency_filter: 'hour' // Actualites de l'heure
             }),
             signal: AbortSignal.timeout(30000) // 30 secondes timeout
         });
@@ -512,7 +512,7 @@ function parsePerplexityNews(content) {
                 const type = parts[3] || 'other';
                 let url = parts[4] || '';
                 
-                // Convertir l'heure en heure de Montréal
+                // Convertir l'heure en heure de Montreal
                 time = formatTimeMontreal(time);
                 
                 // Nettoyer l'URL (enlever "N/A" ou URLs invalides)
@@ -537,10 +537,10 @@ function parsePerplexityNews(content) {
                 const source = parts[2] || 'Perplexity';
                 let url = parts[3] || '';
                 
-                // Convertir l'heure en heure de Montréal
+                // Convertir l'heure en heure de Montreal
                 time = formatTimeMontreal(time);
                 
-                // Détecter le type depuis le headline
+                // Detecter le type depuis le headline
                 const detectedType = detectNewsType(headline);
                 
                 if (url === 'N/A' || !url.startsWith('http')) {
@@ -563,10 +563,10 @@ function parsePerplexityNews(content) {
                 const headline = parts[1] || '';
                 const source = parts[2] || 'Perplexity';
                 
-                // Convertir l'heure en heure de Montréal
+                // Convertir l'heure en heure de Montreal
                 time = formatTimeMontreal(time);
                 
-                // Détecter le type depuis le headline
+                // Detecter le type depuis le headline
                 const detectedType = detectNewsType(headline);
                 
                 if (headline && headline.length > 10) {
@@ -584,10 +584,10 @@ function parsePerplexityNews(content) {
                 let time = parts[0] || 'Aujourd\'hui';
                 const headline = parts[1] || '';
                 
-                // Convertir l'heure en heure de Montréal
+                // Convertir l'heure en heure de Montreal
                 time = formatTimeMontreal(time);
                 
-                // Détecter le type depuis le headline
+                // Detecter le type depuis le headline
                 const detectedType = detectNewsType(headline);
                 
                 if (headline && headline.length > 10) {
@@ -611,7 +611,7 @@ function parsePerplexityNews(content) {
 }
 
 /**
- * Détecter le type de nouvelle depuis le headline
+ * Detecter le type de nouvelle depuis le headline
  */
 function detectNewsType(headline) {
     const lowerHeadline = headline.toLowerCase();
@@ -680,9 +680,9 @@ function parseFinvizNews(html) {
             const timeMatch = rowHtml.match(/<td[^>]*>([^<]*\d{1,2}:\d{2}\s*(?:AM|PM)?)[^<]*<\/td>/i);
             let time = timeMatch ? timeMatch[1].trim() : '';
             
-            // Convertir l'heure en heure de Montréal si disponible
+            // Convertir l'heure en heure de Montreal si disponible
             if (time) {
-                // Parser l'heure de Finviz (généralement en format "HH:MM AM/PM")
+                // Parser l'heure de Finviz (generalement en format "HH:MM AM/PM")
                 const timeParts = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
                 if (timeParts) {
                     let hours = parseInt(timeParts[1]);
@@ -692,11 +692,11 @@ function parseFinvizNews(html) {
                     if (ampm === 'PM' && hours !== 12) hours += 12;
                     if (ampm === 'AM' && hours === 12) hours = 0;
                     
-                    // Créer une date avec l'heure (en supposant que c'est aujourd'hui)
+                    // Creer une date avec l'heure (en supposant que c'est aujourd'hui)
                     const date = new Date();
                     date.setHours(hours, minutes, 0, 0);
                     
-                    // Formater en heure de Montréal
+                    // Formater en heure de Montreal
                     time = formatTimeMontreal(date);
                 }
             }
@@ -723,7 +723,7 @@ function parseFinvizNews(html) {
                     }
                 }
                 
-                // Détecter le type depuis le headline
+                // Detecter le type depuis le headline
                 const detectedType = detectNewsType(headline);
             
             newsItems.push({
@@ -762,7 +762,7 @@ function parseFinvizNews(html) {
                         }
                     }
                     
-                    // Détecter le type depuis le headline
+                    // Detecter le type depuis le headline
                     const detectedType = detectNewsType(headline);
                     
                     newsItems.push({
@@ -784,7 +784,7 @@ function parseFinvizNews(html) {
     
     // If no news found, return sample news
     if (newsItems.length === 0) {
-        // Retourner des actualités d'exemple avec l'heure de Montréal
+        // Retourner des actualites d'exemple avec l'heure de Montreal
         const now = new Date();
         const sampleTime1 = new Date(now);
         sampleTime1.setHours(11, 15, 0, 0);
@@ -825,7 +825,7 @@ function parseFinvizNews(html) {
 }
 
 /**
- * Dédupliquer les actualités par headline (normalisé)
+ * Dedupliquer les actualites par headline (normalise)
  */
 function deduplicateNews(newsItems) {
     const seen = new Set();
@@ -849,7 +849,7 @@ function deduplicateNews(newsItems) {
 }
 
 /**
- * Formater une date/heure en heure de Montréal (Eastern Time)
+ * Formater une date/heure en heure de Montreal (Eastern Time)
  * Format: "Aujourd'hui, HH:MM AM/PM" ou "Il y a X heures"
  */
 function formatTimeMontreal(dateOrTimeString) {
@@ -857,7 +857,7 @@ function formatTimeMontreal(dateOrTimeString) {
     
     // Si c'est une string de temps existante, essayer de la parser
     if (typeof dateOrTimeString === 'string') {
-        // Si c'est déjà formaté "Aujourd'hui, HH:MM AM/PM", parser l'heure
+        // Si c'est deja formate "Aujourd'hui, HH:MM AM/PM", parser l'heure
         const todayMatch = dateOrTimeString.match(/Aujourd'hui[,\s]+(\d{1,2}):(\d{2})\s*(AM|PM)/i);
         if (todayMatch) {
             const now = new Date();
@@ -886,12 +886,12 @@ function formatTimeMontreal(dateOrTimeString) {
         date = new Date();
     }
     
-    // Vérifier si la date est valide
+    // Verifier si la date est valide
     if (isNaN(date.getTime())) {
         return 'Aujourd\'hui';
     }
     
-    // Obtenir l'heure actuelle en heure de Montréal
+    // Obtenir l'heure actuelle en heure de Montreal
     const nowMontreal = new Date();
     const nowMontrealStr = new Intl.DateTimeFormat('en-CA', {
         timeZone: 'America/Montreal',
@@ -900,7 +900,7 @@ function formatTimeMontreal(dateOrTimeString) {
         day: '2-digit'
     }).format(nowMontreal);
     
-    // Convertir la date en heure de Montréal
+    // Convertir la date en heure de Montreal
     const montrealFormatter = new Intl.DateTimeFormat('en-US', {
         timeZone: 'America/Montreal',
         hour: 'numeric',
@@ -914,11 +914,11 @@ function formatTimeMontreal(dateOrTimeString) {
     const montrealParts = montrealFormatter.formatToParts(date);
     const montrealDateStr = `${montrealParts.find(p => p.type === 'year').value}-${montrealParts.find(p => p.type === 'month').value}-${montrealParts.find(p => p.type === 'day').value}`;
     
-    // Vérifier si c'est aujourd'hui
+    // Verifier si c'est aujourd'hui
     const isToday = montrealDateStr === nowMontrealStr.replace(/\//g, '-');
     
     if (isToday) {
-        // Formater en "Aujourd'hui, HH:MM AM/PM" en heure de Montréal
+        // Formater en "Aujourd'hui, HH:MM AM/PM" en heure de Montreal
         const hours = parseInt(montrealParts.find(p => p.type === 'hour').value);
         const minutes = parseInt(montrealParts.find(p => p.type === 'minute').value);
         const ampm = montrealParts.find(p => p.type === 'dayPeriod').value;
@@ -927,12 +927,12 @@ function formatTimeMontreal(dateOrTimeString) {
         
         return `Aujourd'hui, ${displayHours}:${displayMinutes} ${ampm.toUpperCase()}`;
     } else {
-        // Calculer la différence en heures (en utilisant les timestamps UTC)
+        // Calculer la difference en heures (en utilisant les timestamps UTC)
         const diffMs = nowMontreal.getTime() - date.getTime();
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
         
         if (diffHours < 1) {
-            return 'À l\'instant';
+            return 'A l\'instant';
         } else if (diffHours < 24) {
             return `Il y a ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
         } else {
@@ -943,7 +943,7 @@ function formatTimeMontreal(dateOrTimeString) {
 }
 
 /**
- * Parser le temps pour trier les actualités
+ * Parser le temps pour trier les actualites
  */
 function parseTime(timeStr) {
     if (!timeStr) return 0;
@@ -975,7 +975,7 @@ function parseTime(timeStr) {
         return time.getTime();
     }
     
-    // Par défaut, retourner maintenant
+    // Par defaut, retourner maintenant
     return now.getTime();
 }
 
@@ -984,7 +984,7 @@ function parseTime(timeStr) {
  */
 async function translateNews(newsItems) {
     if (!process.env.GEMINI_API_KEY) {
-        console.warn('GEMINI_API_KEY non définie, retour des actualités en anglais');
+        console.warn('GEMINI_API_KEY non definie, retour des actualites en anglais');
         return newsItems;
     }
 
@@ -1008,7 +1008,7 @@ async function translateNews(newsItems) {
 
             const headlines = batch.map(item => item.headline).join('\n');
 
-            const prompt = `Traduis ces titres d'actualités financières en français. Garde le style professionnel et les termes techniques financiers appropriés. Retourne uniquement les traductions, une par ligne, dans le même ordre:\n\n${headlines}`;
+            const prompt = `Traduis ces titres d'actualites financieres en francais. Garde le style professionnel et les termes techniques financiers appropries. Retourne uniquement les traductions, une par ligne, dans le meme ordre:\n\n${headlines}`;
 
             try {
                 const result = await model.generateContent(prompt);
@@ -1034,7 +1034,7 @@ async function translateNews(newsItems) {
                     errorMessage.includes('API_KEY_INVALID') ||
                     errorMessage.includes('PERMISSION_DENIED') ||
                     errorMessage.includes('invalid api key')) {
-                    console.warn('⚠️ Gemini API key invalid/expired, skipping translation');
+                    console.warn(' Gemini API key invalid/expired, skipping translation');
                     apiKeyValid = false;
                 } else {
                     console.error('Erreur traduction batch:', translateError.message);
@@ -1052,7 +1052,7 @@ async function translateNews(newsItems) {
         if (errorMessage.includes('API key expired') ||
             errorMessage.includes('API_KEY_INVALID') ||
             errorMessage.includes('PERMISSION_DENIED')) {
-            console.warn('⚠️ Gemini API key invalid/expired, returning news in English');
+            console.warn(' Gemini API key invalid/expired, returning news in English');
         } else {
             console.error('Erreur traduction:', error.message);
         }

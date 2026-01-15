@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emma - Démarrage Rapide</title>
+    <title>Emma - Demarrage Rapide</title>
     <style>
         body {
             margin: 0;
@@ -13,7 +13,7 @@
             font-family: 'Inter', system-ui, sans-serif;
             color: white;
         }
-        /* Réduction globale pour mobile: police et espacements à 50% */
+        /* Reduction globale pour mobile: police et espacements a 50% */
         @media (max-width: 768px) {
             html { font-size: 50%; }
         }
@@ -113,43 +113,43 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤖 Emma</h1>
-            <p>Assistante Financière - Démarrage Rapide</p>
+            <h1> Emma</h1>
+            <p>Assistante Financiere - Demarrage Rapide</p>
         </div>
 
         <div class="steps">
             <div class="step">
-                <h3>1️⃣ Configuration</h3>
-                <p>Configurez votre clé API Gemini pour activer Emma</p>
+                <h3>1 Configuration</h3>
+                <p>Configurez votre cle API Gemini pour activer Emma</p>
             </div>
             <div class="step">
-                <h3>2️⃣ Personnalisation</h3>
-                <p>Adaptez le prompt d'Emma à vos besoins spécifiques</p>
+                <h3>2 Personnalisation</h3>
+                <p>Adaptez le prompt d'Emma a vos besoins specifiques</p>
             </div>
             <div class="step">
-                <h3>3️⃣ Utilisation</h3>
-                <p>Commencez à chatter avec Emma pour vos analyses financières</p>
+                <h3>3 Utilisation</h3>
+                <p>Commencez a chatter avec Emma pour vos analyses financieres</p>
             </div>
         </div>
 
         <div class="actions">
             <a href="beta-combined-dashboard.html" class="btn btn-primary">
-                🚀 Dashboard Principal
+                 Dashboard Principal
             </a>
             <a href="emma-demo.html" class="btn btn-secondary">
-                🎭 Démonstration
+                 Demonstration
             </a>
             <a href="emma-test.html" class="btn btn-secondary">
-                🧪 Tests
+                 Tests
             </a>
         </div>
 
         <div class="status">
-            <h3>📊 Statut de l'Installation</h3>
+            <h3> Statut de l'Installation</h3>
             <div id="status-items">
                 <div class="status-item">
-                    <span class="icon">⏳</span>
-                    <span>Vérification en cours...</span>
+                    <span class="icon"></span>
+                    <span>Verification en cours...</span>
                 </div>
             </div>
         </div>
@@ -159,11 +159,11 @@
         // Import des modules Emma
         import { emmaVerification } from './emma-verification.js';
 
-        // Fonction pour mettre à jour le statut
+        // Fonction pour mettre a jour le statut
         function updateStatus() {
             const statusContainer = document.getElementById('status-items');
             
-            // Vérifications de base
+            // Verifications de base
             const checks = [
                 { name: 'Fichiers Emma', check: () => checkFiles() },
                 { name: 'Modules ES6', check: () => checkModules() },
@@ -180,7 +180,7 @@
                         const statusItem = document.createElement('div');
                         statusItem.className = 'status-item';
                         statusItem.innerHTML = `
-                            <span class="icon">${result ? '✅' : '❌'}</span>
+                            <span class="icon">${result ? '' : ''}</span>
                             <span>${check.name}: ${result ? 'OK' : 'Erreur'}</span>
                         `;
                         statusContainer.appendChild(statusItem);
@@ -188,7 +188,7 @@
                         const statusItem = document.createElement('div');
                         statusItem.className = 'status-item';
                         statusItem.innerHTML = `
-                            <span class="icon">❌</span>
+                            <span class="icon"></span>
                             <span>${check.name}: Erreur</span>
                         `;
                         statusContainer.appendChild(statusItem);
@@ -197,7 +197,7 @@
             });
         }
 
-        // Vérifier les fichiers
+        // Verifier les fichiers
         async function checkFiles() {
             const files = [
                 'emma-financial-profile.js',
@@ -218,7 +218,7 @@
             return true;
         }
 
-        // Vérifier les modules
+        // Verifier les modules
         async function checkModules() {
             try {
                 await import('./emma-financial-profile.js');
@@ -230,7 +230,7 @@
             }
         }
 
-        // Vérifier la configuration
+        // Verifier la configuration
         async function checkConfig() {
             try {
                 const { getFinancialProfile } = await import('./emma-financial-profile.js');
@@ -241,7 +241,7 @@
             }
         }
 
-        // Vérifier le navigateur
+        // Verifier le navigateur
         function checkBrowser() {
             return (
                 typeof fetch !== 'undefined' &&
@@ -251,7 +251,7 @@
             );
         }
 
-        // Démarrer la vérification
+        // Demarrer la verification
         document.addEventListener('DOMContentLoaded', () => {
             updateStatus();
         });

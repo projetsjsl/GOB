@@ -134,7 +134,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                     
                     // Extract symbols from screener results
                     stocksToScreen = stocks.slice(0, 50).map(s => s.symbol || s.ticker).filter(Boolean);
-                    void(`📊 FMP Screener: ${stocksToScreen.length} stocks found`);
+                    void(` FMP Screener: ${stocksToScreen.length} stocks found`);
                 }
             } catch (screenerError) {
                 console.warn('FMP screener failed, using default list:', screenerError);
@@ -152,7 +152,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
             }
 
             // Step 2: Fetch data for all stocks using batch API
-            void(`🔍 Screening ${stocksToScreen.length} stocks...`);
+            void(` Screening ${stocksToScreen.length} stocks...`);
             
             // Split into batches of 10 to avoid API limits
             const BATCH_SIZE = 10;
@@ -252,11 +252,11 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
             allResults.sort((a, b) => b.marketCap - a.marketCap);
             
             setResults(allResults);
-            void(`✅ Screening complete: ${allResults.length} stocks match criteria`);
+            void(` Screening complete: ${allResults.length} stocks match criteria`);
             
         } catch (error) {
             console.error('Screening error:', error);
-            setError('Erreur lors du screening. Veuillez réessayer.');
+            setError('Erreur lors du screening. Veuillez reessayer.');
         } finally {
             setLoading(false);
         }
@@ -276,10 +276,10 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                             <span className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
                                 <i className="iconoir-filter text-emerald-400 text-xl"></i>
                             </span>
-                            Screener Avancé
+                            Screener Avance
                         </h2>
                         <p className="text-gray-400 text-sm mt-1">
-                            Filtrez les titres selon vos critères
+                            Filtrez les titres selon vos criteres
                         </p>
                     </div>
                     <button title="Action"
@@ -298,7 +298,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
 
                             {/* Market Cap */}
                             <div className="mb-4">
-                                <label className="text-sm text-gray-400 block mb-2">Capitalisation Boursière</label>
+                                <label className="text-sm text-gray-400 block mb-2">Capitalisation Boursiere</label>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
                                         <input
@@ -409,13 +409,13 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                                 disabled={loading}
                                 className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50"
                             >
-                                {loading ? 'Analyse en cours...' : '🔍 Lancer le Screening'}
+                                {loading ? 'Analyse en cours...' : ' Lancer le Screening'}
                             </button>
                         </div>
 
                         {/* Presets */}
                         <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-4 border border-gray-700">
-                            <h3 className="text-lg font-bold text-white mb-4">Préréglages</h3>
+                            <h3 className="text-lg font-bold text-white mb-4">Prereglages</h3>
 
                             {/* Quick Presets */}
                             <div className="space-y-2 mb-4">
@@ -434,7 +434,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                             <div className="border-t border-gray-700 pt-4">
                                 <input
                                     type="text"
-                                    placeholder="Nom du préréglage"
+                                    placeholder="Nom du prereglage"
                                     value={presetName}
                                     onChange={(e) => setPresetName(e.target.value)}
                                     className="w-full bg-gray-700 text-white rounded px-3 py-2 text-sm mb-2"
@@ -443,14 +443,14 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                                     onClick={savePreset}
                                     className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg text-sm transition-colors"
                                 >
-                                    💾 Sauvegarder
+                                     Sauvegarder
                                 </button>
                             </div>
 
                             {/* Saved Presets */}
                             {savedPresets.length > 0 && (
                                 <div className="mt-4 space-y-2">
-                                    <div className="text-xs text-gray-400 mb-2">Mes préréglages:</div>
+                                    <div className="text-xs text-gray-400 mb-2">Mes prereglages:</div>
                                     {savedPresets.map((preset, idx) => (
                                         <div key={idx} className="flex gap-2">
                                             <button
@@ -463,7 +463,7 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                                                 onClick={() => deletePreset(idx)}
                                                 className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 rounded transition-colors"
                                             >
-                                                🗑️
+                                                
                                             </button>
                                         </div>
                                     ))}
@@ -476,14 +476,14 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                     <div className="lg:col-span-2">
                         <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-4 border border-gray-700">
                             <h3 className="text-lg font-bold text-white mb-4">
-                                Résultats ({results.length} titres)
+                                Resultats ({results.length} titres)
                             </h3>
 
                             {loading ? (
                                 <div className="text-center py-12">
                                     <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                                     <p className="text-gray-400">Analyse en cours...</p>
-                                    <p className="text-gray-500 text-sm mt-2">Récupération des données depuis FMP</p>
+                                    <p className="text-gray-500 text-sm mt-2">Recuperation des donnees depuis FMP</p>
                                 </div>
                             ) : error ? (
                                 <div className="text-center py-12 text-red-400">
@@ -493,8 +493,8 @@ const AdvancedScreenerModal = ({ onClose, onSelectStock }) => {
                             ) : results.length === 0 ? (
                                 <div className="text-center py-12 text-gray-400">
                                     <i className="iconoir-search text-6xl mb-4 block"></i>
-                                    <p>Aucun résultat. Lancez un screening pour voir les titres correspondants.</p>
-                                    <p className="text-sm text-gray-500 mt-2">Essayez d'ajuster vos filtres pour obtenir plus de résultats.</p>
+                                    <p>Aucun resultat. Lancez un screening pour voir les titres correspondants.</p>
+                                    <p className="text-sm text-gray-500 mt-2">Essayez d'ajuster vos filtres pour obtenir plus de resultats.</p>
                                 </div>
                             ) : (
                                 <div className="space-y-3 max-h-[600px] overflow-y-auto">

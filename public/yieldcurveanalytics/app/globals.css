@@ -205,7 +205,7 @@
     animation: slide-in-top 0.3s ease-out;
   }
 
-  /* Effet de lueur premium sur les éléments actifs */
+  /* Effet de lueur premium sur les elements actifs */
   .active-glow {
     @apply shadow-2xl shadow-blue-500/30;
   }

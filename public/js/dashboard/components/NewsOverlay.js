@@ -1,6 +1,6 @@
 /**
- * NewsOverlay - Overlay de nouveautés en bas à gauche
- * S'affiche lorsque activé depuis AdminJSLaiTab
+ * NewsOverlay - Overlay de nouveautes en bas a gauche
+ * S'affiche lorsque active depuis AdminJSLaiTab
  */
 
 const { useState, useEffect } = React;
@@ -10,7 +10,7 @@ const NewsOverlay = ({ isDarkMode = true }) => {
     const [isMinimized, setIsMinimized] = useState(false);
     const [config, setConfig] = useState({
         enabled: false,
-        title: 'Nouveautés',
+        title: 'Nouveautes',
         items: []
     });
 
@@ -48,7 +48,7 @@ const NewsOverlay = ({ isDarkMode = true }) => {
 
         loadConfig();
 
-        // Écouter les changements de configuration
+        // Ecouter les changements de configuration
         const handleConfigChange = () => {
             loadConfig();
         };
@@ -59,7 +59,7 @@ const NewsOverlay = ({ isDarkMode = true }) => {
         };
     }, []);
 
-    // Ne rien afficher si désactivé
+    // Ne rien afficher si desactive
     if (!isVisible || !config.enabled) {
         return null;
     }
@@ -134,7 +134,7 @@ const NewsOverlay = ({ isDarkMode = true }) => {
                                     border: '1px solid rgba(16, 185, 129, 0.4)'
                                 }}
                             >
-                                <span className="text-lg">🆕</span>
+                                <span className="text-lg"></span>
                             </div>
                             <div>
                                 <h3
@@ -142,7 +142,7 @@ const NewsOverlay = ({ isDarkMode = true }) => {
                                         isDarkMode ? 'text-emerald-400' : 'text-emerald-600'
                                     }`}
                                 >
-                                    {config.title || 'Nouveautés'}
+                                    {config.title || 'Nouveautes'}
                                 </h3>
                                 {!isMinimized && config.items && config.items.length > 0 && (
                                     <p className={`text-xs ${
@@ -162,7 +162,7 @@ const NewsOverlay = ({ isDarkMode = true }) => {
                                         ? 'hover:bg-emerald-500/20 text-emerald-400' 
                                         : 'hover:bg-emerald-500/10 text-emerald-600'
                                 }`}
-                                title={isMinimized ? 'Agrandir' : 'Réduire'}
+                                title={isMinimized ? 'Agrandir' : 'Reduire'}
                             >
                                 <svg 
                                     viewBox="0 0 24 24" 
@@ -187,7 +187,7 @@ const NewsOverlay = ({ isDarkMode = true }) => {
                             <button
                                 onClick={() => {
                                     setIsVisible(false);
-                                    // Désactiver temporairement (peut être réactivé depuis Admin)
+                                    // Desactiver temporairement (peut etre reactive depuis Admin)
                                     const newConfig = { ...config, enabled: false };
                                     setConfig(newConfig);
                                     localStorage.setItem('news-overlay-config', JSON.stringify(newConfig));
@@ -287,7 +287,7 @@ const NewsOverlay = ({ isDarkMode = true }) => {
                                 <div className={`p-6 text-center ${
                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                 }`}>
-                                    <p className="text-sm">Aucune nouveauté pour le moment</p>
+                                    <p className="text-sm">Aucune nouveaute pour le moment</p>
                                 </div>
                             )}
                         </div>

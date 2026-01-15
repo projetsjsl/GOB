@@ -30,7 +30,7 @@ const CustomTooltipPriceRange = ({ active, payload, label }: any) => {
           <span className="font-semibold">Bas:</span> {formatCurrency(data.low)}
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          Écart: {formatCurrency(data.high - data.low)}
+          Ecart: {formatCurrency(data.high - data.low)}
         </p>
       </div>
     );
@@ -169,7 +169,7 @@ export const ValuationCharts: React.FC<ValuationChartsProps> = ({
               </span>
             </div>
             <p className="text-center text-gray-500 text-xs mt-2 px-6">
-              Le titre est considéré à l'ACHAT sous {buyPrice.toFixed(2)}$, à CONSERVER entre {buyPrice.toFixed(2)}$ et {sellPrice.toFixed(2)}$, et à la VENTE au-dessus de {sellPrice.toFixed(2)}$.
+              Le titre est considere a l'ACHAT sous {buyPrice.toFixed(2)}$, a CONSERVER entre {buyPrice.toFixed(2)}$ et {sellPrice.toFixed(2)}$, et a la VENTE au-dessus de {sellPrice.toFixed(2)}$.
             </p>
           </div>
         </div>
@@ -213,7 +213,7 @@ export const ValuationCharts: React.FC<ValuationChartsProps> = ({
 
         {/* Interactive Ratios Chart */}
         <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
-          <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Évolution Historique des Ratios (P/E vs P/CF)</h3>
+          <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">Evolution Historique des Ratios (P/E vs P/CF)</h3>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart

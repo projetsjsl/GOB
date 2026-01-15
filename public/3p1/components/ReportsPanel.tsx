@@ -25,7 +25,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<ReportTab>('overview');
 
-  // Calculer les assumptions sanitisées pour comparaison
+  // Calculer les assumptions sanitisees pour comparaison
   const sanitizedAssumptions = useMemo(() => {
     return sanitizeAssumptionsSync(assumptions);
   }, [assumptions]);
@@ -40,7 +40,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <DocumentChartBarIcon className="w-6 h-6" />
-              Rapports Visuels et Analyse de Données
+              Rapports Visuels et Analyse de Donnees
             </h2>
             <p className="text-indigo-100 text-sm mt-1">
               {info.symbol} - {info.name}
@@ -67,7 +67,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
                 : 'border-transparent text-gray-500 hover:text-gray-700'
             }`}
           >
-            📊 Vue d'ensemble
+             Vue d'ensemble
           </button>
           <button
             onClick={() => setActiveTab('quality')}
@@ -78,7 +78,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
             }`}
           >
             <ExclamationTriangleIcon className="w-4 h-4 inline mr-1" />
-            Qualité des Données
+            Qualite des Donnees
           </button>
           <button
             onClick={() => setActiveTab('sanitization')}
@@ -100,7 +100,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
             }`}
           >
             <ChartBarIcon className="w-4 h-4 inline mr-1" />
-            Visualisation Complète
+            Visualisation Complete
           </button>
         </div>
 
@@ -110,17 +110,17 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                  <h3 className="font-bold text-blue-800 mb-2">Données Historiques</h3>
+                  <h3 className="font-bold text-blue-800 mb-2">Donnees Historiques</h3>
                   <div className="text-2xl font-bold text-blue-600">{data.length}</div>
-                  <div className="text-sm text-blue-600">années de données</div>
+                  <div className="text-sm text-blue-600">annees de donnees</div>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                  <h3 className="font-bold text-green-800 mb-2">Métriques Valides</h3>
+                  <h3 className="font-bold text-green-800 mb-2">Metriques Valides</h3>
                   <div className="text-2xl font-bold text-green-600">
                     {[assumptions.excludeEPS, assumptions.excludeCF, assumptions.excludeBV, assumptions.excludeDIV]
                       .filter(excluded => !excluded).length} / 4
                   </div>
-                  <div className="text-sm text-green-600">métriques incluses</div>
+                  <div className="text-sm text-green-600">metriques incluses</div>
                 </div>
                 <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
                   <h3 className="font-bold text-purple-800 mb-2">Corrections</h3>
@@ -131,7 +131,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
                              assumptions[k] !== sanitizedAssumptions[k];
                     }).length}
                   </div>
-                  <div className="text-sm text-purple-600">valeurs corrigées</div>
+                  <div className="text-sm text-purple-600">valeurs corrigees</div>
                 </div>
               </div>
               <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
@@ -142,9 +142,9 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
                     className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 text-left transition-colors"
                   >
                     <ExclamationTriangleIcon className="w-8 h-8 text-blue-600 mb-2" />
-                    <h4 className="font-bold text-blue-800 mb-1">Qualité des Données</h4>
+                    <h4 className="font-bold text-blue-800 mb-1">Qualite des Donnees</h4>
                     <p className="text-sm text-blue-600">
-                      Visualise les données aberrantes, les exclusions et la qualité des données historiques
+                      Visualise les donnees aberrantes, les exclusions et la qualite des donnees historiques
                     </p>
                   </button>
                   <button
@@ -154,7 +154,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
                     <CheckCircleIcon className="w-8 h-8 text-green-600 mb-2" />
                     <h4 className="font-bold text-green-800 mb-1">Rapport de Sanitisation</h4>
                     <p className="text-sm text-green-600">
-                      Affiche toutes les corrections automatiques appliquées aux hypothèses
+                      Affiche toutes les corrections automatiques appliquees aux hypotheses
                     </p>
                   </button>
                   <button
@@ -162,9 +162,9 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
                     className="p-4 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 text-left transition-colors"
                   >
                     <ChartBarIcon className="w-8 h-8 text-purple-600 mb-2" />
-                    <h4 className="font-bold text-purple-800 mb-1">Visualisation Complète</h4>
+                    <h4 className="font-bold text-purple-800 mb-1">Visualisation Complete</h4>
                     <p className="text-sm text-purple-600">
-                      Graphiques complets de toutes les données historiques, ratios et métriques
+                      Graphiques complets de toutes les donnees historiques, ratios et metriques
                     </p>
                   </button>
                 </div>

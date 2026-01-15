@@ -1,88 +1,88 @@
-📊 FORMAT WEB OPTIMISÉ (Maximum Détail & Visuel)
+ FORMAT WEB OPTIMISE (Maximum Detail & Visuel)
 
-═══════════════════════════════════════════════════════════
-🎯 STRUCTURE VISUELLE AMÉLIORÉE
-═══════════════════════════════════════════════════════════
 
-📊 [{TICKER}] - {NOM COMPAGNIE} - ${PRICE} ({CHANGE}%)
+ STRUCTURE VISUELLE AMELIOREE
+
+
+ [{TICKER}] - {NOM COMPAGNIE} - ${PRICE} ({CHANGE}%)
 Type: {PRODUCT_TYPE} | {Secteur} | {Bourse}
 
-🎯 RÉSUMÉ EXÉCUTIF
-{Synthèse 2-3 phrases avec recommandation claire}
+ RESUME EXECUTIF
+{Synthese 2-3 phrases avec recommandation claire}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📈 VALORISATION COMPARATIVE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-┌──────────────┬─────────┬──────────┬─────────┬───────────┐
-│ Ratio        │ Actuel  │ Secteur  │ Hist 5Y │ vs Hist   │
-├──────────────┼─────────┼──────────┼─────────┼───────────┤
-│ P/E (TTM)    │ XX.Xx   │ XX.Xx    │ XX.Xx   │ ±XX% ✅/⚠️│
-│ P/B          │ X.Xx    │ X.Xx     │ X.Xx    │ ±XX% ✅/⚠️│
-│ PEG Ratio    │ X.Xx    │ X.Xx     │ X.Xx    │ ✅/⚠️     │
-│ FCF Yield    │ X.X%    │ X.X%     │ X.X%    │ ±XX% ✅/⚠️│
-│ EV/EBITDA    │ XX.Xx   │ XX.Xx    │ XX.Xx   │ ±XX% ✅/⚠️│
-└──────────────┴─────────┴──────────┴─────────┴───────────┘
+ VALORISATION COMPARATIVE
 
-💡 ANALYSE: {Paragraphe détaillé 100-150 mots sur valorisation}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💰 FONDAMENTAUX FINANCIERS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📊 REVENUS & CROISSANCE
-• Revenus TTM: $XX.XB (±X.X% YoY)
-• CAGR 5 ans: X.X%
-• Guidance: $XX.X-XX.XB
+ Ratio         Actuel   Secteur   Hist 5Y  vs Hist   
 
-💎 RENTABILITÉ
-• Marge brute: XX.X% (vs XX.X% secteur)
-• Marge opé: XX.X%
-• ROE: XX.X% ✅/⚠️
-• ROIC: XX.X% ✅/⚠️
+ P/E (TTM)     XX.Xx    XX.Xx     XX.Xx    XX% /
+ P/B           X.Xx     X.Xx      X.Xx     XX% /
+ PEG Ratio     X.Xx     X.Xx      X.Xx     /     
+ FCF Yield     X.X%     X.X%      X.X%     XX% /
+ EV/EBITDA     XX.Xx    XX.Xx     XX.Xx    XX% /
 
-💵 GÉNÉRATION CASH
-• FCF TTM: $X.XB
-• FCF/Share: $X.XX
-• FCF Yield: X.X% ✅/⚠️
 
-🏦 SANTÉ FINANCIÈRE
-• Debt/Equity: X.Xx (✅ solide / ⚠️ élevé)
-• Current Ratio: X.Xx
-• Interest Coverage: XX.Xx
+ ANALYSE: {Paragraphe detaille 100-150 mots sur valorisation}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏰 MOAT ANALYSIS (Warren Buffett)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🛡️ MOAT RATING: ████████░░ {X}/10 ({WIDE/MODERATE/NARROW})
+ FONDAMENTAUX FINANCIERS
 
-✅ {Avantage 1}: {Score}/10
-   {Description détaillée avec preuves}
 
-✅ {Avantage 2}: {Score}/10
-   {Description détaillée avec preuves}
+ REVENUS & CROISSANCE
+- Revenus TTM: $XX.XB (X.X% YoY)
+- CAGR 5 ans: X.X%
+- Guidance: $XX.X-XX.XB
 
-✅ {Avantage 3}: {Score}/10
-   {Description détaillée avec preuves}
+ RENTABILITE
+- Marge brute: XX.X% (vs XX.X% secteur)
+- Marge ope: XX.X%
+- ROE: XX.X% /
+- ROIC: XX.X% /
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📰 CATALYSEURS & ACTUALITÉS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GENERATION CASH
+- FCF TTM: $X.XB
+- FCF/Share: $X.XX
+- FCF Yield: X.X% /
 
-{3-5 actualités récentes avec analyse d'impact}
+ SANTE FINANCIERE
+- Debt/Equity: X.Xx ( solide /  eleve)
+- Current Ratio: X.Xx
+- Interest Coverage: XX.Xx
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎓 RECOMMANDATION CFA® & VALUE INVESTING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-{Paragraphe synthèse 200-300 mots}
+ MOAT ANALYSIS (Warren Buffett)
 
-🎯 NOTATION: {STRONG BUY / BUY / HOLD / REDUCE / SELL}
-⏰ HORIZON: {Court/Moyen/Long terme}
-💼 PROFIL RISQUE: {Conservateur/Modéré/Agressif}
 
-✅ POINTS FORTS (3-5)
-⚠️ RISQUES (3-5)
+ MOAT RATING:  {X}/10 ({WIDE/MODERATE/NARROW})
 
-═══════════════════════════════════════════════════════════
+ {Avantage 1}: {Score}/10
+   {Description detaillee avec preuves}
+
+ {Avantage 2}: {Score}/10
+   {Description detaillee avec preuves}
+
+ {Avantage 3}: {Score}/10
+   {Description detaillee avec preuves}
+
+
+ CATALYSEURS & ACTUALITES
+
+
+{3-5 actualites recentes avec analyse d'impact}
+
+
+ RECOMMANDATION CFA & VALUE INVESTING
+
+
+{Paragraphe synthese 200-300 mots}
+
+ NOTATION: {STRONG BUY / BUY / HOLD / REDUCE / SELL}
+ HORIZON: {Court/Moyen/Long terme}
+ PROFIL RISQUE: {Conservateur/Modere/Agressif}
+
+ POINTS FORTS (3-5)
+ RISQUES (3-5)
+
+

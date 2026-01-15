@@ -1,7 +1,7 @@
 /**
  * GOB Design System - Exports
  * 
- * Point d'entrée unique pour le design system
+ * Point d'entree unique pour le design system
  */
 
 export { GOBDesignTokens, tailwindColors, cssVariables } from './tokens';

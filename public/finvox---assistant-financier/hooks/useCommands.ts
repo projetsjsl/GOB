@@ -49,7 +49,7 @@ export const useCommands = () => {
   };
 
   const resetCommands = () => {
-    if (window.confirm("Voulez-vous vraiment réinitialiser toutes les commandes aux valeurs par défaut ?")) {
+    if (window.confirm("Voulez-vous vraiment reinitialiser toutes les commandes aux valeurs par defaut ?")) {
       setCommands(DEFAULT_COMMANDS);
     }
   };

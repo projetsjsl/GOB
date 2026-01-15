@@ -1,5 +1,5 @@
 /**
- * Service pour récupérer les données de marché depuis ticker_market_cache
+ * Service pour recuperer les donnees de marche depuis ticker_market_cache
  * Optimise l'egress Supabase en utilisant le cache au lieu d'appels FMP individuels
  */
 
@@ -34,11 +34,11 @@ export interface MarketDataBatchResponse {
 }
 
 /**
- * Récupère les données de marché pour plusieurs tickers en une seule requête
- * Utilise ticker_market_cache pour réduire l'egress
+ * Recupere les donnees de marche pour plusieurs tickers en une seule requete
+ * Utilise ticker_market_cache pour reduire l'egress
  * 
  * @param tickers - Liste des symboles (ex: ['AAPL', 'MSFT', 'GOOGL'])
- * @returns Données de marché depuis le cache
+ * @returns Donnees de marche depuis le cache
  */
 export async function fetchMarketDataBatch(tickers: string[]): Promise<MarketDataBatchResponse> {
   if (tickers.length === 0) {
@@ -50,20 +50,20 @@ export async function fetchMarketDataBatch(tickers: string[]): Promise<MarketDat
     };
   }
 
-  // Limiter à 100 tickers par requête
+  // Limiter a 100 tickers par requete
   if (tickers.length > 100) {
     throw new Error('Maximum 100 tickers per request. Please split into multiple requests.');
   }
 
   try {
     const tickersStr = tickers.join(',');
-    // Utiliser l'endpoint correct /api/marketdata/batch avec le paramètre 'symbols' attendu par le serveur
+    // Utiliser l'endpoint correct /api/marketdata/batch avec le parametre 'symbols' attendu par le serveur
     const response = await fetch(`/api/marketdata/batch?symbols=${encodeURIComponent(tickersStr)}&endpoints=quote`);
 
     if (!response.ok) {
-      // Si les deux endpoints échouent, retourner un résultat vide plutôt que d'échouer
+      // Si les deux endpoints echouent, retourner un resultat vide plutot que d'echouer
       if (response.status === 404) {
-        console.warn('⚠️ Endpoint market-data-batch non disponible - Retour vide');
+        console.warn(' Endpoint market-data-batch non disponible - Retour vide');
         return {
           success: true,
           data: [],
@@ -122,7 +122,7 @@ export async function fetchMarketDataBatch(tickers: string[]): Promise<MarketDat
     return result;
 
   } catch (error: any) {
-    console.error('❌ Erreur fetchMarketDataBatch:', error);
+    console.error(' Erreur fetchMarketDataBatch:', error);
     return {
       success: false,
       data: [],
@@ -134,11 +134,11 @@ export async function fetchMarketDataBatch(tickers: string[]): Promise<MarketDat
 }
 
 /**
- * Récupère les données de marché pour un seul ticker
+ * Recupere les donnees de marche pour un seul ticker
  * Utilise le cache en interne (appelle fetchMarketDataBatch avec 1 ticker)
  * 
  * @param ticker - Symbole unique (ex: 'AAPL')
- * @returns Données de marché ou null si non trouvé
+ * @returns Donnees de marche ou null si non trouve
  */
 export async function fetchMarketData(ticker: string): Promise<MarketData | null> {
   const result = await fetchMarketDataBatch([ticker]);

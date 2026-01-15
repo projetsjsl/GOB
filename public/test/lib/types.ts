@@ -3,52 +3,52 @@
  */
 
 /**
- * Représente un point de rendement sur la courbe
+ * Represente un point de rendement sur la courbe
  */
 export interface YieldPoint {
-  /** Maturité (1M, 3M, 6M, etc.) */
+  /** Maturite (1M, 3M, 6M, etc.) */
   maturity: string
   /** Rendement en pourcentage */
   yield: number
-  /** Nombre de jours jusqu'à maturité */
+  /** Nombre de jours jusqu'a maturite */
   days: number
   /** Date du point */
   date: string
-  /** Timestamp de récupération des données */
+  /** Timestamp de recuperation des donnees */
   fetchedAt: string
 }
 
 /**
- * Données complètes de courbe de taux
+ * Donnees completes de courbe de taux
  */
 export interface CurveData {
   /** Pays (US ou CA) */
   country: "US" | "CA"
   /** Points de rendement */
   points: YieldPoint[]
-  /** Source des données */
+  /** Source des donnees */
   dataSource: "FRED" | "BOC" | "FMP" | "MOCK"
-  /** Date de mise à jour */
+  /** Date de mise a jour */
   date: string
   /** Taux directeur central (si applicable) */
   policyRate?: number
 }
 
 /**
- * Métriques avancées de courbe
+ * Metriques avancees de courbe
  */
 export interface CurveMetrics {
   /** Pente 2Y-10Y en points de base */
   slope2Y10Y: number
   /** Pente 5Y-30Y en points de base */
   slope5Y30Y: number
-  /** Convexité (courbure) */
+  /** Convexite (courbure) */
   convexity: number
-  /** Volatilité implicite */
+  /** Volatilite implicite */
   volatility: number
   /** Rendement moyen */
   averageYield: number
-  /** Écart-type */
+  /** Ecart-type */
   stdDeviation: number
 }
 
@@ -56,42 +56,42 @@ export interface CurveMetrics {
  * Configuration des filtres de graphique
  */
 export interface GraphFilters {
-  /** Afficher les points observés */
+  /** Afficher les points observes */
   showObserved: boolean
-  /** Afficher les points interpolés */
+  /** Afficher les points interpoles */
   showInterpolated: boolean
-  /** Type d'échelle (linéaire ou log) */
+  /** Type d'echelle (lineaire ou log) */
   scaleType: "linear" | "log"
-  /** Maturité minimale */
+  /** Maturite minimale */
   minMaturity: string
-  /** Maturité maximale */
+  /** Maturite maximale */
   maxMaturity: string
-  /** Opacité (0-1) */
+  /** Opacite (0-1) */
   opacity: number
 }
 
 /**
- * État global de l'application
+ * Etat global de l'application
  */
 export interface AppState {
-  /** Pays sélectionnés */
+  /** Pays selectionnes */
   selectedCountries: ("US" | "CA")[]
-  /** Données actuelles */
+  /** Donnees actuelles */
   currentData: Record<"US" | "CA", CurveData | null>
-  /** Données historiques */
+  /** Donnees historiques */
   historicalData: Record<string, Record<"US" | "CA", CurveData | null>>
   /** Filtres de graphique */
   graphFilters: GraphFilters
-  /** État de chargement */
+  /** Etat de chargement */
   isLoading: boolean
-  /** Message d'erreur éventuel */
+  /** Message d'erreur eventuel */
   error: string | null
-  /** Date de dernière mise à jour */
+  /** Date de derniere mise a jour */
   lastUpdated: string | null
 }
 
 /**
- * Réponse API pour les taux
+ * Reponse API pour les taux
  */
 export interface YieldApiResponse {
   data: {

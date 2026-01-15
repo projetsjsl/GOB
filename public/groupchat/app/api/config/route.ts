@@ -2,16 +2,16 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   const providers = {
-    simulation: { id: 'simulation', name: 'Simulation', description: 'Free demo - 10 simulated sites', status: 'ready' as const, cost: 'FREE', icon: '🎭', endpoint: '/api/simulate', tier: 'free' },
+    simulation: { id: 'simulation', name: 'Simulation', description: 'Free demo - 10 simulated sites', status: 'ready' as const, cost: 'FREE', icon: '', endpoint: '/api/simulate', tier: 'free' },
     browserbase: { id: 'browserbase', name: 'Browserbase', description: 'Real cloud browser with live view',
       status: (process.env.BROWSERBASE_API_KEY && process.env.BROWSERBASE_PROJECT_ID) ? 'ready' as const : 'not_configured' as const,
-      cost: '$39+/mo', icon: '🌐', endpoint: '/api/browser', configUrl: 'https://browserbase.com', tier: 'pro' },
+      cost: '$39+/mo', icon: '', endpoint: '/api/browser', configUrl: 'https://browserbase.com', tier: 'pro' },
     browserless: { id: 'browserless', name: 'Browserless', description: 'Alternative cloud browser',
       status: process.env.BROWSERLESS_API_KEY ? 'ready' as const : 'not_configured' as const,
-      cost: '$10+/mo', icon: '🔷', endpoint: '/api/browser', configUrl: 'https://browserless.io', tier: 'pro' },
+      cost: '$10+/mo', icon: '', endpoint: '/api/browser', configUrl: 'https://browserless.io', tier: 'pro' },
     steel: { id: 'steel', name: 'Steel Browser', description: 'AI-optimized sessions',
       status: process.env.STEEL_API_KEY ? 'ready' as const : 'not_configured' as const,
-      cost: 'Usage', icon: '🔩', endpoint: '/api/browser', configUrl: 'https://steel.dev', tier: 'pro' },
+      cost: 'Usage', icon: '', endpoint: '/api/browser', configUrl: 'https://steel.dev', tier: 'pro' },
   };
 
   const defaultProvider = providers.browserbase.status === 'ready' ? 'browserbase' :

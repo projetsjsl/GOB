@@ -105,7 +105,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                         <InformationCircleIcon className="w-6 h-6 text-blue-600" />
                         <div>
                             <h2 className="text-xl font-bold text-gray-900">
-                                Détails de Synchronisation - {ticker}
+                                Details de Synchronisation - {ticker}
                             </h2>
                             <p className="text-sm text-gray-500 mt-1">
                                 {formatDate(syncDetails.timestamp)}
@@ -127,7 +127,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                         {syncDetails.success !== false ? (
                             <>
                                 <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                                <span className="text-sm font-semibold text-green-700">Synchronisation réussie</span>
+                                <span className="text-sm font-semibold text-green-700">Synchronisation reussie</span>
                             </>
                         ) : (
                             <>
@@ -152,7 +152,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
 
                     {/* Source */}
                     <div className="bg-gray-50 rounded-lg p-4">
-                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Source de données</h3>
+                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Source de donnees</h3>
                         <div className="flex items-center gap-2">
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
                                 syncDetails.source === 'fmp' ? 'bg-blue-100 text-blue-800' :
@@ -183,17 +183,17 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                         </div>
                     )}
 
-                    {/* Données récupérées */}
+                    {/* Donnees recuperees */}
                     {syncDetails.dataRetrieved && (
                         <div className="bg-blue-50 rounded-lg p-4">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-3">Données récupérées</h3>
+                            <h3 className="text-sm font-semibold text-gray-900 mb-3">Donnees recuperees</h3>
                             <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div>
-                                    <span className="text-gray-600">Années :</span>
+                                    <span className="text-gray-600">Annees :</span>
                                     <span className="ml-2 font-semibold text-gray-900">{syncDetails.dataRetrieved.years}</span>
                                 </div>
                                 <div>
-                                    <span className="text-gray-600">Points de données :</span>
+                                    <span className="text-gray-600">Points de donnees :</span>
                                     <span className="ml-2 font-semibold text-gray-900">{syncDetails.dataRetrieved.dataPoints}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -201,7 +201,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                                     {syncDetails.dataRetrieved.hasProfile ? (
                                         <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                     ) : (
-                                        <span className="text-red-500">✗</span>
+                                        <span className="text-red-500"></span>
                                     )}
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -209,7 +209,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                                     {syncDetails.dataRetrieved.hasKeyMetrics ? (
                                         <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                     ) : (
-                                        <span className="text-red-500">✗</span>
+                                        <span className="text-red-500"></span>
                                     )}
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -217,7 +217,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                                     {syncDetails.dataRetrieved.hasQuotes ? (
                                         <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                     ) : (
-                                        <span className="text-red-500">✗</span>
+                                        <span className="text-red-500"></span>
                                     )}
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -225,7 +225,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                                     {syncDetails.dataRetrieved.hasFinancials ? (
                                         <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                     ) : (
-                                        <span className="text-red-500">✗</span>
+                                        <span className="text-red-500"></span>
                                     )}
                                 </div>
                             </div>
@@ -235,7 +235,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                     {/* Outliers */}
                     {syncDetails.outliers && syncDetails.outliers.detected.length > 0 && (
                         <div className="bg-yellow-50 rounded-lg p-4">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-3">Métriques aberrantes détectées</h3>
+                            <h3 className="text-sm font-semibold text-gray-900 mb-3">Metriques aberrantes detectees</h3>
                             <div className="space-y-2">
                                 {syncDetails.outliers.detected.map((metric) => {
                                     const isExcluded = syncDetails.outliers?.excluded[metric as keyof typeof syncDetails.outliers.excluded];
@@ -265,10 +265,10 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                     {syncDetails.orangeData && (
                         <div className="bg-orange-50 rounded-lg p-4">
                             <h3 className="text-sm font-semibold text-gray-900 mb-3">
-                                Données oranges (Assumptions)
+                                Donnees oranges (Assumptions)
                                 {syncDetails.orangeData.wasReplaced && (
                                     <span className="ml-2 text-xs bg-orange-200 text-orange-800 px-2 py-0.5 rounded">
-                                        Remplacées
+                                        Remplacees
                                     </span>
                                 )}
                             </h3>
@@ -316,13 +316,13 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                          syncDetails.zeroData.bookValuePerShare > 0 ||
                          syncDetails.zeroData.dividendPerShare > 0) && (
                             <div className="bg-gray-50 rounded-lg p-4">
-                                <h3 className="text-sm font-semibold text-gray-900 mb-3">Données à zéro</h3>
+                                <h3 className="text-sm font-semibold text-gray-900 mb-3">Donnees a zero</h3>
                                 <div className="space-y-2 text-sm">
                                     {syncDetails.zeroData.earningsPerShare > 0 && (
                                         <div>
                                             <span className="text-gray-600">EPS :</span>
                                             <span className="ml-2 font-semibold text-gray-900">
-                                                {syncDetails.zeroData.earningsPerShare} années
+                                                {syncDetails.zeroData.earningsPerShare} annees
                                             </span>
                                             {syncDetails.zeroData.reasons.earningsPerShare && (
                                                 <p className="text-xs text-gray-500 mt-0.5">
@@ -335,7 +335,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                                         <div>
                                             <span className="text-gray-600">CF :</span>
                                             <span className="ml-2 font-semibold text-gray-900">
-                                                {syncDetails.zeroData.cashFlowPerShare} années
+                                                {syncDetails.zeroData.cashFlowPerShare} annees
                                             </span>
                                             {syncDetails.zeroData.reasons.cashFlowPerShare && (
                                                 <p className="text-xs text-gray-500 mt-0.5">
@@ -352,7 +352,7 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                     {/* N/A Data */}
                     {syncDetails.naData && syncDetails.naData.fields.length > 0 && (
                         <div className="bg-gray-50 rounded-lg p-4">
-                            <h3 className="text-sm font-semibold text-gray-900 mb-3">Données N/A</h3>
+                            <h3 className="text-sm font-semibold text-gray-900 mb-3">Donnees N/A</h3>
                             <div className="space-y-2 text-sm">
                                 {syncDetails.naData.fields.map((field) => (
                                     <div key={field}>
@@ -377,33 +377,33 @@ export const SyncDetailsDialog: React.FC<SyncDetailsDialogProps> = ({
                                     {syncDetails.other.snapshotSaved ? (
                                         <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                     ) : (
-                                        <span className="text-red-500">✗</span>
+                                        <span className="text-red-500"></span>
                                     )}
-                                    <span className="text-gray-700">Snapshot sauvegardé</span>
+                                    <span className="text-gray-700">Snapshot sauvegarde</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {syncDetails.other.assumptionsUpdated ? (
                                         <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                     ) : (
-                                        <span className="text-red-500">✗</span>
+                                        <span className="text-red-500"></span>
                                     )}
-                                    <span className="text-gray-700">Assumptions mises à jour</span>
+                                    <span className="text-gray-700">Assumptions mises a jour</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {syncDetails.other.infoUpdated ? (
                                         <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                     ) : (
-                                        <span className="text-red-500">✗</span>
+                                        <span className="text-red-500"></span>
                                     )}
-                                    <span className="text-gray-700">Infos mises à jour</span>
+                                    <span className="text-gray-700">Infos mises a jour</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     {syncDetails.other.valueLineMetricsSynced ? (
                                         <CheckCircleIcon className="w-4 h-4 text-green-500" />
                                     ) : (
-                                        <span className="text-red-500">✗</span>
+                                        <span className="text-red-500"></span>
                                     )}
-                                    <span className="text-gray-700">Métriques ValueLine</span>
+                                    <span className="text-gray-700">Metriques ValueLine</span>
                                 </div>
                             </div>
                         </div>

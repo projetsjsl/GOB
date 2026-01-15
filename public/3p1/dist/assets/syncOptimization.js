@@ -5,7 +5,7 @@ async function analyzeSyncNeeds(ticker, existingData, existingCurrentPrice, exis
   try {
     supabaseSnapshot = await loadCurrentSnapshotFromSupabase(upperTicker);
   } catch (error) {
-    console.warn(`⚠️ Erreur lors du chargement Supabase pour ${upperTicker}:`, error);
+    console.warn(` Erreur lors du chargement Supabase pour ${upperTicker}:`, error);
   }
   const hasSupabaseData = supabaseSnapshot && supabaseSnapshot.annual_data && supabaseSnapshot.annual_data.length > 0;
   const existingYears = new Set(existingData.map((d) => d.year));
@@ -22,9 +22,9 @@ async function analyzeSyncNeeds(ticker, existingData, existingCurrentPrice, exis
   const hasMissingMetrics = options.syncOnlyMissingMetrics && existingData.length > 0 ? existingData.some(
     (row) => !row.earningsPerShare || row.earningsPerShare === 0 || (!row.cashFlowPerShare || row.cashFlowPerShare === 0) || (!row.bookValuePerShare || row.bookValuePerShare === 0) || (!row.dividendPerShare || row.dividendPerShare === 0) || (!row.priceHigh || row.priceHigh === 0) || (!row.priceLow || row.priceLow === 0)
   ) : false;
-  const needsHistoricalData = options.syncData && (existingData.length === 0 || // Aucune donnée
-  missingYears.length > 0 || // Années manquantes
-  hasMissingMetrics || // Métriques manquantes
+  const needsHistoricalData = options.syncData && (existingData.length === 0 || // Aucune donnee
+  missingYears.length > 0 || // Annees manquantes
+  hasMissingMetrics || // Metriques manquantes
   !hasSupabaseData);
   const needsCurrentPrice = options.updateCurrentPrice && (!existingCurrentPrice || existingCurrentPrice === 0 || !hasSupabaseData);
   const needsInfo = options.syncInfo && (!existingInfo || !existingInfo.name || !existingInfo.sector || !hasSupabaseData);

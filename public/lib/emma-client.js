@@ -27,7 +27,7 @@ const DEFAULT_CONFIG = {
     mode: 'auto', // 'auto' | 'external' | 'local'
     useExternalForFinance: true,
     useLocalForSensitive: true,
-    sensitiveKeywords: ['personnel', 'salaire', 'employé', 'confidentiel', 'secret', 'privé', 'rh', 'ressources humaines'],
+    sensitiveKeywords: ['personnel', 'salaire', 'employe', 'confidentiel', 'secret', 'prive', 'rh', 'ressources humaines'],
     timeout: 30000,
     retryAttempts: 2,
     language: 'fr'
@@ -37,22 +37,22 @@ const DEFAULT_CONFIG = {
 const LOCAL_KNOWLEDGE_BASE = {
     // Greetings
     'bonjour|salut|hello|hi|hey': {
-        response: (ctx) => `Bonjour${ctx.userName ? ' ' + ctx.userName : ''} ! 👋 Je suis Emma, votre assistante IA. Comment puis-je vous aider ?`,
+        response: (ctx) => `Bonjour${ctx.userName ? ' ' + ctx.userName : ''} !  Je suis Emma, votre assistante IA. Comment puis-je vous aider ?`,
         intent: 'greeting'
     },
     // Help
     'aide|help|quoi faire|comment': {
-        response: () => `Je peux vous aider avec:\n\n📊 **Analyse financière** - Prix, fondamentaux, actualités\n📋 **Tâches** - Suivi de votre intégration\n👥 **Contacts** - Trouver les bonnes personnes\n💡 **Questions générales** - N'hésitez pas à demander !`,
+        response: () => `Je peux vous aider avec:\n\n **Analyse financiere** - Prix, fondamentaux, actualites\n **Taches** - Suivi de votre integration\n **Contacts** - Trouver les bonnes personnes\n **Questions generales** - N'hesitez pas a demander !`,
         intent: 'help'
     },
     // Thanks
     'merci|thanks|thank you': {
-        response: (ctx) => `De rien${ctx.userName ? ' ' + ctx.userName : ''} ! 😊 N'hésitez pas si vous avez d'autres questions.`,
+        response: (ctx) => `De rien${ctx.userName ? ' ' + ctx.userName : ''} !  N'hesitez pas si vous avez d'autres questions.`,
         intent: 'thanks'
     },
     // OK/Acknowledgment
     'ok|okay|d\'accord|parfait|bien|compris': {
-        response: () => `Parfait ! 👍 Que souhaitez-vous faire maintenant ?`,
+        response: () => `Parfait !  Que souhaitez-vous faire maintenant ?`,
         intent: 'acknowledgment'
     }
 };
@@ -75,15 +75,15 @@ export class EmmaClient {
         
         // Load global mode from Supabase (non-blocking, shared across all users)
         this._loadModeFromSupabase().catch(err => {
-            console.warn('⚠️ Emma Client: Could not load global mode:', err.message);
+            console.warn(' Emma Client: Could not load global mode:', err.message);
         });
         
         // Also load other config from Supabase
         this._loadConfigFromSupabase().catch(err => {
-            console.warn('⚠️ Emma Client: Could not load config from Supabase, using defaults:', err.message);
+            console.warn(' Emma Client: Could not load config from Supabase, using defaults:', err.message);
         });
         
-        console.log(`🤖 Emma Client initialized for ${this.context.appName} (mode: ${this.config.mode})`);
+        console.log(` Emma Client initialized for ${this.context.appName} (mode: ${this.config.mode})`);
     }
 
     /**
@@ -119,7 +119,7 @@ export class EmmaClient {
                     
                     if (!error && data?.value && ['external', 'local', 'auto'].includes(data.value)) {
                         this.config.mode = data.value;
-                        console.log(`🌐 Emma mode loaded from Supabase (GLOBAL): ${data.value}`);
+                        console.log(` Emma mode loaded from Supabase (GLOBAL): ${data.value}`);
                         return;
                     }
                 }
@@ -142,7 +142,7 @@ export class EmmaClient {
         // Determine which mode to use
         const mode = options.forceMode || this._selectMode(message);
         
-        console.log(`💬 Emma Client: Processing message (mode: ${mode})`);
+        console.log(` Emma Client: Processing message (mode: ${mode})`);
         
         let response;
         
@@ -153,16 +153,16 @@ export class EmmaClient {
                 response = this._processLocally(message, options);
             }
         } catch (error) {
-            console.error('❌ Emma Client error:', error);
+            console.error(' Emma Client error:', error);
             
             // Fallback to local mode on API failure
             if (mode === 'external') {
-                console.log('🔄 Falling back to local mode');
+                console.log(' Falling back to local mode');
                 response = this._processLocally(message, { ...options, fallback: true });
             } else {
                 response = {
                     success: false,
-                    text: "Désolée, j'ai rencontré une erreur technique. Veuillez réessayer.",
+                    text: "Desolee, j'ai rencontre une erreur technique. Veuillez reessayer.",
                     error: error.message
                 };
             }
@@ -219,7 +219,7 @@ export class EmmaClient {
                 messageLower.includes(kw.toLowerCase())
             );
             if (hasSensitiveContent) {
-                console.log('🔒 Sensitive content detected - using local mode');
+                console.log(' Sensitive content detected - using local mode');
                 return 'local';
             }
         }
@@ -228,8 +228,8 @@ export class EmmaClient {
         if (this.config.useExternalForFinance) {
             const financeKeywords = [
                 'prix', 'price', 'cours', 'ticker', 'action', 'stock', 
-                'analyse', 'analysis', 'marché', 'market', 'fondamental',
-                'technique', 'actualité', 'news', 'earnings', 'résultats',
+                'analyse', 'analysis', 'marche', 'market', 'fondamental',
+                'technique', 'actualite', 'news', 'earnings', 'resultats',
                 'dividende', 'ratio', 'pe', 'roi', 'croissance', 'sector',
                 'aapl', 'msft', 'googl', 'tsla', 'amzn', 'bce', 'ry', 'td'
             ];
@@ -332,13 +332,13 @@ export class EmmaClient {
         }
         
         // Default fallback
-        let fallbackText = `🤔 Je n'ai pas bien compris votre question.`;
+        let fallbackText = ` Je n'ai pas bien compris votre question.`;
         
         if (options.fallback) {
-            fallbackText += `\n\n⚠️ Le service IA externe n'est pas disponible actuellement. Je fonctionne en mode local avec des capacités limitées.`;
+            fallbackText += `\n\n Le service IA externe n'est pas disponible actuellement. Je fonctionne en mode local avec des capacites limitees.`;
         }
         
-        fallbackText += `\n\nPouvez-vous préciser si cela concerne:\n- 📊 Une analyse financière\n- 👥 Vos contacts ou collègues\n- 📋 Vos tâches ou objectifs`;
+        fallbackText += `\n\nPouvez-vous preciser si cela concerne:\n-  Une analyse financiere\n-  Vos contacts ou collegues\n-  Vos taches ou objectifs`;
         
         return {
             success: true,
@@ -397,13 +397,13 @@ export class EmmaClient {
                         : data.value;
                     
                     Object.assign(this.config, configValues);
-                    console.log('✅ Emma Client: Config loaded from Supabase');
+                    console.log(' Emma Client: Config loaded from Supabase');
                 }
             }
             
             this.configLoaded = true;
         } catch (err) {
-            console.warn('⚠️ Could not load Emma config from Supabase:', err);
+            console.warn(' Could not load Emma config from Supabase:', err);
         }
     }
 

@@ -1,21 +1,21 @@
-# ✅ Vérification Rapide - Modifications 3p1
+#  Verification Rapide - Modifications 3p1
 
-## 🔍 Vérification Immédiate
+##  Verification Immediate
 
-### Étape 1 : Ouvrir la Console (F12)
+### Etape 1 : Ouvrir la Console (F12)
 
 Dans la console, vous devriez voir :
 ```
-🚀 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels activés
-✅ Modifications disponibles:
+ 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels actives
+ Modifications disponibles:
    - Section "Filtres et Tri" en bas de sidebar
-   - Bouton 📊 Rapports dans Header
-   - Bouton ⚙️ Settings fonctionnel
+   - Bouton  Rapports dans Header
+   - Bouton  Settings fonctionnel
 ```
 
-**Si vous ne voyez PAS ce message** → Le cache n'est pas vidé ou la mauvaise version est chargée.
+**Si vous ne voyez PAS ce message** -> Le cache n'est pas vide ou la mauvaise version est chargee.
 
-### Étape 2 : Vérifier l'URL
+### Etape 2 : Verifier l'URL
 
 **URL CORRECTE :**
 ```
@@ -27,61 +27,61 @@ https://gobapps.com/3p1/dist/index.html
 https://gobapps.com/3p1/index.html
 ```
 
-### Étape 3 : Vider le Cache COMPLÈTEMENT
+### Etape 3 : Vider le Cache COMPLETEMENT
 
 **Chrome/Edge :**
 1. Ouvrir DevTools (F12)
-2. Clic droit sur le bouton de rafraîchissement
-3. Sélectionner "Vider le cache et actualiser de force"
+2. Clic droit sur le bouton de rafraichissement
+3. Selectionner "Vider le cache et actualiser de force"
 
 **OU :**
 1. `Ctrl+Shift+Delete` (Windows) ou `Cmd+Shift+Delete` (Mac)
 2. Cocher "Images et fichiers en cache"
-3. Cliquer "Effacer les données"
+3. Cliquer "Effacer les donnees"
 4. Recharger la page
 
-### Étape 4 : Vérifier les Modifications
+### Etape 4 : Verifier les Modifications
 
-#### ✅ Modification 1 : Section "Filtres et Tri"
+####  Modification 1 : Section "Filtres et Tri"
 
-**Où :** Bas de la sidebar gauche
+**Ou :** Bas de la sidebar gauche
 
 **Vous devriez voir :**
-- Titre : "🔽 Filtres et Tri" (avec icône entonnoir)
-- 3 boutons : [Tous] [⭐ Portefeuille] [👁 Watchlist]
-- Menu déroulant avec 6 options de tri
+- Titre : " Filtres et Tri" (avec icone entonnoir)
+- 3 boutons : [Tous] [ Portefeuille] [ Watchlist]
+- Menu deroulant avec 6 options de tri
 
 **Vous ne devriez PAS voir :**
 - "Recherche Rapide"
 - Boutons "Yahoo Finance", "Google Finance", etc.
 
-#### ✅ Modification 2 : Bouton Rapports 📊
+####  Modification 2 : Bouton Rapports 
 
-**Où :** Header (en haut à droite), à côté du bouton ⚙️
+**Ou :** Header (en haut a droite), a cote du bouton 
 
 **Vous devriez voir :**
-- Icône 📊 (DocumentChartBarIcon)
+- Icone  (DocumentChartBarIcon)
 - Au survol : couleur violette
 
-#### ✅ Modification 3 : Bouton Settings ⚙️
+####  Modification 3 : Bouton Settings 
 
-**Où :** Header (en haut à droite)
+**Ou :** Header (en haut a droite)
 
 **Vous devriez voir :**
 - Au clic : Panneau modal s'ouvre avec 4 onglets
 
-## 🐛 Si Vous Ne Voyez Toujours Rien
+##  Si Vous Ne Voyez Toujours Rien
 
-### Test 1 : Vérifier la Version dans la Console
+### Test 1 : Verifier la Version dans la Console
 
 ```javascript
 // Dans la console (F12), tapez :
 document.querySelector('script[src*="index.js"]')?.src
 ```
 
-**Résultat attendu :** `/3p1/dist/assets/index.js`
+**Resultat attendu :** `/3p1/dist/assets/index.js`
 
-### Test 2 : Vérifier la Date du Fichier
+### Test 2 : Verifier la Date du Fichier
 
 ```javascript
 // Dans la console :
@@ -89,9 +89,9 @@ fetch('/3p1/dist/assets/index.js', {method: 'HEAD'})
   .then(r => console.log('Date:', r.headers.get('last-modified')))
 ```
 
-**Résultat attendu :** Date d'aujourd'hui (16 ou 17 décembre 2025)
+**Resultat attendu :** Date d'aujourd'hui (16 ou 17 decembre 2025)
 
-### Test 3 : Vérifier le Contenu
+### Test 3 : Verifier le Contenu
 
 ```javascript
 // Dans la console :
@@ -101,49 +101,49 @@ fetch('/3p1/dist/assets/index.js')
     const hasFilters = text.includes('Filtres et Tri');
     const hasReports = text.includes('ReportsPanel');
     const hasOldSearch = text.includes('Recherche Rapide');
-    console.log('✅ Filtres et Tri:', hasFilters);
-    console.log('✅ Rapports:', hasReports);
-    console.log('❌ Ancienne recherche:', hasOldSearch);
+    console.log(' Filtres et Tri:', hasFilters);
+    console.log(' Rapports:', hasReports);
+    console.log(' Ancienne recherche:', hasOldSearch);
   });
 ```
 
-**Résultat attendu :**
-- ✅ Filtres et Tri: true
-- ✅ Rapports: true
-- ❌ Ancienne recherche: false
+**Resultat attendu :**
+-  Filtres et Tri: true
+-  Rapports: true
+-  Ancienne recherche: false
 
-## 🚨 Si Rien Ne Fonctionne
+##  Si Rien Ne Fonctionne
 
-1. **Vérifier Vercel :**
+1. **Verifier Vercel :**
    - Aller sur https://vercel.com
-   - Vérifier que le dernier déploiement est récent (il y a quelques minutes)
-   - Vérifier qu'il n'y a pas d'erreurs de build
+   - Verifier que le dernier deploiement est recent (il y a quelques minutes)
+   - Verifier qu'il n'y a pas d'erreurs de build
 
-2. **Test en Navigation Privée :**
-   - Ouvrir une fenêtre privée
+2. **Test en Navigation Privee :**
+   - Ouvrir une fenetre privee
    - Aller sur https://gobapps.com/3p1/dist/index.html
-   - Vérifier si les modifications apparaissent
+   - Verifier si les modifications apparaissent
 
-3. **Vérifier le Répertoire :**
-   - Les fichiers doivent être dans `public/3p1/dist/`
+3. **Verifier le Repertoire :**
+   - Les fichiers doivent etre dans `public/3p1/dist/`
    - Pas dans `public/3p1/` directement
 
-## 📋 Checklist Complète
+##  Checklist Complete
 
-- [ ] Console affiche "🚀 3p1 App v2.1.0"
+- [ ] Console affiche " 3p1 App v2.1.0"
 - [ ] URL est `/3p1/dist/index.html`
-- [ ] Cache vidé complètement
+- [ ] Cache vide completement
 - [ ] Section "Filtres et Tri" visible en bas de sidebar
-- [ ] Bouton 📊 visible dans Header
-- [ ] Bouton ⚙️ ouvre le panneau de settings
+- [ ] Bouton  visible dans Header
+- [ ] Bouton  ouvre le panneau de settings
 - [ ] Plus de "Recherche Rapide" dans sidebar
 
-## 💡 Note Importante
+##  Note Importante
 
-**Le build a été fait et commité à 19:21 aujourd'hui.**
+**Le build a ete fait et commite a 19:21 aujourd'hui.**
 
-Si vous ne voyez toujours rien après avoir vidé le cache :
+Si vous ne voyez toujours rien apres avoir vide le cache :
 1. Attendre 2-3 minutes (Vercel peut prendre du temps)
-2. Tester en navigation privée
-3. Vérifier les logs Vercel pour voir si le déploiement a réussi
+2. Tester en navigation privee
+3. Verifier les logs Vercel pour voir si le deploiement a reussi
 

@@ -1,7 +1,7 @@
 /**
  * V0 Integration Wrapper - v8 (ESM to CJS + require polyfill)
  * 
- * Permet d'intégrer directement les composants créés dans v0.app
+ * Permet d'integrer directement les composants crees dans v0.app
  */
 
 (function() {
@@ -22,7 +22,7 @@
             if (moduleName === 'prop-types') return window.PropTypes || {};
             if (moduleName === 'recharts') {
                 const r = window.Recharts || (window.exports ? window.exports.Recharts : null);
-                if (!r) console.warn('⚠️ Recharts non disponible sur window');
+                if (!r) console.warn(' Recharts non disponible sur window');
                 return r || {};
             }
             
@@ -61,7 +61,7 @@
                     }
 
                     // Fallback
-                    console.log(`🛠️ require: Mocking unknown export '${prop}' from ${moduleName}`);
+                    console.log(` require: Mocking unknown export '${prop}' from ${moduleName}`);
                     return MockComponent(prop);
                 }
             });
@@ -73,7 +73,7 @@
     function loadDependency(name) {
         return new Promise((resolve, reject) => {
             const dep = V0_DEPENDENCIES[name];
-            if (!dep) return reject(new Error(`Dépendance inconnue: ${name}`));
+            if (!dep) return reject(new Error(`Dependance inconnue: ${name}`));
             if (window[dep.global]) return resolve(window[dep.global]);
             if (loadingState.dependencies[name] === 'loading') {
                 // OPTIMIZATION: Use requestAnimationFrame instead of 100ms interval
@@ -102,7 +102,7 @@
                 if (window[dep.global] && window[dep.global].default) window[dep.global] = window[dep.global].default;
                 resolve(window[dep.global]);
             };
-            script.onerror = () => reject(new Error(`Échec chargement ${name}`));
+            script.onerror = () => reject(new Error(`Echec chargement ${name}`));
             document.head.appendChild(script);
         });
     }
@@ -112,14 +112,14 @@
     }
 
     function adaptV0Component(code, componentName) {
-        console.log(`🛠️ v8 Adapting ${componentName} via Babel ESM->CJS...`);
+        console.log(` v8 Adapting ${componentName} via Babel ESM->CJS...`);
         
-        // Nettoyage minimal pour éviter les erreurs de chemin relatif
+        // Nettoyage minimal pour eviter les erreurs de chemin relatif
         let adapted = code
             .replace(/import\s+.*?\s+from\s+['"]@\/.*?['"];?/g, (m) => `// ${m} (removed)`);
 
         try {
-            if (!window.Babel) throw new Error("Babel Standalone non chargé");
+            if (!window.Babel) throw new Error("Babel Standalone non charge");
             
             // Transform ESM to CJS using Babel
             const result = window.Babel.transform(adapted, {
@@ -151,14 +151,14 @@
 
                     if (finalComponent) {
                         window.${componentName} = finalComponent;
-                        console.log('✅ ${componentName} exposed via CJS bridge');
+                        console.log(' ${componentName} exposed via CJS bridge');
                     } else {
-                        console.error('❌ Could not find export for ${componentName}', module.exports);
+                        console.error(' Could not find export for ${componentName}', module.exports);
                     }
                 })();
             `;
         } catch (err) {
-            console.error(`❌ Babel Transform Error for ${componentName}:`, err);
+            console.error(` Babel Transform Error for ${componentName}:`, err);
             return `console.error("Babel error: " + ${JSON.stringify(err.message)})`;
         }
     }
@@ -179,13 +179,13 @@
                 if (window[componentName]) return window[componentName];
                 await new Promise(r => setTimeout(r, 100));
             }
-            throw new Error(`Le composant ${componentName} n'a pas été exposé.`);
+            throw new Error(`Le composant ${componentName} n'a pas ete expose.`);
         } catch (err) {
-            console.error(`❌ V0 Integration:`, err);
+            console.error(` V0 Integration:`, err);
             throw err;
         }
     }
 
     window.V0Integration = { loadDependency, loadDependencies, loadV0Component, adaptV0Component };
-    console.log('✅ V0 Integration v8 Ready');
+    console.log(' V0 Integration v8 Ready');
 })();

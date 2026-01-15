@@ -58,22 +58,22 @@ export default async function handler(req, res) {
                          googleResponse.status === 403;
 
       if (isKeyError) {
-        console.error('❌ [Gemini] API key invalid or expired');
+        console.error(' [Gemini] API key invalid or expired');
         return res.status(401).json({
           error: 'Gemini API key invalid or expired',
-          message: 'La clé API Gemini est invalide ou expirée',
+          message: 'La cle API Gemini est invalide ou expiree',
           details: errorMessage,
-          fix: 'Vérifiez GEMINI_API_KEY dans les variables d\'environnement Vercel',
+          fix: 'Verifiez GEMINI_API_KEY dans les variables d\'environnement Vercel',
           timestamp: new Date().toISOString()
         });
       }
 
       // Handle rate limiting
       if (googleResponse.status === 429) {
-        console.error('❌ [Gemini] Rate limit exceeded');
+        console.error(' [Gemini] Rate limit exceeded');
         return res.status(429).json({
           error: 'Gemini rate limit exceeded',
-          message: 'Limite de requêtes Gemini atteinte',
+          message: 'Limite de requetes Gemini atteinte',
           details: errorMessage,
           timestamp: new Date().toISOString()
         });
@@ -85,13 +85,13 @@ export default async function handler(req, res) {
     return res.status(200).json(responseData);
 
   } catch (error) {
-    console.error('❌ [Gemini Proxy] Error:', error.message);
+    console.error(' [Gemini Proxy] Error:', error.message);
 
     // Handle timeout
     if (error.name === 'AbortError') {
       return res.status(504).json({
         error: 'Gemini API timeout',
-        message: 'La requête à Gemini a expiré (30s)',
+        message: 'La requete a Gemini a expire (30s)',
         timestamp: new Date().toISOString()
       });
     }

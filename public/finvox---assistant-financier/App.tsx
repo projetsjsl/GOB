@@ -12,7 +12,7 @@ import { ConnectionState } from './types';
 import { decode, decodeAudioData } from './utils/audioUtils';
 
 const VOICES = [
-  { id: 'Aoede', label: 'Aoede', desc: 'Élégante (F)' },
+  { id: 'Aoede', label: 'Aoede', desc: 'Elegante (F)' },
   { id: 'Kore', label: 'Kore', desc: 'Calme (F)' },
   { id: 'Fenrir', label: 'Fenrir', desc: 'Profonde (H)' },
   { id: 'Charon', label: 'Charon', desc: 'Grave (H)' },
@@ -67,7 +67,7 @@ const App: React.FC = () => {
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: {
-          parts: [{ text: "Bonjour, je suis votre assistante FinVox. Je suis prête à analyser les marchés pour vous." }]
+          parts: [{ text: "Bonjour, je suis votre assistante FinVox. Je suis prete a analyser les marches pour vous." }]
         },
         config: {
           responseModalities: [Modality.AUDIO],
@@ -161,22 +161,22 @@ const App: React.FC = () => {
           <div className="text-center py-4 animate-in fade-in duration-300">
             {connectionState === ConnectionState.DISCONNECTED && (
               <p className="text-slate-400 text-lg">
-                Configurez votre voix et appuyez sur le bouton pour démarrer.
+                Configurez votre voix et appuyez sur le bouton pour demarrer.
               </p>
             )}
             {connectionState === ConnectionState.CONNECTING && (
               <p className="text-emerald-400 text-lg animate-pulse">
-                Connexion sécurisée en cours...
+                Connexion securisee en cours...
               </p>
             )}
             {connectionState === ConnectionState.CONNECTED && (
               <p className="text-slate-300 text-lg">
-                Je vous écoute. Demandez une analyse ou le cours d'une action.
+                Je vous ecoute. Demandez une analyse ou le cours d'une action.
               </p>
             )}
             {connectionState === ConnectionState.ERROR && (
               <p className="text-red-400 text-lg">
-                Une erreur est survenue. Veuillez vérifier votre clé API ou réessayer.
+                Une erreur est survenue. Veuillez verifier votre cle API ou reessayer.
               </p>
             )}
           </div>
@@ -235,7 +235,7 @@ const App: React.FC = () => {
                       onClick={() => setLanguage('fr-CA')}
                       className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${language === 'fr-CA' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
                     >
-                      Français (CA)
+                      Francais (CA)
                     </button>
                     <button
                       onClick={() => setLanguage('en-CA')}
@@ -255,20 +255,20 @@ const App: React.FC = () => {
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${useAccent ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'}`}
                     >
                       <span className={`w-2 h-2 rounded-full ${useAccent ? 'bg-emerald-500' : 'bg-slate-600'}`}></span>
-                      Québécois
+                      Quebecois
                     </button>
                   </div>
                 )}
 
                 {/* TTS Toggle */}
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs text-slate-400 font-medium">Synthèse Vocale (TTS)</label>
+                  <label className="text-xs text-slate-400 font-medium">Synthese Vocale (TTS)</label>
                   <button
                     onClick={() => setIsTtsEnabled(!isTtsEnabled)}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${isTtsEnabled ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400' : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'}`}
                   >
                     <span className={`w-2 h-2 rounded-full ${isTtsEnabled ? 'bg-emerald-500' : 'bg-slate-600'}`}></span>
-                    {isTtsEnabled ? 'Activée' : 'Désactivée'}
+                    {isTtsEnabled ? 'Activee' : 'Desactivee'}
                   </button>
                 </div>
 
@@ -303,7 +303,7 @@ const App: React.FC = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-12 h-12">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
                 </svg>
-                <p className="text-sm">La conversation apparaîtra ici...</p>
+                <p className="text-sm">La conversation apparaitra ici...</p>
               </div>
             ) : (
               logs.map((log, index) => (
@@ -373,7 +373,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="py-6 text-center text-slate-600 text-xs relative">
-        <p>Propulsé par Google Gemini 2.5 Flash Live API & Gemini 3 Pro</p>
+        <p>Propulse par Google Gemini 2.5 Flash Live API & Gemini 3 Pro</p>
         <div style={{ position: 'absolute', bottom: 5, right: 5, background: 'rgba(0,0,0,0.7)', color: '#fff', padding: '2px 6px', fontSize: '10px', borderRadius: '4px', pointerEvents: 'none', opacity: 0.6 }}>
           FILE: public/finvox---assistant-financier/App.tsx
         </div>

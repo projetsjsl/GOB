@@ -4,13 +4,13 @@
  * GET /api/supabase-daily-cache?type=top_movers&date=2025-01-15
  * POST /api/supabase-daily-cache
  * 
- * Gère le cache des données de marché qui changent peu pendant la journée
+ * Gere le cache des donnees de marche qui changent peu pendant la journee
  */
 
 import { createClient } from '@supabase/supabase-js';
 
-// Durée du cache par défaut (peut être modifiée via paramètre)
-const DEFAULT_MAX_CACHE_AGE_HOURS = 4; // Cache valide pendant 4 heures par défaut
+// Duree du cache par defaut (peut etre modifiee via parametre)
+const DEFAULT_MAX_CACHE_AGE_HOURS = 4; // Cache valide pendant 4 heures par defaut
 
 export default async function handler(req, res) {
   // CORS Headers
@@ -36,11 +36,11 @@ export default async function handler(req, res) {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // GET : Récupérer depuis le cache
+    // GET : Recuperer depuis le cache
     if (req.method === 'GET') {
       const { type, date } = req.query;
 
-      // Endpoint spécial pour récupérer le statut de tous les caches
+      // Endpoint special pour recuperer le statut de tous les caches
       if (type === 'status') {
         const today = new Date().toISOString().split('T')[0];
         const cacheTypes = ['top_movers', 'general_news', 'ticker_news', 'gemini_analysis', 'top_movers_news'];
@@ -92,17 +92,17 @@ export default async function handler(req, res) {
       if (!type) {
         return res.status(400).json({
           success: false,
-          error: 'Paramètre "type" requis (ex: top_movers, general_news, etc.) ou "status" pour le statut global'
+          error: 'Parametre "type" requis (ex: top_movers, general_news, etc.) ou "status" pour le statut global'
         });
       }
 
-      const cacheDate = date || new Date().toISOString().split('T')[0]; // Date du jour par défaut
-      // Récupérer la durée max du cache depuis les paramètres (défaut: 4h)
+      const cacheDate = date || new Date().toISOString().split('T')[0]; // Date du jour par defaut
+      // Recuperer la duree max du cache depuis les parametres (defaut: 4h)
       const maxAgeHours = parseInt(req.query.maxAgeHours) || DEFAULT_MAX_CACHE_AGE_HOURS;
 
-      console.log(`📦 Récupération cache: type=${type}, date=${cacheDate}, maxAge=${maxAgeHours}h`);
+      console.log(` Recuperation cache: type=${type}, date=${cacheDate}, maxAge=${maxAgeHours}h`);
 
-      // Récupérer le cache depuis Supabase
+      // Recuperer le cache depuis Supabase
       const { data: cacheEntry, error } = await supabase
         .from('daily_market_cache')
         .select('*')
@@ -111,22 +111,22 @@ export default async function handler(req, res) {
         .single();
 
       if (error && error.code !== 'PGRST116') { // PGRST116 = not found
-        console.error('❌ Erreur récupération cache:', error);
+        console.error(' Erreur recuperation cache:', error);
         return res.status(500).json({
           success: false,
-          error: 'Erreur lors de la récupération du cache',
+          error: 'Erreur lors de la recuperation du cache',
           details: error.message
         });
       }
 
-      // Vérifier si le cache existe et est récent
+      // Verifier si le cache existe et est recent
       if (cacheEntry) {
         const updatedAt = new Date(cacheEntry.updated_at);
         const now = new Date();
         const ageHours = (now - updatedAt) / (1000 * 60 * 60);
 
         if (ageHours < maxAgeHours) {
-          console.log(`✅ Cache trouvé et récent (${ageHours.toFixed(1)}h, max: ${maxAgeHours}h)`);
+          console.log(` Cache trouve et recent (${ageHours.toFixed(1)}h, max: ${maxAgeHours}h)`);
           return res.status(200).json({
             success: true,
             cached: true,
@@ -136,12 +136,12 @@ export default async function handler(req, res) {
             max_age_hours: maxAgeHours
           });
         } else {
-          console.log(`⚠️ Cache expiré (${ageHours.toFixed(1)}h, max: ${maxAgeHours}h)`);
+          console.log(` Cache expire (${ageHours.toFixed(1)}h, max: ${maxAgeHours}h)`);
           return res.status(200).json({
             success: true,
             cached: false,
             expired: true,
-            data: cacheEntry.data, // Retourner quand même les données expirées
+            data: cacheEntry.data, // Retourner quand meme les donnees expirees
             updated_at: cacheEntry.updated_at,
             age_hours: ageHours.toFixed(2),
             max_age_hours: maxAgeHours
@@ -149,8 +149,8 @@ export default async function handler(req, res) {
         }
       }
 
-      // Cache non trouvé
-      console.log('📭 Cache non trouvé');
+      // Cache non trouve
+      console.log(' Cache non trouve');
       return res.status(200).json({
         success: true,
         cached: false,
@@ -166,15 +166,15 @@ export default async function handler(req, res) {
       if (!type || !data) {
         return res.status(400).json({
           success: false,
-          error: 'Paramètres "type" et "data" requis'
+          error: 'Parametres "type" et "data" requis'
         });
       }
 
       const cacheDate = date || new Date().toISOString().split('T')[0];
 
-      console.log(`💾 Sauvegarde cache: type=${type}, date=${cacheDate}`);
+      console.log(` Sauvegarde cache: type=${type}, date=${cacheDate}`);
 
-      // Insérer ou mettre à jour le cache
+      // Inserer ou mettre a jour le cache
       const { data: cacheEntry, error } = await supabase
         .from('daily_market_cache')
         .upsert({
@@ -190,7 +190,7 @@ export default async function handler(req, res) {
         .single();
 
       if (error) {
-        console.error('❌ Erreur sauvegarde cache:', error);
+        console.error(' Erreur sauvegarde cache:', error);
         return res.status(500).json({
           success: false,
           error: 'Erreur lors de la sauvegarde du cache',
@@ -198,7 +198,7 @@ export default async function handler(req, res) {
         });
       }
 
-      console.log('✅ Cache sauvegardé avec succès');
+      console.log(' Cache sauvegarde avec succes');
       return res.status(200).json({
         success: true,
         cached: true,
@@ -221,14 +221,14 @@ export default async function handler(req, res) {
           throw error;
         }
 
-        console.log('✅ Cache vidé pour la date:', today);
+        console.log(' Cache vide pour la date:', today);
         return res.status(200).json({
           success: true,
-          message: 'Cache vidé avec succès',
+          message: 'Cache vide avec succes',
           date: today
         });
       } catch (error) {
-        console.error('❌ Erreur vidage cache:', error);
+        console.error(' Erreur vidage cache:', error);
         return res.status(500).json({
           success: false,
           error: 'Erreur lors du vidage du cache',
@@ -239,11 +239,11 @@ export default async function handler(req, res) {
 
     return res.status(405).json({
       success: false,
-      error: 'Méthode non autorisée'
+      error: 'Methode non autorisee'
     });
 
   } catch (error) {
-    console.error('❌ Erreur API cache:', error);
+    console.error(' Erreur API cache:', error);
     return res.status(500).json({
       success: false,
       error: 'Erreur serveur',

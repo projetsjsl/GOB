@@ -64,7 +64,7 @@ const RateCard = memo(function RateCard({
           {spread !== null && (
             <div className="text-[9px] text-center pt-0.5 border-t border-border/20">
               <span className={Number(spread) >= 0 ? "text-emerald-400" : "text-amber-400"}>
-                Écart: {Number(spread) >= 0 ? "+" : ""}
+                Ecart: {Number(spread) >= 0 ? "+" : ""}
                 {spread} pb
               </span>
             </div>
@@ -143,7 +143,7 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
               <span className="text-[10px] font-medium text-muted-foreground uppercase">Fed Rate</span>
             </div>
             <div className="text-xl font-bold text-blue-400">
-              {isValidYield(usPolicyRate) ? `${usPolicyRate!.toFixed(2)}%` : "—"}
+              {isValidYield(usPolicyRate) ? `${usPolicyRate!.toFixed(2)}%` : "-"}
             </div>
             {isValidYield(usPolicyRate) && (
               <div className="text-[10px] text-muted-foreground mt-0.5">{(usPolicyRate! * 100).toFixed(0)} pb</div>
@@ -173,7 +173,7 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
                 {(us2Y10YSpread * 100).toFixed(0)} pb
               </div>
               <div className="text-[10px] text-muted-foreground mt-0.5">
-                {us2Y10YSpread >= 0 ? "Normale" : "Inversée"}
+                {us2Y10YSpread >= 0 ? "Normale" : "Inversee"}
               </div>
             </CardContent>
           </Card>
@@ -189,7 +189,7 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
                 {(ca2Y10YSpread * 100).toFixed(0)} pb
               </div>
               <div className="text-[10px] text-muted-foreground mt-0.5">
-                {ca2Y10YSpread >= 0 ? "Normale" : "Inversée"}
+                {ca2Y10YSpread >= 0 ? "Normale" : "Inversee"}
               </div>
             </CardContent>
           </Card>
@@ -199,7 +199,7 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
         {usCA10YSpread !== null && (
           <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-500/5 border-cyan-500/30">
             <CardContent className="p-3">
-              <div className="text-[10px] font-medium text-muted-foreground uppercase mb-1">Écart 10Y US-CA</div>
+              <div className="text-[10px] font-medium text-muted-foreground uppercase mb-1">Ecart 10Y US-CA</div>
               <div className={`text-xl font-bold ${usCA10YSpread >= 0 ? "text-cyan-400" : "text-pink-400"}`}>
                 {usCA10YSpread >= 0 ? "+" : ""}
                 {(usCA10YSpread * 100).toFixed(0)} pb
@@ -214,7 +214,7 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {/* US Maturities */}
         <div className="space-y-2">
-          <h3 className="text-xs font-bold text-blue-400 uppercase">États-Unis (FRED)</h3>
+          <h3 className="text-xs font-bold text-blue-400 uppercase">Etats-Unis (FRED)</h3>
           <div className="grid grid-cols-5 gap-1.5">
             {KEY_MATURITIES.map((maturity) => {
               const usYield = getYield(usData, maturity)
@@ -233,7 +233,7 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
                       {getChangeIcon()}
                     </div>
                     <div className="text-sm font-bold text-blue-400">
-                      {isValidYield(usYield) ? `${usYield!.toFixed(2)}%` : "—"}
+                      {isValidYield(usYield) ? `${usYield!.toFixed(2)}%` : "-"}
                     </div>
                     {Object.keys(usPerformance).includes(maturity) && (
                       <div
@@ -272,7 +272,7 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
                         {getChangeIcon()}
                       </div>
                       <div className="text-sm font-bold text-red-400">
-                        {isValidYield(caYield) ? `${caYield!.toFixed(2)}%` : "—"}
+                        {isValidYield(caYield) ? `${caYield!.toFixed(2)}%` : "-"}
                       </div>
                       {Object.keys(caPerformance).includes(maturity) && (
                         <div
@@ -297,7 +297,7 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-              <span>États-Unis (FRED)</span>
+              <span>Etats-Unis (FRED)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="h-2 w-2 rounded-full bg-red-500"></div>
@@ -310,7 +310,7 @@ export const KeyRatesSummary = memo(function KeyRatesSummary({
           </div>
         </div>
         <p className="text-[9px] mt-2 text-muted-foreground">
-          Les données avec "—" indiquent une absence de données réelles. La performance du jour montre le changement en
+          Les donnees avec "-" indiquent une absence de donnees reelles. La performance du jour montre le changement en
           points de base depuis la veille.
         </p>
       </div>

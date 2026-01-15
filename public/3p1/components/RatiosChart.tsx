@@ -23,7 +23,7 @@ export const RatiosChart: React.FC<RatiosChartProps> = ({ data }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow border border-gray-200 h-full">
       <h3 className="text-sm font-bold text-gray-500 uppercase mb-4">
-        Évolution Historique des Ratios (P/E vs P/CF)
+        Evolution Historique des Ratios (P/E vs P/CF)
       </h3>
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">

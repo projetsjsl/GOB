@@ -3,7 +3,7 @@
  * 
  * GET /api/3p1-sync-na
  *   - Analyse tous les tickers et identifie ceux avec N/A
- *   - Retourne la liste des tickers à synchroniser
+ *   - Retourne la liste des tickers a synchroniser
  * 
  * POST /api/3p1-sync-na
  *   - Synchronise automatiquement tous les tickers avec N/A
@@ -11,7 +11,7 @@
  * 
  * Query params:
  *   - action: 'analyze' (default) ou 'sync'
- *   - limit: nombre maximum de tickers à traiter (default: 100)
+ *   - limit: nombre maximum de tickers a traiter (default: 100)
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -62,20 +62,20 @@ export default async function handler(req, res) {
         if (!tickers || tickers.length === 0) {
             return res.status(200).json({
                 success: true,
-                message: 'Aucun ticker trouvé',
+                message: 'Aucun ticker trouve',
                 naTickers: [],
                 validTickers: [],
                 errorTickers: []
             });
         }
 
-        // 2. Pour chaque ticker, récupérer les données depuis FMP via l'API interne
+        // 2. Pour chaque ticker, recuperer les donnees depuis FMP via l'API interne
         const naTickers = [];
         const validTickers = [];
         const errorTickers = [];
 
-        // Utiliser l'API interne pour récupérer les données
-        // Construire l'URL de base depuis la requête
+        // Utiliser l'API interne pour recuperer les donnees
+        // Construire l'URL de base depuis la requete
         let apiBaseUrl = 'http://localhost:3000';
         if (req.headers.host) {
             const protocol = req.headers['x-forwarded-proto'] || (req.headers.host.includes('localhost') ? 'http' : 'https');
@@ -107,7 +107,7 @@ export default async function handler(req, res) {
 
                 const result = await response.json();
 
-                // Vérifier si le ticker a des valeurs N/A
+                // Verifier si le ticker a des valeurs N/A
                 const hasNA = hasNAValues(result.data || [], result.info || {}, result.currentPrice || 0);
 
                 if (hasNA) {
@@ -115,7 +115,7 @@ export default async function handler(req, res) {
                         ticker: symbol,
                         companyName: ticker.company_name,
                         sector: ticker.sector,
-                        reason: 'JPEGY null ou données invalides',
+                        reason: 'JPEGY null ou donnees invalides',
                         dataYears: (result.data || []).length,
                         currentPrice: result.currentPrice || 0
                     });
@@ -136,20 +136,20 @@ export default async function handler(req, res) {
                 });
             }
 
-            // Attendre un peu entre les requêtes pour éviter de surcharger
+            // Attendre un peu entre les requetes pour eviter de surcharger
             if (i < Math.min(tickers.length, limit) - 1) {
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
         }
 
-        // 3. Si action = 'sync', déclencher la synchronisation
+        // 3. Si action = 'sync', declencher la synchronisation
         if (action === 'sync' && naTickers.length > 0) {
-            // Note: La synchronisation réelle doit être faite côté client
-            // car les données sont stockées dans localStorage
-            // On retourne juste la liste des tickers à synchroniser
+            // Note: La synchronisation reelle doit etre faite cote client
+            // car les donnees sont stockees dans localStorage
+            // On retourne juste la liste des tickers a synchroniser
             return res.status(200).json({
                 success: true,
-                message: `${naTickers.length} tickers avec N/A identifiés`,
+                message: `${naTickers.length} tickers avec N/A identifies`,
                 action: 'sync',
                 naTickers: naTickers.map(t => t.ticker),
                 naTickersDetails: naTickers,
@@ -164,7 +164,7 @@ export default async function handler(req, res) {
             const validationResults = [];
             const tickersToValidate = [...errorTickers, ...naTickers];
             
-            console.log(`🔍 Validation de ${tickersToValidate.length} tickers problématiques...`);
+            console.log(` Validation de ${tickersToValidate.length} tickers problematiques...`);
             
             for (let i = 0; i < tickersToValidate.length; i++) {
                 const problemTicker = tickersToValidate[i];
@@ -206,17 +206,17 @@ export default async function handler(req, res) {
             
             return res.status(200).json({
                 success: true,
-                message: 'Validation terminée',
+                message: 'Validation terminee',
                 action: 'validate',
                 validationResults,
                 scannedCount: tickersToValidate.length
             });
         }
 
-        // 4. Retourner l'analyse (par défaut)
+        // 4. Retourner l'analyse (par defaut)
         return res.status(200).json({
             success: true,
-            message: 'Analyse terminée',
+            message: 'Analyse terminee',
             action: 'analyze',
             totalTickers: tickers.length,
             naTickers: naTickers.map(t => t.ticker),
@@ -232,7 +232,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('❌ Erreur 3p1-sync-na:', error);
+        console.error(' Erreur 3p1-sync-na:', error);
         return res.status(500).json({
             success: false,
             error: error.message || 'Erreur inconnue'
@@ -241,7 +241,7 @@ export default async function handler(req, res) {
 }
 
 /**
- * Vérifie si un ticker a des valeurs N/A
+ * Verifie si un ticker a des valeurs N/A
  */
 function hasNAValues(data, info, currentPrice) {
     if (!data || data.length === 0) return true;
@@ -255,7 +255,7 @@ function hasNAValues(data, info, currentPrice) {
     if (!hasValidData) return true;
     if (!currentPrice || currentPrice <= 0 || !isFinite(currentPrice)) return true;
 
-    // Simuler les assumptions par défaut
+    // Simuler les assumptions par defaut
     const assumptions = {
         currentPrice,
         baseYear: data[data.length - 1].year,

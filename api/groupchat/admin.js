@@ -23,10 +23,10 @@ const THEMES = {
 };
 
 const PRESET_WORKFLOWS = [
-  { id: 'hotel-search', name: 'Hotel Search', description: 'Search hotels', icon: '🏨', template: 'Find hotels in {location}', variables: ['location'] },
-  { id: 'product-compare', name: 'Product Search', description: 'Find products', icon: '🛒', template: 'Find {product} on Amazon', variables: ['product'] },
-  { id: 'job-search', name: 'Job Search', description: 'Find jobs', icon: '💼', template: 'Find {role} jobs on LinkedIn', variables: ['role'] },
-  { id: 'research', name: 'Research', description: 'Research topics', icon: '🔬', template: 'Research {topic}', variables: ['topic'] },
+  { id: 'hotel-search', name: 'Hotel Search', description: 'Search hotels', icon: '', template: 'Find hotels in {location}', variables: ['location'] },
+  { id: 'product-compare', name: 'Product Search', description: 'Find products', icon: '', template: 'Find {product} on Amazon', variables: ['product'] },
+  { id: 'job-search', name: 'Job Search', description: 'Find jobs', icon: '', template: 'Find {role} jobs on LinkedIn', variables: ['role'] },
+  { id: 'research', name: 'Research', description: 'Research topics', icon: '', template: 'Research {topic}', variables: ['topic'] },
 ];
 
 export default async function handler(req, res) {

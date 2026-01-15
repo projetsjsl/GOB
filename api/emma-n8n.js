@@ -1,21 +1,21 @@
 /**
  * EMMA N8N INTEGRATION API
  *
- * Endpoint unifié pour automation n8n.
+ * Endpoint unifie pour automation n8n.
  * Permet d'appeler tous les agents Emma via workflows n8n.
  *
- * Sécurité: Bearer token authentication (N8N_API_KEY)
+ * Securite: Bearer token authentication (N8N_API_KEY)
  *
  * Actions disponibles:
- * 1. briefing - Générer briefing quotidien
- * 2. question - Poser une question à Emma
+ * 1. briefing - Generer briefing quotidien
+ * 2. question - Poser une question a Emma
  * 3. portfolio - Analyser portefeuille
  * 4. initialize_earnings_calendar - Initialiser calendrier annuel
- * 5. daily_earnings_check - Vérification quotidienne earnings
- * 6. pre_earnings_analysis - Analyse pré-earnings
- * 7. poll_earnings_results - Polling résultats (15min)
- * 8. analyze_earnings_results - Analyser résultats spécifiques
- * 9. monitor_news - Surveiller actualités (15min)
+ * 5. daily_earnings_check - Verification quotidienne earnings
+ * 6. pre_earnings_analysis - Analyse pre-earnings
+ * 7. poll_earnings_results - Polling resultats (15min)
+ * 8. analyze_earnings_results - Analyser resultats specifiques
+ * 9. monitor_news - Surveiller actualites (15min)
  * 10. weekly_news_digest - Digest hebdomadaire
  *
  * Usage n8n:
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // Vérifier authentification
+    // Verifier authentification
     const authHeader = req.headers.authorization;
     const N8N_API_KEY = process.env.N8N_API_KEY;
 
@@ -77,14 +77,14 @@ export default async function handler(req, res) {
         });
     }
 
-    // Initialiser agents si nécessaire
+    // Initialiser agents si necessaire
     if (!earningsCalendarAgent) {
         earningsCalendarAgent = new EarningsCalendarAgent();
         earningsResultsAgent = new EarningsResultsAgent();
         newsMonitoringAgent = new NewsMonitoringAgent();
     }
 
-    // Router vers l'action demandée
+    // Router vers l'action demandee
     const action = req.query.action;
 
     if (!action) {
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
         });
     }
 
-    console.log(`📞 n8n API call: ${action}`);
+    console.log(` n8n API call: ${action}`);
 
     try {
         let result;
@@ -224,7 +224,7 @@ export default async function handler(req, res) {
                 });
         }
 
-        // Retourner résultat
+        // Retourner resultat
         return res.status(200).json({
             success: true,
             action,
@@ -233,7 +233,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error(`❌ n8n API error (${action}):`, error);
+        console.error(` n8n API error (${action}):`, error);
         return res.status(500).json({
             success: false,
             action,
@@ -345,7 +345,7 @@ async function handlePortfolio(params) {
     const { SmartAgent } = await import('./emma-agent.js');
     const agent = new SmartAgent();
 
-    const message = `Analyse complète du portefeuille contenant: ${params.tickers.join(', ')}. Inclus performance, risques, diversification et recommandations.`;
+    const message = `Analyse complete du portefeuille contenant: ${params.tickers.join(', ')}. Inclus performance, risques, diversification et recommandations.`;
 
     const context = {
         output_mode: 'chat',

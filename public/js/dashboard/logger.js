@@ -104,7 +104,7 @@
 
     // Log on init
     if (currentLevel <= LOG_LEVELS.INFO) {
-        console.log('✅ Logger initialized. Level:', Logger.getLevel());
-        console.log('💡 Change level: Logger.setLevel("DEBUG"|"INFO"|"WARN"|"ERROR"|"NONE")');
+        console.log(' Logger initialized. Level:', Logger.getLevel());
+        console.log(' Change level: Logger.setLevel("DEBUG"|"INFO"|"WARN"|"ERROR"|"NONE")');
     }
 })();

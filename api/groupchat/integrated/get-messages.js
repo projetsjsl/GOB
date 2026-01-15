@@ -1,5 +1,5 @@
 /**
- * API endpoint pour récupérer les messages d'un salon de chat intégré
+ * API endpoint pour recuperer les messages d'un salon de chat integre
  * GET /api/groupchat/integrated/get-messages?roomId=xxx&limit=50
  */
 
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
             process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
-        // Vérifier que le salon existe et est actif
+        // Verifier que le salon existe et est actif
         const { data: room, error: roomError } = await supabase
             .from('group_chat_rooms')
             .select('*')
@@ -44,11 +44,11 @@ export default async function handler(req, res) {
         if (roomError || !room) {
             return res.status(404).json({
                 success: false,
-                error: 'Salon non trouvé ou inactif'
+                error: 'Salon non trouve ou inactif'
             });
         }
 
-        // Construire la requête
+        // Construire la requete
         let query = supabase
             .from('group_chat_messages')
             .select('*')
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
             query = query.limit(parseInt(limit));
         }
 
-        // Récupérer les messages après un timestamp si fourni
+        // Recuperer les messages apres un timestamp si fourni
         if (after) {
             query = query.gt('created_at', after);
         }
@@ -68,10 +68,10 @@ export default async function handler(req, res) {
         const { data: messages, error: messagesError } = await query;
 
         if (messagesError) {
-            console.error('Erreur récupération messages:', messagesError);
+            console.error('Erreur recuperation messages:', messagesError);
             return res.status(500).json({
                 success: false,
-                error: 'Erreur récupération messages',
+                error: 'Erreur recuperation messages',
                 details: messagesError.message
             });
         }

@@ -43,7 +43,7 @@ async function ensureInitialized() {
         orchestrator = new MasterOrchestrator();
         personaManager = new PersonaManager();
         modelSelector = new ModelSelectorAgent();
-        console.log('✅ [Orchestrator API] Core initialized');
+        console.log(' [Orchestrator API] Core initialized');
     }
     
     // Register all agents (lazy load to avoid import issues)
@@ -51,9 +51,9 @@ async function ensureInitialized() {
         try {
             const { registerAllAgents } = await import('../lib/orchestrator/agent-registry.js');
             registerAllAgents(orchestrator);
-            console.log('✅ [Orchestrator API] All agents registered');
+            console.log(' [Orchestrator API] All agents registered');
         } catch (error) {
-            console.warn('⚠️ [Orchestrator API] Agent registry not available:', error.message);
+            console.warn(' [Orchestrator API] Agent registry not available:', error.message);
         } finally {
             agentsRegistered = true;
         }
@@ -154,7 +154,7 @@ export default async function handler(req, res) {
             if (!message && !agent) {
                 return res.status(400).json({
                     success: false,
-                    error: 'Format de requête invalide. Un "message" (pour chat) ou un "agent" (pour action directe) est requis.',
+                    error: 'Format de requete invalide. Un "message" (pour chat) ou un "agent" (pour action directe) est requis.',
                     usage: 'Consultez la documentation ou utilisez les exemples ci-dessous.',
                     examples: {
                         chat: { message: "Analyse AAPL", persona: "finance" },
@@ -163,13 +163,13 @@ export default async function handler(req, res) {
                 });
             }
 
-            console.log(`\n═══════════════════════════════════════════════════`);
-            console.log(`📨 [Orchestrator API] Request received`);
+            console.log(`\n`);
+            console.log(` [Orchestrator API] Request received`);
             console.log(`   Type: ${agent ? 'Agent Call' : 'Chat'}`);
             if (message && typeof message === 'string') console.log(`   Message: ${message.substring(0, 50)}...`);
             if (agent) console.log(`   Agent: ${agent}, Action: ${action}`);
             console.log(`   Persona: ${persona || 'auto'}`);
-            console.log(`═══════════════════════════════════════════════════`);
+            console.log(``);
 
             let result;
 
@@ -239,7 +239,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error('❌ [Orchestrator API] Error:', error);
+        console.error(' [Orchestrator API] Error:', error);
         return res.status(500).json({
             success: false,
             error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
@@ -249,16 +249,16 @@ export default async function handler(req, res) {
 }
 
 /**
- * ═══════════════════════════════════════════════════════════════════
+ * 
  * UNIVERSAL USAGE GUIDE
- * ═══════════════════════════════════════════════════════════════════
+ * 
  * 
  * This API is designed to be THE single entry point for all AI in GOB.
  * Use it from any chatbot, prompt, or AI feature.
  * 
- * ─────────────────────────────────────────────────────────────────────
+ * 
  * CHAT MODE (Natural language processing)
- * ─────────────────────────────────────────────────────────────────────
+ * 
  * 
  * 1. Simple chat (auto persona):
  *    POST /api/orchestrator
@@ -271,16 +271,16 @@ export default async function handler(req, res) {
  * 3. Chat with full options:
  *    POST /api/orchestrator
  *    {
- *      "message": "Analyse complète Tesla",
+ *      "message": "Analyse complete Tesla",
  *      "persona": "finance",
  *      "tickers": ["TSLA"],
  *      "channel": "web",
  *      "options": { "comprehensive": true }
  *    }
  * 
- * ─────────────────────────────────────────────────────────────────────
+ * 
  * AGENT MODE (Direct agent calls)
- * ─────────────────────────────────────────────────────────────────────
+ * 
  * 
  * 1. Get stock data:
  *    POST /api/orchestrator
@@ -302,9 +302,9 @@ export default async function handler(req, res) {
  *    POST /api/orchestrator
  *    { "agent": "workflow", "action": "execute_workflow", "workflowId": "morning_briefing" }
  * 
- * ─────────────────────────────────────────────────────────────────────
+ * 
  * AVAILABLE PERSONAS
- * ─────────────────────────────────────────────────────────────────────
+ * 
  * - finance   : Stock analysis, portfolio, dividends
  * - critic    : Risk analysis, skepticism, contrarian views
  * - researcher: Deep research, documentation, citations
@@ -314,9 +314,9 @@ export default async function handler(req, res) {
  * - macro     : Macroeconomics, rates, global markets
  * - politics  : Policy impact, regulations, elections
  * 
- * ─────────────────────────────────────────────────────────────────────
+ * 
  * FRONTEND INTEGRATION
- * ─────────────────────────────────────────────────────────────────────
+ * 
  * 
  * // Load the client:
  * <script src="/js/orchestrator-client.js"></script>
@@ -326,5 +326,5 @@ export default async function handler(req, res) {
  * const financeResponse = await window.orchestratorClient.askFinance("TSLA valuation");
  * const newsData = await window.orchestratorClient.agent("news", "monitor_news", { tickers: ["AAPL"] });
  * 
- * ═══════════════════════════════════════════════════════════════════
+ * 
  */

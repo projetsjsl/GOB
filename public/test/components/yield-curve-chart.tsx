@@ -84,7 +84,7 @@ const ChartContent = memo(function ChartContent({
           stroke="#9ca3af"
           tick={{ fill: "#9ca3af", fontSize: 12 }}
           label={{
-            value: "Maturité (Années)",
+            value: "Maturite (Annees)",
             position: "insideBottom",
             offset: -10,
             fill: "#d1d5db",
@@ -119,7 +119,7 @@ const ChartContent = memo(function ChartContent({
               .replace(/_\d+/, "")
             return [`${value.toFixed(3)}%`, label]
           }}
-          labelFormatter={(label) => `${label} Années`}
+          labelFormatter={(label) => `${label} Annees`}
         />
         <Legend
           wrapperStyle={{ paddingTop: 20 }}
@@ -203,7 +203,7 @@ export const YieldCurveChart = memo(function YieldCurveChart({
           <CardTitle className="text-foreground">Courbe des Taux Obligataires</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-96 flex items-center justify-center text-muted-foreground">Aucune donnée disponible</div>
+          <div className="h-96 flex items-center justify-center text-muted-foreground">Aucune donnee disponible</div>
         </CardContent>
       </Card>
     )
@@ -267,8 +267,8 @@ export const YieldCurveChart = memo(function YieldCurveChart({
         <CardTitle className="text-foreground">Courbe des Taux Obligataires</CardTitle>
         <CardDescription className="text-muted-foreground">
           {curves.length === 1
-            ? "Données officielles directes et courbe interpolée (Cubic Spline)"
-            : `Comparaison ${curves.length} courbes - courbes historiques en pointillés`}
+            ? "Donnees officielles directes et courbe interpolee (Cubic Spline)"
+            : `Comparaison ${curves.length} courbes - courbes historiques en pointilles`}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -286,7 +286,7 @@ export const YieldCurveChart = memo(function YieldCurveChart({
           <div className="flex items-start gap-2 text-xs">
             <div className="w-3 h-3 rounded-full bg-gray-500 mt-0.5 flex-shrink-0"></div>
             <p className="text-muted-foreground">
-              <span className="font-semibold">Points de marché:</span> Données officielles directes du Trésor
+              <span className="font-semibold">Points de marche:</span> Donnees officielles directes du Tresor
             </p>
           </div>
           <div className="flex items-start gap-2 text-xs">
@@ -301,7 +301,7 @@ export const YieldCurveChart = memo(function YieldCurveChart({
               style={{ width: "12px", strokeDasharray: "5 5" }}
             ></div>
             <p className="text-muted-foreground">
-              <span className="font-semibold">Courbe pointillée:</span> Données historiques comparées
+              <span className="font-semibold">Courbe pointillee:</span> Donnees historiques comparees
             </p>
           </div>
           <p className="text-xs text-muted-foreground mt-2">

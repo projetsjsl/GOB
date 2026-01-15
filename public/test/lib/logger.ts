@@ -38,10 +38,10 @@ class Logger {
     // Log to console in development
     if (this.isDevelopment) {
       const emoji = {
-        debug: "🔍",
-        info: "ℹ️",
-        warn: "⚠️",
-        error: "❌",
+        debug: "",
+        info: "i",
+        warn: "",
+        error: "",
       }
       const prefix = `[${emoji[level]}] [CurveWatch]`
       console.log(`${prefix} ${message}`, data || "")

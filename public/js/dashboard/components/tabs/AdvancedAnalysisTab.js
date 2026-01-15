@@ -55,12 +55,12 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
 
         const loadWatchlistFromSupabase = async () => {
             try {
-                void('📥 Loading watchlist from Supabase...');
+                void(' Loading watchlist from Supabase...');
                 const res = await fetch('/api/supabase-watchlist');
                 if (res.ok) {
                     const json = await res.json();
                     const tickers = Array.isArray(json.tickers) ? json.tickers : [];
-                    void('✅ Watchlist loaded from Supabase:', tickers);
+                    void(' Watchlist loaded from Supabase:', tickers);
 
                     const merged = Array.isArray(json.teamTickers) && json.teamTickers.length > 0
                         ? Array.from(new Set([...tickers, ...json.teamTickers]))
@@ -77,7 +77,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                     return;
                 }
             } catch (e) {
-                void('⚠️ Supabase not available, using default tickers');
+                void(' Supabase not available, using default tickers');
             }
 
             // Fallback to default tickers if Supabase fails
@@ -101,7 +101,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
     const getFromCache = (key, ttl) => {
         const cached = cacheRef.current.get(key);
         if (cached && (Date.now() - cached.timestamp) < ttl) {
-            void(`📦 Cache hit: ${key}`);
+            void(` Cache hit: ${key}`);
             return cached.data;
         }
         return null;
@@ -144,7 +144,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             const earningsResponse = earningsRes.status === 'fulfilled' && earningsRes.value.ok ? await earningsRes.value.json() : null;
             const analystResponse = analystRes.status === 'fulfilled' && analystRes.value.ok ? await analystRes.value.json() : null;
 
-            void('✅ Comprehensive data loaded for', symbol);
+            void(' Comprehensive data loaded for', symbol);
 
             const newStockData = {
                 symbol: symbol,
@@ -185,7 +185,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             }, CACHE_TTL.quote);
 
         } catch (error) {
-            console.error('❌ Error fetching data for', symbol, error);
+            console.error(' Error fetching data for', symbol, error);
             setStockData({
                 symbol: symbol,
                 price: 0,
@@ -245,7 +245,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                 setCache(cacheKey, analysis, CACHE_TTL.ai);
             }
         } catch (error) {
-            console.error('❌ AI Analysis error:', error);
+            console.error(' AI Analysis error:', error);
         } finally {
             setLoadingAI(false);
         }
@@ -357,7 +357,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
         const verifyWidget = () => {
             const iframe = container.querySelector('iframe');
             if (!iframe) {
-                handleFailure('Widget bloqué ou non chargé.');
+                handleFailure('Widget bloque ou non charge.');
                 return;
             }
             iframe.style.width = '100%';
@@ -522,13 +522,13 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
 
     const renderWidgetError = (message, onRetry) => (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center gap-3 bg-gray-900/80 text-gray-200">
-            <div className="text-sm font-semibold">Widget bloqué</div>
+            <div className="text-sm font-semibold">Widget bloque</div>
             <div className="text-xs text-gray-400 max-w-xs">{message}</div>
             <button
                 onClick={onRetry}
                 className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium"
             >
-                Réessayer
+                Reessayer
             </button>
         </div>
     );
@@ -543,10 +543,10 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
             <div className="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-                        Analyse Financière Pro 🚀
+                        Analyse Financiere Pro 
                     </h1>
                     <p className="text-gray-400 text-sm mt-1">
-                        Plateforme unifiée d'analyse technique et fondamentale
+                        Plateforme unifiee d'analyse technique et fondamentale
                     </p>
                 </div>
 
@@ -609,10 +609,10 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                                     <i className="iconoir-stats-report text-blue-400 text-3xl"></i>
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold text-white mb-1">Analyse Approfondie Complète</h3>
+                                    <h3 className="text-xl font-bold text-white mb-1">Analyse Approfondie Complete</h3>
                                     <p className="text-gray-400 text-sm max-w-xl">
-                                        Accédez au rapport complet : DCF, États Financiers, Ratios, et Analyse IA.
-                                        Le centre de commande pour vos décisions d'investissement.
+                                        Accedez au rapport complet : DCF, Etats Financiers, Ratios, et Analyse IA.
+                                        Le centre de commande pour vos decisions d'investissement.
                                     </p>
                                 </div>
                             </div>
@@ -632,11 +632,11 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">Comparaison Pairs</h3>
                         <p className="text-gray-400 text-sm">
-                            Comparez {selectedStock} avec ses concurrents directs sur plus de 10 métriques clés.
+                            Comparez {selectedStock} avec ses concurrents directs sur plus de 10 metriques cles.
                         </p>
                     </div>
 
-                    {/* 3. Analyse de Scénarios */}
+                    {/* 3. Analyse de Scenarios */}
                     <div
                         onClick={() => setShowScenarioAnalysis(true)}
                         className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-700/30 rounded-xl p-6 cursor-pointer hover:border-purple-500 transition-all hover:shadow-lg hover:shadow-purple-500/10 group"
@@ -644,13 +644,13 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                         <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                             <i className="iconoir-graph-up text-purple-400 text-2xl"></i>
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-2">Simulateur de Scénarios</h3>
+                        <h3 className="text-lg font-bold text-white mb-2">Simulateur de Scenarios</h3>
                         <p className="text-gray-400 text-sm">
-                            Modélisation DCF interactive. Testez vos hypothèses (Optimiste, Base, Pessimiste).
+                            Modelisation DCF interactive. Testez vos hypotheses (Optimiste, Base, Pessimiste).
                         </p>
                     </div>
 
-                    {/* 4. Screener Avancé */}
+                    {/* 4. Screener Avance */}
                     <div
                         onClick={() => setShowAdvancedScreener(true)}
                         className="bg-gradient-to-br from-orange-900/20 to-red-900/20 border border-orange-700/30 rounded-xl p-6 cursor-pointer hover:border-orange-500 transition-all hover:shadow-lg hover:shadow-orange-500/10 group"
@@ -658,9 +658,9 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                         <div className="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                             <i className="iconoir-filter text-orange-400 text-2xl"></i>
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-2">Screener Avancé</h3>
+                        <h3 className="text-lg font-bold text-white mb-2">Screener Avance</h3>
                         <p className="text-gray-400 text-sm">
-                            Trouvez les pépites du marché avec des filtres personnalisés et des préréglages.
+                            Trouvez les pepites du marche avec des filtres personnalises et des prereglages.
                         </p>
                     </div>
 
@@ -674,7 +674,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">AI Stock Analysis</h3>
                         <p className="text-gray-400 text-sm">
-                            Analyse pilotée par IA : thèse d'investissement, risques, valorisation et recommandation.
+                            Analyse pilotee par IA : these d'investissement, risques, valorisation et recommandation.
                         </p>
                     </div>
 
@@ -688,7 +688,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">News & Sentiment</h3>
                         <p className="text-gray-400 text-sm">
-                            Actualités en temps réel avec analyse de sentiment IA et impact sur le cours.
+                            Actualites en temps reel avec analyse de sentiment IA et impact sur le cours.
                         </p>
                     </div>
 
@@ -730,7 +730,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">Economic Events</h3>
                         <p className="text-gray-400 text-sm">
-                            Calendrier économique (7j) avec analyse d'impact sur vos titres.
+                            Calendrier economique (7j) avec analyse d'impact sur vos titres.
                         </p>
                     </div>
 
@@ -744,7 +744,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">Watchlist Screener</h3>
                         <p className="text-gray-400 text-sm">
-                            Classement IA de votre watchlist avec scores de buy et opportunités.
+                            Classement IA de votre watchlist avec scores de buy et opportunites.
                         </p>
                     </div>
 
@@ -766,7 +766,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                                     }
                                 });
                             } else {
-                                console.log('Alert suppressed:', 'Données non disponibles pour l\'export. Veuillez d\'abord charger les données du titre.');
+                                console.log('Alert suppressed:', 'Donnees non disponibles pour l\'export. Veuillez d\'abord charger les donnees du titre.');
                             }
                         }}
                         className="bg-gradient-to-br from-cyan-900/20 to-blue-900/20 border border-cyan-700/30 rounded-xl p-6 cursor-pointer hover:border-cyan-500 transition-all hover:shadow-lg hover:shadow-cyan-500/10 group"
@@ -776,7 +776,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                         </div>
                         <h3 className="text-lg font-bold text-white mb-2">Export Rapport PDF</h3>
                         <p className="text-gray-400 text-sm">
-                            Générez un rapport professionnel complet prêt à être partagé ou imprimé.
+                            Generez un rapport professionnel complet pret a etre partage ou imprime.
                         </p>
                     </div>
                 </div>
@@ -799,7 +799,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                 <div className="space-y-6 animate-fade-in">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div className="lg:col-span-2 bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
-                            <div className="p-4 border-b border-gray-700 font-bold">États Financiers</div>
+                            <div className="p-4 border-b border-gray-700 font-bold">Etats Financiers</div>
                             <LazyWidgetWrapper threshold={0.5} height={440} forceLoad={true}>
                                 <div className="relative h-full">
                                     <div className="tradingview-widget-container h-full" ref={financialsContainerRef}></div>
@@ -808,7 +808,7 @@ const AdvancedAnalysisTab = ({ isDarkMode }) => {
                             </LazyWidgetWrapper>
                         </div>
                         <div className="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 h-[500px]">
-                            <div className="p-4 border-b border-gray-700 font-bold">Profil Société</div>
+                            <div className="p-4 border-b border-gray-700 font-bold">Profil Societe</div>
                             <LazyWidgetWrapper threshold={0.5} height={440} forceLoad={true}>
                                 <div className="relative h-full">
                                     <div className="tradingview-widget-container h-full" ref={profileContainerRef}></div>

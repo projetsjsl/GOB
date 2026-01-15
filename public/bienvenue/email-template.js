@@ -1,4 +1,4 @@
-// Email Template Generator pour Plan d'Intégration RH
+// Email Template Generator pour Plan d'Integration RH
 // Compatible avec tous les clients email (Outlook, Gmail, Apple Mail, etc.)
 
 window.generateEmailHTML = function(employee, phases, tasks, resources) {
@@ -6,11 +6,11 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
     const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
     
     const getResourceNames = (ids) => {
-        return resources.filter(r => ids.includes(r.id)).map(r => r.name).join(', ') || 'Non assigné';
+        return resources.filter(r => ids.includes(r.id)).map(r => r.name).join(', ') || 'Non assigne';
     };
 
     const getStatusLabel = (status) => {
-        return status === 'completed' ? '✅ Complété' : status === 'inProgress' ? '🔄 En cours' : '⏳ En attente';
+        return status === 'completed' ? ' Complete' : status === 'inProgress' ? ' En cours' : ' En attente';
     };
 
     const getStatusColor = (status) => {
@@ -26,8 +26,8 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
         <tr>
             <td colspan="4" style="background-color: ${phase.color}15; padding: 12px; border-left: 4px solid ${phase.color};">
                 <strong style="color: ${phase.color}; font-size: 16px;">${phase.name}</strong>
-                <span style="float: right; color: ${phase.color};">${phaseCompleted}/${phaseTasks.length} complétées</span>
-                <br><span style="color: #666; font-size: 12px;">${phase.description} | ${phase.startDate} → ${phase.endDate}</span>
+                <span style="float: right; color: ${phase.color};">${phaseCompleted}/${phaseTasks.length} completees</span>
+                <br><span style="color: #666; font-size: 12px;">${phase.description} | ${phase.startDate} -> ${phase.endDate}</span>
             </td>
         </tr>`;
         
@@ -52,7 +52,7 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plan d'Intégration - ${employee.name}</title>
+    <title>Plan d'Integration - ${employee.name}</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f5;">
     <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 20px;">
@@ -62,7 +62,7 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #1e3a8a 0%, #4338ca 100%); padding: 30px; text-align: center;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Plan d'Intégration RH</h1>
+                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">Plan d'Integration RH</h1>
                             <p style="color: #93c5fd; margin: 10px 0 0 0;">Bienvenue ${employee.name} !</p>
                         </td>
                     </tr>
@@ -72,9 +72,9 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
                         <td style="padding: 20px;">
                             <table width="100%" cellpadding="10" style="background-color: #f8fafc; border-radius: 8px;">
                                 <tr>
-                                    <td width="25%"><strong style="color: #64748b;">Employé:</strong><br>${employee.name}</td>
+                                    <td width="25%"><strong style="color: #64748b;">Employe:</strong><br>${employee.name}</td>
                                     <td width="25%"><strong style="color: #64748b;">Poste:</strong><br>${employee.role}</td>
-                                    <td width="25%"><strong style="color: #64748b;">Début:</strong><br>${employee.startDate}</td>
+                                    <td width="25%"><strong style="color: #64748b;">Debut:</strong><br>${employee.startDate}</td>
                                     <td width="25%"><strong style="color: #64748b;">Progression:</strong><br><span style="color: #3B82F6; font-size: 20px; font-weight: bold;">${progress}%</span></td>
                                 </tr>
                             </table>
@@ -95,7 +95,7 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
                                     </td>
                                 </tr>
                             </table>
-                            <p style="text-align: center; color: #666; margin: 5px 0 0 0; font-size: 12px;">${completedTasks} sur ${tasks.length} tâches complétées</p>
+                            <p style="text-align: center; color: #666; margin: 5px 0 0 0; font-size: 12px;">${completedTasks} sur ${tasks.length} taches completees</p>
                         </td>
                     </tr>
                     
@@ -104,7 +104,7 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
                         <td style="padding: 0 20px 20px 20px;">
                             <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
                                 <tr style="background-color: #1e3a8a;">
-                                    <th style="padding: 12px; color: white; text-align: left;">Tâche</th>
+                                    <th style="padding: 12px; color: white; text-align: left;">Tache</th>
                                     <th style="padding: 12px; color: white; text-align: center;">Statut</th>
                                     <th style="padding: 12px; color: white; text-align: center;">Date</th>
                                     <th style="padding: 12px; color: white; text-align: left;">Responsable</th>
@@ -117,7 +117,7 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
                     <!-- Responsables Section -->
                     <tr>
                         <td style="padding: 0 20px 20px 20px;">
-                            <h3 style="color: #1e3a8a; margin: 0 0 10px 0;">📞 Vos contacts clés</h3>
+                            <h3 style="color: #1e3a8a; margin: 0 0 10px 0;"> Vos contacts cles</h3>
                             <table width="100%" cellpadding="8" cellspacing="0" style="background-color: #f8fafc; border-radius: 8px;">
                                 ${resources.map(r => `<tr><td><span style="display: inline-block; width: 12px; height: 12px; background-color: ${r.color}; border-radius: 50%; margin-right: 8px;"></span><strong>${r.name}</strong> - ${r.role}</td></tr>`).join('')}
                             </table>
@@ -127,8 +127,8 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
                     <!-- Footer -->
                     <tr>
                         <td style="background-color: #1f2937; padding: 20px; text-align: center;">
-                            <p style="color: #fbbf24; margin: 0 0 10px 0; font-size: 12px;">⚠️ Ce document est confidentiel</p>
-                            <p style="color: #9ca3af; margin: 0; font-size: 12px;">Plateforme d'Intégration RH | Généré le ${new Date().toLocaleDateString('fr-CA')}</p>
+                            <p style="color: #fbbf24; margin: 0 0 10px 0; font-size: 12px;"> Ce document est confidentiel</p>
+                            <p style="color: #9ca3af; margin: 0; font-size: 12px;">Plateforme d'Integration RH | Genere le ${new Date().toLocaleDateString('fr-CA')}</p>
                         </td>
                     </tr>
                 </table>
@@ -141,7 +141,7 @@ window.generateEmailHTML = function(employee, phases, tasks, resources) {
 
 window.sendEmailPlan = async function(employee, phases, tasks, resources) {
     const html = window.generateEmailHTML(employee, phases, tasks, resources);
-    const subject = `Plan d'Intégration - ${employee.name}`;
+    const subject = `Plan d'Integration - ${employee.name}`;
     
     // Use a promise-based approach for email input
     // This will be handled by the React component in index.html
@@ -168,9 +168,9 @@ window.sendEmailPlan = async function(employee, phases, tasks, resources) {
     });
     
     async function sendEmailToAddress(to, subject, html) {
-        // Feedback visuel (simple alert pour l'instant, idéalement un toast dans l'UI)
+        // Feedback visuel (simple alert pour l'instant, idealement un toast dans l'UI)
         const originalText = document.activeElement ? document.activeElement.innerText : '';
-        if (document.activeElement) document.activeElement.innerText = 'Envoi... ⏳';
+        if (document.activeElement) document.activeElement.innerText = 'Envoi... ';
 
         try {
             const response = await fetch('/api/send-email', {
@@ -189,14 +189,14 @@ window.sendEmailPlan = async function(employee, phases, tasks, resources) {
             const data = await response.json();
 
             if (response.ok) {
-                alert('✅ Email envoyé avec succès !');
+                alert(' Email envoye avec succes !');
             } else {
                 console.error('Erreur envoi email:', data);
-                alert(`❌ Erreur lors de l'envoi : ${data.message || 'Erreur inconnue'}`);
+                alert(` Erreur lors de l'envoi : ${data.message || 'Erreur inconnue'}`);
             }
         } catch (error) {
-            console.error('Erreur réseau:', error);
-            alert('❌ Erreur réseau lors de l\'envoi de l\'email.');
+            console.error('Erreur reseau:', error);
+            alert(' Erreur reseau lors de l\'envoi de l\'email.');
         } finally {
             if (document.activeElement) document.activeElement.innerText = originalText;
         }
@@ -206,9 +206,9 @@ window.sendEmailPlan = async function(employee, phases, tasks, resources) {
 window.copyEmailHTML = function(employee, phases, tasks, resources) {
     const html = window.generateEmailHTML(employee, phases, tasks, resources);
     navigator.clipboard.writeText(html).then(() => {
-        alert('HTML copié ! Collez-le dans votre client email (mode HTML).');
+        alert('HTML copie ! Collez-le dans votre client email (mode HTML).');
     }).catch(err => {
         console.error('Erreur copie:', err);
-        alert('Erreur lors de la copie. Sélectionnez et copiez manuellement.');
+        alert('Erreur lors de la copie. Selectionnez et copiez manuellement.');
     });
 };

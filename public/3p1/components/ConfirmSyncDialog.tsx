@@ -52,11 +52,11 @@ export const ConfirmSyncDialog: React.FC<ConfirmSyncDialogProps> = ({
                         <>
                             <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
                                 <p className="text-sm text-yellow-800 font-medium">
-                                    ⚠️ Vous avez modifié des données manuellement
+                                     Vous avez modifie des donnees manuellement
                                 </p>
                                 <p className="text-sm text-yellow-700 mt-2">
-                                    Charger les données de l'API va <strong>écraser vos modifications</strong>.
-                                    Toutes les cellules seront remplacées par les données FMP/Finnhub.
+                                    Charger les donnees de l'API va <strong>ecraser vos modifications</strong>.
+                                    Toutes les cellules seront remplacees par les donnees FMP/Finnhub.
                                 </p>
                             </div>
 
@@ -70,10 +70,10 @@ export const ConfirmSyncDialog: React.FC<ConfirmSyncDialogProps> = ({
                                 />
                                 <div className="flex-1">
                                     <p className="text-sm font-medium text-gray-900">
-                                        💾 Sauvegarder la version actuelle avant sync
+                                         Sauvegarder la version actuelle avant sync
                                     </p>
                                     <p className="text-xs text-gray-600 mt-1">
-                                        Recommandé: Crée un snapshot de vos modifications avant de charger les nouvelles données.
+                                        Recommande: Cree un snapshot de vos modifications avant de charger les nouvelles donnees.
                                         Vous pourrez restaurer cette version plus tard.
                                     </p>
                                 </div>
@@ -82,7 +82,7 @@ export const ConfirmSyncDialog: React.FC<ConfirmSyncDialogProps> = ({
                     ) : (
                         <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
                             <p className="text-sm text-blue-800">
-                                ℹ️ Aucune modification manuelle détectée. Les données actuelles seront remplacées par les données de l'API.
+                                i Aucune modification manuelle detectee. Les donnees actuelles seront remplacees par les donnees de l'API.
                             </p>
                         </div>
                     )}
@@ -110,7 +110,7 @@ export const ConfirmSyncDialog: React.FC<ConfirmSyncDialogProps> = ({
                         onClick={() => onConfirm(saveBeforeSync)}
                         className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors shadow-sm"
                     >
-                        {hasManualData && saveBeforeSync ? '💾 Sauvegarder & Sync' : 'Synchroniser'}
+                        {hasManualData && saveBeforeSync ? ' Sauvegarder & Sync' : 'Synchroniser'}
                     </button>
                 </div>
             </div>

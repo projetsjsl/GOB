@@ -1,8 +1,8 @@
 /**
- * Configuration centralisée pour CurveWatch
+ * Configuration centralisee pour CurveWatch
  */
 
-// Déterminer l'environnement
+// Determiner l'environnement
 const isDevelopment = typeof process !== "undefined" && process.env.NODE_ENV === "development"
 const isProduction = typeof process !== "undefined" && process.env.NODE_ENV === "production"
 

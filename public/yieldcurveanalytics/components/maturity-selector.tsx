@@ -27,8 +27,8 @@ export function MaturitySelector({ selectedMaturities, onMaturitiesChange }: Mat
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-foreground text-sm font-bold">Maturités</CardTitle>
-            <CardDescription className="text-muted-foreground text-xs">Points de la courbe à afficher</CardDescription>
+            <CardTitle className="text-foreground text-sm font-bold">Maturites</CardTitle>
+            <CardDescription className="text-muted-foreground text-xs">Points de la courbe a afficher</CardDescription>
           </div>
           <span className="text-[10px] font-bold bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/30">
             {selectedMaturities.length}/{MATURITIES.length}
@@ -65,7 +65,7 @@ export function MaturitySelector({ selectedMaturities, onMaturitiesChange }: Mat
             onClick={selectAll} 
             className="text-xs flex-1 font-medium hover:bg-emerald-500/10 hover:text-emerald-400 transition-colors"
           >
-            Tout Sélectionner
+            Tout Selectionner
           </Button>
           <Button 
             variant="ghost" 

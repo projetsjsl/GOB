@@ -1,13 +1,13 @@
 /**
- * CurveWatchTab - Intégration de YieldCurveAnalytics
+ * CurveWatchTab - Integration de YieldCurveAnalytics
  * 
  * Ce composant charge le nouveau dashboard de courbe des taux depuis /yieldcurveanalytics
- * en utilisant le cache global du dashboard pour éviter les blocages.
+ * en utilisant le cache global du dashboard pour eviter les blocages.
  */
 
 const { useState, useEffect } = React;
 
-// Hook pour détecter le thème
+// Hook pour detecter le theme
 const useDarkMode = () => {
     const [isDark, setIsDark] = useState(() => {
         if (typeof window !== "undefined" && typeof window.GOBThemes !== "undefined") {
@@ -46,9 +46,9 @@ const CurveWatchTab = ({ isDarkMode: isDarkModeProp }) => {
         let mounted = true;
         
         const init = async () => {
-            console.log('🔄 CurveWatchTab: Initialisation du nouveau moteur...');
+            console.log(' CurveWatchTab: Initialisation du nouveau moteur...');
             
-            // On vérifie d'abord si le composant est déjà chargé en mémoire
+            // On verifie d'abord si le composant est deja charge en memoire
             if (window.CurveWatchV0) {
                 if (mounted) setComponentReady(true);
                 return;
@@ -57,18 +57,18 @@ const CurveWatchTab = ({ isDarkMode: isDarkModeProp }) => {
             // Tentative de chargement via V0Integration
             if (window.V0Integration) {
                 try {
-                    console.log('📡 CurveWatchTab: Appel V0Integration.loadV0Component...');
+                    console.log(' CurveWatchTab: Appel V0Integration.loadV0Component...');
                     const component = await window.V0Integration.loadV0Component(
                         '/yieldcurveanalytics/components/curve-watch-compatible.tsx',
                         'CurveWatchV0'
                     );
-                    console.log('📡 CurveWatchTab: Résultat chargement:', !!component);
+                    console.log(' CurveWatchTab: Resultat chargement:', !!component);
                     if (mounted) {
                         setComponentReady(true);
-                        console.log('✅ CurveWatchTab: Composant v0 chargé avec succès');
+                        console.log(' CurveWatchTab: Composant v0 charge avec succes');
                     }
                 } catch (err) {
-                    console.error('❌ CurveWatchTab: Échec du chargement v0:', err);
+                    console.error(' CurveWatchTab: Echec du chargement v0:', err);
                     if (mounted) setError(`Erreur de chargement du moteur v0: ${err.message}`);
                 }
             } else {
@@ -134,7 +134,7 @@ const CurveWatchTab = ({ isDarkMode: isDarkModeProp }) => {
         );
     }
 
-    // Priorité au composant moderne
+    // Priorite au composant moderne
     if (window.CurveWatchV0) {
         return (
             <div className={`h-full w-full ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
@@ -160,4 +160,4 @@ const CurveWatchTab = ({ isDarkMode: isDarkModeProp }) => {
 };
 
 window.CurveWatchTab = CurveWatchTab;
-console.log('✅ CurveWatchTab: Moteur YieldCurveAnalytics activé');
+console.log(' CurveWatchTab: Moteur YieldCurveAnalytics active');

@@ -1,5 +1,5 @@
 /**
- * Validateurs pour les données de courbe de taux
+ * Validateurs pour les donnees de courbe de taux
  */
 
 import type { YieldPoint, CurveData } from "./types"
@@ -20,7 +20,7 @@ export function isValidYieldPoint(point: any): point is YieldPoint {
 }
 
 /**
- * Valide une courbe de taux complète
+ * Valide une courbe de taux complete
  */
 export function isValidCurveData(data: any): data is CurveData {
   return (
@@ -35,7 +35,7 @@ export function isValidCurveData(data: any): data is CurveData {
 }
 
 /**
- * Valide la cohérence des rendements (généralement croissants)
+ * Valide la coherence des rendements (generalement croissants)
  */
 export function validateCurveShape(points: YieldPoint[]): { valid: boolean; issues: string[] } {
   const issues: string[] = []
@@ -45,13 +45,13 @@ export function validateCurveShape(points: YieldPoint[]): { valid: boolean; issu
     return { valid: false, issues }
   }
 
-  // Vérifier que les points sont triés par maturité
+  // Verifier que les points sont tries par maturite
   const sorted = [...points].sort((a, b) => a.days - b.days)
   if (JSON.stringify(points) !== JSON.stringify(sorted)) {
-    issues.push("Points non triés par maturité")
+    issues.push("Points non tries par maturite")
   }
 
-  // Vérifier pour les inversions anormales
+  // Verifier pour les inversions anormales
   let inversions = 0
   for (let i = 1; i < points.length; i++) {
     if (points[i].yield < points[i - 1].yield) {
@@ -60,7 +60,7 @@ export function validateCurveShape(points: YieldPoint[]): { valid: boolean; issu
   }
 
   if (inversions > points.length / 2) {
-    issues.push(`Trop d'inversions détectées (${inversions})`)
+    issues.push(`Trop d'inversions detectees (${inversions})`)
   }
 
   return {

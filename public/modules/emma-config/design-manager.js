@@ -1,6 +1,6 @@
-// ═══════════════════════════════════════════════════════════════
+// 
 // DESIGN MANAGER - Gestion du design des emails
-// ═══════════════════════════════════════════════════════════════
+// 
 
 import { loadDesignConfig as apiLoadDesign, saveDesignConfig as apiSaveDesign } from './api-client.js';
 import { showStatus } from './ui-helpers.js';
@@ -19,12 +19,12 @@ export async function loadDesignConfig() {
         updateDesignPreview();
     } catch (error) {
         console.error('Error loading design config:', error);
-        showStatus('❌ Erreur chargement design', 'error');
+        showStatus(' Erreur chargement design', 'error');
     }
 }
 
 /**
- * Remplit le formulaire avec les données du design
+ * Remplit le formulaire avec les donnees du design
  */
 export function populateDesignForm(config) {
     // Branding
@@ -64,7 +64,7 @@ export function populateDesignForm(config) {
 }
 
 /**
- * Récupère les données du formulaire
+ * Recupere les donnees du formulaire
  */
 export function getDesignFormData() {
     return {
@@ -111,12 +111,12 @@ export async function saveDesign() {
         if (result.success) {
             designConfig = result.config;
             originalDesignConfig = JSON.parse(JSON.stringify(designConfig));
-            showStatus('✅ Design sauvegardé!', 'success');
+            showStatus(' Design sauvegarde!', 'success');
         } else {
-            showStatus('❌ Erreur: ' + result.error, 'error');
+            showStatus(' Erreur: ' + result.error, 'error');
         }
     } catch (error) {
-        showStatus('❌ Erreur sauvegarde', 'error');
+        showStatus(' Erreur sauvegarde', 'error');
     }
 }
 
@@ -127,28 +127,28 @@ export function cancelDesignChanges() {
     if (originalDesignConfig) {
         populateDesignForm(originalDesignConfig);
         updateDesignPreview();
-        showStatus('↩️ Modifications annulées', 'info');
+        showStatus(' Modifications annulees', 'info');
     }
 }
 
 /**
- * Réinitialise aux valeurs par défaut
+ * Reinitialise aux valeurs par defaut
  */
 export async function resetDesignToDefaults() {
-    if (confirm('Réinitialiser tous les paramètres design aux valeurs par défaut?')) {
+    if (confirm('Reinitialiser tous les parametres design aux valeurs par defaut?')) {
         try {
             const config = await apiLoadDesign();
             populateDesignForm(config);
             updateDesignPreview();
-            showStatus('🔄 Réinitialisé aux valeurs par défaut', 'info');
+            showStatus(' Reinitialise aux valeurs par defaut', 'info');
         } catch (error) {
-            showStatus('❌ Erreur', 'error');
+            showStatus(' Erreur', 'error');
         }
     }
 }
 
 /**
- * Met à jour le preview du design
+ * Met a jour le preview du design
  */
 export function updateDesignPreview() {
     const preview = document.getElementById('designPreview');
@@ -161,18 +161,18 @@ export function updateDesignPreview() {
     preview.innerHTML = `
         <div style="max-width:500px;margin:0 auto;font-family:sans-serif;background:#f8fafc;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
             <div style="background:linear-gradient(135deg,${primary},${primaryLight});color:white;padding:20px;text-align:center;">
-                ${avatar ? `<img src="${avatar}" style="width:48px;height:48px;border-radius:50%;margin-bottom:8px;">` : '<div style="font-size:32px;margin-bottom:8px;">👩🏻</div>'}
+                ${avatar ? `<img src="${avatar}" style="width:48px;height:48px;border-radius:50%;margin-bottom:8px;">` : '<div style="font-size:32px;margin-bottom:8px;"></div>'}
                 <h2 style="margin:0;font-size:20px;">Emma En Direct</h2>
-                <p style="margin:4px 0 0;opacity:0.9;font-size:12px;">ÉDITION MATIN | ${new Date().toLocaleDateString('fr-FR')}</p>
+                <p style="margin:4px 0 0;opacity:0.9;font-size:12px;">EDITION MATIN | ${new Date().toLocaleDateString('fr-FR')}</p>
             </div>
             <div style="padding:20px;background:white;">
-                <p style="color:#1f2937;line-height:1.6;">Bonjour! Voici votre briefing matinal des marchés financiers...</p>
-                <h3 style="color:${primary};margin:16px 0 8px;">📊 Marchés</h3>
+                <p style="color:#1f2937;line-height:1.6;">Bonjour! Voici votre briefing matinal des marches financiers...</p>
+                <h3 style="color:${primary};margin:16px 0 8px;"> Marches</h3>
                 <p style="color:#4b5563;font-size:14px;">Les indices sont en hausse ce matin...</p>
             </div>
             <div style="padding:16px;background:#f8fafc;text-align:center;border-top:1px solid #e5e7eb;">
                 ${logo ? `<img src="${logo}" style="height:30px;margin-bottom:8px;">` : ''}
-                <p style="margin:0;font-size:11px;color:#6b7280;">🤖 Généré par Emma IA • ${company}</p>
+                <p style="margin:0;font-size:11px;color:#6b7280;"> Genere par Emma IA - ${company}</p>
             </div>
         </div>
     `;

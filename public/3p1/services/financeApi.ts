@@ -7,7 +7,7 @@ import { AnnualData, CompanyInfo } from '../types';
  */
 export const fetchCompanyData = async (symbol: string): Promise<any> => {
     if (!symbol || symbol.trim() === '') {
-        console.warn('⚠️ fetchCompanyData called with empty symbol');
+        console.warn(' fetchCompanyData called with empty symbol');
         // Return empty structure instead of throwing 500
         return {
             data: [],
@@ -30,8 +30,8 @@ export const fetchCompanyData = async (symbol: string): Promise<any> => {
         const triedSymbols = errorData.tried || [cleanSymbol];
         throw new Error(
           `Symbole '${cleanSymbol}' introuvable. ` +
-          `Variantes essayées: ${triedSymbols.join(', ')}. ` +
-          `Vérifiez que le symbole est correct ou essayez un format différent.`
+          `Variantes essayees: ${triedSymbols.join(', ')}. ` +
+          `Verifiez que le symbole est correct ou essayez un format different.`
         );
       }
       throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
@@ -60,7 +60,7 @@ export const fetchCompanyData = async (symbol: string): Promise<any> => {
             // Use average of high/low as a proxy for price if realtime missing
             if (latest.priceHigh > 0 && latest.priceLow > 0) {
                 finalCurrentPrice = (latest.priceHigh + latest.priceLow) / 2;
-                console.log(`⚠️ currentPrice was 0, used latest annual average: ${finalCurrentPrice}`);
+                console.log(` currentPrice was 0, used latest annual average: ${finalCurrentPrice}`);
             }
         }
     }
@@ -69,7 +69,7 @@ export const fetchCompanyData = async (symbol: string): Promise<any> => {
       data: dataWithFlag,
       info: result.info || {},
       currentPrice: finalCurrentPrice, // Use validated/fallback price
-      currentDividend: result.currentDividend || 0, // ✅ NOUVEAU: Dividende actuel depuis l'API
+      currentDividend: result.currentDividend || 0, //  NOUVEAU: Dividende actuel depuis l'API
       financials: result.financials,
       analysisData: result.analysisData
     };

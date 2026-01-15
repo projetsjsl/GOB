@@ -21,7 +21,7 @@ export const getThemeColors = (isDark: boolean) => ({
   tooltip: isDark ? "#1e293b" : "#ffffff",
 })
 
-// Constantes définies AVANT les states
+// Constantes definies AVANT les states
 export const PERIODS = ["1w", "1m", "3m", "6m", "1y", "5y"]
 export const MATURITIES = ["1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "20Y", "30Y"]
 export const VIEWS = ["curves", "spread", "compare"] as const

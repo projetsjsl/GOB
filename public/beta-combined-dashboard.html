@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>GOB Apps - Dashboard Financier Beta • Propulsé par JSLAI</title>
+    <title>GOB Apps - Dashboard Financier Beta - Propulse par JSLAI</title>
     <!-- Version: 2.1.0 - JLab V2 with Synchronized Widgets - 2025-10-25 -->
     <!-- Favicon JLab -->
     <link rel="icon" type="image/png" href="/jlab.png">
@@ -16,7 +16,7 @@
     <!-- Variable d'environnement VITE_GROUP_CHAT_URL pour ChatGPTGroupTab -->
     <meta name="vite-group-chat-url" content="" id="vite-group-chat-url-meta" />
     <!-- Cache bust: 2025-10-15 21:00 -->
-    <!-- BUG #7 FIX: Précharger logo JSLAI pour chargement immédiat -->
+    <!-- BUG #7 FIX: Precharger logo JSLAI pour chargement immediat -->
     <link rel="preload" href="/logojslaidark.jpg" as="image" type="image/jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,11 +24,11 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=Georgia:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     <!-- Avenir Pro 85 Heavy alternative: Montserrat Heavy (900) ou Avenir Next si disponible -->
-    <!-- Note: Variables CSS thèmes, animations, fonts, React Grid Layout et Emma components -->
-    <!-- ont été extraits vers des fichiers CSS séparés et importés via gob-design-system.css -->
+    <!-- Note: Variables CSS themes, animations, fonts, React Grid Layout et Emma components -->
+    <!-- ont ete extraits vers des fichiers CSS separes et importes via gob-design-system.css -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Note: Babel Standalone utilisé intentionnellement pour ce fichier standalone -->
+    <!-- Note: Babel Standalone utilise intentionnellement pour ce fichier standalone -->
     <!-- PRODUCTION NOTE: Babel Standalone is intentionally used for this standalone file -->
     <!-- The console warning "You are using the in-browser Babel transformer" is expected and can be ignored -->
     <!-- For production optimization, consider precompiling with: npm run build:babel -->
@@ -40,7 +40,7 @@
         // MUST run before React Grid Layout and any Babel transpilation
         (function() {
             // =================================================================
-            // 🛡️ CRASH PREVENTION SHIELD v2
+            //  CRASH PREVENTION SHIELD v2
             // Fixes "TypeError: t.animate is not a function" (specifically on Window)
             // =================================================================
             const createMockAnimation = () => ({
@@ -72,8 +72,8 @@
             // 1. Critical: Polyfill window.animate (The culprit identified in logs)
             if (typeof window !== 'undefined' && !window.animate) {
                 window.animate = function(keyframes, options) {
-                    console.warn('🛡️ PREVENTED CRASH: window.animate called!', keyframes);
-                    console.trace('🛡️ Stack Trace for window.animate call:');
+                    console.warn(' PREVENTED CRASH: window.animate called!', keyframes);
+                    console.trace(' Stack Trace for window.animate call:');
                     return createMockAnimation();
                 };
             }
@@ -95,12 +95,12 @@
                 }
             });
 
-            // 4. Fallback ultime pour TOUS les objets (agressif mais nécessaire pour ce crash)
-            // Utilise defineProperty pour éviter d'énumérer la propriété et causer des effets de bord
+            // 4. Fallback ultime pour TOUS les objets (agressif mais necessaire pour ce crash)
+            // Utilise defineProperty pour eviter d'enumerer la propriete et causer des effets de bord
             if (!Object.prototype.animate) {
                 Object.defineProperty(Object.prototype, 'animate', {
                     value: function(keyframes, options) {
-                        console.warn('🛡️ PREVENTED CRASH: Object.prototype.animate called on:', this);
+                        console.warn(' PREVENTED CRASH: Object.prototype.animate called on:', this);
                         return createMockAnimation();
                     },
                     writable: true,
@@ -178,7 +178,7 @@
                     if (header && !document.getElementById('admin-btn')) {
                         var btn = document.createElement('button');
                         btn.id = 'admin-btn';
-                        btn.innerHTML = '🧩';
+                        btn.innerHTML = '';
                         btn.title = 'Component Manager';
                         btn.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9999;width:40px;height:40px;border-radius:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:transform 0.2s;';
                         btn.onmouseover = function() { this.style.transform = 'scale(1.1)'; };
@@ -301,17 +301,17 @@
 
             if (typeof window.ReactGridLayout === 'undefined' && moduleExports) {
                 window.ReactGridLayout = moduleExports;
-                console.log('✅ ReactGridLayout recovered from module.exports');
+                console.log(' ReactGridLayout recovered from module.exports');
             }
 
             if (typeof window.ReactGridLayout === 'undefined') {
-                console.warn('⚠️ ReactGridLayout not available');
+                console.warn(' ReactGridLayout not available');
                 return;
             }
 
             // Check if exports are nested under .default (ES module bundle)
             if (window.ReactGridLayout.default && !window.ReactGridLayout.Responsive) {
-                console.log('🔄 ReactGridLayout: Flattening .default exports...');
+                console.log(' ReactGridLayout: Flattening .default exports...');
                 const defaultExports = window.ReactGridLayout.default;
                 // Spread all default exports onto the main object
                 Object.keys(defaultExports).forEach(key => {
@@ -320,15 +320,15 @@
                     }
                 });
             }
-            console.log('✅ ReactGridLayout loaded successfully:', {
+            console.log(' ReactGridLayout loaded successfully:', {
                 hasResponsive: !!window.ReactGridLayout.Responsive,
                 hasWidthProvider: !!window.ReactGridLayout.WidthProvider
             });
         })();
     </script>
 
-    <!-- Performance Optimizer - Réduit le temps de chargement -->
-    <!-- Performance Optimizer - Réduit le temps de chargement -->
+    <!-- Performance Optimizer - Reduit le temps de chargement -->
+    <!-- Performance Optimizer - Reduit le temps de chargement -->
     <script src="/js/dashboard/logger.js"></script>
     <!-- Performance Optimizer REMOVED (was causing widget hangs) -->
     <!-- <script src="/js/dashboard/performance-optimizer.js"></script> -->
@@ -340,15 +340,15 @@
     <!-- <script src="/js/dashboard/widget-loader-optimized.js"></script> -->
 
     <script src="/js/dashboard/constants.js"></script>
-    <!-- Utilitaires partagés exposés globalement -->
+    <!-- Utilitaires partages exposes globalement -->
     <script src="/js/dashboard/utils-shared.js"></script>
-    <!-- Prompts briefing externalisés -->
+    <!-- Prompts briefing externalises -->
     <script src="/js/dashboard/briefing-prompts.js"></script>
-    <!-- Système de thèmes -->
+    <!-- Systeme de themes -->
     <script src="/js/dashboard/theme-system.js"></script>
     
-    <!-- ⚡ ESSENTIAL COMPONENTS (Load first - required for initial view) -->
-    <!-- Auto-Expand: Ajoute boutons fullscreen à TOUTES les sections -->
+    <!--  ESSENTIAL COMPONENTS (Load first - required for initial view) -->
+    <!-- Auto-Expand: Ajoute boutons fullscreen a TOUTES les sections -->
     <script src="js/dashboard/components/shared/auto-expand-init.js"></script>
     <!-- Theme Selector Component -->
     <script type="text/babel" src="js/dashboard/components/ThemeSelector.js"></script>
@@ -382,12 +382,12 @@
     
     <!-- Script de test GOD MODE (disponible en console) -->
     <!-- <script src="/js/dashboard/test-god-mode-console.js"></script> -->
-    <!-- Script de débogage GOD MODE -->
+    <!-- Script de debogage GOD MODE -->
     <!-- <script src="/js/dashboard/debug-god-mode.js"></script> -->
     <!-- Quick Fix GOD MODE -->
     <!-- <script src="/js/dashboard/quick-fix-god-mode.js"></script> -->
     <script>
-        // Exposer les fonctions de débogage globalement
+        // Exposer les fonctions de debogage globalement
         window.debugGodMode = function() {
             const script = document.createElement('script');
             script.src = '/js/dashboard/debug-god-mode.js';
@@ -400,7 +400,7 @@
         };
     </script>
 
-    <!-- TradingView Lightweight Charts - Bibliothèque officielle pour graphiques personnalisés -->
+    <!-- TradingView Lightweight Charts - Bibliotheque officielle pour graphiques personnalises -->
     <!-- <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script> -->
     <!-- Tailwind CSS - Compiled CSS file (production-ready, replaces CDN) -->
     <link rel="stylesheet" href="/css/tailwind.css">
@@ -430,7 +430,7 @@
                 }
                 
                 if (window.Recharts && window.Recharts.LineChart && window.Recharts.ResponsiveContainer) {
-                    console.log('✅ Recharts exposé et prêt');
+                    console.log(' Recharts expose et pret');
                     // Dispatch event for components waiting for Recharts
                     window.dispatchEvent(new CustomEvent('recharts-ready'));
                     return true;
@@ -466,7 +466,7 @@
 
     <!-- Scripts Tab Seeking Alpha & Scraping -->
     <script type="text/babel" src="js/dashboard/components/tabs/YieldCurveTab.js"></script>
-    <!-- YieldCurveLiteTab - Version simplifiée pour la grille DashboardGridWrapper -->
+    <!-- YieldCurveLiteTab - Version simplifiee pour la grille DashboardGridWrapper -->
     <script type="text/babel" src="js/dashboard/components/tabs/YieldCurveLiteTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/EconomicCalendarTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/DansWatchlistTab.js"></script>
@@ -475,11 +475,11 @@
     <script type="text/babel" src="js/dashboard/components/tabs/SeekingAlphaTab.js"></script>
     <script type="text/babel" src="js/dashboard/components/tabs/ScrappingSATab.js"></script>
     
-    <!-- Styles des thèmes -->
+    <!-- Styles des themes -->
     <link rel="stylesheet" href="/css/themes.css">
-    <!-- GOB Design System - Styles consolidés (tokens, spacing, accessibility, components, animations, fonts, etc.) -->
+    <!-- GOB Design System - Styles consolides (tokens, spacing, accessibility, components, animations, fonts, etc.) -->
     <link rel="stylesheet" href="/css/gob-design-system.css">
-    <!-- Google Fonts pour les polices personnalisées des thèmes -->
+    <!-- Google Fonts pour les polices personnalisees des themes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Source+Sans+Pro:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Avenir+Next:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&family=Georgia:wght@400;700&display=swap" rel="stylesheet">
@@ -489,7 +489,7 @@
     
     <!-- Environment Configuration from env-config.js -->
     <script src="/js/env-config.js"></script>
-    <!-- PERF #16 FIX: State Persistence pour éviter rechargement complet -->
+    <!-- PERF #16 FIX: State Persistence pour eviter rechargement complet -->
     <script src="/js/dashboard/state-persistence.js"></script>
     <!-- Mock API for Local Development -->
     <script src="/js/dashboard/mock-api.js"></script>
@@ -501,28 +501,28 @@
     <!-- Toast Notification Manager (Global) -->
     <script src="/js/utils/toast-manager.js"></script>
 
-    <!-- Script pour exposer les bibliothèques globalement -->
+    <!-- Script pour exposer les bibliotheques globalement -->
     <script>
         // Exposer Recharts globalement (CRITIQUE pour CurveWatch)
-        // Recharts est chargé via CDN, mais doit être exposé correctement
+        // Recharts est charge via CDN, mais doit etre expose correctement
         (function() {
-            // Attendre que Recharts soit chargé
+            // Attendre que Recharts soit charge
             function exposeRecharts() {
                 // Si Recharts est disponible globalement (via CDN)
                 if (typeof Recharts !== 'undefined') {
                     window.Recharts = Recharts;
-                    // Gérer le format UMD
+                    // Gerer le format UMD
                     if (Recharts.default) {
                         const recharts = Recharts.default;
                         window.Recharts = recharts;
-                        // Copier aussi les exports au niveau supérieur
+                        // Copier aussi les exports au niveau superieur
                         Object.keys(recharts).forEach(key => {
                             if (!window.Recharts[key]) {
                                 window.Recharts[key] = recharts[key];
                             }
                         });
                     }
-                    console.log('✅ Recharts exposé globalement:', {
+                    console.log(' Recharts expose globalement:', {
                         hasLineChart: !!(window.Recharts && window.Recharts.LineChart),
                         hasResponsiveContainer: !!(window.Recharts && window.Recharts.ResponsiveContainer)
                     });
@@ -531,19 +531,19 @@
                 return false;
             }
             
-            // Essayer immédiatement
+            // Essayer immediatement
             if (!exposeRecharts()) {
                 // Attendre le chargement de la page
                 window.addEventListener('load', function() {
                     setTimeout(exposeRecharts, 100);
                 });
-                // Vérifier périodiquement
+                // Verifier periodiquement
                 const checkInterval = setInterval(() => {
                     if (exposeRecharts()) {
                         clearInterval(checkInterval);
                     }
                 }, 100);
-                // Arrêter après 5 secondes
+                // Arreter apres 5 secondes
                 setTimeout(() => clearInterval(checkInterval), 5000);
             }
         })();
@@ -552,10 +552,10 @@
         // INJECTION VARIABLE D'ENVIRONNEMENT VITE_GROUP_CHAT_URL
         // ============================================
         // Pour Babel inline, on doit passer la variable via un script
-        // En production Vercel, cette variable sera injectée côté serveur
-        // En développement, elle peut être définie dans window.importMetaEnv
+        // En production Vercel, cette variable sera injectee cote serveur
+        // En developpement, elle peut etre definie dans window.importMetaEnv
         (function() {
-            // Essayer de récupérer depuis window.importMetaEnv (si défini par Vite)
+            // Essayer de recuperer depuis window.importMetaEnv (si defini par Vite)
             const envChatUrl = (typeof window !== 'undefined' && window.importMetaEnv && window.importMetaEnv.VITE_GROUP_CHAT_URL)
                 ? window.importMetaEnv.VITE_GROUP_CHAT_URL
                 : '';
@@ -566,7 +566,7 @@
                 metaTag.setAttribute('content', envChatUrl);
             }
             
-            // Exposer aussi via window pour accès direct
+            // Exposer aussi via window pour acces direct
             if (typeof window !== 'undefined') {
                 window.importMetaEnv = window.importMetaEnv || {};
                 if (envChatUrl) {
@@ -575,15 +575,15 @@
             }
         })();
 
-        // OPTIMISATION: Gestionnaire d'erreur global amélioré pour éviter que les erreurs de scripts externes cassent l'application
+        // OPTIMISATION: Gestionnaire d'erreur global ameliore pour eviter que les erreurs de scripts externes cassent l'application
         window.addEventListener('error', function (event) {
             // Ignorer les erreurs de scripts externes (extensions, etc.)
             if (event.filename && (event.filename.includes('share-modal') || event.filename.includes('extension'))) {
-                console.warn('⚠️ Erreur ignorée depuis un script externe:', event.filename);
+                console.warn(' Erreur ignoree depuis un script externe:', event.filename);
                 event.preventDefault();
                 return true;
             }
-            // Filtre pour éviter les erreurs TradingView répétitives
+            // Filtre pour eviter les erreurs TradingView repetitives
             const errorMsg = event.message || event.error?.message || 'Unknown error';
             const source = event.filename || 'unknown';
 
@@ -592,30 +592,30 @@
                 return;
             }
             
-            // Filtrer les erreurs TradingView répétitives (contentWindow, invalid environment)
+            // Filtrer les erreurs TradingView repetitives (contentWindow, invalid environment)
             if (source.includes('tradingview.com') || source.includes('embed-widget')) {
                 if (errorMsg.includes('contentWindow is not available') || 
                     errorMsg.includes('Invalid environment') ||
                     errorMsg.includes('Cannot listen to the event')) {
                     // Ces erreurs sont normales pour TradingView (sandbox restrictions)
-                    // Logger seulement en mode debug pour éviter la pollution de la console
+                    // Logger seulement en mode debug pour eviter la pollution de la console
                     if (window.DEBUG_MODE) {
                         console.debug(`[TradingView] ${errorMsg.substring(0, 100)}`);
                     }
-                    return; // Ne pas logger ces erreurs répétitives
+                    return; // Ne pas logger ces erreurs repetitives
                 }
             }
 
             // OPTIMISATION: Logger les erreurs dashboard pour debugging
             if (event.filename && event.filename.includes('dashboard')) {
-                console.error('❌ Erreur dashboard:', errorMsg, 'at', event.filename + ':' + event.lineno);
+                console.error(' Erreur dashboard:', errorMsg, 'at', event.filename + ':' + event.lineno);
                 if (event.error && event.error.stack) {
                     console.error('Stack:', event.error.stack);
                 }
             }
             // Log VM errors (from Babel transpilation)
             else if (!event.filename || event.filename.includes('VM')) {
-                console.error('❌ Erreur transpilation:', errorMsg);
+                console.error(' Erreur transpilation:', errorMsg);
                 if (event.error && event.error.stack) {
                     console.error('Stack:', event.error.stack);
                 } else if (event.filename) {
@@ -624,19 +624,19 @@
             }
         }, true);
 
-        // Protection contre les addEventListener sur des éléments null
+        // Protection contre les addEventListener sur des elements null
         const originalAddEventListener = EventTarget.prototype.addEventListener;
         EventTarget.prototype.addEventListener = function (type, listener, options) {
             if (this === null || this === undefined) {
-                console.warn('⚠️ Tentative d\'ajouter un event listener sur un élément null/undefined:', type);
+                console.warn(' Tentative d\'ajouter un event listener sur un element null/undefined:', type);
                 return;
             }
             return originalAddEventListener.call(this, type, listener, options);
         };
 
-        // Vérifier le chargement des bibliothèques
+        // Verifier le chargement des bibliotheques
         window.addEventListener('load', function () {
-            console.log('📚 Vérification des bibliothèques:');
+            console.log(' Verification des bibliotheques:');
             console.log('Recharts disponible:', typeof window.Recharts !== 'undefined');
             console.log('Iconoir disponible:', document.querySelectorAll('[class*="iconoir-"]').length > 0);
 
@@ -645,12 +645,12 @@
             // For production optimization, consider precompiling with: npm run build:babel
             // FIX: Check if process is defined before using it (browser compatibility)
             if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'production') {
-                console.log('ℹ️ Production mode: Consider using precompiled scripts for better performance');
+                console.log('i Production mode: Consider using precompiled scripts for better performance');
             }
         });
 
         // ============================================
-        // 🔍 FREEZE DIAGNOSTICS & FAILSAFE SYSTEM
+        //  FREEZE DIAGNOSTICS & FAILSAFE SYSTEM
         // ============================================
         (function() {
             'use strict';
@@ -663,9 +663,9 @@
                 isMonitoring: false
             };
 
-            // 🔍 DIAGNOSTIC: Identify what element is blocking clicks
+            //  DIAGNOSTIC: Identify what element is blocking clicks
             window.diagnoseFreeze = function() {
-                console.log('🔍 DIAGNOSE FREEZE - Running...');
+                console.log(' DIAGNOSE FREEZE - Running...');
                 console.log('==================================================');
                 
                 // 1) What element is at center of screen?
@@ -673,13 +673,13 @@
                 const centerY = window.innerHeight / 2;
                 const topElement = document.elementFromPoint(centerX, centerY);
                 
-                console.log('📍 TOP ELEMENT at center:', topElement);
+                console.log(' TOP ELEMENT at center:', topElement);
                 if (topElement) {
                     console.log('   id:', topElement.id || '(none)');
                     console.log('   class:', topElement.className || '(none)');
                     console.log('   tagName:', topElement.tagName);
                     topElement.style.outline = '4px solid red';
-                    console.log('   ✅ Outlined in RED');
+                    console.log('    Outlined in RED');
                 }
                 
                 // 2) Check pointer-events on body, html, root
@@ -688,10 +688,10 @@
                 const root = document.querySelector('#root');
                 const rootPE = root ? getComputedStyle(root).pointerEvents : 'N/A';
                 
-                console.log('\n🖱️ POINTER-EVENTS:');
-                console.log('   body:', bodyPE, bodyPE === 'none' ? '❌ BLOCKED!' : '✅');
-                console.log('   html:', htmlPE, htmlPE === 'none' ? '❌ BLOCKED!' : '✅');
-                console.log('   #root:', rootPE, rootPE === 'none' ? '❌ BLOCKED!' : '✅');
+                console.log('\n POINTER-EVENTS:');
+                console.log('   body:', bodyPE, bodyPE === 'none' ? ' BLOCKED!' : '');
+                console.log('   html:', htmlPE, htmlPE === 'none' ? ' BLOCKED!' : '');
+                console.log('   #root:', rootPE, rootPE === 'none' ? ' BLOCKED!' : '');
                 
                 // 3) Find all fixed/absolute overlays with high z-index
                 const allElements = document.querySelectorAll('div, section, aside, dialog, [role="dialog"]');
@@ -730,9 +730,9 @@
                     }
                 });
                 
-                console.log('\n🚧 POTENTIAL BLOCKERS (z-index >= 40, covers center):');
+                console.log('\n POTENTIAL BLOCKERS (z-index >= 40, covers center):');
                 if (blockers.length === 0) {
-                    console.log('   ✅ None found');
+                    console.log('    None found');
                 } else {
                     blockers.sort((a, b) => b.zIndex - a.zIndex);
                     blockers.slice(0, 10).forEach((b, i) => {
@@ -749,43 +749,43 @@
                     '.modal-backdrop', '.click-shield', '[class*="backdrop"]'
                 ];
                 
-                console.log('\n⏳ LOADING/MODAL OVERLAYS:');
+                console.log('\n LOADING/MODAL OVERLAYS:');
                 let foundLoading = false;
                 loadingSelectors.forEach(sel => {
                     const els = document.querySelectorAll(sel);
                     els.forEach(el => {
                         const style = getComputedStyle(el);
                         if (style.display !== 'none' && style.visibility !== 'hidden' && parseFloat(style.opacity) > 0) {
-                            console.log(`   ⚠️ VISIBLE: ${sel}`, el);
+                            console.log(`    VISIBLE: ${sel}`, el);
                             foundLoading = true;
                         }
                     });
                 });
-                if (!foundLoading) console.log('   ✅ None visible');
+                if (!foundLoading) console.log('    None visible');
                 
                 // 5) Check ReactGridLayout drag layer
                 const rglDragLayer = document.querySelector('.react-grid-layout');
                 if (rglDragLayer) {
                     const rglStyle = getComputedStyle(rglDragLayer);
-                    console.log('\n📐 REACT GRID LAYOUT:');
+                    console.log('\n REACT GRID LAYOUT:');
                     console.log('   pointerEvents:', rglStyle.pointerEvents);
                     console.log('   zIndex:', rglStyle.zIndex);
                     
                     const placeholders = document.querySelectorAll('.react-grid-placeholder, .react-draggable-dragging');
                     if (placeholders.length > 0) {
-                        console.log('   ⚠️ Active drag/placeholder elements:', placeholders.length);
+                        console.log('    Active drag/placeholder elements:', placeholders.length);
                     }
                 }
                 
                 console.log('\n==================================================');
-                console.log('💡 TO FIX: Run window.forceUnfreeze() to restore pointer-events');
+                console.log(' TO FIX: Run window.forceUnfreeze() to restore pointer-events');
                 
                 return { topElement, bodyPE, htmlPE, rootPE, blockers };
             };
 
-            // 🔧 FORCE UNFREEZE: Restore pointer-events and remove stuck overlays
+            //  FORCE UNFREEZE: Restore pointer-events and remove stuck overlays
             window.forceUnfreeze = function() {
-                console.log('🔧 FORCE UNFREEZE - Restoring UI...');
+                console.log(' FORCE UNFREEZE - Restoring UI...');
                 
                 // Restore pointer-events
                 document.body.style.pointerEvents = 'auto';
@@ -815,10 +815,10 @@
                     el.classList.remove('react-draggable-dragging');
                 });
                 
-                console.log('✅ UI should be responsive now');
+                console.log(' UI should be responsive now');
             };
 
-            // ⚡ AUTO-FAILSAFE: Periodically check and restore pointer-events
+            //  AUTO-FAILSAFE: Periodically check and restore pointer-events
             // Using longer interval (10s) to reduce main thread blocking
             const failsafeInterval = window._performanceOptimizedFailsafeInterval || 10000;
             setInterval(function() {
@@ -826,7 +826,7 @@
                 const htmlPE = getComputedStyle(document.documentElement).pointerEvents;
                 
                 if (bodyPE === 'none' || htmlPE === 'none') {
-                    console.warn('[Failsafe] ⚠️ pointer-events blocked, restoring...');
+                    console.warn('[Failsafe]  pointer-events blocked, restoring...');
                     document.body.style.pointerEvents = 'auto';
                     document.documentElement.style.pointerEvents = 'auto';
                     const root = document.querySelector('#root');
@@ -834,7 +834,7 @@
                 }
             }, failsafeInterval);
 
-            // 📊 CLICK MONITOR: Log clicks to detect if they're being captured
+            //  CLICK MONITOR: Log clicks to detect if they're being captured
             document.addEventListener('click', function(e) {
                 window._freezeDiagnostics.lastClickTime = Date.now();
                 window._freezeDiagnostics.clickCount++;
@@ -850,18 +850,18 @@
                 }
             }, true); // capture phase
 
-            // 🎯 START CLICK MONITORING
+            //  START CLICK MONITORING
             window.startClickMonitor = function() {
                 window._freezeDiagnostics.isMonitoring = true;
-                console.log('👁️ Click monitoring ENABLED - all clicks will be logged');
+                console.log(' Click monitoring ENABLED - all clicks will be logged');
             };
 
             window.stopClickMonitor = function() {
                 window._freezeDiagnostics.isMonitoring = false;
-                console.log('👁️ Click monitoring DISABLED');
+                console.log(' Click monitoring DISABLED');
             };
 
-            console.log('✅ Freeze Diagnostics loaded. Commands: diagnoseFreeze(), forceUnfreeze(), startClickMonitor()');
+            console.log(' Freeze Diagnostics loaded. Commands: diagnoseFreeze(), forceUnfreeze(), startClickMonitor()');
         })();
     </script>
 
@@ -869,14 +869,14 @@
     <script type="module">
         import { emmaConfig } from './emma-config.js';
         window.emmaConfig = emmaConfig;
-        console.log('✅ Emma Config chargé:', window.emmaConfig ? 'OK' : 'ERREUR');
+        console.log(' Emma Config charge:', window.emmaConfig ? 'OK' : 'ERREUR');
 
         // Init Toast Helper Global
         window.showToast = (msg, type = 'info') => {
             if (window.Toast) window.Toast.show(msg, type);
             else console.log('Toast:', msg);
         };
-        // BUG #A3 FIX: Welcome Toast - Positionné en haut pour ne pas couvrir la navigation
+        // BUG #A3 FIX: Welcome Toast - Positionne en haut pour ne pas couvrir la navigation
         window.addEventListener('load', () => {
             setTimeout(() => {
                 if(window.showToast) {
@@ -887,7 +887,7 @@
                         toastContainer.style.top = '24px';
                     }
                     window.showToast('Bienvenue sur votre Dashboard Premium', 'gold', 'JSLai Wealth');
-                    // Réinitialiser la position après 3 secondes
+                    // Reinitialiser la position apres 3 secondes
                     setTimeout(() => {
                         if (toastContainer) {
                             toastContainer.style.top = 'auto';
@@ -901,15 +901,15 @@
 
     <!-- Styles Emma -->
     <link rel="stylesheet" href="emma-styles.css">
-    <!-- Note: Tous les styles inline ont été extraits vers des fichiers CSS séparés -->
-    <!-- et sont importés via /css/gob-design-system.css -->
-    <!-- Fichiers créés: animations.css, fonts.css, tab-styles.css, iconoir-fixes.css, -->
+    <!-- Note: Tous les styles inline ont ete extraits vers des fichiers CSS separes -->
+    <!-- et sont importes via /css/gob-design-system.css -->
+    <!-- Fichiers crees: animations.css, fonts.css, tab-styles.css, iconoir-fixes.css, -->
     <!-- ui-effects.css, card-effects.css, mobile-responsive.css, scrollbar-styles.css, utilities.css -->
 
-    <!-- 🔐 Auth Guard - Protection du Dashboard -->
+    <!--  Auth Guard - Protection du Dashboard -->
     <script src="/js/auth-guard.js"></script>
     <!-- Note: Styles Emma IA (buttons, glass-card, footer-info-bar, etc.) -->
-    <!-- extraits vers /css/emma-components.css (importé via gob-design-system.css) -->
+    <!-- extraits vers /css/emma-components.css (importe via gob-design-system.css) -->
 </head>
 
 <body class="min-h-screen bg-black m-0 p-0">
@@ -940,7 +940,7 @@
     <!-- <script type="text/babel" src="/js/dashboard/components/tabs/FastGraphsTab.js"></script> -->
     <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisModals.js"></script>
     <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisTab.js"></script>
-    <!-- V0 Integration Wrapper - Permet d'intégrer directement les composants v0 -->
+    <!-- V0 Integration Wrapper - Permet d'integrer directement les composants v0 -->
     <script src="/js/dashboard/components/v0-integration-wrapper.js"></script>
     <script type="text/babel" src="/js/dashboard/components/tabs/CurveWatchTab.js"></script>
 
@@ -966,7 +966,7 @@
         // Mark components as ready after all scripts are parsed
         window.__COMPONENTS_READY__ = true;
         window.dispatchEvent(new CustomEvent('components-ready'));
-        console.log('✅ All component scripts loaded, components-ready event dispatched');
+        console.log(' All component scripts loaded, components-ready event dispatched');
     </script>
 
     <!-- Inline bundle - Using Babel Standalone (intentional for standalone file) -->
@@ -987,7 +987,7 @@
         setTimeout(function() {
             const loader = document.getElementById('loadingOverlay');
             if (loader && loader.style.display !== 'none') {
-                console.warn('⚠️ Failsafe triggered: Removing stuck loader');
+                console.warn(' Failsafe triggered: Removing stuck loader');
                 loader.style.opacity = '0';
                 setTimeout(() => loader.style.display = 'none', 500);
             }

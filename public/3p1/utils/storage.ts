@@ -134,18 +134,18 @@ export const localStorageAdapter: StorageAdapter = {
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (e: any) {
-      // Si QuotaExceededError, essayer de nettoyer et réessayer une fois
+      // Si QuotaExceededError, essayer de nettoyer et reessayer une fois
       if (e?.name === 'QuotaExceededError' || e?.message?.includes('quota')) {
-        console.warn(`⚠️ LocalStorage quota exceeded for ${key}, attempting cleanup...`);
-        // Nettoyer les anciennes clés de cache si possible
+        console.warn(` LocalStorage quota exceeded for ${key}, attempting cleanup...`);
+        // Nettoyer les anciennes cles de cache si possible
         try {
           const keys = Object.keys(localStorage);
           const oldCacheKeys = keys.filter(k => k.startsWith('cache_') || k.includes('_cache'));
           oldCacheKeys.forEach(k => localStorage.removeItem(k));
-          // Réessayer
+          // Reessayer
           localStorage.setItem(key, JSON.stringify(value));
         } catch (retryError) {
-          console.error('❌ Failed to save even after cleanup, data too large for localStorage', retryError);
+          console.error(' Failed to save even after cleanup, data too large for localStorage', retryError);
           throw e; // Re-throw original error
         }
       } else {

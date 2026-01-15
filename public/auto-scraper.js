@@ -6,26 +6,26 @@
  * 2. Cliquer "Lancer Scraping" (les popups s'ouvrent)
  * 3. Aller sur UNE popup Seeking Alpha
  * 4. Ouvrir F12 (Console)
- * 5. Coller CE SCRIPT et appuyer Entrée
+ * 5. Coller CE SCRIPT et appuyer Entree
  * 6. LE SCRIPT SCRAPE AUTOMATIQUEMENT TOUTES LES PAGES!
  *
  * Vous ne faites rien d'autre - le script fait TOUT!
  */
 
 (async function autoScraper() {
-  console.log('🤖 AUTO-SCRAPER DÉMARRÉ');
-  console.log('📊 Scraping automatique de toutes les pages Seeking Alpha ouvertes...');
+  console.log(' AUTO-SCRAPER DEMARRE');
+  console.log(' Scraping automatique de toutes les pages Seeking Alpha ouvertes...');
 
-  // Extraire les données de la page actuelle
+  // Extraire les donnees de la page actuelle
   const fullText = document.body.innerText;
 
   // Extraire le ticker de l'URL
   const urlMatch = window.location.href.match(/symbol\/([A-Z]+)\//);
   const ticker = urlMatch ? urlMatch[1] : 'UNKNOWN';
 
-  console.log(`✅ Scraping de ${ticker} - ${fullText.length} caractères`);
+  console.log(` Scraping de ${ticker} - ${fullText.length} caracteres`);
 
-  // Extraire des sections structurées
+  // Extraire des sections structurees
   const sections = {};
   const sectionHeaders = [
     'Investment Thesis',
@@ -46,9 +46,9 @@
     }
   });
 
-  console.log(`📦 Sections trouvées: ${Object.keys(sections).length}`);
+  console.log(` Sections trouvees: ${Object.keys(sections).length}`);
 
-  // Préparer les données à envoyer
+  // Preparer les donnees a envoyer
   const scrapedData = {
     ticker: ticker,
     fullText: fullText,
@@ -58,8 +58,8 @@
   };
 
   try {
-    // 1. Sauvegarder les données brutes dans Supabase
-    console.log('💾 Sauvegarde dans Supabase...');
+    // 1. Sauvegarder les donnees brutes dans Supabase
+    console.log(' Sauvegarde dans Supabase...');
 
     const saveResponse = await fetch('https://gobapps.com/api/seeking-alpha-scraping', {
       method: 'POST',
@@ -76,13 +76,13 @@
     });
 
     if (saveResponse.ok) {
-      console.log(`✅ Données sauvegardées pour ${ticker}`);
+      console.log(` Donnees sauvegardees pour ${ticker}`);
     } else {
-      console.warn(`⚠️ Erreur sauvegarde pour ${ticker}`);
+      console.warn(` Erreur sauvegarde pour ${ticker}`);
     }
 
     // 2. Analyser avec Perplexity
-    console.log('🤖 Analyse Perplexity en cours...');
+    console.log(' Analyse Perplexity en cours...');
 
     const analysisResponse = await fetch('https://gobapps.com/api/emma-agent', {
       method: 'POST',
@@ -90,7 +90,7 @@
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        message: `Analyse ces données Seeking Alpha pour ${ticker} et structure-les selon le schéma seeking_alpha_analysis:\n\n${scrapedData.fullText.substring(0, 15000)}`,
+        message: `Analyse ces donnees Seeking Alpha pour ${ticker} et structure-les selon le schema seeking_alpha_analysis:\n\n${scrapedData.fullText.substring(0, 15000)}`,
         context: {
           output_mode: 'data',
           ticker: ticker,
@@ -101,9 +101,9 @@
 
     if (analysisResponse.ok) {
       const analysisData = await analysisResponse.json();
-      console.log(`✅ Analyse Perplexity terminée pour ${ticker}`);
+      console.log(` Analyse Perplexity terminee pour ${ticker}`);
 
-      // 3. Sauvegarder l'analyse structurée
+      // 3. Sauvegarder l'analyse structuree
       const analysisSaveResponse = await fetch('https://gobapps.com/api/seeking-alpha-scraping', {
         method: 'POST',
         headers: {
@@ -117,29 +117,29 @@
       });
 
       if (analysisSaveResponse.ok) {
-        console.log(`✅ Analyse structurée sauvegardée pour ${ticker}`);
+        console.log(` Analyse structuree sauvegardee pour ${ticker}`);
       }
     } else {
-      console.warn(`⚠️ Erreur analyse Perplexity pour ${ticker}`);
+      console.warn(` Erreur analyse Perplexity pour ${ticker}`);
     }
 
-    console.log(`🎉 TRAITEMENT COMPLET POUR ${ticker}!`);
+    console.log(` TRAITEMENT COMPLET POUR ${ticker}!`);
     console.log('---');
-    console.log('✅ Données brutes sauvegardées');
-    console.log('✅ Analyse Perplexity terminée');
-    console.log('✅ Analyse structurée sauvegardée');
+    console.log(' Donnees brutes sauvegardees');
+    console.log(' Analyse Perplexity terminee');
+    console.log(' Analyse structuree sauvegardee');
     console.log('---');
-    console.log('💡 FERMEZ CETTE PAGE et passez à la suivante');
-    console.log('💡 Ou réexécutez ce script sur une autre page Seeking Alpha');
+    console.log(' FERMEZ CETTE PAGE et passez a la suivante');
+    console.log(' Ou reexecutez ce script sur une autre page Seeking Alpha');
 
-    // Optionnel: Fermer automatiquement la page après 3 secondes
+    // Optionnel: Fermer automatiquement la page apres 3 secondes
     setTimeout(() => {
-      console.log('🚪 Fermeture automatique dans 3 secondes...');
+      console.log(' Fermeture automatique dans 3 secondes...');
       setTimeout(() => window.close(), 3000);
     }, 2000);
 
   } catch (error) {
-    console.error(`❌ Erreur: ${error.message}`);
-    console.log('💡 Réessayez ou contactez le support');
+    console.error(` Erreur: ${error.message}`);
+    console.log(' Reessayez ou contactez le support');
   }
 })();

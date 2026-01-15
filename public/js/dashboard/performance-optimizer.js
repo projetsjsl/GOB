@@ -1,10 +1,10 @@
 /**
- * Performance Optimizer V2 - Réduit le temps de chargement et les freezes du dashboard
+ * Performance Optimizer V2 - Reduit le temps de chargement et les freezes du dashboard
  * 
- * Problèmes résolus :
- * 1. Trop de widgets TradingView chargés simultanément
- * 2. Babel prend trop de temps à traiter app-inline.js
- * 3. Erreurs répétées de TradingView
+ * Problemes resolus :
+ * 1. Trop de widgets TradingView charges simultanement
+ * 2. Babel prend trop de temps a traiter app-inline.js
+ * 3. Erreurs repetees de TradingView
  * 4. [NEW] Tab navigation freezes
  * 5. [NEW] Heavy DOM operations blocking main thread
  */
@@ -17,7 +17,7 @@
     }
     window.__performanceOptimizerInitialized = true;
 
-    console.log('🚀 Performance Optimizer V2: Initialisation...');
+    console.log(' Performance Optimizer V2: Initialisation...');
 
     // ============================================
     // TAB NAVIGATION OPTIMIZATION
@@ -134,7 +134,7 @@
         
         if (typeof url === 'string' && url.includes('tradingview-widget.com')) {
             return originalFetch.apply(this, args).catch(error => {
-                console.warn('⚠️ TradingView widget failed to load, skipping retry:', url);
+                console.warn(' TradingView widget failed to load, skipping retry:', url);
                 return new Response('', { status: 200, statusText: 'OK' });
             });
         }
@@ -184,16 +184,16 @@
             const loadTime = perfData.loadEventEnd - perfData.fetchStart;
             const domTime = perfData.domContentLoadedEventEnd - perfData.fetchStart;
             
-            console.log('📊 Performance Metrics V2:');
+            console.log(' Performance Metrics V2:');
             console.log(`   - Total Load Time: ${loadTime.toFixed(0)}ms`);
             console.log(`   - DOM Ready: ${domTime.toFixed(0)}ms`);
             console.log(`   - TradingView Scripts: ${tradingViewScriptCount}`);
             
             if (loadTime > 5000) {
-                console.warn('⚠️ Temps de chargement élevé (>5s). Le dashboard sera optimisé.');
+                console.warn(' Temps de chargement eleve (>5s). Le dashboard sera optimise.');
             }
         }, 1000);
     });
 
-    console.log('✅ Performance Optimizer V2: Actif');
+    console.log(' Performance Optimizer V2: Actif');
 })();

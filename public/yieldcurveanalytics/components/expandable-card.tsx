@@ -30,7 +30,7 @@ export function ExpandableCard({ children, title, expandedSize = "large" }: Expa
             variant="ghost"
             size="sm"
             className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-blue-500/20 hover:text-blue-300 animate-glow-premium"
-            title="Agrandir (Clic pour voir en plein écran)"
+            title="Agrandir (Clic pour voir en plein ecran)"
             aria-label="Agrandir le composant"
           >
             <Maximize2 className="size-4" />

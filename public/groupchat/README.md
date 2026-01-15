@@ -1,32 +1,32 @@
-# 🤖 JSLAI RobotWeb Ultimate v5.0
+#  JSLAI RobotWeb Ultimate v5.0
 
 Professional AI browser automation with full customization, multi-provider support, and advanced LLM integration.
 
-## ✨ Features
+##  Features
 
-### 🎯 Core
+###  Core
 - **Multi-Provider**: Simulation, Browserbase, Browserless, Steel
 - **Advanced LLM**: Claude AI with smart planning
 - **10 Simulated Sites**: Google, Booking, GitHub, Amazon, LinkedIn, YouTube, Twitter, Reddit, Wikipedia, IMDb
 
-### ⚙️ Admin Panel
+###  Admin Panel
 - **7 Themes**: Dark, Light, Midnight, Forest, Ocean, Sunset, Cyberpunk
 - **LLM Settings**: Model selection, tokens, custom instructions
 - **Provider Management**: Status, testing, configuration
 - **Connection Testing**: Test all providers at once
 
-### ⚡ Workflows
+###  Workflows
 - **8 Pre-built**: Hotel search, GitHub repos, Amazon products, LinkedIn jobs, YouTube videos, Web research, Social monitoring, Price tracking
 - **Custom Variables**: Dynamic task generation
 - **Category Filtering**: Travel, Shopping, Development, Career, Research, Social, Media
 
-### 🔬 Expert Mode
+###  Expert Mode
 - Detailed execution logs
 - Memory/CPU metrics
 - Debug information
 - Real-time performance stats
 
-## 🚀 Quick Start
+##  Quick Start
 
 ```bash
 # 1. Install dependencies
@@ -41,28 +41,28 @@ vercel --prod
 
 **Works immediately in Simulation mode (FREE)!**
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 jslai-robotweb/
-├── app/
-│   ├── api/
-│   │   ├── simulate/route.ts   # 10 simulated sites
-│   │   ├── browser/route.ts    # Real browser (3 providers)
-│   │   ├── config/route.ts     # Provider detection
-│   │   ├── admin/route.ts      # Settings, themes
-│   │   ├── test/route.ts       # Connectivity tests
-│   │   └── workflows/route.ts  # Pre-built automations
-│   ├── page.tsx                # Full UI with Admin
-│   ├── layout.tsx
-│   └── globals.css             # Theme system
-├── package.json
-├── next.config.js
-├── tsconfig.json
-└── vercel.json
+ app/
+    api/
+       simulate/route.ts   # 10 simulated sites
+       browser/route.ts    # Real browser (3 providers)
+       config/route.ts     # Provider detection
+       admin/route.ts      # Settings, themes
+       test/route.ts       # Connectivity tests
+       workflows/route.ts  # Pre-built automations
+    page.tsx                # Full UI with Admin
+    layout.tsx
+    globals.css             # Theme system
+ package.json
+ next.config.js
+ tsconfig.json
+ vercel.json
 ```
 
-## 🔧 Environment Variables (Optional)
+##  Environment Variables (Optional)
 
 | Variable | Description |
 |----------|-------------|
@@ -72,7 +72,7 @@ jslai-robotweb/
 | `BROWSERLESS_API_KEY` | Browserless alternative |
 | `STEEL_API_KEY` | Steel AI-optimized browser |
 
-## 🎨 Themes
+##  Themes
 
 - **Dark** (default): Deep blacks with cyan/purple accents
 - **Light**: Clean white with blue accents
@@ -82,14 +82,14 @@ jslai-robotweb/
 - **Sunset**: Warm reds with orange accents
 - **Cyberpunk**: Neon pink/cyan on black
 
-## 📋 Example Tasks
+##  Example Tasks
 
 ### Simulation Mode (FREE)
-- `Hotels in Paris on Booking` → 5 hotels with prices
-- `React projects on GitHub` → 4 repos with stars
-- `iPhone 15 on Amazon` → 4 products with prices
-- `Developer jobs on LinkedIn` → 4 job listings
-- `JavaScript tutorial on YouTube` → 4 videos
+- `Hotels in Paris on Booking` -> 5 hotels with prices
+- `React projects on GitHub` -> 4 repos with stars
+- `iPhone 15 on Amazon` -> 4 products with prices
+- `Developer jobs on LinkedIn` -> 4 job listings
+- `JavaScript tutorial on YouTube` -> 4 videos
 
 ### Real Browser Mode (requires provider)
 - Any web automation task
@@ -97,13 +97,13 @@ jslai-robotweb/
 - Live debugging
 - Data extraction
 
-## 🧪 Testing
+##  Testing
 
-1. Go to Admin → Test tab
+1. Go to Admin -> Test tab
 2. Click "Test All"
 3. View results for each provider
 
-## 📊 Stats v5.0
+##  Stats v5.0
 
 - **16 files** total
 - **6 API routes**

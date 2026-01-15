@@ -1,52 +1,52 @@
 /**
- * RUNTIME RELATIONSHIPS - Mapping des prompts utilisés ensemble lors de l'exécution
+ * RUNTIME RELATIONSHIPS - Mapping des prompts utilises ensemble lors de l'execution
  *
- * Ce fichier définit les relations basées sur l'utilisation réelle des prompts
- * dans les différents scénarios d'exécution d'Emma (SMS, Web, Email, Messenger).
+ * Ce fichier definit les relations basees sur l'utilisation reelle des prompts
+ * dans les differents scenarios d'execution d'Emma (SMS, Web, Email, Messenger).
  *
- * Architecture d'exécution:
- * 1. Identité de base (general_identity ou spécialisée par canal)
- * 2. Intent spécifique (intent_xxx ou intent_xxx_sms/web/email)
+ * Architecture d'execution:
+ * 1. Identite de base (general_identity ou specialisee par canal)
+ * 2. Intent specifique (intent_xxx ou intent_xxx_sms/web/email)
  * 3. Standards CFA (cfa_standards, cfa_instructions)
  * 4. Format de canal (modules dynamiques: smsFormat, webFormat, emailFormat)
- * 5. Briefings (briefing_morning/midday/evening utilisent identités + outils)
+ * 5. Briefings (briefing_morning/midday/evening utilisent identites + outils)
  */
 
 /**
- * Flux d'exécution par canal et intent
+ * Flux d'execution par canal et intent
  *
  * Format:
  * {
  *   flowId: {
  *     name: "Nom du flux",
- *     description: "Description du scénario",
+ *     description: "Description du scenario",
  *     prompts: ["prompt_key1", "prompt_key2", ...],
  *     type: "channel" | "intent" | "briefing"
  *   }
  * }
  */
 export const RUNTIME_FLOWS = {
-    // ═══════════════════════════════════════════════════════════
+    // 
     // FLUX SMS - Analyses via SMS (multi-parties)
-    // ═══════════════════════════════════════════════════════════
+    // 
     "sms_comprehensive_analysis": {
-        name: "📱 SMS: Analyse Complète",
-        description: "Analyse CFA complète d'un ticker via SMS (multi-parties, 12 sections)",
+        name: " SMS: Analyse Complete",
+        description: "Analyse CFA complete d'un ticker via SMS (multi-parties, 12 sections)",
         channel: "sms",
         intent: "comprehensive_analysis",
         prompts: [
-            "general_identity_sms",       // Identité pour SMS
-            "intent_comprehensive_analysis", // Analyse complète (générique)
+            "general_identity_sms",       // Identite pour SMS
+            "intent_comprehensive_analysis", // Analyse complete (generique)
             "intent_comprehensive_analysis_sms", // Variante SMS si existe
-            "cfa_standards",              // Standards de qualité CFA
+            "cfa_standards",              // Standards de qualite CFA
             "cfa_instructions",           // Instructions de formatage
-            "cfa_identity"                // Identité professionnelle
+            "cfa_identity"                // Identite professionnelle
         ],
         dynamicModules: ["core", "smsFormat", "comprehensiveAnalysis", "qualityChecklist"]
     },
 
     "sms_stock_price": {
-        name: "📱 SMS: Prix Action",
+        name: " SMS: Prix Action",
         description: "Demande rapide de prix via SMS",
         channel: "sms",
         intent: "stock_price",
@@ -60,8 +60,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "sms_news": {
-        name: "📱 SMS: Actualités",
-        description: "Résumé des actualités financières via SMS",
+        name: " SMS: Actualites",
+        description: "Resume des actualites financieres via SMS",
         channel: "sms",
         intent: "news",
         prompts: [
@@ -74,7 +74,7 @@ export const RUNTIME_FLOWS = {
     },
 
     "sms_fundamentals": {
-        name: "📱 SMS: Fondamentaux",
+        name: " SMS: Fondamentaux",
         description: "Analyse fondamentale via SMS",
         channel: "sms",
         intent: "fundamentals",
@@ -89,7 +89,7 @@ export const RUNTIME_FLOWS = {
     },
 
     "sms_technical_analysis": {
-        name: "📱 SMS: Analyse Technique",
+        name: " SMS: Analyse Technique",
         description: "Indicateurs techniques via SMS",
         channel: "sms",
         intent: "technical_analysis",
@@ -103,8 +103,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "sms_greeting": {
-        name: "📱 SMS: Salutation",
-        description: "Première interaction SMS",
+        name: " SMS: Salutation",
+        description: "Premiere interaction SMS",
         channel: "sms",
         intent: "greeting",
         prompts: [
@@ -115,12 +115,12 @@ export const RUNTIME_FLOWS = {
         dynamicModules: ["core", "smsFormat"]
     },
 
-    // ═══════════════════════════════════════════════════════════
+    // 
     // FLUX WEB - Chatbot sur dashboard
-    // ═══════════════════════════════════════════════════════════
+    // 
     "web_comprehensive_analysis": {
-        name: "💬 Web: Analyse Complète",
-        description: "Analyse CFA complète via chatbot web (format long, markdown)",
+        name: " Web: Analyse Complete",
+        description: "Analyse CFA complete via chatbot web (format long, markdown)",
         channel: "web",
         intent: "comprehensive_analysis",
         prompts: [
@@ -136,7 +136,7 @@ export const RUNTIME_FLOWS = {
     },
 
     "web_stock_price": {
-        name: "💬 Web: Prix Action",
+        name: " Web: Prix Action",
         description: "Demande de prix via chatbot web",
         channel: "web",
         intent: "stock_price",
@@ -151,7 +151,7 @@ export const RUNTIME_FLOWS = {
     },
 
     "web_economic_analysis": {
-        name: "💬 Web: Analyse Économique",
+        name: " Web: Analyse Economique",
         description: "Analyse macro (taux, inflation, Fed) via web",
         channel: "web",
         intent: "economic_analysis",
@@ -166,8 +166,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "web_market_overview": {
-        name: "💬 Web: Vue Marché",
-        description: "Aperçu des marchés (indices, sentiment)",
+        name: " Web: Vue Marche",
+        description: "Apercu des marches (indices, sentiment)",
         channel: "web",
         intent: "market_overview",
         prompts: [
@@ -181,8 +181,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "web_greeting": {
-        name: "💬 Web: Bienvenue",
-        description: "Première interaction sur chatbot web",
+        name: " Web: Bienvenue",
+        description: "Premiere interaction sur chatbot web",
         channel: "web",
         intent: "greeting",
         prompts: [
@@ -195,12 +195,12 @@ export const RUNTIME_FLOWS = {
         dynamicModules: ["core", "webFormat"]
     },
 
-    // ═══════════════════════════════════════════════════════════
-    // FLUX EMAIL - Réponses par email
-    // ═══════════════════════════════════════════════════════════
+    // 
+    // FLUX EMAIL - Reponses par email
+    // 
     "email_comprehensive_analysis": {
-        name: "📧 Email: Analyse Complète",
-        description: "Analyse complète envoyée par email (format professionnel)",
+        name: " Email: Analyse Complete",
+        description: "Analyse complete envoyee par email (format professionnel)",
         channel: "email",
         intent: "comprehensive_analysis",
         prompts: [
@@ -216,8 +216,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "email_response": {
-        name: "📧 Email: Réponse Générale",
-        description: "Réponse générale par email",
+        name: " Email: Reponse Generale",
+        description: "Reponse generale par email",
         channel: "email",
         intent: "general_conversation",
         prompts: [
@@ -229,12 +229,12 @@ export const RUNTIME_FLOWS = {
         dynamicModules: ["core", "emailFormat"]
     },
 
-    // ═══════════════════════════════════════════════════════════
+    // 
     // FLUX MESSENGER - Facebook Messenger
-    // ═══════════════════════════════════════════════════════════
+    // 
     "messenger_stock_price": {
-        name: "💬 Messenger: Prix Action",
-        description: "Prix et données via Facebook Messenger",
+        name: " Messenger: Prix Action",
+        description: "Prix et donnees via Facebook Messenger",
         channel: "messenger",
         intent: "stock_price",
         prompts: [
@@ -248,8 +248,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "messenger_greeting": {
-        name: "💬 Messenger: Bienvenue",
-        description: "Première interaction sur Messenger",
+        name: " Messenger: Bienvenue",
+        description: "Premiere interaction sur Messenger",
         channel: "messenger",
         intent: "greeting",
         prompts: [
@@ -262,20 +262,20 @@ export const RUNTIME_FLOWS = {
         dynamicModules: ["core", "messengerFormat"]
     },
 
-    // ═══════════════════════════════════════════════════════════
+    // 
     // FLUX BRIEFINGS - Emails automatiques quotidiens
-    // ═══════════════════════════════════════════════════════════
+    // 
     "briefing_morning": {
-        name: "🌅 Briefing Matin",
-        description: "Briefing matinal quotidien (11:20 UTC, 7h20 Montréal)",
+        name: " Briefing Matin",
+        description: "Briefing matinal quotidien (11:20 UTC, 7h20 Montreal)",
         channel: "email",
         intent: "briefing",
         prompts: [
             "briefing_morning",           // Prompt principal du briefing
-            "general_identity",           // Identité de base
-            "cfa_identity",               // Crédibilité professionnelle
-            "general_instructions",       // Instructions générales
-            "briefing_standards"          // Standards de qualité briefings
+            "general_identity",           // Identite de base
+            "cfa_identity",               // Credibilite professionnelle
+            "general_instructions",       // Instructions generales
+            "briefing_standards"          // Standards de qualite briefings
         ],
         dynamicModules: ["core", "emailFormat", "qualityChecklist"],
         cron: "20 11 * * 1-5", // Weekdays 11:20 UTC
@@ -283,8 +283,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "briefing_midday": {
-        name: "🌤️ Briefing Midi",
-        description: "Briefing mi-journée (15:50 UTC, 11h50 Montréal)",
+        name: " Briefing Midi",
+        description: "Briefing mi-journee (15:50 UTC, 11h50 Montreal)",
         channel: "email",
         intent: "briefing",
         prompts: [
@@ -300,8 +300,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "briefing_evening": {
-        name: "🌆 Briefing Soir",
-        description: "Briefing de clôture (20:20 UTC, 16h20 Montréal)",
+        name: " Briefing Soir",
+        description: "Briefing de cloture (20:20 UTC, 16h20 Montreal)",
         channel: "email",
         intent: "briefing",
         prompts: [
@@ -316,11 +316,11 @@ export const RUNTIME_FLOWS = {
         recipients: ["daniel.ouellet@jsltl.ca"]
     },
 
-    // ═══════════════════════════════════════════════════════════
-    // FLUX SPÉCIALISÉS - Cas particuliers
-    // ═══════════════════════════════════════════════════════════
+    // 
+    // FLUX SPECIALISES - Cas particuliers
+    // 
     "comparative_analysis": {
-        name: "⚖️ Analyse Comparative",
+        name: " Analyse Comparative",
         description: "Comparaison de plusieurs tickers (tous canaux)",
         channel: "any",
         intent: "comparative_analysis",
@@ -335,8 +335,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "earnings_analysis": {
-        name: "📊 Analyse Résultats",
-        description: "Analyse de résultats trimestriels (earnings)",
+        name: " Analyse Resultats",
+        description: "Analyse de resultats trimestriels (earnings)",
         channel: "any",
         intent: "earnings",
         prompts: [
@@ -349,7 +349,7 @@ export const RUNTIME_FLOWS = {
     },
 
     "portfolio_management": {
-        name: "💼 Gestion Portfolio",
+        name: " Gestion Portfolio",
         description: "Gestion watchlist et team tickers",
         channel: "any",
         intent: "portfolio",
@@ -362,8 +362,8 @@ export const RUNTIME_FLOWS = {
     },
 
     "help_request": {
-        name: "❓ Demande d'Aide",
-        description: "Explication des fonctionnalités d'Emma",
+        name: " Demande d'Aide",
+        description: "Explication des fonctionnalites d'Emma",
         channel: "any",
         intent: "help",
         prompts: [
@@ -377,9 +377,9 @@ export const RUNTIME_FLOWS = {
 };
 
 /**
- * Obtient tous les prompts utilisés dans un flux
+ * Obtient tous les prompts utilises dans un flux
  * @param {string} flowId - ID du flux
- * @returns {string[]} - Liste des clés de prompts
+ * @returns {string[]} - Liste des cles de prompts
  */
 export function getFlowPrompts(flowId) {
     const flow = RUNTIME_FLOWS[flowId];
@@ -390,8 +390,8 @@ export function getFlowPrompts(flowId) {
 }
 
 /**
- * Obtient tous les flux utilisant un prompt donné
- * @param {string} promptKey - Clé du prompt
+ * Obtient tous les flux utilisant un prompt donne
+ * @param {string} promptKey - Cle du prompt
  * @returns {Object[]} - Liste des flux utilisant ce prompt
  */
 export function getFlowsUsingPrompt(promptKey) {
@@ -410,8 +410,8 @@ export function getFlowsUsingPrompt(promptKey) {
 }
 
 /**
- * Obtient tous les prompts liés à un prompt donné (via flows communs)
- * @param {string} promptKey - Clé du prompt
+ * Obtient tous les prompts lies a un prompt donne (via flows communs)
+ * @param {string} promptKey - Cle du prompt
  * @returns {Object} - { references: [], referencedBy: [], flows: [] }
  */
 export function getRelatedPrompts(promptKey) {
@@ -429,13 +429,13 @@ export function getRelatedPrompts(promptKey) {
 
     return {
         references: Array.from(relatedPrompts),
-        referencedBy: Array.from(relatedPrompts), // Bidirectionnel car utilisés ensemble
+        referencedBy: Array.from(relatedPrompts), // Bidirectionnel car utilises ensemble
         flows: flows.map(f => ({ id: f.flowId, name: f.name, description: f.description }))
     };
 }
 
 /**
- * Obtient tous les flux pour un canal spécifique
+ * Obtient tous les flux pour un canal specifique
  * @param {string} channel - 'sms' | 'web' | 'email' | 'messenger' | 'any'
  * @returns {Object[]} - Liste des flux
  */
@@ -446,7 +446,7 @@ export function getFlowsByChannel(channel) {
 }
 
 /**
- * Obtient tous les flux pour un intent spécifique
+ * Obtient tous les flux pour un intent specifique
  * @param {string} intent - Type d'intention
  * @returns {Object[]} - Liste des flux
  */

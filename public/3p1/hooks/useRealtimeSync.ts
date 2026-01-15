@@ -5,10 +5,10 @@ import { supabase } from '../services/supabase';
  * Custom hook for Supabase Realtime subscriptions
  * Provides live sync across all connected users
  * 
- * ✅ OPTIMISATIONS:
- * - Utilise useRef pour éviter les closures stale
- * - Nettoyage correct des canaux même si le composant se démonte
- * - Évite les re-souscriptions inutiles
+ *  OPTIMISATIONS:
+ * - Utilise useRef pour eviter les closures stale
+ * - Nettoyage correct des canaux meme si le composant se demonte
+ * - Evite les re-souscriptions inutiles
  * 
  * Usage:
  *   useRealtimeSync('tickers', (payload) => {
@@ -30,10 +30,10 @@ export function useRealtimeSync(
     enabled?: boolean;
   }
 ) {
-  // ✅ FIX: Utiliser useRef pour éviter les closures stale
+  //  FIX: Utiliser useRef pour eviter les closures stale
   const onDataChangeRef = useRef(onDataChange);
   
-  // Mettre à jour la ref quand le callback change
+  // Mettre a jour la ref quand le callback change
   useEffect(() => {
     onDataChangeRef.current = onDataChange;
   }, [onDataChange]);
@@ -46,9 +46,9 @@ export function useRealtimeSync(
     }
 
     const channelName = `realtime-${tableName}-${Date.now()}`;
-    console.log(`📡 Subscribing to ${tableName} changes...`);
+    console.log(` Subscribing to ${tableName} changes...`);
 
-    let isMounted = true; // Flag pour éviter les mises à jour après démontage
+    let isMounted = true; // Flag pour eviter les mises a jour apres demontage
 
     const channel = supabase
       .channel(channelName)
@@ -61,11 +61,11 @@ export function useRealtimeSync(
           filter: options?.filter,
         },
         (payload: any) => {
-          // ✅ FIX: Vérifier que le composant est toujours monté
+          //  FIX: Verifier que le composant est toujours monte
           if (!isMounted) return;
           
-          console.log(`📡 [${tableName}] ${payload.eventType}:`, payload);
-          // ✅ FIX: Utiliser la ref pour éviter les closures stale
+          console.log(` [${tableName}] ${payload.eventType}:`, payload);
+          //  FIX: Utiliser la ref pour eviter les closures stale
           onDataChangeRef.current({
             eventType: payload.eventType,
             new: payload.new,
@@ -75,32 +75,32 @@ export function useRealtimeSync(
       )
       .subscribe((status) => {
         if (isMounted) {
-          // ✅ Ne log que les statuts importants, ignorer CHANNEL_ERROR silencieusement
+          //  Ne log que les statuts importants, ignorer CHANNEL_ERROR silencieusement
           if (status === 'SUBSCRIBED') {
-            console.log(`📡 [${tableName}] Subscription status: ${status}`);
+            console.log(` [${tableName}] Subscription status: ${status}`);
           } else if (status === 'CHANNEL_ERROR') {
             // Erreur de connexion - ignorer silencieusement (non-bloquant)
-            // La synchronisation périodique servira de fallback
+            // La synchronisation periodique servira de fallback
             if (typeof window !== 'undefined' && (localStorage.getItem('3p1-debug') === 'true' || window.location.search.includes('debug=true'))) {
-              console.warn(`⚠️ [${tableName}] Subscription error (non-bloquant, fallback périodique actif)`);
+              console.warn(` [${tableName}] Subscription error (non-bloquant, fallback periodique actif)`);
             }
           } else {
             // Autres statuts (TIMED_OUT, CLOSED, etc.) - log seulement en debug
             if (typeof window !== 'undefined' && (localStorage.getItem('3p1-debug') === 'true' || window.location.search.includes('debug=true'))) {
-              console.log(`📡 [${tableName}] Subscription status: ${status}`);
+              console.log(` [${tableName}] Subscription status: ${status}`);
             }
           }
         }
       });
 
     return () => {
-      isMounted = false; // Marquer comme démonté
-      console.log(`🔌 Unsubscribing from ${tableName}`);
-      // ✅ FIX: Nettoyage robuste du canal
+      isMounted = false; // Marquer comme demonte
+      console.log(` Unsubscribing from ${tableName}`);
+      //  FIX: Nettoyage robuste du canal
       try {
         supabase.removeChannel(channel);
       } catch (error) {
-        console.warn(`⚠️ Error removing channel ${channelName}:`, error);
+        console.warn(` Error removing channel ${channelName}:`, error);
       }
     };
   }, [tableName, options?.schema, options?.filter, options?.enabled]);

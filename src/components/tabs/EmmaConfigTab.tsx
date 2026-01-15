@@ -9,14 +9,14 @@ const EmmaConfigTab: React.FC<TabProps> = ({ isDarkMode = true }) => {
   return (
     <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">🛠️ Emma Config</h2>
+        <h2 className="text-2xl font-bold"> Emma Config</h2>
         <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-          Prompts & paramètres d'Emma IA
+          Prompts & parametres d'Emma IA
         </span>
       </div>
 
       <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-        Ouvrez la page de configuration pour gérer les prompts, paramètres et sauvegardes d'Emma.
+        Ouvrez la page de configuration pour gerer les prompts, parametres et sauvegardes d'Emma.
         Les pages s'ouvrent dans un nouvel onglet.
       </p>
 

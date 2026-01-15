@@ -7,7 +7,7 @@
 
 const PlusTab = ({ isDarkMode, isProfessionalMode, setActiveTab, activeTab }) => {
     const handleLogout = () => {
-        // Nettoyer toutes les données de session
+        // Nettoyer toutes les donnees de session
         sessionStorage.clear();
         
         // Preserve settings
@@ -36,12 +36,12 @@ const PlusTab = ({ isDarkMode, isProfessionalMode, setActiveTab, activeTab }) =>
                 <h2 className={`text-2xl font-bold mb-6 transition-colors duration-300 ${
                     isDarkMode ? 'text-white' : 'text-gray-900'
                 }`}>
-                    {typeof Icon !== 'undefined' ? <Icon emoji="⚙️" name="Settings" size={24} className="mr-2 inline-block" /> : '⚙️'}
-                    Paramètres
+                    {typeof Icon !== 'undefined' ? <Icon emoji="" name="Settings" size={24} className="mr-2 inline-block" /> : ''}
+                    Parametres
                 </h2>
 
                 <div className="space-y-4">
-                    {/* ✅ FIX BUG-020: Section Compte enrichie */}
+                    {/*  FIX BUG-020: Section Compte enrichie */}
                     <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                         isDarkMode
                             ? 'bg-gray-800 border-gray-700'
@@ -55,7 +55,7 @@ const PlusTab = ({ isDarkMode, isProfessionalMode, setActiveTab, activeTab }) =>
                         <p className={`text-sm mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                         }`}>
-                            Gérez votre compte et vos préférences
+                            Gerez votre compte et vos preferences
                         </p>
                         <button 
                             onClick={handleLogout}
@@ -64,15 +64,15 @@ const PlusTab = ({ isDarkMode, isProfessionalMode, setActiveTab, activeTab }) =>
                                     ? 'bg-red-600 hover:bg-red-700 text-white'
                                     : 'bg-red-500 hover:bg-red-600 text-white'
                             } shadow-lg hover:shadow-xl transform hover:scale-105`}
-                            aria-label="Se déconnecter"
-                            title="Se déconnecter"
+                            aria-label="Se deconnecter"
+                            title="Se deconnecter"
                         >
-                            {typeof Icon !== 'undefined' ? <Icon emoji="🚪" name="LogOut" size={20} className="mr-2 inline-block" /> : '🚪'}
-                            Se déconnecter
+                            {typeof Icon !== 'undefined' ? <Icon emoji="" name="LogOut" size={20} className="mr-2 inline-block" /> : ''}
+                            Se deconnecter
                         </button>
                     </div>
                     
-                    {/* ✅ FIX BUG-020: Section Préférences ajoutée */}
+                    {/*  FIX BUG-020: Section Preferences ajoutee */}
                     <div className={`p-4 rounded-lg border transition-colors duration-300 ${
                         isDarkMode
                             ? 'bg-gray-800 border-gray-700'
@@ -81,18 +81,18 @@ const PlusTab = ({ isDarkMode, isProfessionalMode, setActiveTab, activeTab }) =>
                         <h3 className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
-                            Préférences
+                            Preferences
                         </h3>
                         <p className={`text-sm mb-4 transition-colors duration-300 ${
                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                         }`}>
-                            Personnalisez votre expérience
+                            Personnalisez votre experience
                         </p>
                         <div className="space-y-2">
                             <p className={`text-xs transition-colors duration-300 ${
                                 isDarkMode ? 'text-gray-500' : 'text-gray-500'
                             }`}>
-                                Les paramètres avancés sont disponibles dans la section Admin > Configuration
+                                Les parametres avances sont disponibles dans la section Admin > Configuration
                             </p>
                         </div>
                     </div>

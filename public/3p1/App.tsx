@@ -57,7 +57,7 @@ const LoadingFallback = () => (
 );
 
 
-// Données initiales par défaut (VIDE - en attente de chargement)
+// Donnees initiales par defaut (VIDE - en attente de chargement)
 const INITIAL_DATA: AnnualData[] = [];
 
 const INITIAL_ASSUMPTIONS: Assumptions = {
@@ -100,37 +100,37 @@ const DEFAULT_PROFILE: AnalysisProfile = {
     isWatchlist: false
 };
 
-// ✅ Configurations chargées depuis Supabase (pas de hardcoding)
-let STORAGE_KEY = 'finance_pro_profiles'; // Valeur par défaut, sera remplacée par Supabase
-let CACHE_MAX_AGE_MS = 5 * 60 * 1000; // Valeur par défaut, sera remplacée par Supabase
+//  Configurations chargees depuis Supabase (pas de hardcoding)
+let STORAGE_KEY = 'finance_pro_profiles'; // Valeur par defaut, sera remplacee par Supabase
+let CACHE_MAX_AGE_MS = 5 * 60 * 1000; // Valeur par defaut, sera remplacee par Supabase
 
-// ✅ Structure du cache avec timestamp pour invalidation automatique
+//  Structure du cache avec timestamp pour invalidation automatique
 interface CacheEntry {
     data: Record<string, AnalysisProfile>;
     timestamp: number;
 }
 
-// ✅ Helper function pour sauvegarder avec timestamp (Supabase = source de vérité, localStorage = cache)
-// ✅ NOUVEAU: Sauvegarder dans Supabase ET cache local (Supabase = source de vérité)
+//  Helper function pour sauvegarder avec timestamp (Supabase = source de verite, localStorage = cache)
+//  NOUVEAU: Sauvegarder dans Supabase ET cache local (Supabase = source de verite)
 const saveToSupabase = async (data: Record<string, AnalysisProfile>): Promise<void> => {
     try {
-        // Sauvegarder dans Supabase (source de vérité)
+        // Sauvegarder dans Supabase (source de verite)
         const { saveProfilesBatchToSupabase } = await import('./services/profileApi');
         const result = await saveProfilesBatchToSupabase(data);
         
         if (result.failed > 0) {
-            console.warn(`⚠️ ${result.failed} profils n'ont pas pu être sauvegardés dans Supabase:`, result.errors.slice(0, 5));
+            console.warn(` ${result.failed} profils n'ont pas pu etre sauvegardes dans Supabase:`, result.errors.slice(0, 5));
         }
         
         if (result.success > 0) {
-            console.log(`✅ ${result.success} profils sauvegardés dans Supabase`);
+            console.log(` ${result.success} profils sauvegardes dans Supabase`);
         }
     } catch (e) {
         console.warn('Failed to save to Supabase:', e);
     }
 };
 
-// ✅ Cache local uniquement (pour performance, Supabase = source de vérité)
+//  Cache local uniquement (pour performance, Supabase = source de verite)
 const saveToCache = async (data: Record<string, AnalysisProfile>): Promise<void> => {
     try {
         const cacheEntry: CacheEntry = {
@@ -143,10 +143,10 @@ const saveToCache = async (data: Record<string, AnalysisProfile>): Promise<void>
     }
 };
 
-// ✅ Sauvegarder dans Supabase ET cache local
+//  Sauvegarder dans Supabase ET cache local
 const saveProfiles = async (data: Record<string, AnalysisProfile>, saveToSupabaseFirst: boolean = true): Promise<void> => {
     if (saveToSupabaseFirst) {
-        // Sauvegarder dans Supabase d'abord (source de vérité)
+        // Sauvegarder dans Supabase d'abord (source de verite)
         await saveToSupabase(data);
     }
     
@@ -177,15 +177,15 @@ const ProgressBar = ({ current, total }: { current: number; total: number }) => 
 export default function App() {
     // --- VERSION INDICATOR ---
     useEffect(() => {
-        console.log('🚀 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels activés');
-        console.log('✅ Modifications disponibles:');
+        console.log(' 3p1 App v2.1.0 - Filtres/Tri & Rapports Visuels actives');
+        console.log(' Modifications disponibles:');
         console.log('   - Section "Filtres et Tri" en bas de sidebar');
-        console.log('   - Bouton 📊 Rapports dans Header');
-        console.log('   - Bouton ⚙️ Settings fonctionnel');
+        console.log('   - Bouton  Rapports dans Header');
+        console.log('   - Bouton  Settings fonctionnel');
     }, []);
 
     // --- GLOBAL STATE & PERSISTENCE ---
-    // Vérifier si l'utilisateur a déjà vu la landing page
+    // Verifier si l'utilisateur a deja vu la landing page
     const [showLanding, setShowLanding] = useState(() => {
         const hasSeenLanding = localStorage.getItem('3p1-has-seen-landing');
         return hasSeenLanding !== 'true';
@@ -201,7 +201,7 @@ export default function App() {
     const [showConfirmSync, setShowConfirmSync] = useState(false);
     const [showAdvancedSyncDialog, setShowAdvancedSyncDialog] = useState(false);
     const [isAdvancedSyncForBulk, setIsAdvancedSyncForBulk] = useState(false);
-    const [isLoading, setIsLoading] = useState(false); // État pour la synchronisation d'un seul ticker
+    const [isLoading, setIsLoading] = useState(false); // Etat pour la synchronisation d'un seul ticker
     const [showRestoreDialog, setShowRestoreDialog] = useState(false);
     const [latestSnapshotDate, setLatestSnapshotDate] = useState<string | undefined>(undefined);
     const [notifications, setNotifications] = useState<Array<{ id: string; message: string; type: 'success' | 'error' | 'warning' | 'info' }>>([]);
@@ -235,7 +235,7 @@ export default function App() {
     const handleSaveConfig = (newConfig: GuardrailConfig) => {
         setGuardrailConfig(newConfig);
         saveConfig(newConfig);
-        showNotification('Configuration sauvegardée avec succès', 'success');
+        showNotification('Configuration sauvegardee avec succes', 'success');
     };
 
     const handleSettingsClose = () => {
@@ -243,9 +243,9 @@ export default function App() {
         // Reload guardrail config after settings are saved (async)
         loadConfig().then(config => {
             setGuardrailConfig(config);
-            // Invalider le cache pour recharger les nouveaux paramètres
+            // Invalider le cache pour recharger les nouveaux parametres
             invalidateValidationSettingsCache();
-            showNotification('Paramètres de validation mis à jour', 'success');
+            showNotification('Parametres de validation mis a jour', 'success');
         }).catch(console.error);
     };
 
@@ -264,37 +264,37 @@ export default function App() {
     /**
      * --- SUPABASE REALTIME SUBSCRIPTIONS ---
      * 
-     * Synchronisation temps réel via Supabase Realtime pour cohérence multi-utilisateurs.
+     * Synchronisation temps reel via Supabase Realtime pour coherence multi-utilisateurs.
      * 
      * Architecture :
-     * - Écoute les changements sur la table 'tickers'
-     * - INSERT/DELETE → Force rechargement complet (invalide cache)
-     * - UPDATE → Met à jour métriques ValueLine directement
-     * - Synchronisation périodique (2 min) comme fallback
+     * - Ecoute les changements sur la table 'tickers'
+     * - INSERT/DELETE -> Force rechargement complet (invalide cache)
+     * - UPDATE -> Met a jour metriques ValueLine directement
+     * - Synchronisation periodique (2 min) comme fallback
      * 
      * Gestion des race conditions :
-     * - useRef pour onDataChange (évite closures stale)
-     * - isMounted check (évite updates sur unmounted)
-     * - Timeout avec cleanup (évite fuites mémoire)
+     * - useRef pour onDataChange (evite closures stale)
+     * - isMounted check (evite updates sur unmounted)
+     * - Timeout avec cleanup (evite fuites memoire)
      * - Invalidation cache explicite
      * 
      * Performance :
-     * - Délai de 100ms pour batch updates (évite rapid re-renders)
-     * - Cache invalidation seulement si nécessaire
-     * - Cleanup automatique au démontage
+     * - Delai de 100ms pour batch updates (evite rapid re-renders)
+     * - Cache invalidation seulement si necessaire
+     * - Cleanup automatique au demontage
      * 
-     * @see useRealtimeSync hook pour l'implémentation
+     * @see useRealtimeSync hook pour l'implementation
      * @see loadTickersFromSupabase pour le rechargement
      */
     // Live sync: when any user adds/updates/deletes tickers, all clients see it instantly
-    // ✅ OPTIMISATION: Utiliser useRef pour éviter les closures stale et les race conditions
+    //  OPTIMISATION: Utiliser useRef pour eviter les closures stale et les race conditions
     const realtimeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const loadTickersFromSupabaseRef = useRef<(() => Promise<void>) | null>(null);
     
     useRealtimeSync('tickers', (payload) => {
-        console.log('📡 [3p1] Realtime ticker change:', payload.eventType, payload.new?.ticker || payload.old?.ticker);
+        console.log(' [3p1] Realtime ticker change:', payload.eventType, payload.new?.ticker || payload.old?.ticker);
         
-        // ✅ FIX: Annuler le timeout précédent pour éviter les race conditions
+        //  FIX: Annuler le timeout precedent pour eviter les race conditions
         if (realtimeTimeoutRef.current) {
             clearTimeout(realtimeTimeoutRef.current);
             realtimeTimeoutRef.current = null;
@@ -303,33 +303,33 @@ export default function App() {
         if (payload.eventType === 'INSERT' && payload.new) {
             const symbol = payload.new.ticker?.toUpperCase();
             if (symbol) {
-                showNotification(`📡 Nouveau ticker ajouté par un autre utilisateur: ${symbol}`, 'info');
-                // ✅ NOUVEAU : Invalider le cache localStorage automatiquement
+                showNotification(` Nouveau ticker ajoute par un autre utilisateur: ${symbol}`, 'info');
+                //  NOUVEAU : Invalider le cache localStorage automatiquement
                 storage.removeItem(STORAGE_KEY).catch(console.warn);
-                // ✅ FORCER le rechargement complet depuis Supabase pour synchronisation
+                //  FORCER le rechargement complet depuis Supabase pour synchronisation
                 hasLoadedTickersRef.current = false;
                 supabaseTickersCacheRef.current = null; // Invalider le cache
-                // ✅ FIX: Utiliser un timeout avec nettoyage pour éviter les fuites mémoire
+                //  FIX: Utiliser un timeout avec nettoyage pour eviter les fuites memoire
                 realtimeTimeoutRef.current = setTimeout(() => {
                     realtimeTimeoutRef.current = null;
                     if (loadTickersFromSupabaseRef.current) {
                         loadTickersFromSupabaseRef.current();
                     }
-                }, 300); // Réduit à 300ms pour réactivité
+                }, 300); // Reduit a 300ms pour reactivite
             }
         } else if (payload.eventType === 'DELETE' && payload.old) {
             const symbol = payload.old.ticker?.toUpperCase();
             if (symbol) {
-                showNotification(`📡 Ticker supprimé par un autre utilisateur: ${symbol}`, 'warning');
-                // ✅ NOUVEAU : Invalider le cache localStorage automatiquement
+                showNotification(` Ticker supprime par un autre utilisateur: ${symbol}`, 'warning');
+                //  NOUVEAU : Invalider le cache localStorage automatiquement
                 storage.removeItem(STORAGE_KEY).catch(console.warn);
-                // ✅ Supprimer du state local ET forcer rechargement
+                //  Supprimer du state local ET forcer rechargement
                 setLibrary(prev => {
                     const updated = { ...prev };
                     delete updated[symbol];
                     return updated;
                 });
-                // Recharger depuis Supabase pour être sûr
+                // Recharger depuis Supabase pour etre sur
                 hasLoadedTickersRef.current = false;
                 supabaseTickersCacheRef.current = null;
                 realtimeTimeoutRef.current = setTimeout(() => {
@@ -342,10 +342,10 @@ export default function App() {
         } else if (payload.eventType === 'UPDATE' && payload.new) {
             const symbol = payload.new.ticker?.toUpperCase();
             if (symbol) {
-                showNotification(`📡 Ticker mis à jour: ${symbol}`, 'info');
-                // ✅ NOUVEAU : Invalider le cache localStorage automatiquement
+                showNotification(` Ticker mis a jour: ${symbol}`, 'info');
+                //  NOUVEAU : Invalider le cache localStorage automatiquement
                 storage.removeItem(STORAGE_KEY).catch(console.warn);
-                // ✅ Mettre à jour les métriques ValueLine ET recharger pour cohérence
+                //  Mettre a jour les metriques ValueLine ET recharger pour coherence
                 setLibrary(prev => {
                     if (!prev[symbol]) return prev;
                     return {
@@ -374,7 +374,7 @@ export default function App() {
                         }
                     };
                 });
-                // Recharger depuis Supabase pour synchronisation complète
+                // Recharger depuis Supabase pour synchronisation complete
                 hasLoadedTickersRef.current = false;
                 supabaseTickersCacheRef.current = null;
                 realtimeTimeoutRef.current = setTimeout(() => {
@@ -382,12 +382,12 @@ export default function App() {
                     if (loadTickersFromSupabaseRef.current) {
                         loadTickersFromSupabaseRef.current();
                     }
-                }, 500); // Réduit à 500ms pour réactivité
+                }, 500); // Reduit a 500ms pour reactivite
             }
         }
     });
     
-    // ✅ FIX: Nettoyer le timeout au démontage pour éviter les fuites mémoire
+    //  FIX: Nettoyer le timeout au demontage pour eviter les fuites memoire
     useEffect(() => {
         return () => {
             if (realtimeTimeoutRef.current) {
@@ -411,14 +411,14 @@ export default function App() {
                 setIsAdmin(true);
                 // Persist admin role in localStorage for session
                 localStorage.setItem('3p1-admin', 'true');
-                console.log('🔐 Admin access granted via URL parameter');
+                console.log(' Admin access granted via URL parameter');
                 return;
             }
             
             // Check localStorage for persisted admin flag
             if (localStorage.getItem('3p1-admin') === 'true') {
                 setIsAdmin(true);
-                console.log('🔐 Admin access granted via localStorage');
+                console.log(' Admin access granted via localStorage');
                 return;
             }
             
@@ -429,7 +429,7 @@ export default function App() {
                 // Check multiple possible admin indicators
                 if (user.role === 'admin' || user.is_admin === true || user.username === 'admin' || user.id === 'admin') {
                     setIsAdmin(true);
-                    console.log('🔐 Admin access granted via sessionStorage');
+                    console.log(' Admin access granted via sessionStorage');
                 }
             }
         } catch (e) {
@@ -437,18 +437,18 @@ export default function App() {
         }
     }, []);
 
-    // ✅ Fonction cachée pour toggle admin mode (double-clic sur logo)
+    //  Fonction cachee pour toggle admin mode (double-clic sur logo)
     const handleToggleAdmin = () => {
         const newAdminState = !isAdmin;
         setIsAdmin(newAdminState);
         if (newAdminState) {
             localStorage.setItem('3p1-admin', 'true');
-            console.log('🔐 Mode admin activé (double-clic sur logo)');
-            showNotification('🔐 Mode admin activé', 'success');
+            console.log(' Mode admin active (double-clic sur logo)');
+            showNotification(' Mode admin active', 'success');
         } else {
             localStorage.removeItem('3p1-admin');
-            console.log('🔓 Mode admin désactivé (double-clic sur logo)');
-            showNotification('🔓 Mode admin désactivé', 'info');
+            console.log(' Mode admin desactive (double-clic sur logo)');
+            showNotification(' Mode admin desactive', 'info');
         }
     };
 
@@ -456,7 +456,7 @@ export default function App() {
     const handleAdminRepair = async (tickerToRepair: string) => {
         setIsRepairing(tickerToRepair);
         try {
-            console.log(`🔧 Admin: Repairing ${tickerToRepair}...`);
+            console.log(` Admin: Repairing ${tickerToRepair}...`);
             const result = await fetchCompanyData(tickerToRepair);
             
             if (result.data && result.data.length > 0) {
@@ -504,13 +504,13 @@ export default function App() {
                    };
                 });
                 
-                showNotification(`✅ Repaired ${tickerToRepair}`, 'success');
+                showNotification(` Repaired ${tickerToRepair}`, 'success');
             } else {
-                showNotification(`❌ Failed to fetch data for ${tickerToRepair}`, 'error');
+                showNotification(` Failed to fetch data for ${tickerToRepair}`, 'error');
             }
         } catch (e) {
             console.error(e);
-            showNotification(`❌ Error repairing ${tickerToRepair}`, 'error');
+            showNotification(` Error repairing ${tickerToRepair}`, 'error');
         } finally {
             setIsRepairing(null);
         }
@@ -529,41 +529,41 @@ export default function App() {
     useEffect(() => {
         const loadFromStorage = async () => {
             try {
-                // ✅ NOUVEAU: Charger depuis Supabase d'abord (source de vérité)
-                console.log('📡 Chargement des profils depuis Supabase...');
+                //  NOUVEAU: Charger depuis Supabase d'abord (source de verite)
+                console.log(' Chargement des profils depuis Supabase...');
                 const { loadAllProfilesFromSupabase } = await import('./services/profileApi');
                 const supabaseResult = await loadAllProfilesFromSupabase();
                 
                 let parsed: Record<string, AnalysisProfile> = {};
                 
                 if (supabaseResult.success && Object.keys(supabaseResult.profiles).length > 0) {
-                    // ✅ Utiliser les profils depuis Supabase
+                    //  Utiliser les profils depuis Supabase
                     parsed = supabaseResult.profiles;
-                    console.log(`✅ ${Object.keys(parsed).length} profils chargés depuis Supabase`);
+                    console.log(` ${Object.keys(parsed).length} profils charges depuis Supabase`);
                     
-                    // Mettre à jour le cache local avec les données Supabase (cache uniquement, Supabase = source de vérité)
+                    // Mettre a jour le cache local avec les donnees Supabase (cache uniquement, Supabase = source de verite)
                     await saveToCache(parsed);
                 } else {
-                    // ✅ Fallback: Charger depuis cache local si Supabase échoue
-                    console.log('⚠️ Échec chargement Supabase, fallback sur cache local...');
+                    //  Fallback: Charger depuis cache local si Supabase echoue
+                    console.log(' Echec chargement Supabase, fallback sur cache local...');
                     const saved = await storage.getItem(STORAGE_KEY);
                     if (saved) {
                         let cacheTimestamp: number | null = null;
                         
-                        // ✅ NOUVEAU : Vérifier si c'est la nouvelle structure avec timestamp
+                        //  NOUVEAU : Verifier si c'est la nouvelle structure avec timestamp
                         if (saved && typeof saved === 'object' && 'data' in saved && 'timestamp' in saved) {
                             const cacheEntry = saved as CacheEntry;
                             cacheTimestamp = cacheEntry.timestamp;
                             parsed = cacheEntry.data;
                             
-                            // ✅ Vérifier si le cache est obsolète (> 5 min)
+                            //  Verifier si le cache est obsolete (> 5 min)
                             const now = Date.now();
                             const cacheAge = now - cacheTimestamp;
                             if (cacheAge > CACHE_MAX_AGE_MS) {
-                                console.log(`🔄 Cache obsolète (${Math.round(cacheAge / 1000 / 60)} min) - Ignoré`);
+                                console.log(` Cache obsolete (${Math.round(cacheAge / 1000 / 60)} min) - Ignore`);
                                 parsed = {};
                             } else {
-                                console.log(`✅ Cache valide (${Math.round(cacheAge / 1000)}s) - Utilisation cache local`);
+                                console.log(` Cache valide (${Math.round(cacheAge / 1000)}s) - Utilisation cache local`);
                             }
                         } else if (typeof saved === 'string') {
                             // Migration depuis ancien format (string)
@@ -592,21 +592,21 @@ export default function App() {
                         }
 
                         if (removedMutualFunds.length > 0) {
-                            console.log(`🧹 ${removedMutualFunds.length} fonds mutuel(s) supprimé(s) automatiquement`);
-                            // ✅ Sauvegarder dans Supabase ET cache local
+                            console.log(` ${removedMutualFunds.length} fonds mutuel(s) supprime(s) automatiquement`);
+                            //  Sauvegarder dans Supabase ET cache local
                             await saveProfiles(cleaned, true);
                         }
 
                         if (Object.keys(cleaned).length > 0) {
                             setLibrary(cleaned);
-                            // Sélectionner le premier ticker en ordre alphabétique
+                            // Selectionner le premier ticker en ordre alphabetique
                             const sortedKeys = Object.keys(cleaned).sort((a, b) =>
                                 (cleaned[a].info.preferredSymbol || a).localeCompare(cleaned[b].info.preferredSymbol || b)
                             );
                             setActiveId(sortedKeys[0]);
                         } else {
-                            // ✅ NOUVEAU : Cache vide ou obsolète → Forcer chargement depuis Supabase
-                            console.log('📡 Cache vide ou obsolète - Chargement depuis Supabase...');
+                            //  NOUVEAU : Cache vide ou obsolete -> Forcer chargement depuis Supabase
+                            console.log(' Cache vide ou obsolete - Chargement depuis Supabase...');
                             setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                             setActiveId(DEFAULT_PROFILE.id);
                             // Marquer pour forcer le chargement depuis Supabase
@@ -614,8 +614,8 @@ export default function App() {
                             supabaseTickersCacheRef.current = null;
                         }
                     } else {
-                        // ✅ NOUVEAU : Aucun cache → Forcer chargement depuis Supabase
-                        console.log('📡 Aucun cache trouvé - Chargement depuis Supabase...');
+                        //  NOUVEAU : Aucun cache -> Forcer chargement depuis Supabase
+                        console.log(' Aucun cache trouve - Chargement depuis Supabase...');
                         setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                         setActiveId(DEFAULT_PROFILE.id);
                         // Marquer pour forcer le chargement depuis Supabase
@@ -625,8 +625,8 @@ export default function App() {
                 }
             } catch (e) {
                 console.warn("Storage access failed", e);
-                // ✅ NOUVEAU : Erreur de cache → Forcer chargement depuis Supabase
-                console.log('📡 Erreur accès cache - Chargement depuis Supabase...');
+                //  NOUVEAU : Erreur de cache -> Forcer chargement depuis Supabase
+                console.log(' Erreur acces cache - Chargement depuis Supabase...');
                 setLibrary({ [DEFAULT_PROFILE.id]: DEFAULT_PROFILE });
                 setActiveId(DEFAULT_PROFILE.id);
                 // Marquer pour forcer le chargement depuis Supabase
@@ -641,7 +641,7 @@ export default function App() {
 
     // --- LOAD TICKERS FROM SUPABASE ON INITIALIZATION ---
     const [isLoadingTickers, setIsLoadingTickers] = useState(false);
-    // États pour la progression du chargement Supabase
+    // Etats pour la progression du chargement Supabase
     const [supabaseProgress, setSupabaseProgress] = useState({
         current: 0,
         total: 0,
@@ -649,13 +649,13 @@ export default function App() {
         message: ''
     });
     const [tickersLoadError, setTickersLoadError] = useState<string | null>(null);
-    const hasLoadedTickersRef = useRef(false); // Flag pour éviter les chargements multiples
-    const activeIdRef = useRef(activeId); // Ref pour accéder à activeId sans dépendance
-    const supabaseTickersCacheRef = useRef<{ data: any[]; timestamp: number } | null>(null); // Cache pour éviter les appels répétés
+    const hasLoadedTickersRef = useRef(false); // Flag pour eviter les chargements multiples
+    const activeIdRef = useRef(activeId); // Ref pour acceder a activeId sans dependance
+    const supabaseTickersCacheRef = useRef<{ data: any[]; timestamp: number } | null>(null); // Cache pour eviter les appels repetes
     const SUPABASE_CACHE_TTL = 60000; // Cache valide pendant 60 secondes
-    const isLoadingProfileRef = useRef(false); // Flag pour éviter les sauvegardes pendant le chargement d'un profil
+    const isLoadingProfileRef = useRef(false); // Flag pour eviter les sauvegardes pendant le chargement d'un profil
 
-    // Mettre à jour la ref quand activeId change
+    // Mettre a jour la ref quand activeId change
     useEffect(() => {
         activeIdRef.current = activeId;
     }, [activeId]);
@@ -663,31 +663,31 @@ export default function App() {
     useEffect(() => {
         if (!isInitialized) return;
         
-        // Éviter les chargements multiples
+        // Eviter les chargements multiples
         if (hasLoadedTickersRef.current) {
             return;
         }
 
-        // ✅ Mise à jour automatique des prix à l'ouverture (remplace le cron continu)
-        // NOTE: Désactivé car l'endpoint /api/market-data-batch n'existe pas
-        // Si nécessaire, utiliser /api/marketdata/batch à la place
+        //  Mise a jour automatique des prix a l'ouverture (remplace le cron continu)
+        // NOTE: Desactive car l'endpoint /api/market-data-batch n'existe pas
+        // Si necessaire, utiliser /api/marketdata/batch a la place
         const refreshPriceCacheIfNeeded = async () => {
-            // Endpoint désactivé - pas d'appel API inutile
-            // Le cache sera mis à jour lors de la synchronisation normale
+            // Endpoint desactive - pas d'appel API inutile
+            // Le cache sera mis a jour lors de la synchronisation normale
             return;
         };
 
         const loadTickersFromSupabase = async () => {
-            // Éviter les chargements multiples simultanés
+            // Eviter les chargements multiples simultanes
             if (isLoadingTickers) {
-                console.log('⏳ Chargement tickers déjà en cours, ignoré');
+                console.log(' Chargement tickers deja en cours, ignore');
                 return;
             }
             
-            // ✅ Stocker la fonction dans useRef pour utilisation dans useRealtimeSync
+            //  Stocker la fonction dans useRef pour utilisation dans useRealtimeSync
             loadTickersFromSupabaseRef.current = loadTickersFromSupabase;
             
-            // ✅ NE PAS marquer comme chargé AVANT d'avoir réussi (pour permettre retry si échec)
+            //  NE PAS marquer comme charge AVANT d'avoir reussi (pour permettre retry si echec)
             setIsLoadingTickers(true);
             setTickersLoadError(null);
             
@@ -699,97 +699,97 @@ export default function App() {
                 message: 'Chargement de la liste des tickers...'
             });
             
-            console.log('📡 Début chargement tickers depuis Supabase...');
+            console.log(' Debut chargement tickers depuis Supabase...');
 
             try {
                 const result = await loadAllTickersFromSupabase();
 
                 if (!result.success) {
                     const errorMsg = result.error || 'Erreur lors du chargement des tickers';
-                    console.error('❌ Échec chargement tickers:', errorMsg);
+                    console.error(' Echec chargement tickers:', errorMsg);
                     setTickersLoadError(errorMsg);
                     setIsLoadingTickers(false);
-                    hasLoadedTickersRef.current = false; // Réessayer au prochain render
+                    hasLoadedTickersRef.current = false; // Reessayer au prochain render
                     
-                    // ✅ Afficher notification d'erreur visible
+                    //  Afficher notification d'erreur visible
                     showNotification(
-                        `❌ Impossible de charger les tickers: ${errorMsg}\n\nVérifiez votre connexion et réessayez.`,
+                        ` Impossible de charger les tickers: ${errorMsg}\n\nVerifiez votre connexion et reessayez.`,
                         'error'
                     );
                     return;
                 }
                 
-                // ✅ Vérifier qu'on a bien des tickers
+                //  Verifier qu'on a bien des tickers
                 if (!result.tickers || result.tickers.length === 0) {
-                    console.warn('⚠️ Aucun ticker retourné par l\'API');
-                    setTickersLoadError('Aucun ticker trouvé dans la base de données');
+                    console.warn(' Aucun ticker retourne par l\'API');
+                    setTickersLoadError('Aucun ticker trouve dans la base de donnees');
                     setIsLoadingTickers(false);
                     hasLoadedTickersRef.current = false;
                     
                     showNotification(
-                        '⚠️ Aucun ticker trouvé dans la base de données.\n\nVérifiez que des tickers sont actifs dans Supabase.',
+                        ' Aucun ticker trouve dans la base de donnees.\n\nVerifiez que des tickers sont actifs dans Supabase.',
                         'warning'
                     );
                     return;
                 }
                 
-                console.log(`✅ ${result.tickers.length} tickers chargés depuis Supabase`);
+                console.log(` ${result.tickers.length} tickers charges depuis Supabase`);
                 
-                // ✅ NETTOYAGE AUTOMATIQUE: Supprimer les profils obsolètes qui ne sont plus dans Supabase
+                //  NETTOYAGE AUTOMATIQUE: Supprimer les profils obsoletes qui ne sont plus dans Supabase
                 try {
                     const cleanupResult = await autoCleanupProfiles();
                     if (cleanupResult.removed > 0) {
-                        console.log(`🧹 Nettoyage automatique: ${cleanupResult.removed} profils obsolètes supprimés de localStorage`);
-                        // Recharger depuis localStorage après nettoyage
+                        console.log(` Nettoyage automatique: ${cleanupResult.removed} profils obsoletes supprimes de localStorage`);
+                        // Recharger depuis localStorage apres nettoyage
                         const cleaned = await storage.getItem(STORAGE_KEY);
                         if (cleaned && typeof cleaned === 'object' && 'data' in cleaned) {
                             setLibrary(cleaned.data || {});
                         }
                     }
                 } catch (cleanupError) {
-                    console.warn('⚠️ Erreur lors du nettoyage automatique:', cleanupError);
-                    // Ne pas bloquer le chargement si le nettoyage échoue
+                    console.warn(' Erreur lors du nettoyage automatique:', cleanupError);
+                    // Ne pas bloquer le chargement si le nettoyage echoue
                 }
                 
-                // Mettre à jour la progression pour le chargement des données
+                // Mettre a jour la progression pour le chargement des donnees
                 const validTickers = result.tickers.filter(t => t.ticker && !isMutualFund(t.ticker, t.company_name));
                 setSupabaseProgress({
                     current: 0,
                     total: validTickers.length,
                     startTime: Date.now(),
-                    message: `Chargement des données pour ${validTickers.length} ticker(s)...`
+                    message: `Chargement des donnees pour ${validTickers.length} ticker(s)...`
                 });
                 
-                // ✅ Marquer comme chargé seulement après succès
+                //  Marquer comme charge seulement apres succes
                 hasLoadedTickersRef.current = true;
 
-                // Mettre à jour le cache pour handleSelectTicker
+                // Mettre a jour le cache pour handleSelectTicker
                 supabaseTickersCacheRef.current = {
                     data: result.tickers,
                     timestamp: Date.now()
                 };
 
-                // Identifier les nouveaux tickers AVANT la mise à jour (utiliser setLibrary avec fonction)
+                // Identifier les nouveaux tickers AVANT la mise a jour (utiliser setLibrary avec fonction)
                 let newTickers: typeof result.tickers = [];
 
-                // ✅ MIGRATION : Créer un Map de source pour tous les tickers Supabase
+                //  MIGRATION : Creer un Map de source pour tous les tickers Supabase
                 const sourceMap = new Map<string, 'team' | 'watchlist' | 'both' | 'manual'>();
                 result.tickers.forEach(t => {
                     sourceMap.set(t.ticker.toUpperCase(), t.source);
                 });
 
-                // Merge intelligent : ne pas écraser les profils existants
+                // Merge intelligent : ne pas ecraser les profils existants
                 setLibrary(prev => {
                     const existingSymbols = new Set(Object.keys(prev));
                     newTickers = result.tickers.filter(t => {
                         const symbol = t.ticker.toUpperCase();
-                        // Exclure si déjà dans library
+                        // Exclure si deja dans library
                         if (existingSymbols.has(symbol)) {
-                            // ✅ FIX: Si c'est un profil squelette ou vide, on doit le recharger (le considérer comme nouveau)
+                            //  FIX: Si c'est un profil squelette ou vide, on doit le recharger (le considerer comme nouveau)
                             const existingProfile = prev[symbol];
                             if (existingProfile._isSkeleton || !existingProfile.data || existingProfile.data.length === 0) {
-                                // C'est un squelette/vide, on le garde dans newTickers pour déclencher le chargement
-                                console.log(`🔄 Reloading skeleton/empty profile: ${symbol}`);
+                                // C'est un squelette/vide, on le garde dans newTickers pour declencher le chargement
+                                console.log(` Reloading skeleton/empty profile: ${symbol}`);
                                 return true;
                             }
                             // Sinon c'est un profil complet, on l'ignore
@@ -797,36 +797,36 @@ export default function App() {
                         }
                         // Exclure les fonds mutuels
                         if (isMutualFund(symbol, t.company_name)) {
-                            console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - exclu du chargement automatique`);
+                            console.warn(` ${symbol}: Fonds mutuel detecte - exclu du chargement automatique`);
                             return false;
                         }
                         return true;
                     });
                     
-                    // ✅ DEBUG: Compter les team tickers dans newTickers vs déjà dans library
+                    //  DEBUG: Compter les team tickers dans newTickers vs deja dans library
                     const teamTickersInNew = newTickers.filter(t => t.source === 'team' || t.source === 'both');
                     const teamTickersAlreadyInLibrary = result.tickers.filter(t => {
                         const symbol = t.ticker.toUpperCase();
                         return (t.source === 'team' || t.source === 'both') && existingSymbols.has(symbol);
                     });
                     
-                    console.log(`📊 Team tickers: ${teamTickersInNew.length} nouveaux à créer, ${teamTickersAlreadyInLibrary.length} déjà dans library`);
+                    console.log(` Team tickers: ${teamTickersInNew.length} nouveaux a creer, ${teamTickersAlreadyInLibrary.length} deja dans library`);
                     if (teamTickersInNew.length > 0) {
-                        console.log(`   ➕ Nouveaux:`, teamTickersInNew.map(t => t.ticker).join(', '));
+                        console.log(`    Nouveaux:`, teamTickersInNew.map(t => t.ticker).join(', '));
                     }
                     if (teamTickersAlreadyInLibrary.length > 0) {
-                        console.log(`   🔄 Déjà dans library (seront mis à jour):`, teamTickersAlreadyInLibrary.map(t => t.ticker).join(', '));
+                        console.log(`    Deja dans library (seront mis a jour):`, teamTickersAlreadyInLibrary.map(t => t.ticker).join(', '));
                     }
 
                     const updated = { ...prev };
                     let newTickersCount = 0;
                     let migrationCount = 0;
 
-                    // ✅ MIGRATION : Corriger TOUS les profils existants qui ne sont pas dans Supabase
+                    //  MIGRATION : Corriger TOUS les profils existants qui ne sont pas dans Supabase
                     // Si un profil existe dans localStorage mais pas dans Supabase, le marquer comme 'manual' (null)
                     Object.keys(updated).forEach(symbol => {
                         if (!sourceMap.has(symbol)) {
-                            // Ticker existe localement mais pas dans Supabase → Normal (pas d'icône)
+                            // Ticker existe localement mais pas dans Supabase -> Normal (pas d'icone)
                             if (updated[symbol].isWatchlist !== null && updated[symbol].isWatchlist !== undefined) {
                                 updated[symbol] = {
                                     ...updated[symbol],
@@ -840,33 +840,33 @@ export default function App() {
                     result.tickers.forEach(supabaseTicker => {
                         const tickerSymbol = supabaseTicker.ticker.toUpperCase();
                         
-                        // Si le profil existe déjà, mettre à jour les métriques ValueLine depuis Supabase
+                        // Si le profil existe deja, mettre a jour les metriques ValueLine depuis Supabase
                         if (updated[tickerSymbol]) {
-                            // ✅ MIGRATION FORCÉE : Toujours mettre à jour isWatchlist depuis Supabase
+                            //  MIGRATION FORCEE : Toujours mettre a jour isWatchlist depuis Supabase
                             // Les profils existants peuvent avoir un ancien isWatchlist incorrect
                             const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                             
-                            // Mettre à jour les métriques ValueLine depuis Supabase (si elles existent)
+                            // Mettre a jour les metriques ValueLine depuis Supabase (si elles existent)
                             const hasValueLineUpdates = supabaseTicker.security_rank || 
                                                        supabaseTicker.earnings_predictability || 
                                                        supabaseTicker.price_growth_persistence || 
                                                        supabaseTicker.price_stability;
                             
-                            // ✅ FORCER la mise à jour de isWatchlist même si identique (migration)
-                            // Cela corrige les profils existants qui ont un ancien état incorrect
+                            //  FORCER la mise a jour de isWatchlist meme si identique (migration)
+                            // Cela corrige les profils existants qui ont un ancien etat incorrect
                             const needsUpdate = updated[tickerSymbol].isWatchlist !== shouldBeWatchlist || hasValueLineUpdates;
                             const isTeamTicker = supabaseTicker.source === 'team' || supabaseTicker.source === 'both';
                             
-                            // ✅ DEBUG: Log pour les team tickers existants
+                            //  DEBUG: Log pour les team tickers existants
                             if (isTeamTicker && needsUpdate) {
-                                console.log(`   🔄 Mise à jour team ticker existant: ${tickerSymbol} (isWatchlist: ${updated[tickerSymbol].isWatchlist} → ${shouldBeWatchlist})`);
+                                console.log(`    Mise a jour team ticker existant: ${tickerSymbol} (isWatchlist: ${updated[tickerSymbol].isWatchlist} -> ${shouldBeWatchlist})`);
                             }
                             
                             if (needsUpdate) {
                                 updated[tickerSymbol] = {
                                     ...updated[tickerSymbol],
-                                    isWatchlist: shouldBeWatchlist, // ✅ FORCER mise à jour depuis Supabase
-                                    // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
+                                    isWatchlist: shouldBeWatchlist, //  FORCER mise a jour depuis Supabase
+                                    //  MULTI-UTILISATEUR : Supabase est la source de verite pour les metriques ValueLine
                                     // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                                     info: {
                                         ...updated[tickerSymbol].info,
@@ -889,20 +889,20 @@ export default function App() {
                                 };
                                 migrationCount++;
                                 
-                                // Si c'est le profil actif, mettre à jour aussi le state local
+                                // Si c'est le profil actif, mettre a jour aussi le state local
                                 if (tickerSymbol === activeIdRef.current) {
                                     setInfo(updated[tickerSymbol].info);
                                     setIsWatchlist(shouldBeWatchlist ?? false);
                                 }
                             } else if (updated[tickerSymbol].isWatchlist !== shouldBeWatchlist) {
-                                // ✅ Même si pas d'autres updates, forcer isWatchlist pour migration
+                                //  Meme si pas d'autres updates, forcer isWatchlist pour migration
                                 updated[tickerSymbol] = {
                                     ...updated[tickerSymbol],
                                     isWatchlist: shouldBeWatchlist
                                 };
                                 migrationCount++;
                                 
-                                // Si c'est le profil actif, mettre à jour aussi le state local
+                                // Si c'est le profil actif, mettre a jour aussi le state local
                                 if (tickerSymbol === activeIdRef.current) {
                                     setIsWatchlist(shouldBeWatchlist ?? false);
                                 }
@@ -910,24 +910,24 @@ export default function App() {
                             return;
                         }
 
-                        // ✅ NOUVEAU : Créer un profil squelette IMMÉDIATEMENT pour affichage
-                        // Même si le profil n'existe pas encore, on le crée avec les infos de base depuis Supabase
+                        //  NOUVEAU : Creer un profil squelette IMMEDIATEMENT pour affichage
+                        // Meme si le profil n'existe pas encore, on le cree avec les infos de base depuis Supabase
                         const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                         const isTeamTicker = supabaseTicker.source === 'team' || supabaseTicker.source === 'both';
                         
-                        // ✅ CRITIQUE : Ne pas utiliser INITIAL_ASSUMPTIONS (valeurs à 0) pour les squelettes
-                        // Créer un objet assumptions minimal avec seulement les champs requis, sans valeurs inventées
+                        //  CRITIQUE : Ne pas utiliser INITIAL_ASSUMPTIONS (valeurs a 0) pour les squelettes
+                        // Creer un objet assumptions minimal avec seulement les champs requis, sans valeurs inventees
                         updated[tickerSymbol] = {
                             id: tickerSymbol,
                             lastModified: Date.now(),
-                            data: [], // Données vides pour l'instant
+                            data: [], // Donnees vides pour l'instant
                             assumptions: {
-                                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
-                                currentPrice: 0, // Sera mis à jour lors du chargement FMP
+                                //  Seulement les champs requis, pas de valeurs inventees (0)
+                                currentPrice: 0, // Sera mis a jour lors du chargement FMP
                                 currentDividend: 0,
                                 baseYear: new Date().getFullYear(),
-                                requiredReturn: 10.0, // Valeur par défaut raisonnable
-                                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                                requiredReturn: 10.0, // Valeur par defaut raisonnable
+                                //  Tous les autres champs sont undefined (pas 0) pour eviter les valeurs inventees
                                 growthRateEPS: undefined,
                                 growthRateSales: undefined,
                                 growthRateCF: undefined,
@@ -960,31 +960,31 @@ export default function App() {
                             _isSkeleton: true // Flag pour indiquer que c'est un profil incomplet
                         };
                         
-                        // ✅ DEBUG: Log pour les team tickers créés
+                        //  DEBUG: Log pour les team tickers crees
                         if (isTeamTicker) {
-                            console.log(`   ⭐ Création profil squelette team ticker: ${tickerSymbol} (source: ${supabaseTicker.source}, isWatchlist: ${isWatchlist})`);
+                            console.log(`    Creation profil squelette team ticker: ${tickerSymbol} (source: ${supabaseTicker.source}, isWatchlist: ${isWatchlist})`);
                         }
                         
                         newTickersCount++;
                     });
 
-                    // ✅ Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - migration locale)
-                    // ❌ NE PAS sauvegarder dans Supabase lors de migration - données déjà présentes
+                    //  Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - migration locale)
+                    //  NE PAS sauvegarder dans Supabase lors de migration - donnees deja presentes
                     saveProfiles(updated, false).catch(e => console.warn('Failed to save profiles:', e));
 
                     if (newTickersCount > 0) {
-                        console.log(`✅ ${newTickersCount} nouveaux profils squelettes créés depuis Supabase`);
-                        console.log(`📊 Library après migration: ${Object.keys(updated).length} profils (dont ${Object.keys(updated).filter(k => k !== DEFAULT_PROFILE.id).length} réels)`);
+                        console.log(` ${newTickersCount} nouveaux profils squelettes crees depuis Supabase`);
+                        console.log(` Library apres migration: ${Object.keys(updated).length} profils (dont ${Object.keys(updated).filter(k => k !== DEFAULT_PROFILE.id).length} reels)`);
                     } else {
-                        console.log(`ℹ️ Aucun nouveau ticker - ${Object.keys(updated).length} profils déjà dans library`);
+                        console.log(`i Aucun nouveau ticker - ${Object.keys(updated).length} profils deja dans library`);
                     }
 
-                    // ✅ DEBUG: Compter les profils avec isWatchlist=false après migration
+                    //  DEBUG: Compter les profils avec isWatchlist=false apres migration
                     const portfolioCount = Object.values(updated).filter((p: any) => p.isWatchlist === false).length;
                     const watchlistCount = Object.values(updated).filter((p: any) => p.isWatchlist === true).length;
                     const normalCount = Object.values(updated).filter((p: any) => p.isWatchlist === null || p.isWatchlist === undefined).length;
                     
-                    // ✅ DEBUG: Identifier les team tickers manquants (après création profils squelettes)
+                    //  DEBUG: Identifier les team tickers manquants (apres creation profils squelettes)
                     const teamTickersInSupabaseAfter = result.tickers.filter(t => {
                         const source = t.source;
                         return source === 'team' || source === 'both';
@@ -999,21 +999,21 @@ export default function App() {
                     });
                     
                     if (migrationCount > 0) {
-                        console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+                        console.log(` Migration: ${migrationCount} profil(s) mis a jour avec isWatchlist depuis Supabase`);
                     }
                     
                     if (teamTickersInSupabaseAfter.length !== teamTickersInLibraryAfter.length) {
-                        console.warn(`⚠️ ${teamTickersInSupabaseAfter.length} team tickers dans Supabase, mais seulement ${teamTickersInLibraryAfter.length} avec ⭐ dans library`);
+                        console.warn(` ${teamTickersInSupabaseAfter.length} team tickers dans Supabase, mais seulement ${teamTickersInLibraryAfter.length} avec  dans library`);
                         if (missingTeamTickersAfter.length > 0) {
-                            console.warn(`   📋 ${missingTeamTickersAfter.length} team ticker(s) manquant(s) ou incorrect(s):`, missingTeamTickersAfter.map(t => `${t.ticker} (source: ${t.source})`).join(', '));
+                            console.warn(`    ${missingTeamTickersAfter.length} team ticker(s) manquant(s) ou incorrect(s):`, missingTeamTickersAfter.map(t => `${t.ticker} (source: ${t.source})`).join(', '));
                         }
                     } else {
-                        console.log(`✅ Tous les ${teamTickersInSupabaseAfter.length} team tickers ont ⭐ (isWatchlist=false)`);
+                        console.log(` Tous les ${teamTickersInSupabaseAfter.length} team tickers ont  (isWatchlist=false)`);
                     }
                     
-                    console.log(`📊 Après migration - Portefeuille (⭐): ${portfolioCount}, Watchlist (👁️): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
+                    console.log(` Apres migration - Portefeuille (): ${portfolioCount}, Watchlist (): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
                     
-                    // ✅ VÉRIFICATION: S'assurer que tous les team tickers ont isWatchlist=false
+                    //  VERIFICATION: S'assurer que tous les team tickers ont isWatchlist=false
                     const teamTickersInSupabase = result.tickers.filter(t => {
                         const mapped = mapSourceToIsWatchlist(t.source);
                         return mapped === false; // Portefeuille
@@ -1023,7 +1023,7 @@ export default function App() {
                         return updated[symbol] && updated[symbol].isWatchlist === false;
                     });
                     
-                    // Séparer les tickers manquants (pas dans localStorage) des incorrects (isWatchlist !== false)
+                    // Separer les tickers manquants (pas dans localStorage) des incorrects (isWatchlist !== false)
                     const missingTickers = teamTickersInSupabase.filter(t => {
                         const symbol = t.ticker.toUpperCase();
                         return !updated[symbol];
@@ -1034,25 +1034,25 @@ export default function App() {
                     });
                     
                     if (teamTickersInSupabase.length !== teamTickersInLibrary.length) {
-                        console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
+                        console.warn(` ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
                         if (missingTickers.length > 0) {
-                            console.warn(`   📋 ${missingTickers.length} ticker(s) non chargé(s) depuis FMP:`, missingTickers.map(t => t.ticker).join(', '));
+                            console.warn(`    ${missingTickers.length} ticker(s) non charge(s) depuis FMP:`, missingTickers.map(t => t.ticker).join(', '));
                         }
                         if (incorrectTickers.length > 0) {
-                            console.warn(`   ❌ ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map(t => t.ticker).join(', '));
+                            console.warn(`    ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map(t => t.ticker).join(', '));
                         }
-                        console.log(`   ✅ ${teamTickersInLibrary.length} ticker(s) correctement configuré(s) dans localStorage`);
+                        console.log(`    ${teamTickersInLibrary.length} ticker(s) correctement configure(s) dans localStorage`);
                     } else {
-                        console.log(`✅ Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
+                        console.log(` Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
                     }
 
                     return updated;
                 });
 
-                // ✅ FIX: Après migration, charger les données pour les profils squelettes
-                // Utiliser setTimeout pour attendre que setLibrary soit terminé
+                //  FIX: Apres migration, charger les donnees pour les profils squelettes
+                // Utiliser setTimeout pour attendre que setLibrary soit termine
                 setTimeout(async () => {
-                    // Vérifier le state actuel pour trouver les squelettes
+                    // Verifier le state actuel pour trouver les squelettes
                     setLibrary(currentLib => {
                         const skeletonTickers = Object.entries(currentLib)
                             .filter(([symbol, profile]) => {
@@ -1063,20 +1063,20 @@ export default function App() {
                             .map(([symbol]) => symbol);
 
                         if (skeletonTickers.length > 0) {
-                            console.log(`🔄 Trouvé ${skeletonTickers.length} squelettes à charger après migration`);
+                            console.log(` Trouve ${skeletonTickers.length} squelettes a charger apres migration`);
 
-                            // Créer la liste de tickers à partir de result.tickers
+                            // Creer la liste de tickers a partir de result.tickers
                             const tickersToLoad = result.tickers.filter(t => {
                                 const symbol = t.ticker.toUpperCase();
                                 return skeletonTickers.includes(symbol) && !isMutualFund(symbol, t.company_name);
                             });
 
                             if (tickersToLoad.length > 0) {
-                                console.log(`🚀 Démarrage du chargement pour ${tickersToLoad.length} squelettes`);
+                                console.log(` Demarrage du chargement pour ${tickersToLoad.length} squelettes`);
 
-                                // Charger en petits batches pour éviter les 500 errors
+                                // Charger en petits batches pour eviter les 500 errors
                                 const loadSkeletonsInBackground = async () => {
-                                    const batchSize = 10; // Petit batch pour éviter surcharge
+                                    const batchSize = 10; // Petit batch pour eviter surcharge
                                     const delayBetweenBatches = 1000; // 1 seconde entre batches
 
                                     for (let i = 0; i < tickersToLoad.length; i += batchSize) {
@@ -1084,19 +1084,19 @@ export default function App() {
                                         const batchNum = Math.floor(i / batchSize) + 1;
                                         const totalBatches = Math.ceil(tickersToLoad.length / batchSize);
 
-                                        console.log(`📥 Chargement squelettes batch ${batchNum}/${totalBatches}...`);
+                                        console.log(` Chargement squelettes batch ${batchNum}/${totalBatches}...`);
 
                                         // Charger depuis Supabase d'abord
                                         const tickerSymbols = batch.map(t => t.ticker.toUpperCase());
                                         const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
 
-                                        // Mettre à jour les profils avec les données Supabase ou FMP
+                                        // Mettre a jour les profils avec les donnees Supabase ou FMP
                                         for (const supabaseTicker of batch) {
                                             const symbol = supabaseTicker.ticker.toUpperCase();
                                             const supabaseResult = supabaseResults[symbol];
 
                                             if (supabaseResult && supabaseResult.data && supabaseResult.data.length > 0) {
-                                                // Données trouvées dans Supabase
+                                                // Donnees trouvees dans Supabase
                                                 setLibrary(prev => ({
                                                     ...prev,
                                                     [symbol]: {
@@ -1106,7 +1106,7 @@ export default function App() {
                                                     }
                                                 }));
                                             } else {
-                                                // Pas de données Supabase - charger depuis FMP
+                                                // Pas de donnees Supabase - charger depuis FMP
                                                 try {
                                                     const fmpResult = await fetchCompanyData(symbol);
                                                     if (fmpResult && fmpResult.data && fmpResult.data.length > 0) {
@@ -1129,66 +1129,66 @@ export default function App() {
                                                         }));
                                                     }
                                                 } catch (e) {
-                                                    console.warn(`❌ FMP fetch failed for ${symbol}:`, e);
+                                                    console.warn(` FMP fetch failed for ${symbol}:`, e);
                                                 }
                                             }
                                         }
 
-                                        // Délai entre batches
+                                        // Delai entre batches
                                         if (i + batchSize < tickersToLoad.length) {
                                             await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
                                         }
                                     }
 
-                                    console.log(`✅ Chargement squelettes terminé`);
+                                    console.log(` Chargement squelettes termine`);
                                 };
 
-                                // Lancer le chargement en arrière-plan
+                                // Lancer le chargement en arriere-plan
                                 loadSkeletonsInBackground().catch(e => console.error('Erreur chargement squelettes:', e));
                             }
                         }
 
                         return currentLib; // Ne pas modifier le state
                     });
-                }, 500); // Délai pour s'assurer que setLibrary est terminé
+                }, 500); // Delai pour s'assurer que setLibrary est termine
 
-                // ✅ OPTIMISATION PERFORMANCE : Créer des profils "squelettes" immédiatement
-                // pour affichage instantané, puis charger les données FMP en arrière-plan
+                //  OPTIMISATION PERFORMANCE : Creer des profils "squelettes" immediatement
+                // pour affichage instantane, puis charger les donnees FMP en arriere-plan
                 if (newTickers.length > 0) {
                     // Filtrer les fonds mutuels AVANT tout appel API
                     const validTickers = newTickers.filter(t => {
                         const symbol = t.ticker.toUpperCase();
                         if (isMutualFund(symbol, t.company_name)) {
-                            console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - profil NON créé (exclu automatiquement)`);
+                            console.warn(` ${symbol}: Fonds mutuel detecte - profil NON cree (exclu automatiquement)`);
                             return false;
                         }
                         return true;
                     });
 
                     if (validTickers.length === 0) {
-                        console.log('✅ Aucun ticker valide après filtrage des fonds mutuels');
-                        setIsLoadingTickers(false); // ✅ Libérer le loading immédiatement
+                        console.log(' Aucun ticker valide apres filtrage des fonds mutuels');
+                        setIsLoadingTickers(false); //  Liberer le loading immediatement
                         return;
                     }
 
-                    // ✅ ÉTAPE 1 : Créer des profils "squelettes" immédiatement pour affichage instantané
+                    //  ETAPE 1 : Creer des profils "squelettes" immediatement pour affichage instantane
                     const skeletonProfiles: Record<string, AnalysisProfile> = {};
                     validTickers.forEach(supabaseTicker => {
                         const symbol = supabaseTicker.ticker.toUpperCase();
                         const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                         
-                        // ✅ CRITIQUE : Ne pas utiliser INITIAL_ASSUMPTIONS (valeurs à 0) pour les squelettes
+                        //  CRITIQUE : Ne pas utiliser INITIAL_ASSUMPTIONS (valeurs a 0) pour les squelettes
                         skeletonProfiles[symbol] = {
                             id: symbol,
                             lastModified: Date.now(),
-                            data: [], // Données vides pour l'instant
+                            data: [], // Donnees vides pour l'instant
                             assumptions: {
-                                // ✅ Seulement les champs requis, pas de valeurs inventées (0)
+                                //  Seulement les champs requis, pas de valeurs inventees (0)
                                 currentPrice: 0,
                                 currentDividend: 0,
                                 baseYear: new Date().getFullYear(),
                                 requiredReturn: 10.0,
-                                // ✅ Tous les autres champs sont undefined (pas 0) pour éviter les valeurs inventées
+                                //  Tous les autres champs sont undefined (pas 0) pour eviter les valeurs inventees
                                 growthRateEPS: undefined,
                                 growthRateSales: undefined,
                                 growthRateCF: undefined,
@@ -1222,46 +1222,46 @@ export default function App() {
                         };
                     });
 
-                    // Ajouter les profils squelettes immédiatement pour affichage
+                    // Ajouter les profils squelettes immediatement pour affichage
                     setLibrary(prev => {
                         const updated = { ...prev, ...skeletonProfiles };
-                        console.log(`📊 ${Object.keys(skeletonProfiles).length} profils squelettes ajoutés à library (total: ${Object.keys(updated).length})`);
-                        // ✅ Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - squelettes temporaires!)
-                        // ❌ NE PAS sauvegarder squelettes dans Supabase - données incomplètes
+                        console.log(` ${Object.keys(skeletonProfiles).length} profils squelettes ajoutes a library (total: ${Object.keys(updated).length})`);
+                        //  Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - squelettes temporaires!)
+                        //  NE PAS sauvegarder squelettes dans Supabase - donnees incompletes
                     saveProfiles(updated, false).catch(e => console.warn('Failed to save profiles:', e));
                         return updated;
                     });
 
-                    // ✅ Libérer le loading immédiatement pour afficher la liste
+                    //  Liberer le loading immediatement pour afficher la liste
                     setIsLoadingTickers(false);
-                    console.log(`✅ ${validTickers.length} profils squelettes créés - affichage immédiat`);
+                    console.log(` ${validTickers.length} profils squelettes crees - affichage immediat`);
 
 
-                    // ✅ ÉTAPE 2 : Charger les données depuis Supabase d'abord, puis FMP si nécessaire
+                    //  ETAPE 2 : Charger les donnees depuis Supabase d'abord, puis FMP si necessaire
                     // Utiliser requestIdleCallback pour ne pas bloquer l'UI
                     const loadFMPDataInBackground = async () => {
-                        // ✅ OPTIMISATION MASSIVE : Supabase est rapide, on peut charger de gros batchs
+                        //  OPTIMISATION MASSIVE : Supabase est rapide, on peut charger de gros batchs
                         const batchSize = 50; // Increased to 50 for faster loading (Supabase handles this easily)
                         const delayBetweenBatches = 200; // Reduced delay to 200ms
 
-                        console.log(`🚀 Démarrage du chargement optimisé pour ${validTickers.length} tickers (Batch: ${batchSize})`);
+                        console.log(` Demarrage du chargement optimise pour ${validTickers.length} tickers (Batch: ${batchSize})`);
 
                         let processedCount = 0;
                         for (let i = 0; i < validTickers.length; i += batchSize) {
                             const batch = validTickers.slice(i, i + batchSize);
                             
-                            // Petit délai entre batches pour ne pas surcharger le navigateur (pas le serveur)
+                            // Petit delai entre batches pour ne pas surcharger le navigateur (pas le serveur)
                             if (i > 0) {
                                 await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
                             }
 
-                            // ✅ OPTIMISATION : Charger depuis Supabase en batch
+                            //  OPTIMISATION : Charger depuis Supabase en batch
                             const tickerSymbols = batch.map(t => t.ticker.toUpperCase());
                             const batchNumber = Math.floor(i/batchSize) + 1;
                             const totalBatches = Math.ceil(validTickers.length/batchSize);
-                            console.log(`📥 Chargement batch ${batchNumber}/${totalBatches}: ${tickerSymbols.length} tickers...`);
+                            console.log(` Chargement batch ${batchNumber}/${totalBatches}: ${tickerSymbols.length} tickers...`);
                             
-                            // Mettre à jour la progression
+                            // Mettre a jour la progression
                             setSupabaseProgress(prev => ({
                                 ...prev,
                                 message: `Chargement batch ${batchNumber}/${totalBatches}...`
@@ -1269,17 +1269,17 @@ export default function App() {
                             
                             const supabaseResults = await loadProfilesBatchFromSupabase(tickerSymbols);
 
-                            // Traiter chaque résultat
+                            // Traiter chaque resultat
                             await Promise.allSettled(
 
                                 batch.map(async (supabaseTicker) => {
-                                    if (!supabaseTicker.ticker) return; // ✅ Guard clause: Skip invalid tickers
+                                    if (!supabaseTicker.ticker) return; //  Guard clause: Skip invalid tickers
                                     
                                     const symbol = supabaseTicker.ticker.toUpperCase();
-                                    if (!symbol || symbol.trim() === '') return; // ✅ Double check
+                                    if (!symbol || symbol.trim() === '') return; //  Double check
                                     
                                     const markAsInvalid = (reason: string) => {
-                                        console.warn(`❌ ${symbol}: ${reason} - Marking as invalid/loaded`);
+                                        console.warn(` ${symbol}: ${reason} - Marking as invalid/loaded`);
                                         setLibrary(prev => ({
                                             ...prev,
                                             [symbol]: {
@@ -1302,21 +1302,21 @@ export default function App() {
                                     try {
                                         let result: any;
                                         
-                                        // ✅ LOGIQUE SIMPLIFIÉE : Utiliser Supabase si disponible
-                                        // ❌ NE PAS appeler FMP ici - c'est ce qui causait les 429 et la lenteur
+                                        //  LOGIQUE SIMPLIFIEE : Utiliser Supabase si disponible
+                                        //  NE PAS appeler FMP ici - c'est ce qui causait les 429 et la lenteur
                                         if (supabaseResult && supabaseResult.source === 'supabase' && 
                                             supabaseResult.data && supabaseResult.data.length > 0) {
-                                            // ✅ CAS 1 : Snapshot Supabase existe → Utiliser directement
+                                            //  CAS 1 : Snapshot Supabase existe -> Utiliser directement
                                             result = supabaseResult;
                                             // Log silencieux pour ne pas spammer la console
                                         } else {
-                                            // ✅ CAS 2 : Pas de snapshot → Marquer comme N/A (sync manuelle requise)
+                                            //  CAS 2 : Pas de snapshot -> Marquer comme N/A (sync manuelle requise)
                                             // NE PAS appeler FMP ici - l'utilisateur peut sync manuellement
                                             markAsInvalid('Pas de snapshot Supabase - sync requise');
                                             return;
                                         }
                                         
-                                        // ✅ Utiliser directement les données Supabase
+                                        //  Utiliser directement les donnees Supabase
                                         result = {
                                             data: supabaseResult.data,
                                             info: supabaseResult.info || {},
@@ -1325,9 +1325,9 @@ export default function App() {
                                             source: 'supabase' as const
                                         };
                                         
-                                        // VALIDATION : Vérifier que les données sont valides
+                                        // VALIDATION : Verifier que les donnees sont valides
                                         if (!result.data || result.data.length === 0) {
-                                            markAsInvalid('Données vides après chargement');
+                                            markAsInvalid('Donnees vides apres chargement');
                                             return;
                                         }
                                         
@@ -1336,17 +1336,17 @@ export default function App() {
                                             return;
                                         }
                                         
-                                        // Vérifier qu'on a au moins une année avec des données valides
+                                        // Verifier qu'on a au moins une annee avec des donnees valides
                                         const hasValidData = result.data.some((d: any) => 
                                             d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
                                         );
                                         
                                         if (!hasValidData) {
-                                            markAsInvalid('Aucune année avec données suffisantes (EPS/CF/BV > 0)');
+                                            markAsInvalid('Aucune annee avec donnees suffisantes (EPS/CF/BV > 0)');
                                             return;
                                         }
                                     
-                                    // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données
+                                    //  TOUTES LES VALIDATIONS PASSEES - Creer le profil avec les donnees
                                     const isWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                                     
                                     // Si les assumptions viennent de Supabase, les utiliser, sinon auto-fill
@@ -1362,18 +1362,18 @@ export default function App() {
                                             result.data,
                                             result.currentPrice,
                                             INITIAL_ASSUMPTIONS,
-                                            result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
+                                            result.currentDividend //  NOUVEAU: Dividende actuel depuis l'API
                                         ) as Assumptions;
                                     }
                                     
-                                    // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
+                                    // Detecter et exclure automatiquement les metriques avec prix cibles aberrants
                                     const outlierDetection = detectOutlierMetrics(result.data, baseAssumptions);
                                     
                                     if (outlierDetection.detectedOutliers.length > 0) {
-                                        console.log(`⚠️ ${symbol}: Métriques aberrantes auto-exclues: ${outlierDetection.detectedOutliers.join(', ')}`);
+                                        console.log(` ${symbol}: Metriques aberrantes auto-exclues: ${outlierDetection.detectedOutliers.join(', ')}`);
                                     }
                                     
-                                    // Appliquer les exclusions détectées
+                                    // Appliquer les exclusions detectees
                                     const finalAssumptions = {
                                         ...baseAssumptions,
                                         excludeEPS: outlierDetection.excludeEPS,
@@ -1406,7 +1406,7 @@ export default function App() {
                                         isWatchlist
                                     };
                                     
-                                    // ✅ Mettre à jour le profil
+                                    //  Mettre a jour le profil
                                     setLibrary(prev => {
                                         if (!prev[symbol]) return prev;
                                         const updated = {
@@ -1416,15 +1416,15 @@ export default function App() {
                                                 _isSkeleton: false
                                             }
                                         };
-                                        // ✅ NOUVEAU : Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - données déjà là!)
-                                        // ❌ NE PAS sauvegarder dans Supabase lors du chargement - évite boucle circulaire
+                                        //  NOUVEAU : Sauvegarder UNIQUEMENT dans cache local (PAS Supabase - donnees deja la!)
+                                        //  NE PAS sauvegarder dans Supabase lors du chargement - evite boucle circulaire
                     saveProfiles(updated, false).catch(e => console.warn('Failed to save profiles:', e));
                                         return updated;
                                     });
 
-                                    console.log(`✅ ${symbol}: Profil mis à jour depuis ${result.source === 'supabase' ? 'Supabase' : 'FMP'}`);
+                                    console.log(` ${symbol}: Profil mis a jour depuis ${result.source === 'supabase' ? 'Supabase' : 'FMP'}`);
                                     
-                                    // Mettre à jour la progression
+                                    // Mettre a jour la progression
                                     processedCount++;
                                     setSupabaseProgress(prev => ({
                                         ...prev,
@@ -1432,9 +1432,9 @@ export default function App() {
                                         message: `Chargement ${processedCount}/${prev.total} ticker(s)...`
                                     }));
                                 } catch (error) {
-                                    console.error(`❌ ${symbol}: Erreur chargement données:`, error);
+                                    console.error(` ${symbol}: Erreur chargement donnees:`, error);
                                     
-                                    // Mettre à jour la progression même en cas d'erreur
+                                    // Mettre a jour la progression meme en cas d'erreur
                                     processedCount++;
                                     setSupabaseProgress(prev => ({
                                         ...prev,
@@ -1449,10 +1449,10 @@ export default function App() {
                         setSupabaseProgress(prev => ({
                             ...prev,
                             current: prev.total,
-                            message: 'Chargement terminé'
+                            message: 'Chargement termine'
                         }));
                         
-                        // Masquer la progression après 2 secondes
+                        // Masquer la progression apres 2 secondes
                         setTimeout(() => {
                             setSupabaseProgress({
                                 current: 0,
@@ -1463,14 +1463,14 @@ export default function App() {
                         }, 2000);
                     };
 
-                    // ✅ FIX: Appeler directement avec un petit délai pour laisser l'UI se mettre à jour
+                    //  FIX: Appeler directement avec un petit delai pour laisser l'UI se mettre a jour
                     // requestIdleCallback ne fonctionne pas correctement avec les re-renders React
                     setTimeout(() => {
-                        console.log('⏰ Démarrage du chargement de données après délai...');
+                        console.log(' Demarrage du chargement de donnees apres delai...');
                         loadFMPDataInBackground();
                     }, 500);
                 } else {
-                    // Aucun nouveau ticker - libérer le loading
+                    // Aucun nouveau ticker - liberer le loading
                     setIsLoadingTickers(false);
                     setSupabaseProgress({
                         current: 0,
@@ -1481,9 +1481,9 @@ export default function App() {
                 }
 
             } catch (error: any) {
-                console.error('❌ Erreur lors du chargement des tickers:', error);
+                console.error(' Erreur lors du chargement des tickers:', error);
                 setTickersLoadError(error.message || 'Erreur inconnue');
-                hasLoadedTickersRef.current = false; // Réessayer au prochain render
+                hasLoadedTickersRef.current = false; // Reessayer au prochain render
                 setSupabaseProgress({
                     current: 0,
                     total: 0,
@@ -1495,34 +1495,34 @@ export default function App() {
             }
         };
 
-        // ✅ Vérifier et mettre à jour le cache prix en parallèle (non-bloquant)
+        //  Verifier et mettre a jour le cache prix en parallele (non-bloquant)
         refreshPriceCacheIfNeeded();
         
         // Charger les tickers
         loadTickersFromSupabase();
 
-        // ✅ Synchronisation périodique avec Supabase (toutes les 2 minutes)
-        // Pour s'assurer que tous les utilisateurs voient les mêmes tickers
+        //  Synchronisation periodique avec Supabase (toutes les 2 minutes)
+        // Pour s'assurer que tous les utilisateurs voient les memes tickers
         const syncIntervalId = setInterval(() => {
             if (!isLoadingTickers && hasLoadedTickersRef.current) {
-                console.log('🔄 Synchronisation périodique avec Supabase pour cohérence multi-utilisateurs...');
+                console.log(' Synchronisation periodique avec Supabase pour coherence multi-utilisateurs...');
                 hasLoadedTickersRef.current = false;
                 supabaseTickersCacheRef.current = null; // Invalider le cache
                 loadTickersFromSupabase();
             }
         }, 120000); // 2 minutes
 
-        // ✅ Mise à jour automatique du cache prix toutes les 5 minutes pendant la session
+        //  Mise a jour automatique du cache prix toutes les 5 minutes pendant la session
         const intervalId = setInterval(() => {
             refreshPriceCacheIfNeeded();
         }, 5 * 60 * 1000); // 5 minutes
 
-        // Nettoyer l'interval quand le composant est démonté ou la page est fermée
+        // Nettoyer l'interval quand le composant est demonte ou la page est fermee
         return () => {
             clearInterval(intervalId);
             clearInterval(syncIntervalId);
         };
-    }, [isInitialized]); // Seulement après l'initialisation - pas de dépendance à library pour éviter la boucle
+    }, [isInitialized]); // Seulement apres l'initialisation - pas de dependance a library pour eviter la boucle
 
     // --- ACTIVE SESSION STATE ---
     const [data, setData] = useState<AnnualData[]>(INITIAL_DATA);
@@ -1531,7 +1531,7 @@ export default function App() {
     const [notes, setNotes] = useState<string>('');
     const [isWatchlist, setIsWatchlist] = useState<boolean>(false);
 
-    // ✅ WRAPPER SIMPLE : Sanitis automatiquement toutes les mises à jour d'assumptions
+    //  WRAPPER SIMPLE : Sanitis automatiquement toutes les mises a jour d'assumptions
     // Plus besoin de sanitis manuellement partout dans le code !
     const setAssumptions = (value: Assumptions | ((prev: Assumptions) => Assumptions)) => {
         if (typeof value === 'function') {
@@ -1546,7 +1546,7 @@ export default function App() {
         if (!isInitialized) return;
         const profile = library[activeId];
         if (profile) {
-            // Marquer comme en cours de chargement pour éviter les sauvegardes inutiles
+            // Marquer comme en cours de chargement pour eviter les sauvegardes inutiles
             isLoadingProfileRef.current = true;
             
             setData(profile.data);
@@ -1561,54 +1561,54 @@ export default function App() {
             setPastData([]);
             setFutureData([]);
             
-            // Réinitialiser le flag après un court délai pour permettre les sauvegardes futures
+            // Reinitialiser le flag apres un court delai pour permettre les sauvegardes futures
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     isLoadingProfileRef.current = false;
                 });
             });
         } else {
-            // ⚠️ Profil non trouvé dans la library - peut-être un nouveau ticker ou chargement initial
+            //  Profil non trouve dans la library - peut-etre un nouveau ticker ou chargement initial
             // Si c'est un profil squelette ou manquant, on tente de forcer le chargement
             // Afficher un avertissement si ce n'est pas le profil initial (ACN) ou si on vient de delete
-            // ✅ Vérifier le ticker par défaut depuis Supabase (pas de hardcoding)
+            //  Verifier le ticker par defaut depuis Supabase (pas de hardcoding)
             (async () => {
                 const { getConfigValue } = await import('./services/appConfigApi');
                 const defaultTicker = await getConfigValue('default_ticker');
                 if (activeId !== defaultTicker && activeId !== '') {
-                    // Ne pas afficher d'erreur tout de suite, cela peut être transitoire
+                    // Ne pas afficher d'erreur tout de suite, cela peut etre transitoire
                 }
             })();
         }
         
-        // ✅ PRIORITÉ CRITIQUE : Si le profil actif est un squelette (vide), le charger IMMÉDIATEMENT
-        // Ne pas attendre le chargement en arrière-plan (trop lent)
+        //  PRIORITE CRITIQUE : Si le profil actif est un squelette (vide), le charger IMMEDIATEMENT
+        // Ne pas attendre le chargement en arriere-plan (trop lent)
         if (activeId && profile && (profile._isSkeleton || !profile.data || profile.data.length === 0)) {
-            console.log(`🚀 Chargement PRIORITAIRE pour le profil actif: ${activeId}`);
-            // Appeler performSync pour charger les données immédiatement
+            console.log(` Chargement PRIORITAIRE pour le profil actif: ${activeId}`);
+            // Appeler performSync pour charger les donnees immediatement
             // Utiliser un timeout pour ne pas bloquer le rendu actuel
             const timeoutId = setTimeout(() => {
-                // Vérifier si toujours actif et vide
+                // Verifier si toujours actif et vide
                 const currentProfile = library[activeId];
                 if (currentProfile && (currentProfile._isSkeleton || !currentProfile.data || currentProfile.data.length === 0)) {
                      performSync(false).catch(console.error);
                 }
-            }, 50); // Petit délai pour laisser l'interface s'afficher
+            }, 50); // Petit delai pour laisser l'interface s'afficher
             return () => clearTimeout(timeoutId);
         }
     }, [activeId, isInitialized, library]);
 
-    // Afficher le démo si aucun ticker n'est sélectionné ou si les données ne sont pas chargées
-    // ⚠️ IMPORTANT: Ce useEffect doit être AVANT TOUS les early returns pour respecter les Rules of Hooks
+    // Afficher le demo si aucun ticker n'est selectionne ou si les donnees ne sont pas chargees
+    //  IMPORTANT: Ce useEffect doit etre AVANT TOUS les early returns pour respecter les Rules of Hooks
     useEffect(() => {
-        if (!isInitialized) return; // Skip si pas encore initialisé
+        if (!isInitialized) return; // Skip si pas encore initialise
         if (showLanding) return; // Skip si on est sur la landing page
-        if (showDemo) return; // Skip si le démo est déjà affiché
+        if (showDemo) return; // Skip si le demo est deja affiche
         
-        // ✅ Vérifier si l'utilisateur a déjà fermé le démo manuellement
+        //  Verifier si l'utilisateur a deja ferme le demo manuellement
         const hasClosedDemo = localStorage.getItem('3p1-has-closed-demo');
         if (hasClosedDemo === 'true') {
-            return; // Ne pas réafficher si l'utilisateur l'a fermé
+            return; // Ne pas reafficher si l'utilisateur l'a ferme
         }
         
         const currentProfile = library[activeId] || DEFAULT_PROFILE;
@@ -1620,9 +1620,9 @@ export default function App() {
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [isInitialized, showLanding, activeId, showDemo]); // ⚠️ Retirer 'library' des dépendances pour éviter la boucle infinie
+    }, [isInitialized, showLanding, activeId, showDemo]); //  Retirer 'library' des dependances pour eviter la boucle infinie
 
-    // Save to Library when Active State Changes (optimisé avec requestIdleCallback)
+    // Save to Library when Active State Changes (optimise avec requestIdleCallback)
     useEffect(() => {
         if (!isInitialized) return;
         
@@ -1631,7 +1631,7 @@ export default function App() {
             return;
         }
 
-        // Utiliser requestIdleCallback si disponible, sinon setTimeout avec délai plus court
+        // Utiliser requestIdleCallback si disponible, sinon setTimeout avec delai plus court
         const saveToStorage = () => {
             setLibrary(prev => {
                 const updated = {
@@ -1646,11 +1646,11 @@ export default function App() {
                         isWatchlist
                     }
                 };
-                // Sauvegarder de manière asynchrone pour ne pas bloquer le thread principal
+                // Sauvegarder de maniere asynchrone pour ne pas bloquer le thread principal
                 if (typeof requestIdleCallback !== 'undefined') {
                     requestIdleCallback(async () => {
                         try {
-                            // ✅ Sauvegarder dans Supabase ET cache local
+                            //  Sauvegarder dans Supabase ET cache local
                             await saveProfiles(updated, true);
                         } catch (e) {
                             console.warn('Failed to save to Storage:', e);
@@ -1660,7 +1660,7 @@ export default function App() {
                     // Fallback pour navigateurs sans requestIdleCallback
                     setTimeout(async () => {
                         try {
-                            // ✅ Sauvegarder dans Supabase ET cache local
+                            //  Sauvegarder dans Supabase ET cache local
                             await saveProfiles(updated, true);
                         } catch (e) {
                             console.warn('Failed to save to Storage:', e);
@@ -1671,7 +1671,7 @@ export default function App() {
             });
         };
 
-        const timer = setTimeout(saveToStorage, 300); // Réduit de 500ms à 300ms
+        const timer = setTimeout(saveToStorage, 300); // Reduit de 500ms a 300ms
 
         return () => clearTimeout(timer);
     }, [data, assumptions, info, notes, isWatchlist, activeId, isInitialized]);
@@ -1726,7 +1726,7 @@ export default function App() {
     // --- HANDLERS ---
 
     const handleFetchData = async () => {
-        // Ouvrir le dialogue avancé au lieu du dialogue simple
+        // Ouvrir le dialogue avance au lieu du dialogue simple
         setIsAdvancedSyncForBulk(false);
         setShowAdvancedSyncDialog(true);
     };
@@ -1742,7 +1742,7 @@ export default function App() {
                 const hasValidAssumptions = assumptions && typeof assumptions === 'object';
 
                 if (hasValidData && hasValidInfo && hasValidAssumptions) {
-                    console.log('💾 Saving current version before sync...');
+                    console.log(' Saving current version before sync...');
                     const saveResult = await saveSnapshot(
                         activeId,
                         data,
@@ -1758,7 +1758,7 @@ export default function App() {
                         // Non-blocking error
                     }
                 } else {
-                    console.log('⚠️ Skipping backup save: Incomplete data state', { hasValidData, hasValidInfo, hasValidAssumptions });
+                    console.log(' Skipping backup save: Incomplete data state', { hasValidData, hasValidInfo, hasValidAssumptions });
                 }
             }
 
@@ -1769,15 +1769,15 @@ export default function App() {
             setPastData(prev => [...prev, data]);
             setFutureData([]);
 
-            // ✅ CRITIQUE : Déclarer mergedData en dehors du if pour qu'il soit accessible partout
+            //  CRITIQUE : Declarer mergedData en dehors du if pour qu'il soit accessible partout
             let mergedData: AnnualData[] = data.length > 0 ? [...data] : [];
 
-            // Update Data avec merge intelligent : préserver les données manuelles (sauf si forceReplace)
+            // Update Data avec merge intelligent : preserver les donnees manuelles (sauf si forceReplace)
             if (result.data.length > 0 && syncOptions?.syncData) {
-                // Merge intelligent : préserver les données manuelles (comme dans handleBulkSyncAllTickers)
+                // Merge intelligent : preserver les donnees manuelles (comme dans handleBulkSyncAllTickers)
                 const newDataByYear = new Map(result.data.map(row => [row.year, row]));
                 
-                // Si syncOnlyNewYears, ne traiter que les nouvelles années
+                // Si syncOnlyNewYears, ne traiter que les nouvelles annees
                 if (syncOptions?.syncOnlyNewYears) {
                     result.data.forEach(newRow => {
                         const exists = mergedData.some(row => row.year === newRow.year);
@@ -1785,35 +1785,35 @@ export default function App() {
                             mergedData.push({
                                 ...newRow,
                                 autoFetched: true,
-                                dataSource: 'fmp-verified' as const // ✅ Nouvelle année directement de FMP = vérifiée
+                                dataSource: 'fmp-verified' as const //  Nouvelle annee directement de FMP = verifiee
                             });
                         }
                     });
                 } else {
-                    // Traitement normal : mettre à jour toutes les années
+                    // Traitement normal : mettre a jour toutes les annees
                     mergedData = data.map((existingRow) => {
                         const newRow = newDataByYear.get(existingRow.year);
                         
-                        // Si pas de nouvelle donnée pour cette année, garder l'existant
+                        // Si pas de nouvelle donnee pour cette annee, garder l'existant
                         if (!newRow) {
                             return existingRow;
                         }
 
-                        // Si forceReplace est true, remplacer toutes les données (données FMP vérifiées)
+                        // Si forceReplace est true, remplacer toutes les donnees (donnees FMP verifiees)
                         if (syncOptions?.forceReplace) {
                             return {
                                 ...(newRow as AnnualData),
                                 autoFetched: true,
-                                dataSource: 'fmp-verified' as const // ✅ Force replace = données FMP vérifiées
+                                dataSource: 'fmp-verified' as const //  Force replace = donnees FMP verifiees
                             };
                         }
 
-                        // Si syncOnlyMissingMetrics, ne remplir que les champs vides (données ajustées)
+                        // Si syncOnlyMissingMetrics, ne remplir que les champs vides (donnees ajustees)
                         if (syncOptions?.syncOnlyMissingMetrics) {
                             const updatedRow = { ...existingRow };
                             const typedNewRow = newRow as AnnualData;
                             let hasAdjustment = false;
-                            // Mettre à jour uniquement les champs qui sont 0, null ou undefined
+                            // Mettre a jour uniquement les champs qui sont 0, null ou undefined
                             if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && typedNewRow.earningsPerShare > 0) {
                                 updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
                                 hasAdjustment = true;
@@ -1838,20 +1838,20 @@ export default function App() {
                                 updatedRow.priceLow = typedNewRow.priceLow;
                                 hasAdjustment = true;
                             }
-                            // Si on a fait des ajustements, marquer comme ajusté
+                            // Si on a fait des ajustements, marquer comme ajuste
                             if (hasAdjustment) {
                                 updatedRow.dataSource = 'fmp-adjusted' as const;
                             }
                             return updatedRow;
                         }
 
-                        // Si la donnée existante est manuelle, la garder
+                        // Si la donnee existante est manuelle, la garder
                         if (existingRow.autoFetched === false || existingRow.dataSource === 'manual') {
-                            return existingRow; // Préserver la donnée manuelle
+                            return existingRow; // Preserver la donnee manuelle
                         }
 
-                        // Sinon, merger avec préservation des valeurs existantes (données ajustées)
-                        // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
+                        // Sinon, merger avec preservation des valeurs existantes (donnees ajustees)
+                        //  CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs a 0
                         const newRowTyped = newRow as AnnualData;
                         const hasPreservedValues = 
                             (newRowTyped.earningsPerShare <= 0 && existingRow.earningsPerShare > 0) ||
@@ -1861,19 +1861,19 @@ export default function App() {
                             (newRowTyped.priceHigh <= 0 && existingRow.priceHigh > 0) ||
                             (newRowTyped.priceLow <= 0 && existingRow.priceLow > 0);
                         
-                        // ✅ PRÉSERVER LE DATASOURCE ORIGINAL SI FMP-VERIFIED ET PAS DE PRÉSERVATION
-                        // Si les données existantes sont 'fmp-verified' et qu'on n'a pas préservé de valeurs,
-                        // on garde 'fmp-verified' pour que les données restent vertes
+                        //  PRESERVER LE DATASOURCE ORIGINAL SI FMP-VERIFIED ET PAS DE PRESERVATION
+                        // Si les donnees existantes sont 'fmp-verified' et qu'on n'a pas preserve de valeurs,
+                        // on garde 'fmp-verified' pour que les donnees restent vertes
                         let finalDataSource: 'fmp-verified' | 'fmp-adjusted' | 'manual' | 'calculated';
                         if (hasPreservedValues) {
-                            // Si on a préservé des valeurs, c'est forcément ajusté
+                            // Si on a preserve des valeurs, c'est forcement ajuste
                             finalDataSource = 'fmp-adjusted' as const;
                         } else if (existingRow.dataSource === 'fmp-verified') {
-                            // Si les données existantes étaient déjà vérifiées et qu'on n'a rien préservé,
-                            // on garde 'fmp-verified' pour que ça reste vert
+                            // Si les donnees existantes etaient deja verifiees et qu'on n'a rien preserve,
+                            // on garde 'fmp-verified' pour que ca reste vert
                             finalDataSource = 'fmp-verified' as const;
                         } else {
-                            // Sinon, on utilise les nouvelles données FMP qui sont vérifiées
+                            // Sinon, on utilise les nouvelles donnees FMP qui sont verifiees
                             finalDataSource = 'fmp-verified' as const;
                         }
                         
@@ -1886,27 +1886,27 @@ export default function App() {
                             priceHigh: (newRowTyped.priceHigh > 0) ? newRowTyped.priceHigh : existingRow.priceHigh,
                             priceLow: (newRowTyped.priceLow > 0) ? newRowTyped.priceLow : existingRow.priceLow,
                             autoFetched: true,
-                            dataSource: finalDataSource // ✅ Préserve 'fmp-verified' si les données n'ont pas été modifiées
+                            dataSource: finalDataSource //  Preserve 'fmp-verified' si les donnees n'ont pas ete modifiees
                         };
                     });
 
-                    // Ajouter les nouvelles années qui n'existent pas dans les données existantes (données FMP vérifiées)
+                    // Ajouter les nouvelles annees qui n'existent pas dans les donnees existantes (donnees FMP verifiees)
                     result.data.forEach(newRow => {
                         const exists = mergedData.some(row => row.year === newRow.year);
                         if (!exists) {
                             mergedData.push({
                                 ...newRow,
                                 autoFetched: true,
-                                dataSource: 'fmp-verified' as const // ✅ Nouvelle année directement de FMP = vérifiée
+                                dataSource: 'fmp-verified' as const //  Nouvelle annee directement de FMP = verifiee
                             });
                         }
                     });
                 }
 
-                // Trier par année
+                // Trier par annee
                 mergedData.sort((a, b) => a.year - b.year);
                 
-                console.log('✅ performSync: Données mergées prêtes', {
+                console.log(' performSync: Donnees mergees pretes', {
                     mergedDataLength: mergedData.length,
                     mergedDataYears: mergedData.map(d => d.year),
                     lastYearEPS: mergedData[mergedData.length - 1]?.earningsPerShare,
@@ -1922,7 +1922,7 @@ export default function App() {
                 
                 setData(mergedData);
             } else {
-                console.warn('⚠️ performSync: Aucune donnée dans result.data', {
+                console.warn(' performSync: Aucune donnee dans result.data', {
                     resultDataLength: result.data.length,
                     currentDataLength: data.length
                 });
@@ -1930,8 +1930,8 @@ export default function App() {
 
             // Update Info (including logo and beta, but preserve ValueLine metrics)
             if (result.info && syncOptions?.syncInfo !== false) {
-                // ⚠️ MULTI-UTILISATEUR : Recharger les métriques ValueLine depuis Supabase lors de la synchronisation FMP
-                // Pour garantir que tous les utilisateurs voient les mêmes valeurs
+                //  MULTI-UTILISATEUR : Recharger les metriques ValueLine depuis Supabase lors de la synchronisation FMP
+                // Pour garantir que tous les utilisateurs voient les memes valeurs
                 const existingProfile = library[activeId];
                 let preservedValueLineMetrics = {
                     securityRank: existingProfile?.info?.securityRank || result.info.securityRank || 'N/A',
@@ -1940,7 +1940,7 @@ export default function App() {
                     priceStability: existingProfile?.info?.priceStability || result.info.priceStability
                 };
                 
-                // Recharger depuis Supabase pour garantir la cohérence multi-utilisateurs
+                // Recharger depuis Supabase pour garantir la coherence multi-utilisateurs
                 try {
                     const supabaseResult = await loadAllTickersFromSupabase();
                     if (supabaseResult.success) {
@@ -1963,13 +1963,13 @@ export default function App() {
                         }
                     }
                 } catch (error) {
-                    console.warn('⚠️ Impossible de recharger les métriques ValueLine depuis Supabase lors de la sync FMP:', error);
+                    console.warn(' Impossible de recharger les metriques ValueLine depuis Supabase lors de la sync FMP:', error);
                     // Continuer avec les valeurs existantes en cas d'erreur
                 }
                 
                 const updatedInfo = {
                     ...result.info,
-                    ...preservedValueLineMetrics // Préserver les métriques ValueLine
+                    ...preservedValueLineMetrics // Preserver les metriques ValueLine
                 };
                 
                 // Ensure required fields are present
@@ -1998,21 +1998,21 @@ export default function App() {
                 });
             }
 
-            // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
-            // ⚠️ IMPORTANT : On préserve les hypothèses existantes (orange) sauf si replaceOrangeData est true
-            // ✅ CRITIQUE : Utiliser mergedData (défini ci-dessus) au lieu de data (ancienne valeur)
-            // mergedData contient les données mergées avec préservation des données manuelles
+            // Auto-fill assumptions basees sur les donnees historiques FMP (fonction centralisee)
+            //  IMPORTANT : On preserve les hypotheses existantes (orange) sauf si replaceOrangeData est true
+            //  CRITIQUE : Utiliser mergedData (defini ci-dessus) au lieu de data (ancienne valeur)
+            // mergedData contient les donnees mergees avec preservation des donnees manuelles
             const mergedDataForCalc = mergedData.length > 0 ? mergedData : result.data;
             // Si replaceOrangeData est true, passer undefined pour forcer le recalcul de toutes les assumptions
             const existingAssumptionsForCalc = syncOptions?.replaceOrangeData ? undefined : assumptions;
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                mergedDataForCalc, // Utiliser les données mergées au lieu de result.data
+                mergedDataForCalc, // Utiliser les donnees mergees au lieu de result.data
                 result.currentPrice,
-                existingAssumptionsForCalc, // Préserver les valeurs existantes seulement si replaceOrangeData est false
-                result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
+                existingAssumptionsForCalc, // Preserver les valeurs existantes seulement si replaceOrangeData est false
+                result.currentDividend //  NOUVEAU: Dividende actuel depuis l'API
             );
 
-            console.log('✅ Auto-filled assumptions in performSync (AVANT setAssumptions):', {
+            console.log(' Auto-filled assumptions in performSync (AVANT setAssumptions):', {
                 growthEPS: autoFilledAssumptions.growthRateEPS,
                 growthCF: autoFilledAssumptions.growthRateCF,
                 growthBV: autoFilledAssumptions.growthRateBV,
@@ -2026,7 +2026,7 @@ export default function App() {
             });
 
             setAssumptions(prev => {
-                // Détecter les outliers si l'option est activée
+                // Detecter les outliers si l'option est activee
                 let outlierDetection = { 
                     detectedOutliers: [], 
                     excludeEPS: prev.excludeEPS || false,
@@ -2042,14 +2042,14 @@ export default function App() {
                 
                 const updated = {
                     ...prev,
-                    ...autoFilledAssumptions, // Mettre à jour avec les nouvelles valeurs calculées
-                    // Préserver les exclusions si l'option est activée
+                    ...autoFilledAssumptions, // Mettre a jour avec les nouvelles valeurs calculees
+                    // Preserver les exclusions si l'option est activee
                     excludeEPS: syncOptions?.preserveExclusions !== false ? (prev.excludeEPS || outlierDetection.excludeEPS) : outlierDetection.excludeEPS,
                     excludeCF: syncOptions?.preserveExclusions !== false ? (prev.excludeCF || outlierDetection.excludeCF) : outlierDetection.excludeCF,
                     excludeBV: syncOptions?.preserveExclusions !== false ? (prev.excludeBV || outlierDetection.excludeBV) : outlierDetection.excludeBV,
                     excludeDIV: syncOptions?.preserveExclusions !== false ? (prev.excludeDIV || outlierDetection.excludeDIV) : outlierDetection.excludeDIV
                 };
-                console.log('✅ setAssumptions: Assumptions mises à jour', {
+                console.log(' setAssumptions: Assumptions mises a jour', {
                     prevGrowthEPS: prev.growthRateEPS,
                     newGrowthEPS: updated.growthRateEPS,
                     prevTargetPE: prev.targetPE,
@@ -2059,28 +2059,28 @@ export default function App() {
                 return updated;
             });
 
-            // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
-            // ✅ CRITIQUE : Utiliser mergedData (défini ci-dessus) qui contient les données mergées
+            // Detecter et exclure automatiquement les metriques avec prix cibles aberrants
+            //  CRITIQUE : Utiliser mergedData (defini ci-dessus) qui contient les donnees mergees
             const finalData = mergedData.length > 0 ? mergedData : result.data;
             
-            // ✅ SIMPLIFIÉ : Plus besoin de sanitiser manuellement, setAssumptions le fait automatiquement !
-            // Merger les assumptions (auto-filled prend priorité sur existantes)
+            //  SIMPLIFIE : Plus besoin de sanitiser manuellement, setAssumptions le fait automatiquement !
+            // Merger les assumptions (auto-filled prend priorite sur existantes)
             const finalAssumptions = {
                 ...assumptions,
-                ...autoFilledAssumptions // Les valeurs auto-remplies prennent priorité
+                ...autoFilledAssumptions // Les valeurs auto-remplies prennent priorite
             };
             
             const outlierDetection = detectOutlierMetrics(finalData, finalAssumptions);
             
             if (outlierDetection.detectedOutliers.length > 0) {
-                console.log(`⚠️ Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                console.log(` Metriques avec prix cibles aberrants detectees: ${outlierDetection.detectedOutliers.join(', ')}`);
                 showNotification(
-                    `Métriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(', ')}`,
+                    `Metriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(', ')}`,
                     'warning'
                 );
             }
 
-            // Appliquer les exclusions détectées
+            // Appliquer les exclusions detectees
             const assumptionsWithOutlierExclusions = {
                 ...finalAssumptions,
                 excludeEPS: outlierDetection.excludeEPS,
@@ -2089,14 +2089,14 @@ export default function App() {
                 excludeDIV: outlierDetection.excludeDIV
             };
 
-            // ✅ SIMPLIFIÉ : setAssumptions sanitis automatiquement !
+            //  SIMPLIFIE : setAssumptions sanitis automatiquement !
             setAssumptions(assumptionsWithOutlierExclusions);
 
-            // Auto-save snapshot after successful sync avec métadonnées de synchronisation
-            // ✅ saveSnapshot sanitis aussi, donc double protection
-            console.log('💾 Auto-saving snapshot after API sync...');
+            // Auto-save snapshot after successful sync avec metadonnees de synchronisation
+            //  saveSnapshot sanitis aussi, donc double protection
+            console.log(' Auto-saving snapshot after API sync...');
             
-            // Préparer les métadonnées de synchronisation pour performSync
+            // Preparer les metadonnees de synchronisation pour performSync
             const syncStartTime = Date.now();
             const syncMetadata = {
                 timestamp: new Date().toISOString(),
@@ -2144,56 +2144,56 @@ export default function App() {
             await saveSnapshot(
                 activeId,
                 finalData,
-                assumptionsWithOutlierExclusions, // setAssumptions a déjà sanitisé, saveSnapshot sanitisera aussi
+                assumptionsWithOutlierExclusions, // setAssumptions a deja sanitise, saveSnapshot sanitisera aussi
                 info,
                 `API sync - ${new Date().toLocaleString()}`,
                 true,  // Mark as current
                 true,  // Auto-fetched
                 0,     // retryCount
                 2,     // maxRetries
-                syncMetadata // Métadonnées de synchronisation
+                syncMetadata // Metadonnees de synchronisation
             );
 
-            showNotification(`Données synchronisées avec succès pour ${activeId}`, 'success');
+            showNotification(`Donnees synchronisees avec succes pour ${activeId}`, 'success');
 
         } catch (e) {
             const error = e as Error;
             let errorMessage = error.message;
             
-            // Améliorer les messages d'erreur pour l'utilisateur
+            // Ameliorer les messages d'erreur pour l'utilisateur
             if (errorMessage.includes('not found') || errorMessage.includes('introuvable')) {
                 errorMessage = `Symbole '${activeId}' introuvable dans FMP.\n\n` +
                     `Causes possibles:\n` +
-                    `• Le symbole n'existe pas ou est mal orthographié\n` +
-                    `• Le symbole nécessite un format différent (ex: BRK-B au lieu de BRK.B)\n` +
-                    `• La clé API FMP n'est pas configurée ou invalide\n` +
-                    `• Le ticker n'est pas disponible dans FMP (essayez un autre fournisseur)\n\n` +
-                    `Vérifiez les logs de la console pour plus de détails.`;
+                    `- Le symbole n'existe pas ou est mal orthographie\n` +
+                    `- Le symbole necessite un format different (ex: BRK-B au lieu de BRK.B)\n` +
+                    `- La cle API FMP n'est pas configuree ou invalide\n` +
+                    `- Le ticker n'est pas disponible dans FMP (essayez un autre fournisseur)\n\n` +
+                    `Verifiez les logs de la console pour plus de details.`;
             } else if (errorMessage.includes('API key') || errorMessage.includes('Invalid API')) {
-                errorMessage = `Erreur de clé API FMP.\n\n` +
-                    `La clé API FMP semble invalide ou non configurée.\n` +
-                    `Vérifiez FMP_API_KEY dans les variables d'environnement Vercel.`;
+                errorMessage = `Erreur de cle API FMP.\n\n` +
+                    `La cle API FMP semble invalide ou non configuree.\n` +
+                    `Verifiez FMP_API_KEY dans les variables d'environnement Vercel.`;
             } else if (errorMessage.includes('empty') || errorMessage.includes('vide')) {
-                errorMessage = `Aucune donnée retournée pour '${activeId}'.\n\n` +
-                    `FMP a retourné un tableau vide. Cela peut signifier:\n` +
-                    `• Le ticker existe mais n'a pas de données historiques disponibles\n` +
-                    `• Le ticker nécessite un abonnement FMP premium\n` +
-                    `• Le symbole doit être formaté différemment\n\n` +
-                    `Vérifiez les logs de la console pour plus de détails.`;
+                errorMessage = `Aucune donnee retournee pour '${activeId}'.\n\n` +
+                    `FMP a retourne un tableau vide. Cela peut signifier:\n` +
+                    `- Le ticker existe mais n'a pas de donnees historiques disponibles\n` +
+                    `- Le ticker necessite un abonnement FMP premium\n` +
+                    `- Le symbole doit etre formate differemment\n\n` +
+                    `Verifiez les logs de la console pour plus de details.`;
             }
             
-            console.error('❌ Erreur synchronisation:', error);
-            showNotification(`Erreur lors de la récupération des données : ${errorMessage}`, 'error');
+            console.error(' Erreur synchronisation:', error);
+            showNotification(`Erreur lors de la recuperation des donnees : ${errorMessage}`, 'error');
         } finally {
             setIsLoading(false);
-            setCurrentSyncingTicker(undefined); // ✅ Réinitialiser le ticker actuel
+            setCurrentSyncingTicker(undefined); //  Reinitialiser le ticker actuel
         }
     };
 
     const handleUpdateRow = (index: number, field: keyof AnnualData, value: number) => {
         // Block updates if viewing historical version in read-only mode
         if (isReadOnly) {
-            showNotification('Cette version est en lecture seule. Déverrouillez-la pour la modifier.', 'warning');
+            showNotification('Cette version est en lecture seule. Deverrouillez-la pour la modifier.', 'warning');
             return;
         }
 
@@ -2210,14 +2210,14 @@ export default function App() {
     };
 
     const handleUpdateInfo = (key: keyof CompanyInfo, value: string | number) => {
-        // ⚠️ MULTI-UTILISATEUR : Empêcher la modification des métriques ValueLine
-        // Ces métriques viennent de Supabase et doivent rester synchronisées pour tous les utilisateurs
+        //  MULTI-UTILISATEUR : Empecher la modification des metriques ValueLine
+        // Ces metriques viennent de Supabase et doivent rester synchronisees pour tous les utilisateurs
         const valueLineFields: (keyof CompanyInfo)[] = ['securityRank', 'earningsPredictability', 'priceGrowthPersistence', 'priceStability'];
         
         if (valueLineFields.includes(key)) {
             showNotification(
-                '⚠️ Les métriques ValueLine ne peuvent pas être modifiées localement.\n' +
-                'Elles sont synchronisées depuis Supabase pour tous les utilisateurs.\n' +
+                ' Les metriques ValueLine ne peuvent pas etre modifiees localement.\n' +
+                'Elles sont synchronisees depuis Supabase pour tous les utilisateurs.\n' +
                 'Pour modifier ces valeurs, utilisez l\'interface d\'administration Supabase.',
                 'warning'
             );
@@ -2234,17 +2234,17 @@ export default function App() {
     // --- SNAPSHOT MANAGEMENT HANDLERS ---
 
     const handleLoadSnapshot = async (snapshotId: string) => {
-        console.log(`🔄 Attempting to load snapshot: ${snapshotId}`);
+        console.log(` Attempting to load snapshot: ${snapshotId}`);
         const result = await loadSnapshot(snapshotId);
 
         if (!result.success) {
-            console.error(`❌ Load failed: ${result.error}`);
+            console.error(` Load failed: ${result.error}`);
             showNotification(`Erreur chargement: ${result.error}`, 'error');
             return;
         }
 
         const snapshot = result.snapshot;
-        console.log('✅ Snapshot loaded:', snapshot);
+        console.log(' Snapshot loaded:', snapshot);
 
         // Set historical version state
         setCurrentSnapshot({
@@ -2262,7 +2262,7 @@ export default function App() {
         setAssumptions(snapshot.assumptions);
         setInfo(snapshot.company_info);
 
-        console.log(`📜 Loaded snapshot v${snapshot.version} from ${snapshot.snapshot_date}`);
+        console.log(` Loaded snapshot v${snapshot.version} from ${snapshot.snapshot_date}`);
     };
 
     const handleRevertToCurrent = async () => {
@@ -2273,7 +2273,7 @@ export default function App() {
             if (currentSnap) {
                 await handleLoadSnapshot(currentSnap.id);
             } else {
-                showNotification('Aucune version actuelle trouvée', 'warning');
+                showNotification('Aucune version actuelle trouvee', 'warning');
             }
         }
 
@@ -2283,7 +2283,7 @@ export default function App() {
     };
 
     const handleUnlockVersion = () => {
-        if (!confirm('Déverrouiller cette version pour modification?\n\nLes changements seront enregistrés sur cette ancienne version.')) {
+        if (!confirm('Deverrouiller cette version pour modification?\n\nLes changements seront enregistres sur cette ancienne version.')) {
             return;
         }
         setIsReadOnly(false);
@@ -2291,10 +2291,10 @@ export default function App() {
 
     // --- RESTORE DATA HANDLERS ---
     const handleOpenRestoreDialog = async () => {
-        // Charger la date de la dernière sauvegarde
+        // Charger la date de la derniere sauvegarde
         const result = await listSnapshots(activeId, 1);
         if (result.success && result.snapshots && result.snapshots.length > 0) {
-            const latest = result.snapshots[0]; // Le plus récent est le premier
+            const latest = result.snapshots[0]; // Le plus recent est le premier
             setLatestSnapshotDate(latest.snapshot_date);
         }
         setShowRestoreDialog(true);
@@ -2305,14 +2305,14 @@ export default function App() {
             const result = await listSnapshots(activeId, 100);
 
             if (result.success && result.snapshots && result.snapshots.length > 0) {
-                // Trouver le snapshot actuel (is_current) ou le plus récent
+                // Trouver le snapshot actuel (is_current) ou le plus recent
                 const currentSnap = result.snapshots.find(s => s.is_current) || result.snapshots[0];
                 
                 if (currentSnap) {
                     await handleLoadSnapshot(currentSnap.id);
-                    showNotification('Données restaurées depuis la dernière sauvegarde', 'success');
+                    showNotification('Donnees restaurees depuis la derniere sauvegarde', 'success');
                 } else {
-                    showNotification('Aucune sauvegarde trouvée', 'warning');
+                    showNotification('Aucune sauvegarde trouvee', 'warning');
                 }
             } else {
                 showNotification('Aucune sauvegarde disponible', 'warning');
@@ -2325,14 +2325,14 @@ export default function App() {
 
     const handleRecalculateFromFMP = async () => {
         try {
-            showNotification(`Recalcul des données depuis FMP pour ${activeId}...`, 'info');
+            showNotification(`Recalcul des donnees depuis FMP pour ${activeId}...`, 'info');
             
-            // Récupérer les données FMP (comme lors d'un nouvel ajout)
+            // Recuperer les donnees FMP (comme lors d'un nouvel ajout)
             const result = await fetchCompanyData(activeId);
             
             // VALIDATION STRICTE
             if (!result.data || result.data.length === 0) {
-                throw new Error(`Aucune donnée FMP retournée pour ${activeId}`);
+                throw new Error(`Aucune donnee FMP retournee pour ${activeId}`);
             }
             
             if (!result.currentPrice || result.currentPrice <= 0) {
@@ -2344,14 +2344,14 @@ export default function App() {
             );
             
             if (!hasValidData) {
-                // Vérifier si c'est un fonds mutuel
+                // Verifier si c'est un fonds mutuel
                 if (isMutualFund(activeId, result.info.name)) {
-                    throw new Error(`${activeId} est un fonds mutuel et ne peut pas être analysé avec les ratios d'entreprise`);
+                    throw new Error(`${activeId} est un fonds mutuel et ne peut pas etre analyse avec les ratios d'entreprise`);
                 }
-                throw new Error(`Aucune donnée financière valide pour ${activeId}`);
+                throw new Error(`Aucune donnee financiere valide pour ${activeId}`);
             }
 
-            // Merge intelligent : préserver les données manuelles (comme dans handleBulkSyncAllTickers)
+            // Merge intelligent : preserver les donnees manuelles (comme dans handleBulkSyncAllTickers)
             const existingProfile = library[activeId];
             const existingData = existingProfile?.data || data;
             const newDataByYear = new Map(result.data.map(row => [row.year, row]));
@@ -2359,24 +2359,24 @@ export default function App() {
             const mergedData = existingData.map((existingRow) => {
                 const newRow = newDataByYear.get(existingRow.year);
                 
-                // Si pas de nouvelle donnée pour cette année, garder l'existant
+                // Si pas de nouvelle donnee pour cette annee, garder l'existant
                 if (!newRow) {
                     return existingRow;
                 }
 
-                // Si la donnée existante est manuelle (autoFetched: false ou undefined), la garder
+                // Si la donnee existante est manuelle (autoFetched: false ou undefined), la garder
                 if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
-                    return existingRow; // Préserver la donnée manuelle
+                    return existingRow; // Preserver la donnee manuelle
                 }
 
-                // Sinon, utiliser la nouvelle donnée avec autoFetched: true
+                // Sinon, utiliser la nouvelle donnee avec autoFetched: true
                 return {
                     ...(newRow as AnnualData),
                     autoFetched: true
                 };
             });
 
-            // Ajouter les nouvelles années qui n'existent pas dans les données existantes
+            // Ajouter les nouvelles annees qui n'existent pas dans les donnees existantes
             result.data.forEach(newRow => {
                 const exists = mergedData.some(row => row.year === newRow.year);
                 if (!exists) {
@@ -2387,19 +2387,19 @@ export default function App() {
                 }
             });
 
-            // Trier par année
+            // Trier par annee
             mergedData.sort((a, b) => a.year - b.year);
 
-            // Auto-fill assumptions avec la fonction centralisée (comme lors d'un nouvel ajout)
-            // Utiliser les données mergées pour le calcul
+            // Auto-fill assumptions avec la fonction centralisee (comme lors d'un nouvel ajout)
+            // Utiliser les donnees mergees pour le calcul
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                mergedData, // Utiliser les données mergées au lieu de result.data
+                mergedData, // Utiliser les donnees mergees au lieu de result.data
                 result.currentPrice,
-                assumptions, // Préserver les exclusions existantes
-                result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
+                assumptions, // Preserver les exclusions existantes
+                result.currentDividend //  NOUVEAU: Dividende actuel depuis l'API
             );
 
-            // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
+            // Detecter et exclure automatiquement les metriques avec prix cibles aberrants
             const tempAssumptions = {
                 ...assumptions,
                 ...autoFilledAssumptions
@@ -2407,14 +2407,14 @@ export default function App() {
             const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
             
             if (outlierDetection.detectedOutliers.length > 0) {
-                console.log(`⚠️ Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                console.log(` Metriques avec prix cibles aberrants detectees: ${outlierDetection.detectedOutliers.join(', ')}`);
                 showNotification(
-                    `Métriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(', ')}`,
+                    `Metriques exclues automatiquement (prix cibles aberrants): ${outlierDetection.detectedOutliers.join(', ')}`,
                     'warning'
                 );
             }
 
-            // Appliquer les exclusions détectées
+            // Appliquer les exclusions detectees
             const finalAssumptions = {
                 ...tempAssumptions,
                 excludeEPS: outlierDetection.excludeEPS,
@@ -2423,20 +2423,20 @@ export default function App() {
                 excludeDIV: outlierDetection.excludeDIV
             };
 
-            // Mettre à jour les données et métriques
+            // Mettre a jour les donnees et metriques
             setData(mergedData);
             setAssumptions(finalAssumptions);
             setInfo(prev => ({
                 ...prev,
                 ...result.info,
-                // Préserver les métriques ValueLine
+                // Preserver les metriques ValueLine
                 securityRank: prev.securityRank || result.info.securityRank || 'N/A',
                 earningsPredictability: prev.earningsPredictability || result.info.earningsPredictability,
                 priceGrowthPersistence: prev.priceGrowthPersistence || result.info.priceGrowthPersistence,
                 priceStability: prev.priceStability || result.info.priceStability
             }));
 
-            // Mettre à jour dans la library
+            // Mettre a jour dans la library
             setLibrary(prev => {
                 const profile = prev[activeId];
                 if (!profile) return prev;
@@ -2444,7 +2444,7 @@ export default function App() {
                     ...prev,
                     [activeId]: {
                         ...profile,
-                        data: mergedData, // Utiliser les données mergées au lieu de result.data
+                        data: mergedData, // Utiliser les donnees mergees au lieu de result.data
                         assumptions: finalAssumptions, // Inclure les exclusions automatiques
                         info: {
                             ...profile.info,
@@ -2463,11 +2463,11 @@ export default function App() {
             setCurrentSnapshot(null);
             setIsReadOnly(false);
 
-            showNotification(`✅ Données recalculées depuis FMP avec succès pour ${activeId}`, 'success');
-            console.log(`✅ ${activeId}: Données recalculées depuis FMP`);
+            showNotification(` Donnees recalculees depuis FMP avec succes pour ${activeId}`, 'success');
+            console.log(` ${activeId}: Donnees recalculees depuis FMP`);
         } catch (error: any) {
-            console.error(`❌ ${activeId}: Erreur lors du recalcul FMP:`, error);
-            showNotification(`❌ Erreur: ${error.message}`, 'error');
+            console.error(` ${activeId}: Erreur lors du recalcul FMP:`, error);
+            showNotification(` Erreur: ${error.message}`, 'error');
         }
     };
 
@@ -2488,7 +2488,7 @@ export default function App() {
         );
 
         if (result.success) {
-            showNotification('Version sauvegardée avec succès!', 'success');
+            showNotification('Version sauvegardee avec succes!', 'success');
             // Update current snapshot state to reflect this new version
             if (result.snapshot) {
                 setCurrentSnapshot({
@@ -2526,7 +2526,7 @@ export default function App() {
         );
 
         if (result.success) {
-            showNotification('Nouvelle version sauvegardée!', 'success');
+            showNotification('Nouvelle version sauvegardee!', 'success');
             // Reset to normal mode
             setCurrentSnapshot(null);
             setIsReadOnly(false);
@@ -2535,10 +2535,10 @@ export default function App() {
         }
     };
 
-    // ✅ NOUVEAU : Fonction pour détecter si les données sont corrompues (toutes à 0)
+    //  NOUVEAU : Fonction pour detecter si les donnees sont corrompues (toutes a 0)
     const hasCorruptedData = (data: AnnualData[]): boolean => {
         if (!data || data.length === 0) return true;
-        // Vérifier si TOUTES les années ont toutes les valeurs à 0
+        // Verifier si TOUTES les annees ont toutes les valeurs a 0
         const allZero = data.every(row => 
             (!row.earningsPerShare || row.earningsPerShare === 0) &&
             (!row.cashFlowPerShare || row.cashFlowPerShare === 0) &&
@@ -2553,7 +2553,7 @@ export default function App() {
             // Load existing profile data
             const existingProfile = library[upperSymbol];
             
-            // ✅ VÉRIFICATION CRITIQUE : Si c'est un profil squelette ou si les données sont vides, charger depuis Supabase puis FMP
+            //  VERIFICATION CRITIQUE : Si c'est un profil squelette ou si les donnees sont vides, charger depuis Supabase puis FMP
             const isSkeleton = (existingProfile as any)._isSkeleton === true;
             const hasNoData = !existingProfile.data || existingProfile.data.length === 0;
             const hasNoPrice = !existingProfile.assumptions?.currentPrice || existingProfile.assumptions.currentPrice === 0;
@@ -2562,20 +2562,20 @@ export default function App() {
             
             if (isSkeleton || hasNoData || hasNoPrice || hasCorruptedDataValue) {
                 if (hasCorruptedDataValue) {
-                    console.warn(`⚠️ ${upperSymbol}: Données corrompues détectées (toutes les valeurs à 0) - Re-synchronisation forcée...`);
-                    showNotification(`⚠️ ${upperSymbol}: Données corrompues détectées. Re-synchronisation en cours...`, 'warning');
+                    console.warn(` ${upperSymbol}: Donnees corrompues detectees (toutes les valeurs a 0) - Re-synchronisation forcee...`);
+                    showNotification(` ${upperSymbol}: Donnees corrompues detectees. Re-synchronisation en cours...`, 'warning');
                 }
-                console.log(`🔄 ${upperSymbol}: Profil squelette ou données vides détectées - Tentative chargement Supabase puis FMP...`);
+                console.log(` ${upperSymbol}: Profil squelette ou donnees vides detectees - Tentative chargement Supabase puis FMP...`);
                 
-                // ✅ NOUVEAU : Essayer d'abord de charger depuis Supabase (snapshot)
+                //  NOUVEAU : Essayer d'abord de charger depuis Supabase (snapshot)
                 try {
                     const { loadProfileFromSupabase } = await import('./services/supabaseDataLoader');
                     const supabaseProfile = await loadProfileFromSupabase(upperSymbol, false); // Ne pas fallback FMP ici
                     
                     if (supabaseProfile && supabaseProfile.source === 'supabase' && supabaseProfile.data && supabaseProfile.data.length > 0) {
-                        console.log(`✅ ${upperSymbol}: Chargé depuis Supabase (snapshot)`);
+                        console.log(` ${upperSymbol}: Charge depuis Supabase (snapshot)`);
                         
-                        // Mettre à jour le profil avec les données Supabase
+                        // Mettre a jour le profil avec les donnees Supabase
                         const updatedProfile: AnalysisProfile = {
                             id: upperSymbol,
                             lastModified: Date.now(),
@@ -2592,25 +2592,25 @@ export default function App() {
                         // Retirer le flag squelette
                         delete (updatedProfile as any)._isSkeleton;
                         
-                        // Mettre à jour la library
+                        // Mettre a jour la library
                         setLibrary(prev => ({
                             ...prev,
                             [upperSymbol]: updatedProfile
                         }));
                         
-                        // Mettre à jour les states
+                        // Mettre a jour les states
                         setActiveId(upperSymbol);
                         setData(supabaseProfile.data);
                         setAssumptions(updatedProfile.assumptions);
                         setInfo(updatedProfile.info);
                         setNotes(updatedProfile.notes || '');
                         
-                        showNotification(`✅ ${upperSymbol} chargé depuis Supabase`, 'success');
+                        showNotification(` ${upperSymbol} charge depuis Supabase`, 'success');
                         
-                        // ✅ FIX: Récupérer le prix en temps réel depuis l'API market data
-                        // Même après chargement Supabase, le prix peut être à 0 dans le snapshot
+                        //  FIX: Recuperer le prix en temps reel depuis l'API market data
+                        // Meme apres chargement Supabase, le prix peut etre a 0 dans le snapshot
                         try {
-                            console.log(`🔄 Tentative récupération prix temps réel pour ${upperSymbol}...`);
+                            console.log(` Tentative recuperation prix temps reel pour ${upperSymbol}...`);
                             const { fetchMarketData } = await import('./services/marketDataCache');
                             const marketData = await fetchMarketData(upperSymbol);
                             
@@ -2621,7 +2621,7 @@ export default function App() {
                                 };
                                 setAssumptions(priceUpdatedAssumptions);
                                 
-                                // Aussi mettre à jour dans la library
+                                // Aussi mettre a jour dans la library
                                 setLibrary(prev => ({
                                     ...prev,
                                     [upperSymbol]: {
@@ -2630,38 +2630,38 @@ export default function App() {
                                         lastModified: Date.now()
                                     }
                                 }));
-                                console.log(`✅ Prix mis à jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
+                                console.log(` Prix mis a jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
                             } else {
-                                console.log(`⚠️ Prix de marché non disponible pour ${upperSymbol}`);
+                                console.log(` Prix de marche non disponible pour ${upperSymbol}`);
                             }
                         } catch (priceError) {
-                            console.warn(`⚠️ Erreur récupération prix pour ${upperSymbol}:`, priceError);
+                            console.warn(` Erreur recuperation prix pour ${upperSymbol}:`, priceError);
                         }
                         
-                        return; // ✅ Succès - ne pas continuer vers FMP
+                        return; //  Succes - ne pas continuer vers FMP
                     } else {
-                        console.log(`⚠️ ${upperSymbol}: Pas de snapshot Supabase disponible - Fallback FMP...`);
+                        console.log(` ${upperSymbol}: Pas de snapshot Supabase disponible - Fallback FMP...`);
                         // Continuer vers FMP ci-dessous
                     }
                 } catch (supabaseError) {
-                    console.warn(`⚠️ ${upperSymbol}: Erreur chargement Supabase (non bloquant):`, supabaseError);
+                    console.warn(` ${upperSymbol}: Erreur chargement Supabase (non bloquant):`, supabaseError);
                     // Continuer vers FMP ci-dessous
                 }
                 
-                // Ne pas return ici, continuer pour charger les données FMP
+                // Ne pas return ici, continuer pour charger les donnees FMP
             } else {
-                // ✅ Profil valide avec données - Charger normalement
-                // Vérifier et mettre à jour les métriques ValueLine depuis Supabase si disponibles
-                // Utiliser le cache pour éviter les appels répétés
+                //  Profil valide avec donnees - Charger normalement
+                // Verifier et mettre a jour les metriques ValueLine depuis Supabase si disponibles
+                // Utiliser le cache pour eviter les appels repetes
                 try {
                     let supabaseTickers: any[] = [];
                     const now = Date.now();
                     
-                    // Vérifier si le cache est valide
+                    // Verifier si le cache est valide
                     if (supabaseTickersCacheRef.current && (now - supabaseTickersCacheRef.current.timestamp) < SUPABASE_CACHE_TTL) {
                         supabaseTickers = supabaseTickersCacheRef.current.data;
                     } else {
-                        // Charger depuis Supabase et mettre à jour le cache
+                        // Charger depuis Supabase et mettre a jour le cache
                         const supabaseResult = await loadAllTickersFromSupabase();
                         if (supabaseResult.success) {
                             supabaseTickers = supabaseResult.tickers;
@@ -2675,7 +2675,7 @@ export default function App() {
                     if (supabaseTickers.length > 0) {
                         const supabaseTicker = supabaseTickers.find(t => t.ticker.toUpperCase() === upperSymbol);
                         if (supabaseTicker) {
-                            // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
+                            //  MULTI-UTILISATEUR : Supabase est la source de verite pour les metriques ValueLine
                             // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                             const updatedInfo = {
                                 ...existingProfile.info,
@@ -2696,7 +2696,7 @@ export default function App() {
                                     : existingProfile.info.beta
                             };
                             
-                            // Mettre à jour dans la library si les métriques ont changé
+                            // Mettre a jour dans la library si les metriques ont change
                             if (JSON.stringify(existingProfile.info) !== JSON.stringify(updatedInfo)) {
                                 setLibrary(prev => ({
                                     ...prev,
@@ -2706,7 +2706,7 @@ export default function App() {
                                     }
                                 }));
                                 setInfo(updatedInfo);
-                                console.log(`✅ Métriques ValueLine mises à jour depuis Supabase pour ${upperSymbol}`);
+                                console.log(` Metriques ValueLine mises a jour depuis Supabase pour ${upperSymbol}`);
                             } else {
                                 setInfo(existingProfile.info);
                             }
@@ -2717,17 +2717,17 @@ export default function App() {
                         setInfo(existingProfile.info);
                     }
                 } catch (error) {
-                    console.warn(`⚠️ Impossible de charger les métriques ValueLine depuis Supabase pour ${upperSymbol}:`, error);
+                    console.warn(` Impossible de charger les metriques ValueLine depuis Supabase pour ${upperSymbol}:`, error);
                     setInfo(existingProfile.info);
                 }
                 
                 setActiveId(upperSymbol);
                 setData(existingProfile.data);
                 
-                // ✅ FIX: Mettre à jour le prix actuel depuis l'API de marché si le profil existe
-                // Cela garantit que le prix est toujours à jour même pour les profils en cache
+                //  FIX: Mettre a jour le prix actuel depuis l'API de marche si le profil existe
+                // Cela garantit que le prix est toujours a jour meme pour les profils en cache
                 try {
-                    console.log(`🔄 [ELSE BLOCK] Tentative récupération prix temps réel pour ${upperSymbol}...`);
+                    console.log(` [ELSE BLOCK] Tentative recuperation prix temps reel pour ${upperSymbol}...`);
                     const { fetchMarketData } = await import('./services/marketDataCache');
                     const marketData = await fetchMarketData(upperSymbol);
                     
@@ -2738,7 +2738,7 @@ export default function App() {
                         };
                         setAssumptions(updatedAssumptions);
                         
-                        // Aussi mettre à jour dans la library pour persistance
+                        // Aussi mettre a jour dans la library pour persistance
                         setLibrary(prev => ({
                             ...prev,
                             [upperSymbol]: {
@@ -2747,73 +2747,73 @@ export default function App() {
                                 lastModified: Date.now()
                             }
                         }));
-                        console.log(`✅ Prix mis à jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
+                        console.log(` Prix mis a jour pour ${upperSymbol}: $${marketData.currentPrice.toFixed(2)}`);
                     } else {
                         setAssumptions(existingProfile.assumptions);
-                        console.log(`⚠️ Prix de marché non disponible pour ${upperSymbol}, utilisation du cache`);
+                        console.log(` Prix de marche non disponible pour ${upperSymbol}, utilisation du cache`);
                     }
                 } catch (priceError) {
-                    console.warn(`⚠️ Erreur récupération prix pour ${upperSymbol}:`, priceError);
+                    console.warn(` Erreur recuperation prix pour ${upperSymbol}:`, priceError);
                     setAssumptions(existingProfile.assumptions);
                 }
                 
                 setNotes(existingProfile.notes);
-                console.log(`✅ Loaded existing profile for ${upperSymbol}`);
+                console.log(` Loaded existing profile for ${upperSymbol}`);
                 return;
             }
         }
 
-        // ⚠️ RIGUEUR 100% : Ne pas créer de profil placeholder
-        // Charger les données FMP AVANT de créer le profil
+        //  RIGUEUR 100% : Ne pas creer de profil placeholder
+        // Charger les donnees FMP AVANT de creer le profil
         try {
-            showNotification(`Chargement des données pour ${upperSymbol}...`, 'info');
+            showNotification(`Chargement des donnees pour ${upperSymbol}...`, 'info');
             const result = await fetchCompanyData(upperSymbol);
             
-            // VALIDATION STRICTE : Vérifier que les données sont valides
+            // VALIDATION STRICTE : Verifier que les donnees sont valides
             if (!result.data || result.data.length === 0) {
-                throw new Error(`Aucune donnée FMP retournée pour ${upperSymbol}`);
+                throw new Error(`Aucune donnee FMP retournee pour ${upperSymbol}`);
             }
             
             if (!result.currentPrice || result.currentPrice <= 0) {
                 throw new Error(`Prix actuel invalide (${result.currentPrice}) pour ${upperSymbol}`);
             }
             
-            // Vérifier qu'on a au moins une année avec des données valides
+            // Verifier qu'on a au moins une annee avec des donnees valides
             const hasValidData = result.data.some(d => 
                 d.earningsPerShare > 0 || d.cashFlowPerShare > 0 || d.bookValuePerShare > 0
             );
             
             if (!hasValidData) {
-                // Vérifier si c'est un fonds mutuel
+                // Verifier si c'est un fonds mutuel
                 if (isMutualFund(upperSymbol, result.info.name)) {
-                    throw new Error(`${upperSymbol} est un fonds mutuel et ne peut pas être analysé avec les ratios d'entreprise`);
+                    throw new Error(`${upperSymbol} est un fonds mutuel et ne peut pas etre analyse avec les ratios d'entreprise`);
                 }
-                throw new Error(`Aucune donnée financière valide pour ${upperSymbol}`);
+                throw new Error(`Aucune donnee financiere valide pour ${upperSymbol}`);
             }
 
-            // ✅ DÉTECTION : Profil existant (squelette ou vide) ou nouveau profil
+            //  DETECTION : Profil existant (squelette ou vide) ou nouveau profil
             const existingProfile = library[upperSymbol];
             const isUpdatingSkeleton = existingProfile && ((existingProfile as any)._isSkeleton === true || !existingProfile.data || existingProfile.data.length === 0);
             const existingData = existingProfile?.data || [];
 
-            // ✅ MERGE INTELLIGENT : Préserver les données manuelles (orange) comme dans performSync
+            //  MERGE INTELLIGENT : Preserver les donnees manuelles (orange) comme dans performSync
             const newDataByYear = new Map(result.data.map(row => [row.year, row]));
             
             const mergedData = existingData.map((existingRow) => {
                 const newRow = newDataByYear.get(existingRow.year);
                 
-                // Si pas de nouvelle donnée pour cette année, garder l'existant
+                // Si pas de nouvelle donnee pour cette annee, garder l'existant
                 if (!newRow) {
                     return existingRow;
                 }
 
-                // ✅ CRITIQUE : Si la donnée existante est manuelle, la garder
+                //  CRITIQUE : Si la donnee existante est manuelle, la garder
                 if (existingRow.autoFetched === false || existingRow.dataSource === 'manual') {
-                    return existingRow; // Préserver la donnée manuelle (orange)
+                    return existingRow; // Preserver la donnee manuelle (orange)
                 }
 
-                // Sinon, merger avec préservation des valeurs existantes (données ajustées)
-                // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
+                // Sinon, merger avec preservation des valeurs existantes (donnees ajustees)
+                //  CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs a 0
                 const newRowTyped = newRow as AnnualData;
                 const hasPreservedValues = 
                     (newRowTyped.earningsPerShare <= 0 && existingRow.earningsPerShare > 0) ||
@@ -2823,19 +2823,19 @@ export default function App() {
                     (newRowTyped.priceHigh <= 0 && existingRow.priceHigh > 0) ||
                     (newRowTyped.priceLow <= 0 && existingRow.priceLow > 0);
                 
-                // ✅ PRÉSERVER LE DATASOURCE ORIGINAL SI FMP-VERIFIED ET PAS DE PRÉSERVATION
-                // Si les données existantes sont 'fmp-verified' et qu'on n'a pas préservé de valeurs,
-                // on garde 'fmp-verified' pour que les données restent vertes
+                //  PRESERVER LE DATASOURCE ORIGINAL SI FMP-VERIFIED ET PAS DE PRESERVATION
+                // Si les donnees existantes sont 'fmp-verified' et qu'on n'a pas preserve de valeurs,
+                // on garde 'fmp-verified' pour que les donnees restent vertes
                 let finalDataSource: 'fmp-verified' | 'fmp-adjusted' | 'manual' | 'calculated';
                 if (hasPreservedValues) {
-                    // Si on a préservé des valeurs, c'est forcément ajusté
+                    // Si on a preserve des valeurs, c'est forcement ajuste
                     finalDataSource = 'fmp-adjusted' as const;
                 } else if (existingRow.dataSource === 'fmp-verified') {
-                    // Si les données existantes étaient déjà vérifiées et qu'on n'a rien préservé,
-                    // on garde 'fmp-verified' pour que ça reste vert
+                    // Si les donnees existantes etaient deja verifiees et qu'on n'a rien preserve,
+                    // on garde 'fmp-verified' pour que ca reste vert
                     finalDataSource = 'fmp-verified' as const;
                 } else {
-                    // Sinon, on utilise les nouvelles données FMP qui sont vérifiées
+                    // Sinon, on utilise les nouvelles donnees FMP qui sont verifiees
                     finalDataSource = 'fmp-verified' as const;
                 }
                 
@@ -2848,11 +2848,11 @@ export default function App() {
                     priceHigh: (newRowTyped.priceHigh > 0) ? newRowTyped.priceHigh : existingRow.priceHigh,
                     priceLow: (newRowTyped.priceLow > 0) ? newRowTyped.priceLow : existingRow.priceLow,
                     autoFetched: true,
-                    dataSource: finalDataSource // ✅ Préserve 'fmp-verified' si les données n'ont pas été modifiées
+                    dataSource: finalDataSource //  Preserve 'fmp-verified' si les donnees n'ont pas ete modifiees
                 };
             });
 
-            // Ajouter les nouvelles années qui n'existent pas dans les données existantes
+            // Ajouter les nouvelles annees qui n'existent pas dans les donnees existantes
             result.data.forEach(newRow => {
                 const exists = mergedData.some(row => row.year === newRow.year);
                 if (!exists) {
@@ -2863,27 +2863,27 @@ export default function App() {
                 }
             });
 
-            // Trier par année
+            // Trier par annee
             mergedData.sort((a, b) => a.year - b.year);
 
-            // ✅ IMPORTANT : Utiliser les données mergées (avec préservation des données manuelles) pour le calcul
-            // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
-            // ⚠️ CRITIQUE : Préserver les hypothèses existantes (orange) sauf currentPrice
-            // ✅ NOUVEAU : autoFillAssumptionsFromFMPData préserve maintenant automatiquement les valeurs existantes
+            //  IMPORTANT : Utiliser les donnees mergees (avec preservation des donnees manuelles) pour le calcul
+            // Auto-fill assumptions basees sur les donnees historiques FMP (fonction centralisee)
+            //  CRITIQUE : Preserver les hypotheses existantes (orange) sauf currentPrice
+            //  NOUVEAU : autoFillAssumptionsFromFMPData preserve maintenant automatiquement les valeurs existantes
             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
-                mergedData, // ✅ Utiliser mergedData au lieu de result.data
+                mergedData, //  Utiliser mergedData au lieu de result.data
                 result.currentPrice,
                 existingProfile?.assumptions || INITIAL_ASSUMPTIONS,
-                result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
+                result.currentDividend //  NOUVEAU: Dividende actuel depuis l'API
             );
 
-            // ✅ MERGE INTELLIGENT : Préserver les valeurs existantes (orange) AVANT d'appliquer les nouvelles
-            // L'ordre est important : d'abord les nouvelles valeurs calculées, puis les valeurs existantes par-dessus
-            // Cela garantit que les valeurs manuelles (orange) ne sont jamais écrasées
+            //  MERGE INTELLIGENT : Preserver les valeurs existantes (orange) AVANT d'appliquer les nouvelles
+            // L'ordre est important : d'abord les nouvelles valeurs calculees, puis les valeurs existantes par-dessus
+            // Cela garantit que les valeurs manuelles (orange) ne sont jamais ecrasees
             const existingAssumptions = existingProfile?.assumptions || INITIAL_ASSUMPTIONS;
             const tempAssumptions = {
-                ...autoFilledAssumptions, // Nouvelles valeurs calculées (qui préservent déjà les valeurs existantes)
-                // ✅ PRÉSERVER explicitement les valeurs existantes pour être sûr (double protection)
+                ...autoFilledAssumptions, // Nouvelles valeurs calculees (qui preservent deja les valeurs existantes)
+                //  PRESERVER explicitement les valeurs existantes pour etre sur (double protection)
                 growthRateEPS: existingAssumptions.growthRateEPS !== undefined && existingAssumptions.growthRateEPS !== 0 
                     ? existingAssumptions.growthRateEPS 
                     : autoFilledAssumptions.growthRateEPS,
@@ -2899,7 +2899,7 @@ export default function App() {
                 growthRateDiv: existingAssumptions.growthRateDiv !== undefined && existingAssumptions.growthRateDiv !== 0 
                     ? existingAssumptions.growthRateDiv 
                     : autoFilledAssumptions.growthRateDiv,
-                // Préserver aussi les ratios cibles si définis
+                // Preserver aussi les ratios cibles si definis
                 targetPE: existingAssumptions.targetPE !== undefined && existingAssumptions.targetPE !== 0 
                     ? existingAssumptions.targetPE 
                     : autoFilledAssumptions.targetPE,
@@ -2912,7 +2912,7 @@ export default function App() {
                 targetYield: existingAssumptions.targetYield !== undefined && existingAssumptions.targetYield !== 0 
                     ? existingAssumptions.targetYield 
                     : autoFilledAssumptions.targetYield,
-                // Préserver les autres valeurs existantes
+                // Preserver les autres valeurs existantes
                 requiredReturn: existingAssumptions.requiredReturn || autoFilledAssumptions.requiredReturn,
                 dividendPayoutRatio: existingAssumptions.dividendPayoutRatio || autoFilledAssumptions.dividendPayoutRatio,
                 excludeEPS: existingAssumptions.excludeEPS,
@@ -2923,10 +2923,10 @@ export default function App() {
             const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
             
             if (outlierDetection.detectedOutliers.length > 0) {
-                console.log(`⚠️ ${upperSymbol}: Outliers détectés: ${outlierDetection.detectedOutliers.join(', ')}`);
+                console.log(` ${upperSymbol}: Outliers detectes: ${outlierDetection.detectedOutliers.join(', ')}`);
             }
 
-            // ✅ SANITISER les assumptions finales pour appliquer les guardrails
+            //  SANITISER les assumptions finales pour appliquer les guardrails
             const finalAssumptions = sanitizeAssumptionsSync({
                 ...tempAssumptions,
                 excludeEPS: outlierDetection.excludeEPS,
@@ -2938,8 +2938,8 @@ export default function App() {
             const updatedProfile: AnalysisProfile = {
                 id: upperSymbol,
                 lastModified: Date.now(),
-                data: mergedData, // ✅ Utiliser mergedData au lieu de result.data
-                assumptions: finalAssumptions, // ✅ Utiliser finalAssumptions avec guardrails
+                data: mergedData, //  Utiliser mergedData au lieu de result.data
+                assumptions: finalAssumptions, //  Utiliser finalAssumptions avec guardrails
                 info: {
                     ...(existingProfile?.info || {}),
                     symbol: symbol,
@@ -2953,25 +2953,25 @@ export default function App() {
                 isWatchlist: existingProfile?.isWatchlist ?? false
             };
             
-            // ✅ RETIRER LE FLAG SQUELETTE si présent
+            //  RETIRER LE FLAG SQUELETTE si present
             delete (updatedProfile as any)._isSkeleton;
             
-            // Mettre à jour ou créer le profil
+            // Mettre a jour ou creer le profil
             setLibrary(prev => {
                 const updated = {
                     ...prev,
                     [upperSymbol]: updatedProfile
                 };
                 
-                // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
-                        // ✅ Sauvegarder dans Supabase ET cache local
+                //  NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
+                        //  Sauvegarder dans Supabase ET cache local
                         saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
                 
                 return updated;
             });
             
             setActiveId(upperSymbol);
-            setData(mergedData); // ✅ Utiliser mergedData pour préserver les données orange
+            setData(mergedData); //  Utiliser mergedData pour preserver les donnees orange
             setAssumptions(updatedProfile.assumptions);
             // Ensure required fields are present
             const completeInfo: CompanyInfo = {
@@ -2987,17 +2987,17 @@ export default function App() {
             setNotes(existingProfile?.notes || '');
             
             if (isUpdatingSkeleton) {
-                showNotification(`✅ ${upperSymbol} chargé avec succès (profil mis à jour)`, 'success');
-                console.log(`✅ ${upperSymbol}: Profil squelette mis à jour avec données FMP valides`);
+                showNotification(` ${upperSymbol} charge avec succes (profil mis a jour)`, 'success');
+                console.log(` ${upperSymbol}: Profil squelette mis a jour avec donnees FMP valides`);
             } else {
-                showNotification(`✅ ${upperSymbol} chargé avec succès`, 'success');
-                console.log(`✅ ${upperSymbol}: Profil créé avec données FMP valides`);
+                showNotification(` ${upperSymbol} charge avec succes`, 'success');
+                console.log(` ${upperSymbol}: Profil cree avec donnees FMP valides`);
             }
         } catch (e) {
             const error = e as Error;
-            console.error(`❌ ${upperSymbol}: Erreur FMP - profil NON créé:`, error);
-            showNotification(`❌ Impossible de charger ${upperSymbol}: ${error.message}`, 'error');
-            // ⚠️ RIGUEUR 100% : Ne pas créer de profil si FMP échoue
+            console.error(` ${upperSymbol}: Erreur FMP - profil NON cree:`, error);
+            showNotification(` Impossible de charger ${upperSymbol}: ${error.message}`, 'error');
+            //  RIGUEUR 100% : Ne pas creer de profil si FMP echoue
         }
     };
 
@@ -3006,14 +3006,14 @@ export default function App() {
         const newLib = { ...library };
         delete newLib[id];
         setLibrary(newLib);
-        // ✅ Sauvegarder dans Supabase ET cache local
+        //  Sauvegarder dans Supabase ET cache local
         await saveProfiles(newLib, true);
 
         // Update active ticker if needed
         if (activeId === id) {
             const remaining = Object.keys(newLib);
             if (remaining.length > 0) {
-                // Sélectionner le premier ticker en ordre alphabétique
+                // Selectionner le premier ticker en ordre alphabetique
                 const sortedRemaining = remaining.sort((a, b) => 
                     (library[a]?.info?.preferredSymbol || a).localeCompare(library[b]?.info?.preferredSymbol || b)
                 );
@@ -3035,14 +3035,14 @@ export default function App() {
             const result = await response.json();
 
             if (result.success) {
-                console.log(`✅ ${id} supprimé de Supabase:`, result.removed_from);
-                showNotification(`✅ ${id} supprimé définitivement`, 'success');
+                console.log(` ${id} supprime de Supabase:`, result.removed_from);
+                showNotification(` ${id} supprime definitivement`, 'success');
             } else {
-                console.warn(`⚠️ ${id} non trouvé dans Supabase`, result);
+                console.warn(` ${id} non trouve dans Supabase`, result);
             }
         } catch (error) {
-            console.error(`❌ Erreur suppression Supabase pour ${id}:`, error);
-            // Ne pas bloquer l'UI - la suppression locale a déjà été faite
+            console.error(` Erreur suppression Supabase pour ${id}:`, error);
+            // Ne pas bloquer l'UI - la suppression locale a deja ete faite
         }
     };
 
@@ -3051,7 +3051,7 @@ export default function App() {
         if (newId) {
             const upperId = newId.toUpperCase();
             if (library[upperId]) {
-                showNotification("Ce nom existe déjà.", 'warning');
+                showNotification("Ce nom existe deja.", 'warning');
                 return;
             }
             const source = library[id];
@@ -3077,7 +3077,7 @@ export default function App() {
             };
 
             const newLib = { ...prev, [id]: updated };
-            // ✅ Sauvegarder dans Supabase ET cache local
+            //  Sauvegarder dans Supabase ET cache local
             saveProfiles(newLib, true).catch(e => {
                 console.warn('Failed to save to cache:', e);
             });
@@ -3102,7 +3102,7 @@ export default function App() {
             };
 
             const newLib = { ...prev, [id]: updated };
-            // ✅ Sauvegarder dans Supabase ET cache local
+            //  Sauvegarder dans Supabase ET cache local
             saveProfiles(newLib, true).catch(e => {
                 console.warn('Failed to save to cache:', e);
             });
@@ -3117,7 +3117,7 @@ export default function App() {
     };
 
     const handleResetData = () => {
-        if (confirm("Voulez-vous remettre à zéro toutes les données historiques de ce profil ?")) {
+        if (confirm("Voulez-vous remettre a zero toutes les donnees historiques de ce profil ?")) {
             setData(INITIAL_DATA.map(d => ({ ...d, priceHigh: 0, priceLow: 0, earningsPerShare: 0, dividendPerShare: 0, cashFlowPerShare: 0, bookValuePerShare: 0 })));
         }
     };
@@ -3134,23 +3134,23 @@ export default function App() {
     const [syncPausedState, setSyncPausedState] = useState(false);
 
     const handleBulkSyncAllTickers = async () => {
-        // Ouvrir le dialogue avancé pour la synchronisation en masse
+        // Ouvrir le dialogue avance pour la synchronisation en masse
         setIsAdvancedSyncForBulk(true);
         setShowAdvancedSyncDialog(true);
     };
 
     const handleSyncSelectedTickers = async (tickerIds: string[]) => {
         if (tickerIds.length === 0) {
-            showNotification('Aucun ticker sélectionné', 'warning');
+            showNotification('Aucun ticker selectionne', 'warning');
             return;
         }
-        // Stocker les tickers sélectionnés pour le dialogue de synchronisation
+        // Stocker les tickers selectionnes pour le dialogue de synchronisation
         (window as any)._pendingSyncTickers = tickerIds;
         setIsAdvancedSyncForBulk(true);
         setShowAdvancedSyncDialog(true);
     };
 
-    // État pour le rapport de synchronisation
+    // Etat pour le rapport de synchronisation
     const [syncReportData, setSyncReportData] = useState<any>(null);
     const [showSyncReport, setShowSyncReport] = useState(false);
 
@@ -3170,119 +3170,119 @@ export default function App() {
         let errorCount = 0;
         let skippedCount = 0; // Tickers introuvables dans FMP (404)
         const errors: string[] = [];
-        const skippedTickers: string[] = []; // Tickers ignorés car introuvables dans FMP
+        const skippedTickers: string[] = []; // Tickers ignores car introuvables dans FMP
         
-        // ✅ Collecte des données pour le rapport détaillé
+        //  Collecte des donnees pour le rapport detaille
         const tickerResults: any[] = [];
         
-        // ✅ OPTIMISATION CRITIQUE: Charger les tickers Supabase UNE SEULE FOIS au début
-        // et mettre en cache pour éviter des centaines d'appels API pendant la synchronisation
+        //  OPTIMISATION CRITIQUE: Charger les tickers Supabase UNE SEULE FOIS au debut
+        // et mettre en cache pour eviter des centaines d'appels API pendant la synchronisation
         let supabaseTickersCache: any[] | null = null;
         if (options.syncValueLineMetrics) {
             try {
-                console.log('📡 Chargement initial des tickers Supabase pour métriques ValueLine...');
+                console.log(' Chargement initial des tickers Supabase pour metriques ValueLine...');
                 const supabaseResult = await loadAllTickersFromSupabase();
                 if (supabaseResult.success) {
                     supabaseTickersCache = supabaseResult.tickers;
-                    console.log(`✅ ${supabaseTickersCache.length} tickers Supabase chargés et mis en cache pour toute la synchronisation`);
+                    console.log(` ${supabaseTickersCache.length} tickers Supabase charges et mis en cache pour toute la synchronisation`);
                 } else {
-                    console.warn('⚠️ Échec chargement initial tickers Supabase, métriques ValueLine non synchronisées');
+                    console.warn(' Echec chargement initial tickers Supabase, metriques ValueLine non synchronisees');
                 }
             } catch (error: any) {
-                console.warn('⚠️ Erreur chargement initial tickers Supabase:', error.message);
+                console.warn(' Erreur chargement initial tickers Supabase:', error.message);
             }
         }
         
-        // ✅ OPTIMISATION: Utiliser l'endpoint batch pour récupérer plusieurs tickers en une seule requête
-        // ✅ Charger les configurations depuis Supabase (pas de hardcoding)
+        //  OPTIMISATION: Utiliser l'endpoint batch pour recuperer plusieurs tickers en une seule requete
+        //  Charger les configurations depuis Supabase (pas de hardcoding)
         const { getConfigValue } = await import('./services/appConfigApi');
         const BATCH_API_SIZE = await getConfigValue('api_batch_size');
         const delayBetweenBatches = await getConfigValue('delay_between_batches_ms');
         const MAX_SYNC_TIME_MS = await getConfigValue('max_sync_time_ms');
-        const startSyncTime = Date.now(); // Timestamp de début pour timeout global
+        const startSyncTime = Date.now(); // Timestamp de debut pour timeout global
 
-        // ✅ FONCTION HELPER: Récupérer plusieurs tickers en batch
+        //  FONCTION HELPER: Recuperer plusieurs tickers en batch
         const fetchCompanyDataBatch = async (tickerSymbols: string[], includeKeyMetrics: boolean = true): Promise<Map<string, any>> => {
             const results = new Map<string, any>();
             
             try {
                 const symbolString = tickerSymbols.join(',');
-                console.log(`🔍 [BATCH] Appel API pour ${tickerSymbols.length} tickers: ${symbolString.substring(0, 50)}...`);
-                console.log(`🔍 [BATCH] includeKeyMetrics: ${includeKeyMetrics}`);
-                // Inclure les key metrics seulement si demandé (pour optimiser si on veut seulement syncInfo ou syncAssumptions)
+                console.log(` [BATCH] Appel API pour ${tickerSymbols.length} tickers: ${symbolString.substring(0, 50)}...`);
+                console.log(` [BATCH] includeKeyMetrics: ${includeKeyMetrics}`);
+                // Inclure les key metrics seulement si demande (pour optimiser si on veut seulement syncInfo ou syncAssumptions)
                 const url = `/api/fmp-company-data-batch-sync?symbols=${encodeURIComponent(symbolString)}&limit=${BATCH_API_SIZE}&includeKeyMetrics=${includeKeyMetrics}`;
-                console.log(`🔍 [BATCH] URL: ${url.substring(0, 100)}...`);
+                console.log(` [BATCH] URL: ${url.substring(0, 100)}...`);
                 
                 const response = await fetch(url);
-                console.log(`🔍 [BATCH] Réponse HTTP: ${response.status} ${response.statusText}`);
+                console.log(` [BATCH] Reponse HTTP: ${response.status} ${response.statusText}`);
                 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error(`❌ [BATCH] Erreur HTTP ${response.status}:`, errorText.substring(0, 200));
+                    console.error(` [BATCH] Erreur HTTP ${response.status}:`, errorText.substring(0, 200));
                     throw new Error(`Batch API error: ${response.status}`);
                 }
                 
                 const batchData = await response.json();
-                console.log(`🔍 [BATCH] Données reçues:`, {
+                console.log(` [BATCH] Donnees recues:`, {
                     success: batchData.success,
                     resultsCount: batchData.results?.length || 0,
                     stats: batchData.stats
                 });
                 
                 if (batchData.success && batchData.results) {
-                    console.log(`📦 [BATCH] Batch API réponse: ${batchData.results.length} résultats`);
+                    console.log(` [BATCH] Batch API reponse: ${batchData.results.length} resultats`);
                     batchData.results.forEach((result: any) => {
                         if (result.success && result.data) {
                             const dataLength = result.data.data ? result.data.data.length : 0;
                             if (dataLength > 0) {
-                                console.log(`✅ [BATCH] ${result.symbol}: ${dataLength} années de données, currentDividend: ${result.data.currentDividend || 0}`);
+                                console.log(` [BATCH] ${result.symbol}: ${dataLength} annees de donnees, currentDividend: ${result.data.currentDividend || 0}`);
                             } else {
-                                console.log(`⚠️ [BATCH] ${result.symbol}: Profile trouvé mais ${dataLength} années de données`);
+                                console.log(` [BATCH] ${result.symbol}: Profile trouve mais ${dataLength} annees de donnees`);
                             }
-                            // ✅ Stocker la structure complète (result.data contient data, info, currentPrice, currentDividend)
+                            //  Stocker la structure complete (result.data contient data, info, currentPrice, currentDividend)
                             results.set(result.symbol.toUpperCase(), result.data);
                         } else {
-                            console.warn(`❌ [BATCH] ${result.symbol}: Échec ou données manquantes (success: ${result.success}, hasData: ${!!result.data})`);
+                            console.warn(` [BATCH] ${result.symbol}: Echec ou donnees manquantes (success: ${result.success}, hasData: ${!!result.data})`);
                         }
                     });
-                    console.log(`📦 [BATCH] Total résultats stockés dans Map: ${results.size}`);
+                    console.log(` [BATCH] Total resultats stockes dans Map: ${results.size}`);
                 } else {
-                    console.error(`❌ [BATCH] Batch API réponse invalide:`, batchData);
+                    console.error(` [BATCH] Batch API reponse invalide:`, batchData);
                 }
             } catch (error: any) {
-                console.error(`❌ [BATCH] Erreur batch fetch:`, error.message, error);
+                console.error(` [BATCH] Erreur batch fetch:`, error.message, error);
             }
             
             return results;
         };
 
-        // ✅ FONCTION HELPER: fetchCompanyData avec timeout (fallback pour tickers individuels)
+        //  FONCTION HELPER: fetchCompanyData avec timeout (fallback pour tickers individuels)
         const fetchCompanyDataWithTimeout = async (tickerSymbol: string): Promise<any> => {
             return Promise.race([
                 fetchCompanyData(tickerSymbol),
                 new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error(`Timeout après 30000ms`)), 30000)
+                    setTimeout(() => reject(new Error(`Timeout apres 30000ms`)), 30000)
                 )
             ]);
         };
 
         try {
-            console.log(`🚀 Début synchronisation avec options: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / BATCH_API_SIZE)} batches API`);
-            console.log('📋 Options de synchronisation:', options);
+            console.log(` Debut synchronisation avec options: ${allTickers.length} tickers en ${Math.ceil(allTickers.length / BATCH_API_SIZE)} batches API`);
+            console.log(' Options de synchronisation:', options);
             
             // Traiter par batch API pour optimiser les appels FMP
             for (let i = 0; i < allTickers.length; i += BATCH_API_SIZE) {
                 // 0. Check for Pause or Abort
                 if (abortSync.current) {
-                    console.log('🛑 Synchronisation arrêtée par l\'utilisateur.');
+                    console.log(' Synchronisation arretee par l\'utilisateur.');
                     break;
                 }
 
-                // ✅ TIMEOUT GLOBAL: Vérifier si on dépasse le temps maximum
+                //  TIMEOUT GLOBAL: Verifier si on depasse le temps maximum
                 const elapsedTime = Date.now() - startSyncTime;
                 if (elapsedTime > MAX_SYNC_TIME_MS) {
-                    console.warn(`⏱️ Timeout global atteint (${MAX_SYNC_TIME_MS / 1000 / 60} min). Arrêt de la synchronisation.`);
-                    console.warn(`📊 Progression: ${i}/${allTickers.length} tickers traités (${Math.round(i / allTickers.length * 100)}%)`);
+                    console.warn(` Timeout global atteint (${MAX_SYNC_TIME_MS / 1000 / 60} min). Arret de la synchronisation.`);
+                    console.warn(` Progression: ${i}/${allTickers.length} tickers traites (${Math.round(i / allTickers.length * 100)}%)`);
                     break;
                 }
 
@@ -3290,11 +3290,11 @@ export default function App() {
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
-            const batch = allTickers.slice(i, i + BATCH_API_SIZE).filter(t => t && t.trim()); // ✅ FIX: Filtrer les tickers vides
+            const batch = allTickers.slice(i, i + BATCH_API_SIZE).filter(t => t && t.trim()); //  FIX: Filtrer les tickers vides
 
-            // ✅ VALIDATION: Ignorer les batches vides
+            //  VALIDATION: Ignorer les batches vides
             if (batch.length === 0) {
-                console.warn(`⚠️ Batch vide détecté à l'index ${i}, ignoré`);
+                console.warn(` Batch vide detecte a l'index ${i}, ignore`);
                 continue;
             }
 
@@ -3303,12 +3303,12 @@ export default function App() {
                 await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
             }
 
-            // ✅ OPTIMISATION: Filtrer les tickers qui ont vraiment besoin de données FMP
-            // Avant d'appeler l'API batch, vérifier quels tickers ont vraiment besoin de données
+            //  OPTIMISATION: Filtrer les tickers qui ont vraiment besoin de donnees FMP
+            // Avant d'appeler l'API batch, verifier quels tickers ont vraiment besoin de donnees
             const { shouldFetchFromFMP } = await import('./utils/syncOptimization');
             const tickersNeedingFMP: string[] = [];
             
-            // Vérifier chaque ticker du batch en parallèle
+            // Verifier chaque ticker du batch en parallele
             await Promise.all(
                 batch.map(async (tickerSymbol) => {
                     const profile = library[tickerSymbol];
@@ -3335,31 +3335,31 @@ export default function App() {
                     if (needsFMP) {
                         tickersNeedingFMP.push(tickerSymbol);
                     } else {
-                        console.log(`✅ ${tickerSymbol}: Skip FMP - données déjà disponibles`);
+                        console.log(` ${tickerSymbol}: Skip FMP - donnees deja disponibles`);
                     }
                 })
             );
             
-            // ✅ OPTIMISATION: Récupérer seulement les tickers qui en ont besoin
-            // Inclure les key metrics seulement si syncData est activé
+            //  OPTIMISATION: Recuperer seulement les tickers qui en ont besoin
+            // Inclure les key metrics seulement si syncData est active
             const includeKeyMetrics = options.syncData;
             let batchResults = new Map<string, any>();
             
             if (tickersNeedingFMP.length > 0) {
-                console.log(`📦 Récupération batch ${i / BATCH_API_SIZE + 1}/${Math.ceil(allTickers.length / BATCH_API_SIZE)}: ${tickersNeedingFMP.length}/${batch.length} tickers nécessitent FMP`);
-                console.log(`🔍 [BATCH] Options: syncData=${options.syncData}, syncAssumptions=${options.syncAssumptions}, syncInfo=${options.syncInfo}, includeKeyMetrics=${includeKeyMetrics}`);
+                console.log(` Recuperation batch ${i / BATCH_API_SIZE + 1}/${Math.ceil(allTickers.length / BATCH_API_SIZE)}: ${tickersNeedingFMP.length}/${batch.length} tickers necessitent FMP`);
+                console.log(` [BATCH] Options: syncData=${options.syncData}, syncAssumptions=${options.syncAssumptions}, syncInfo=${options.syncInfo}, includeKeyMetrics=${includeKeyMetrics}`);
                 batchResults = await fetchCompanyDataBatch(tickersNeedingFMP, includeKeyMetrics);
             } else {
-                console.log(`✅ Batch ${i / BATCH_API_SIZE + 1}: Tous les tickers ont déjà leurs données, skip FMP`);
+                console.log(` Batch ${i / BATCH_API_SIZE + 1}: Tous les tickers ont deja leurs donnees, skip FMP`);
             }
 
-            // Traiter chaque ticker du batch (même ceux qui n'ont pas besoin de FMP pour les assumptions)
+            // Traiter chaque ticker du batch (meme ceux qui n'ont pas besoin de FMP pour les assumptions)
             await Promise.allSettled(
                 batch.map(async (tickerSymbol) => {
                     const tickerStartTime = Date.now();
                     const TICKER_TIMEOUT_MS = 60000; // 60 secondes max par ticker
                     
-                    // Wrapper avec timeout pour éviter qu'un ticker bloque indéfiniment
+                    // Wrapper avec timeout pour eviter qu'un ticker bloque indefiniment
                     return Promise.race([
                         (async () => {
                             let tickerResult: any = {
@@ -3403,51 +3403,51 @@ export default function App() {
                     };
 
                     try {
-                        // ✅ Mettre à jour le ticker actuel pour l'overlay
+                        //  Mettre a jour le ticker actuel pour l'overlay
                         setCurrentSyncingTicker(tickerSymbol);
                         setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
 
                         const profile = library[tickerSymbol];
                         if (!profile) {
-                            console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
-                            tickerResult.error = 'Profil non trouvé';
+                            console.warn(` ${tickerSymbol}: Profil non trouve`);
+                            tickerResult.error = 'Profil non trouve';
                             tickerResult.timeMs = Date.now() - tickerStartTime;
                             tickerResults.push(tickerResult);
                             return;
                         }
 
-                        // 1. Sauvegarder un snapshot avant la sync (si option activée)
+                        // 1. Sauvegarder un snapshot avant la sync (si option activee)
                         if (options.saveBeforeSync) {
-                            console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                            console.log(` Sauvegarde snapshot pour ${tickerSymbol}...`);
                             try {
                                 const saveResult = await saveSnapshot(
                                     tickerSymbol,
                                     profile.data,
                                     profile.assumptions,
                                     profile.info,
-                                    `Avant synchronisation (${options.replaceOrangeData ? 'avec remplacement données oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
+                                    `Avant synchronisation (${options.replaceOrangeData ? 'avec remplacement donnees oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
                                     false,
                                     false
                                 );
                                 if (saveResult.success) {
                                     tickerResult.other.snapshotSaved = true;
                                 } else {
-                                    console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
-                                    // Ne pas bloquer la synchronisation si la sauvegarde échoue
+                                    console.warn(` ${tickerSymbol}: Echec sauvegarde snapshot avant sync: ${saveResult.error}`);
+                                    // Ne pas bloquer la synchronisation si la sauvegarde echoue
                                 }
                             } catch (saveError: any) {
-                                console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
-                                // Ne pas bloquer la synchronisation si la sauvegarde échoue
+                                console.warn(` ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
+                                // Ne pas bloquer la synchronisation si la sauvegarde echoue
                             }
                         }
 
-                        // 2. ✅ OPTIMISATION: Analyser les besoins avant d'appeler FMP
+                        // 2.  OPTIMISATION: Analyser les besoins avant d'appeler FMP
                         if (!options.syncData && !options.syncAssumptions && !options.syncInfo) {
-                            console.log(`⏭️ ${tickerSymbol}: Aucune option de sync activée, ignoré`);
+                            console.log(` ${tickerSymbol}: Aucune option de sync activee, ignore`);
                             return;
                         }
 
-                        // ✅ Vérifier si on a vraiment besoin d'appeler FMP
+                        //  Verifier si on a vraiment besoin d'appeler FMP
                         const { shouldFetchFromFMP, analyzeSyncNeeds } = await import('./utils/syncOptimization');
                         const needsFMP = await shouldFetchFromFMP(
                             tickerSymbol,
@@ -3464,8 +3464,8 @@ export default function App() {
                         );
 
                         if (!needsFMP) {
-                            console.log(`✅ ${tickerSymbol}: Toutes les données nécessaires déjà disponibles, skip FMP`);
-                            // Mettre à jour seulement les assumptions si nécessaire (sans appeler FMP)
+                            console.log(` ${tickerSymbol}: Toutes les donnees necessaires deja disponibles, skip FMP`);
+                            // Mettre a jour seulement les assumptions si necessaire (sans appeler FMP)
                             if (options.syncAssumptions && profile.data.length > 0) {
                                 const { autoFillAssumptionsFromFMPData } = await import('./utils/calculations');
                                 const updatedAssumptions = autoFillAssumptionsFromFMPData(
@@ -3488,55 +3488,55 @@ export default function App() {
                                 successCount++;
                                 tickerResult.success = true;
                                 setSyncStats(prev => ({ ...prev, successCount: prev.successCount + 1 }));
-                                console.log(`✅ ${tickerSymbol}: Assumptions mises à jour sans appel FMP`);
+                                console.log(` ${tickerSymbol}: Assumptions mises a jour sans appel FMP`);
                             }
                             return;
                         }
 
-                        console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+                        console.log(` Synchronisation ${tickerSymbol}...`);
                         let result;
                         
                         // Essayer d'abord le batch result
                         if (batchResults.has(tickerSymbol)) {
                             const batchResult = batchResults.get(tickerSymbol);
-                            // ✅ FIX: La structure batch est { data: [...], info: {...}, currentPrice: ..., currentDividend: ... }
-                            // batchResult est déjà la structure complète depuis result.data
+                            //  FIX: La structure batch est { data: [...], info: {...}, currentPrice: ..., currentDividend: ... }
+                            // batchResult est deja la structure complete depuis result.data
                             result = {
                                 data: batchResult?.data || [],
                                 info: batchResult?.info || {},
                                 currentPrice: batchResult?.currentPrice || 0,
-                                currentDividend: batchResult?.currentDividend || 0, // ✅ NOUVEAU: Dividende actuel depuis batch
+                                currentDividend: batchResult?.currentDividend || 0, //  NOUVEAU: Dividende actuel depuis batch
                                 financials: batchResult?.financials || [],
                                 analysisData: batchResult?.analysisData || null
                             };
-                            console.log(`📦 ${tickerSymbol}: Données récupérées du batch (data.length: ${result?.data?.length || 0}, currentDividend: ${result.currentDividend})`);
+                            console.log(` ${tickerSymbol}: Donnees recuperees du batch (data.length: ${result?.data?.length || 0}, currentDividend: ${result.currentDividend})`);
                             
-                            // ✅ OPTIMISATION: Filtrer les données FMP si nécessaire
+                            //  OPTIMISATION: Filtrer les donnees FMP si necessaire
                             if (options.syncOnlyNewYears || options.syncOnlyMissingMetrics) {
                                 const { filterFMPDataForSync } = await import('./utils/syncOptimization');
                                 result.data = filterFMPDataForSync(result.data, profile.data, {
                                     syncOnlyNewYears: options.syncOnlyNewYears,
                                     syncOnlyMissingMetrics: options.syncOnlyMissingMetrics
                                 });
-                                console.log(`🔍 ${tickerSymbol}: Données FMP filtrées - ${result.data.length} années à traiter`);
+                                console.log(` ${tickerSymbol}: Donnees FMP filtrees - ${result.data.length} annees a traiter`);
                             }
                         } else {
-                            console.warn(`⚠️ ${tickerSymbol}: Pas dans les résultats du batch, fallback vers appel individuel`);
+                            console.warn(` ${tickerSymbol}: Pas dans les resultats du batch, fallback vers appel individuel`);
                             // Fallback: appel individuel si pas dans le batch
                             try {
                                 result = await fetchCompanyDataWithTimeout(tickerSymbol);
                                 
-                                // ✅ OPTIMISATION: Filtrer les données FMP si nécessaire
+                                //  OPTIMISATION: Filtrer les donnees FMP si necessaire
                                 if (result && result.data && (options.syncOnlyNewYears || options.syncOnlyMissingMetrics)) {
                                     const { filterFMPDataForSync } = await import('./utils/syncOptimization');
                                     result.data = filterFMPDataForSync(result.data, profile.data, {
                                         syncOnlyNewYears: options.syncOnlyNewYears,
                                         syncOnlyMissingMetrics: options.syncOnlyMissingMetrics
                                     });
-                                    console.log(`🔍 ${tickerSymbol}: Données FMP filtrées - ${result.data.length} années à traiter`);
+                                    console.log(` ${tickerSymbol}: Donnees FMP filtrees - ${result.data.length} annees a traiter`);
                                 }
                             } catch (fetchError: any) {
-                                // Détecter si c'est une erreur de rate limiting
+                                // Detecter si c'est une erreur de rate limiting
                                 const isRateLimitError = fetchError.message && (
                                     fetchError.message.includes('Rate limit') ||
                                     fetchError.message.includes('rate limit') ||
@@ -3544,19 +3544,19 @@ export default function App() {
                                 );
                                 
                                 if (isRateLimitError) {
-                                    // Rate limiting - propager l'erreur pour arrêter la synchronisation
+                                    // Rate limiting - propager l'erreur pour arreter la synchronisation
                                     errorCount++;
                                     const errorMsg = `${tickerSymbol}: ${fetchError.message}`;
                                     errors.push(errorMsg);
                                     setSyncStats(prev => ({ ...prev, errorCount: prev.errorCount + 1 }));
-                                    console.error(`❌ ${errorMsg}`);
-                                    console.error(`⚠️ Rate limiting détecté - La synchronisation peut être ralentie ou interrompue.`);
-                                    // Continuer avec les autres tickers mais avec un délai plus long
+                                    console.error(` ${errorMsg}`);
+                                    console.error(` Rate limiting detecte - La synchronisation peut etre ralentie ou interrompue.`);
+                                    // Continuer avec les autres tickers mais avec un delai plus long
                                     await new Promise(resolve => setTimeout(resolve, 5000)); // Attendre 5 secondes
                                     return;
                                 }
                                 
-                                // Détecter si c'est une erreur 404 (ticker introuvable dans FMP)
+                                // Detecter si c'est une erreur 404 (ticker introuvable dans FMP)
                                 const isNotFoundError = fetchError.message && (
                                     fetchError.message.includes('introuvable') ||
                                     fetchError.message.includes('not found') ||
@@ -3567,39 +3567,39 @@ export default function App() {
                                     // Ticker introuvable dans FMP - ignorer ce ticker
                                     skippedCount++;
                                     skippedTickers.push(tickerSymbol);
-                                    console.warn(`⏭️ ${tickerSymbol}: Ignoré (introuvable dans FMP). ${fetchError.message}`);
+                                    console.warn(` ${tickerSymbol}: Ignore (introuvable dans FMP). ${fetchError.message}`);
                                     return; // Sortir de la fonction pour ce ticker
                                 }
-                                // Autre erreur - la propager pour être gérée par le catch externe
+                                // Autre erreur - la propager pour etre geree par le catch externe
                                 throw fetchError;
                             }
                         }
                         
-                        // Vérifier que les données sont valides avant de continuer
-                        // Accepter les tickers avec au moins un profile, même sans données historiques
+                        // Verifier que les donnees sont valides avant de continuer
+                        // Accepter les tickers avec au moins un profile, meme sans donnees historiques
                         if (!result || !result.data) {
                             skippedCount++;
                             skippedTickers.push(tickerSymbol);
-                            console.warn(`⏭️ ${tickerSymbol}: Ignoré (résultat invalide)`);
-                            tickerResult.error = 'Résultat invalide';
+                            console.warn(` ${tickerSymbol}: Ignore (resultat invalide)`);
+                            tickerResult.error = 'Resultat invalide';
                             tickerResult.timeMs = Date.now() - tickerStartTime;
                             tickerResults.push(tickerResult);
                             return; // Sortir de la fonction pour ce ticker
                         }
                         
-                        // Si pas de données historiques mais profile disponible, synchroniser au moins les infos
+                        // Si pas de donnees historiques mais profile disponible, synchroniser au moins les infos
                         if (result.data.length === 0) {
                             if (result.info && options.syncInfo) {
                                 // Synchroniser au moins les informations du profile
-                                console.log(`ℹ️ ${tickerSymbol}: Profile trouvé mais aucune donnée historique. Synchronisation des infos uniquement.`);
+                                console.log(`i ${tickerSymbol}: Profile trouve mais aucune donnee historique. Synchronisation des infos uniquement.`);
                                 
-                                // Mettre à jour les infos dans le profile
+                                // Mettre a jour les infos dans le profile
                                 const updatedProfile = {
                                     ...profile,
                                     info: result.info
                                 };
                                 
-                                // Mettre à jour le prix actuel dans les assumptions si disponible
+                                // Mettre a jour le prix actuel dans les assumptions si disponible
                                 if (result.currentPrice && options.updateCurrentPrice) {
                                     updatedProfile.assumptions = {
                                         ...profile.assumptions,
@@ -3610,7 +3610,7 @@ export default function App() {
                                     tickerResult.currentPrice = result.currentPrice || profile.assumptions.currentPrice || 0;
                                 }
                                 
-                                // Mettre à jour le library
+                                // Mettre a jour le library
                                 setLibrary(prev => ({
                                     ...prev,
                                     [tickerSymbol]: updatedProfile
@@ -3626,23 +3626,23 @@ export default function App() {
                                     hasQuotes: !!(result.currentPrice && result.currentPrice > 0),
                                     hasFinancials: false
                                 };
-                                tickerResult.error = 'Aucune donnée historique disponible (infos synchronisées)';
+                                tickerResult.error = 'Aucune donnee historique disponible (infos synchronisees)';
                                 tickerResult.timeMs = Date.now() - tickerStartTime;
                                 tickerResults.push(tickerResult);
                                 return;
                             } else {
-                                // Pas de profile non plus, ignorer complètement
+                                // Pas de profile non plus, ignorer completement
                                 skippedCount++;
                                 skippedTickers.push(tickerSymbol);
-                                console.warn(`⏭️ ${tickerSymbol}: Ignoré (aucune donnée disponible)`);
-                                tickerResult.error = 'Aucune donnée disponible';
+                                console.warn(` ${tickerSymbol}: Ignore (aucune donnee disponible)`);
+                                tickerResult.error = 'Aucune donnee disponible';
                                 tickerResult.timeMs = Date.now() - tickerStartTime;
                                 tickerResults.push(tickerResult);
                                 return; // Sortir de la fonction pour ce ticker
                             }
                         }
 
-                        // ✅ Collecter les informations sur les données récupérées
+                        //  Collecter les informations sur les donnees recuperees
                         tickerResult.dataRetrieved = {
                             years: result.data?.length || 0,
                             dataPoints: result.data?.length || 0,
@@ -3653,12 +3653,12 @@ export default function App() {
                         };
                         tickerResult.currentPrice = result.currentPrice || 0;
 
-                        // 3. Merge intelligent : préserver les données manuelles (sauf si forceReplace)
+                        // 3. Merge intelligent : preserver les donnees manuelles (sauf si forceReplace)
                         let mergedData = profile.data;
                         if (options.syncData && result.data.length > 0) {
                             const newDataByYear = new Map(result.data.map(row => [row.year, row]));
                             
-                                // Si syncOnlyNewYears, ne traiter que les nouvelles années
+                                // Si syncOnlyNewYears, ne traiter que les nouvelles annees
                                 if (options.syncOnlyNewYears) {
                                     result.data.forEach(newRow => {
                                         const exists = mergedData.some(row => row.year === newRow.year);
@@ -3666,31 +3666,31 @@ export default function App() {
                                             mergedData.push({
                                                 ...(newRow as AnnualData),
                                                 autoFetched: true,
-                                                dataSource: 'fmp-verified' as const // ✅ Nouvelle année directement de FMP = vérifiée
+                                                dataSource: 'fmp-verified' as const //  Nouvelle annee directement de FMP = verifiee
                                             });
                                         }
                                     });
                                 } else {
-                                    // Traitement normal : mettre à jour toutes les années
+                                    // Traitement normal : mettre a jour toutes les annees
                                     mergedData = profile.data.map((existingRow) => {
                                         const newRow = newDataByYear.get(existingRow.year);
                                         if (!newRow) return existingRow;
                                         
-                                        // Si forceReplace est true, remplacer toutes les données (données FMP vérifiées)
+                                        // Si forceReplace est true, remplacer toutes les donnees (donnees FMP verifiees)
                                         if (options.forceReplace) {
                                             return {
                                                 ...(newRow as AnnualData),
                                                 autoFetched: true,
-                                                dataSource: 'fmp-verified' as const // ✅ Force replace = données FMP vérifiées
+                                                dataSource: 'fmp-verified' as const //  Force replace = donnees FMP verifiees
                                             };
                                         }
                                         
-                                        // Si syncOnlyMissingMetrics, ne remplir que les champs vides (données ajustées)
+                                        // Si syncOnlyMissingMetrics, ne remplir que les champs vides (donnees ajustees)
                                         if (options.syncOnlyMissingMetrics) {
                                             const updatedRow = { ...existingRow };
                                             const typedNewRow = newRow as AnnualData;
                                             let hasAdjustment = false;
-                                            // Mettre à jour uniquement les champs qui sont 0, null ou undefined
+                                            // Mettre a jour uniquement les champs qui sont 0, null ou undefined
                                             if ((existingRow.earningsPerShare === 0 || existingRow.earningsPerShare === null || existingRow.earningsPerShare === undefined) && typedNewRow.earningsPerShare > 0) {
                                                 updatedRow.earningsPerShare = typedNewRow.earningsPerShare;
                                                 hasAdjustment = true;
@@ -3715,20 +3715,20 @@ export default function App() {
                                                 updatedRow.priceLow = typedNewRow.priceLow;
                                                 hasAdjustment = true;
                                             }
-                                            // Si on a fait des ajustements, marquer comme ajusté
+                                            // Si on a fait des ajustements, marquer comme ajuste
                                             if (hasAdjustment) {
                                                 updatedRow.dataSource = 'fmp-adjusted' as const;
                                             }
                                             return updatedRow;
                                         }
                                         
-                                        // Si la donnée existante est manuelle, la garder
+                                        // Si la donnee existante est manuelle, la garder
                                         if (existingRow.autoFetched === false || existingRow.dataSource === 'manual') {
                                             return existingRow;
                                         }
                                         
-                                        // Sinon, merger avec préservation des valeurs existantes (données ajustées)
-                                        // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
+                                        // Sinon, merger avec preservation des valeurs existantes (donnees ajustees)
+                                        //  CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs a 0
                                         const typedNewRow = newRow as AnnualData;
                                         const hasPreservedValues = 
                                             (typedNewRow.earningsPerShare <= 0 && existingRow.earningsPerShare > 0) ||
@@ -3738,7 +3738,7 @@ export default function App() {
                                             (typedNewRow.priceHigh <= 0 && existingRow.priceHigh > 0) ||
                                             (typedNewRow.priceLow <= 0 && existingRow.priceLow > 0);
                                         
-                                        // ✅ PRÉSERVER LE DATASOURCE ORIGINAL SI FMP-VERIFIED ET PAS DE PRÉSERVATION
+                                        //  PRESERVER LE DATASOURCE ORIGINAL SI FMP-VERIFIED ET PAS DE PRESERVATION
                                         let finalDataSource: 'fmp-verified' | 'fmp-adjusted' | 'manual' | 'calculated';
                                         if (hasPreservedValues) {
                                             finalDataSource = 'fmp-adjusted' as const;
@@ -3757,18 +3757,18 @@ export default function App() {
                                             priceHigh: (typedNewRow.priceHigh > 0) ? typedNewRow.priceHigh : existingRow.priceHigh,
                                             priceLow: (typedNewRow.priceLow > 0) ? typedNewRow.priceLow : existingRow.priceLow,
                                             autoFetched: true,
-                                            dataSource: finalDataSource // ✅ Préserve 'fmp-verified' si les données n'ont pas été modifiées
+                                            dataSource: finalDataSource //  Preserve 'fmp-verified' si les donnees n'ont pas ete modifiees
                                         };
                                     });
 
-                                    // Ajouter les nouvelles années (données FMP vérifiées)
+                                    // Ajouter les nouvelles annees (donnees FMP verifiees)
                                     result.data.forEach(newRow => {
                                         const exists = mergedData.some(row => row.year === newRow.year);
                                         if (!exists) {
                                             mergedData.push({
                                                 ...(newRow as AnnualData),
                                                 autoFetched: true,
-                                                dataSource: 'fmp-verified' as const // ✅ Nouvelle année directement de FMP = vérifiée
+                                                dataSource: 'fmp-verified' as const //  Nouvelle annee directement de FMP = verifiee
                                             });
                                         }
                                     });
@@ -3777,21 +3777,21 @@ export default function App() {
                             mergedData.sort((a, b) => a.year - b.year);
                         }
 
-                        // 4. Recalculer les métriques (si option activée)
+                        // 4. Recalculer les metriques (si option activee)
                         let finalAssumptions = profile.assumptions;
                         if (options.syncAssumptions) {
                             // Si replaceOrangeData est true, passer undefined pour forcer le recalcul
                             const existingAssumptionsForCalc = options.replaceOrangeData ? undefined : profile.assumptions;
-                            // Si updateCurrentPrice est false, préserver le prix actuel
+                            // Si updateCurrentPrice est false, preserver le prix actuel
                             const currentPriceForCalc = options.updateCurrentPrice ? result.currentPrice : profile.assumptions.currentPrice;
                             const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                                 mergedData,
                                 currentPriceForCalc,
                                 existingAssumptionsForCalc,
-                                result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
+                                result.currentDividend //  NOUVEAU: Dividende actuel depuis l'API
                             );
 
-                            // Détecter les outliers (si option activée)
+                            // Detecter les outliers (si option activee)
                             const tempAssumptions = {
                                 ...profile.assumptions,
                                 ...autoFilledAssumptions
@@ -3809,9 +3809,9 @@ export default function App() {
                                 outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
                                 
                                 if (outlierDetection.detectedOutliers.length > 0) {
-                                    console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                                    console.log(` ${tickerSymbol}: Metriques avec prix cibles aberrants detectees: ${outlierDetection.detectedOutliers.join(', ')}`);
                                     
-                                    // ✅ Collecter les informations sur les outliers
+                                    //  Collecter les informations sur les outliers
                                     tickerResult.outliers.detected = outlierDetection.detectedOutliers;
                                     tickerResult.outliers.excluded = {
                                         EPS: outlierDetection.excludeEPS,
@@ -3823,15 +3823,15 @@ export default function App() {
                                     // Calculer les raisons pour chaque outlier
                                     const currentPrice = tempAssumptions.currentPrice || 1;
                                     const calculateTargetPrice = (metric: string) => {
-                                        // Cette logique devrait correspondre à calculateTargetPrices dans outlierDetection
-                                        // Pour simplifier, on utilise les prix cibles calculés
-                                        return 0; // Sera calculé plus bas
+                                        // Cette logique devrait correspondre a calculateTargetPrices dans outlierDetection
+                                        // Pour simplifier, on utilise les prix cibles calcules
+                                        return 0; // Sera calcule plus bas
                                     };
                                     
                                     outlierDetection.detectedOutliers.forEach(metric => {
                                         const isExcluded = tickerResult.outliers.excluded[metric as keyof typeof tickerResult.outliers.excluded];
                                         if (isExcluded) {
-                                            tickerResult.outliers.reasons[metric] = 'Prix cible aberrant détecté (>1.5σ ou retour implausible)';
+                                            tickerResult.outliers.reasons[metric] = 'Prix cible aberrant detecte (>1.5 ou retour implausible)';
                                         }
                                     });
                                 }
@@ -3839,14 +3839,14 @@ export default function App() {
 
                             finalAssumptions = {
                                 ...tempAssumptions,
-                                // Préserver les exclusions si l'option est activée
+                                // Preserver les exclusions si l'option est activee
                                 excludeEPS: options.preserveExclusions ? (profile.assumptions.excludeEPS || outlierDetection.excludeEPS) : outlierDetection.excludeEPS,
                                 excludeCF: options.preserveExclusions ? (profile.assumptions.excludeCF || outlierDetection.excludeCF) : outlierDetection.excludeCF,
                                 excludeBV: options.preserveExclusions ? (profile.assumptions.excludeBV || outlierDetection.excludeBV) : outlierDetection.excludeBV,
                                 excludeDIV: options.preserveExclusions ? (profile.assumptions.excludeDIV || outlierDetection.excludeDIV) : outlierDetection.excludeDIV
                             } as Assumptions;
                             
-                            // ✅ Collecter les informations sur les cases oranges
+                            //  Collecter les informations sur les cases oranges
                             tickerResult.orangeData = {
                                 growthRateEPS: finalAssumptions.growthRateEPS,
                                 growthRateCF: finalAssumptions.growthRateCF,
@@ -3861,7 +3861,7 @@ export default function App() {
                             tickerResult.other.assumptionsUpdated = true;
                         }
 
-                        // 5. Mettre à jour le profil
+                        // 5. Mettre a jour le profil
                         let updatedInfo = profile.info;
                         if (options.syncInfo && result.info) {
                             updatedInfo = {
@@ -3871,8 +3871,8 @@ export default function App() {
                             };
                             tickerResult.other.infoUpdated = true;
                             
-                            // Synchroniser les métriques ValueLine depuis Supabase (si option activée)
-                            // ✅ OPTIMISATION: Utiliser le cache au lieu d'appeler l'API pour chaque ticker
+                            // Synchroniser les metriques ValueLine depuis Supabase (si option activee)
+                            //  OPTIMISATION: Utiliser le cache au lieu d'appeler l'API pour chaque ticker
                             if (options.syncValueLineMetrics && supabaseTickersCache) {
                                 try {
                                     const supabaseTicker = supabaseTickersCache.find(t => t.ticker.toUpperCase() === tickerSymbol);
@@ -3895,7 +3895,7 @@ export default function App() {
                                             tickerResult.other.valueLineMetricsSynced = true;
                                         }
                                 } catch (error) {
-                                    console.warn(`⚠️ Impossible de recharger les métriques ValueLine pour ${tickerSymbol}:`, error);
+                                    console.warn(` Impossible de recharger les metriques ValueLine pour ${tickerSymbol}:`, error);
                                 }
                             }
                         }
@@ -3912,8 +3912,8 @@ export default function App() {
                                 }
                             };
 
-                            // Sauvegarder avec IndexedDB (évite QuotaExceededError)
-                            // ✅ Sauvegarder dans Supabase ET cache local
+                            // Sauvegarder avec IndexedDB (evite QuotaExceededError)
+                            //  Sauvegarder dans Supabase ET cache local
                             saveProfiles(updated, true).catch(e => {
                                 console.warn('Failed to save profiles:', e);
                             });
@@ -3921,8 +3921,8 @@ export default function App() {
                             return updated;
                         });
 
-                        // ✅ Analyser les données pour le rapport
-                        // Compter les données à zéro
+                        //  Analyser les donnees pour le rapport
+                        // Compter les donnees a zero
                         const zeroCounts = {
                             earningsPerShare: mergedData.filter(d => d.earningsPerShare === 0 || d.earningsPerShare === null).length,
                             cashFlowPerShare: mergedData.filter(d => d.cashFlowPerShare === 0 || d.cashFlowPerShare === null).length,
@@ -3936,14 +3936,14 @@ export default function App() {
                             bookValuePerShare: zeroCounts.bookValuePerShare,
                             dividendPerShare: zeroCounts.dividendPerShare,
                             reasons: {
-                                earningsPerShare: zeroCounts.earningsPerShare > 0 ? `${zeroCounts.earningsPerShare} années avec EPS à 0 (pertes ou données manquantes)` : '',
-                                cashFlowPerShare: zeroCounts.cashFlowPerShare > 0 ? `${zeroCounts.cashFlowPerShare} années avec CF à 0 (CF négatif ou données manquantes)` : '',
-                                bookValuePerShare: zeroCounts.bookValuePerShare > 0 ? `${zeroCounts.bookValuePerShare} années avec BV à 0 (BV négatif ou données manquantes)` : '',
-                                dividendPerShare: zeroCounts.dividendPerShare > 0 ? `${zeroCounts.dividendPerShare} années avec DIV à 0 (pas de dividende ou données manquantes)` : ''
+                                earningsPerShare: zeroCounts.earningsPerShare > 0 ? `${zeroCounts.earningsPerShare} annees avec EPS a 0 (pertes ou donnees manquantes)` : '',
+                                cashFlowPerShare: zeroCounts.cashFlowPerShare > 0 ? `${zeroCounts.cashFlowPerShare} annees avec CF a 0 (CF negatif ou donnees manquantes)` : '',
+                                bookValuePerShare: zeroCounts.bookValuePerShare > 0 ? `${zeroCounts.bookValuePerShare} annees avec BV a 0 (BV negatif ou donnees manquantes)` : '',
+                                dividendPerShare: zeroCounts.dividendPerShare > 0 ? `${zeroCounts.dividendPerShare} annees avec DIV a 0 (pas de dividende ou donnees manquantes)` : ''
                             }
                         };
                         
-                        // Détecter les données N/A
+                        // Detecter les donnees N/A
                         const naFields: string[] = [];
                         const naReasons: { [key: string]: string } = {};
                         
@@ -3954,12 +3954,12 @@ export default function App() {
                         
                         if (mergedData.length === 0) {
                             naFields.push('annualData');
-                            naReasons.annualData = 'Aucune donnée historique disponible';
+                            naReasons.annualData = 'Aucune donnee historique disponible';
                         }
                         
                         if (!finalAssumptions.growthRateEPS && !finalAssumptions.growthRateCF) {
                             naFields.push('assumptions');
-                            naReasons.assumptions = 'Impossible de calculer assumptions (données insuffisantes)';
+                            naReasons.assumptions = 'Impossible de calculer assumptions (donnees insuffisantes)';
                         }
                         
                         tickerResult.naData = {
@@ -3967,9 +3967,9 @@ export default function App() {
                             reasons: naReasons
                         };
 
-                        // 6. Sauvegarder le snapshot après sync avec métadonnées détaillées
+                        // 6. Sauvegarder le snapshot apres sync avec metadonnees detaillees
                         try {
-                            // Préparer les métadonnées de synchronisation
+                            // Preparer les metadonnees de synchronisation
                             const syncMetadata = {
                                 timestamp: new Date().toISOString(),
                                 source: 'fmp',
@@ -3990,22 +3990,22 @@ export default function App() {
                                 mergedData,
                                 finalAssumptions,
                                 updatedInfo,
-                                `Après synchronisation (${options.replaceOrangeData ? 'avec remplacement données oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
+                                `Apres synchronisation (${options.replaceOrangeData ? 'avec remplacement donnees oranges' : 'standard'}) - ${new Date().toLocaleString()}`,
                                 true,
                                 true,
                                 0, // retryCount
                                 2, // maxRetries
-                                syncMetadata // Métadonnées de synchronisation
+                                syncMetadata // Metadonnees de synchronisation
                             );
                             if (saveResult.success) {
                                 tickerResult.other.snapshotSaved = true;
                             } else {
-                                console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
-                                // Ne pas bloquer la synchronisation si la sauvegarde échoue
+                                console.warn(` ${tickerSymbol}: Echec sauvegarde snapshot apres sync: ${saveResult.error}`);
+                                // Ne pas bloquer la synchronisation si la sauvegarde echoue
                             }
                         } catch (saveError: any) {
-                            console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
-                            // Ne pas bloquer la synchronisation si la sauvegarde échoue
+                            console.warn(` ${tickerSymbol}: Erreur lors de la sauvegarde snapshot apres sync: ${saveError.message}`);
+                            // Ne pas bloquer la synchronisation si la sauvegarde echoue
                         }
 
                         successCount++;
@@ -4013,7 +4013,7 @@ export default function App() {
                         tickerResult.timeMs = Date.now() - tickerStartTime;
                         tickerResults.push(tickerResult);
                         setSyncStats(prev => ({ ...prev, successCount: prev.successCount + 1 }));
-                        console.log(`✅ ${tickerSymbol}: Synchronisé avec succès`);
+                        console.log(` ${tickerSymbol}: Synchronise avec succes`);
                     } catch (error: any) {
                         errorCount++;
                         const errorMsg = `${tickerSymbol}: ${error.message || String(error)}`;
@@ -4023,11 +4023,11 @@ export default function App() {
                         tickerResult.timeMs = Date.now() - tickerStartTime;
                         tickerResults.push(tickerResult);
                         setSyncStats(prev => ({ ...prev, errorCount: prev.errorCount + 1 }));
-                        console.error(`❌ ${errorMsg}`);
+                        console.error(` ${errorMsg}`);
                     }
                         })(),
                         new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error(`Timeout après ${TICKER_TIMEOUT_MS / 1000}s`)), TICKER_TIMEOUT_MS)
+                            setTimeout(() => reject(new Error(`Timeout apres ${TICKER_TIMEOUT_MS / 1000}s`)), TICKER_TIMEOUT_MS)
                         )
                     ]).catch((timeoutError: any) => {
                         // Si timeout, enregistrer comme erreur mais continuer
@@ -4049,17 +4049,17 @@ export default function App() {
                         };
                         tickerResults.push(tickerResult);
                         setSyncStats(prev => ({ ...prev, errorCount: prev.errorCount + 1 }));
-                        // ✅ Log timeout seulement en mode debug pour éviter spam console
+                        //  Log timeout seulement en mode debug pour eviter spam console
                         const isDebugMode = typeof window !== 'undefined' && (localStorage.getItem('3p1-debug') === 'true' || window.location.search.includes('debug=true'));
                         if (isDebugMode) {
-                            console.warn(`⏱️ ${errorMsg}`);
+                            console.warn(` ${errorMsg}`);
                         }
                     });
                 })
             );
             }
 
-            // ✅ Générer le rapport de synchronisation
+            //  Generer le rapport de synchronisation
             const endTime = Date.now();
             const totalDataPoints = tickerResults
                 .filter(r => r.success)
@@ -4091,59 +4091,59 @@ export default function App() {
                 }
             };
 
-            // Afficher un résumé détaillé
+            // Afficher un resume detaille
             const totalProcessed = successCount + errorCount + skippedCount;
             const totalTickersProcessed = tickerResults.length;
             
-            // ✅ VÉRIFICATION 100%: S'assurer que tous les tickers ont été traités
+            //  VERIFICATION 100%: S'assurer que tous les tickers ont ete traites
             if (totalTickersProcessed < allTickers.length) {
                 const missingCount = allTickers.length - totalTickersProcessed;
-                console.warn(`⚠️ ATTENTION: ${missingCount} ticker(s) non traité(s) sur ${allTickers.length} total`);
-                // Les tickers manquants sont probablement ceux qui n'ont pas été ajoutés à tickerResults
-                // (ex: timeout avant même d'arriver au try/catch)
+                console.warn(` ATTENTION: ${missingCount} ticker(s) non traite(s) sur ${allTickers.length} total`);
+                // Les tickers manquants sont probablement ceux qui n'ont pas ete ajoutes a tickerResults
+                // (ex: timeout avant meme d'arriver au try/catch)
             }
             
-            let summary = `Synchronisation terminée:\n✅ ${successCount} succès`;
+            let summary = `Synchronisation terminee:\n ${successCount} succes`;
             
             if (skippedCount > 0) {
-                summary += `\n⏭️ ${skippedCount} ignorés (introuvables dans FMP)`;
+                summary += `\n ${skippedCount} ignores (introuvables dans FMP)`;
             }
             
             if (errorCount > 0) {
-                summary += `\n❌ ${errorCount} erreurs`;
+                summary += `\n ${errorCount} erreurs`;
             }
             
-            // ✅ AFFICHER LE TOTAL TRAITÉ pour confirmer 100%
-            summary += `\n📊 Total traité: ${totalTickersProcessed}/${allTickers.length} (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`;
+            //  AFFICHER LE TOTAL TRAITE pour confirmer 100%
+            summary += `\n Total traite: ${totalTickersProcessed}/${allTickers.length} (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`;
             
             if (totalTickersProcessed === allTickers.length) {
-                console.log(`✅ 100% des tickers traités (${totalTickersProcessed}/${allTickers.length})`);
+                console.log(` 100% des tickers traites (${totalTickersProcessed}/${allTickers.length})`);
             } else {
-                console.warn(`⚠️ ${totalTickersProcessed}/${allTickers.length} tickers traités (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`);
+                console.warn(` ${totalTickersProcessed}/${allTickers.length} tickers traites (${Math.round(totalTickersProcessed / allTickers.length * 100)}%)`);
             }
             
-            // Log détaillé
+            // Log detaille
             if (skippedCount > 0) {
-                console.warn(`⏭️ Tickers ignorés (introuvables dans FMP):\n${skippedTickers.slice(0, 20).join(', ')}${skippedTickers.length > 20 ? `\n... et ${skippedTickers.length - 20} autres` : ''}`);
+                console.warn(` Tickers ignores (introuvables dans FMP):\n${skippedTickers.slice(0, 20).join(', ')}${skippedTickers.length > 20 ? `\n... et ${skippedTickers.length - 20} autres` : ''}`);
             }
             
             if (errorCount > 0) {
-                console.warn(`❌ Erreurs:\n${errors.slice(0, 10).join('\n')}${errors.length > 10 ? `\n... et ${errors.length - 10} autres` : ''}`);
+                console.warn(` Erreurs:\n${errors.slice(0, 10).join('\n')}${errors.length > 10 ? `\n... et ${errors.length - 10} autres` : ''}`);
             }
             
             // Notification avec bouton pour voir le rapport
             const notificationId = `bulk-sync-${Date.now()}`;
             if (errorCount > 0 || skippedCount > 0) {
                 const notificationMessage = skippedCount > 0 && errorCount === 0
-                    ? `${summary}\n\n${skippedTickers.length} ticker(s) ignoré(s) car introuvable(s) dans FMP.`
-                    : `${summary}\n\nVoir la console pour les détails.`;
+                    ? `${summary}\n\n${skippedTickers.length} ticker(s) ignore(s) car introuvable(s) dans FMP.`
+                    : `${summary}\n\nVoir la console pour les details.`;
                 
                 setNotifications(prev => [...prev, {
                     id: notificationId,
                     message: notificationMessage,
                     type: skippedCount > 0 && errorCount === 0 ? 'warning' : 'error',
                     action: {
-                        label: 'Voir Rapport Détaillé',
+                        label: 'Voir Rapport Detaille',
                         onClick: () => {
                             setSyncReportData(reportData);
                             setShowSyncReport(true);
@@ -4151,13 +4151,13 @@ export default function App() {
                     }
                 }]);
             } else {
-                console.log(`✅ ${summary}`);
+                console.log(` ${summary}`);
                 setNotifications(prev => [...prev, {
                     id: notificationId,
                     message: summary,
                     type: 'success',
                     action: {
-                        label: 'Voir Rapport Détaillé',
+                        label: 'Voir Rapport Detaille',
                         onClick: () => {
                             setSyncReportData(reportData);
                             setShowSyncReport(true);
@@ -4166,11 +4166,11 @@ export default function App() {
                 }]);
             }
             
-            // ✅ Toujours afficher le rapport après synchronisation
+            //  Toujours afficher le rapport apres synchronisation
             setSyncReportData(reportData);
             setShowSyncReport(true);
         } catch (error: any) {
-            console.error('❌ Erreur lors de la synchronisation en masse:', error);
+            console.error(' Erreur lors de la synchronisation en masse:', error);
             setNotifications(prev => [...prev, {
                 id: `bulk-sync-error-${Date.now()}`,
                 message: `Erreur lors de la synchronisation: ${error.message || String(error)}`,
@@ -4179,18 +4179,18 @@ export default function App() {
         } finally {
             setIsBulkSyncing(false);
             setBulkSyncProgress({ current: 0, total: 0 });
-            setCurrentSyncingTicker(undefined); // ✅ Réinitialiser le ticker actuel
+            setCurrentSyncingTicker(undefined); //  Reinitialiser le ticker actuel
         }
     };
 
-    // Synchroniser uniquement une liste spécifique de tickers (ex: ceux avec N/A)
+    // Synchroniser uniquement une liste specifique de tickers (ex: ceux avec N/A)
     const handleSyncSpecificTickers = async (tickersToSync: string[]) => {
         if (tickersToSync.length === 0) {
-            showNotification('Aucun ticker à synchroniser', 'warning');
+            showNotification('Aucun ticker a synchroniser', 'warning');
             return;
         }
 
-        if (!confirm(`Synchroniser ${tickersToSync.length} ticker(s) avec N/A ?\n\nTickers: ${tickersToSync.slice(0, 10).join(', ')}${tickersToSync.length > 10 ? `\n... et ${tickersToSync.length - 10} autres` : ''}\n\nChaque version sera sauvegardée avant la synchronisation.\nLes données manuelles et hypothèses (orange) seront préservées.`)) {
+        if (!confirm(`Synchroniser ${tickersToSync.length} ticker(s) avec N/A ?\n\nTickers: ${tickersToSync.slice(0, 10).join(', ')}${tickersToSync.length > 10 ? `\n... et ${tickersToSync.length - 10} autres` : ''}\n\nChaque version sera sauvegardee avant la synchronisation.\nLes donnees manuelles et hypotheses (orange) seront preservees.`)) {
             return;
         }
 
@@ -4202,24 +4202,24 @@ export default function App() {
         let errorCount = 0;
         const errors: string[] = [];
 
-        // Traiter par batch pour éviter de surcharger
+        // Traiter par batch pour eviter de surcharger
         const batchSize = 3;
         const delayBetweenBatches = 1000;
-        // ✅ TIMEOUT: Timeout pour chaque appel FMP (30 secondes)
+        //  TIMEOUT: Timeout pour chaque appel FMP (30 secondes)
         const FMP_TIMEOUT_MS = 30000;
 
-        // ✅ FONCTION HELPER: fetchCompanyData avec timeout
+        //  FONCTION HELPER: fetchCompanyData avec timeout
         const fetchCompanyDataWithTimeout = async (tickerSymbol: string): Promise<any> => {
             return Promise.race([
                 fetchCompanyData(tickerSymbol),
                 new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error(`Timeout après ${FMP_TIMEOUT_MS}ms`)), FMP_TIMEOUT_MS)
+                    setTimeout(() => reject(new Error(`Timeout apres ${FMP_TIMEOUT_MS}ms`)), FMP_TIMEOUT_MS)
                 )
             ]);
         };
 
         try {
-            console.log(`🚀 Début synchronisation spécifique: ${tickersToSync.length} tickers`);
+            console.log(` Debut synchronisation specifique: ${tickersToSync.length} tickers`);
             
             for (let i = 0; i < tickersToSync.length; i += batchSize) {
             const batch = tickersToSync.slice(i, i + batchSize);
@@ -4229,22 +4229,22 @@ export default function App() {
                 await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
             }
 
-            // Traiter le batch en parallèle (même logique que handleBulkSyncAllTickers)
+            // Traiter le batch en parallele (meme logique que handleBulkSyncAllTickers)
             await Promise.allSettled(
                 batch.map(async (tickerSymbol) => {
                     try {
-                        // ✅ Mettre à jour le ticker actuel pour l'overlay
+                        //  Mettre a jour le ticker actuel pour l'overlay
                         setCurrentSyncingTicker(tickerSymbol);
                         setBulkSyncProgress(prev => ({ ...prev, current: prev.current + 1 }));
 
                         const profile = library[tickerSymbol];
                         if (!profile) {
-                            console.warn(`⚠️ ${tickerSymbol}: Profil non trouvé`);
+                            console.warn(` ${tickerSymbol}: Profil non trouve`);
                             return;
                         }
 
                         // 1. Sauvegarder un snapshot avant la sync
-                        console.log(`💾 Sauvegarde snapshot pour ${tickerSymbol}...`);
+                        console.log(` Sauvegarde snapshot pour ${tickerSymbol}...`);
                         try {
                             const saveResult = await saveSnapshot(
                                 tickerSymbol,
@@ -4256,17 +4256,17 @@ export default function App() {
                                 false
                             );
                             if (!saveResult.success) {
-                                console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot avant sync: ${saveResult.error}`);
+                                console.warn(` ${tickerSymbol}: Echec sauvegarde snapshot avant sync: ${saveResult.error}`);
                             }
                         } catch (saveError: any) {
-                            console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
+                            console.warn(` ${tickerSymbol}: Erreur lors de la sauvegarde snapshot avant sync: ${saveError.message}`);
                         }
 
-                        // 2. Charger les nouvelles données FMP avec timeout
-                        console.log(`🔄 Synchronisation ${tickerSymbol}...`);
+                        // 2. Charger les nouvelles donnees FMP avec timeout
+                        console.log(` Synchronisation ${tickerSymbol}...`);
                         const result = await fetchCompanyDataWithTimeout(tickerSymbol);
 
-                        // 3. Merge intelligent : préserver les données manuelles
+                        // 3. Merge intelligent : preserver les donnees manuelles
                         const newDataByYear = new Map(result.data.map(row => [row.year, row]));
                         
                         const mergedData = profile.data.map((existingRow) => {
@@ -4275,7 +4275,7 @@ export default function App() {
                             if (existingRow.autoFetched === false || existingRow.autoFetched === undefined) {
                                 return existingRow;
                             }
-                            // ✅ CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs à 0
+                            //  CRITIQUE : Ne pas remplacer les valeurs existantes par des valeurs a 0
                             const newRowTyped = newRow as AnnualData;
                             return {
                                 ...existingRow,
@@ -4289,7 +4289,7 @@ export default function App() {
                             };
                         });
 
-                        // Ajouter les nouvelles années
+                        // Ajouter les nouvelles annees
                         result.data.forEach(newRow => {
                             const exists = mergedData.some(row => row.year === newRow.year);
                             if (!exists) {
@@ -4302,15 +4302,15 @@ export default function App() {
 
                         mergedData.sort((a, b) => a.year - b.year);
 
-                        // 4. Recalculer les métriques
+                        // 4. Recalculer les metriques
                         const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                             mergedData,
                             result.currentPrice,
                             profile.assumptions,
-                            result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
+                            result.currentDividend //  NOUVEAU: Dividende actuel depuis l'API
                         );
 
-                        // 5. Détecter les outliers
+                        // 5. Detecter les outliers
                         const tempAssumptions = {
                             ...profile.assumptions,
                             ...autoFilledAssumptions
@@ -4318,7 +4318,7 @@ export default function App() {
                         const outlierDetection = detectOutlierMetrics(mergedData, tempAssumptions);
                         
                         if (outlierDetection.detectedOutliers.length > 0) {
-                            console.log(`⚠️ ${tickerSymbol}: Métriques avec prix cibles aberrants détectées: ${outlierDetection.detectedOutliers.join(', ')}`);
+                            console.log(` ${tickerSymbol}: Metriques avec prix cibles aberrants detectees: ${outlierDetection.detectedOutliers.join(', ')}`);
                         }
 
                         const finalAssumptions: Assumptions = {
@@ -4329,7 +4329,7 @@ export default function App() {
                             excludeDIV: outlierDetection.excludeDIV
                         } as Assumptions;
 
-                        // 6. Mettre à jour le profil
+                        // 6. Mettre a jour le profil
                         setLibrary(prev => {
                             const updated = {
                                 ...prev,
@@ -4346,8 +4346,8 @@ export default function App() {
                                 }
                             };
 
-                            // Sauvegarder avec IndexedDB (évite QuotaExceededError)
-                            // ✅ Sauvegarder dans Supabase ET cache local
+                            // Sauvegarder avec IndexedDB (evite QuotaExceededError)
+                            //  Sauvegarder dans Supabase ET cache local
                             saveProfiles(updated, true).catch(e => {
                                 console.warn('Failed to save profiles:', e);
                             });
@@ -4355,7 +4355,7 @@ export default function App() {
                             return updated;
                         });
 
-                        // 7. Sauvegarder le snapshot après sync
+                        // 7. Sauvegarder le snapshot apres sync
                         try {
                             const saveResult = await saveSnapshot(
                                 tickerSymbol,
@@ -4370,47 +4370,47 @@ export default function App() {
                                 true
                             );
                             if (!saveResult.success) {
-                                console.warn(`⚠️ ${tickerSymbol}: Échec sauvegarde snapshot après sync: ${saveResult.error}`);
+                                console.warn(` ${tickerSymbol}: Echec sauvegarde snapshot apres sync: ${saveResult.error}`);
                             }
                         } catch (saveError: any) {
-                            console.warn(`⚠️ ${tickerSymbol}: Erreur lors de la sauvegarde snapshot après sync: ${saveError.message}`);
+                            console.warn(` ${tickerSymbol}: Erreur lors de la sauvegarde snapshot apres sync: ${saveError.message}`);
                         }
 
                         successCount++;
                         setSyncStats({ successCount, errorCount });
-                        console.log(`✅ ${tickerSymbol} synchronisé avec succès`);
+                        console.log(` ${tickerSymbol} synchronise avec succes`);
 
                     } catch (error: any) {
                         errorCount++;
                         setSyncStats({ successCount, errorCount });
                         const errorMsg = `${tickerSymbol}: ${error.message || 'Erreur inconnue'}`;
                         errors.push(errorMsg);
-                        console.error(`❌ Erreur sync ${tickerSymbol}:`, error);
+                        console.error(` Erreur sync ${tickerSymbol}:`, error);
                     }
                 })
             );
             }
 
-            console.log(`✅ Synchronisation spécifique terminée: ${successCount} succès, ${errorCount} erreurs`);
+            console.log(` Synchronisation specifique terminee: ${successCount} succes, ${errorCount} erreurs`);
         } catch (error: any) {
-            // ✅ GESTION ERREUR GLOBALE: S'assurer que le sync se termine même en cas d'erreur fatale
-            console.error('❌ Erreur fatale pendant la synchronisation spécifique:', error);
+            //  GESTION ERREUR GLOBALE: S'assurer que le sync se termine meme en cas d'erreur fatale
+            console.error(' Erreur fatale pendant la synchronisation specifique:', error);
             errorCount++;
             errors.push(`Erreur fatale: ${error.message || 'Erreur inconnue'}`);
         } finally {
-            // ✅ GARANTIE: Toujours réinitialiser l'état, même en cas d'erreur
+            //  GARANTIE: Toujours reinitialiser l'etat, meme en cas d'erreur
             setIsBulkSyncing(false);
             setBulkSyncProgress({ current: 0, total: 0 });
-            setCurrentSyncingTicker(undefined); // ✅ Réinitialiser le ticker actuel
+            setCurrentSyncingTicker(undefined); //  Reinitialiser le ticker actuel
 
-            // Afficher le résultat
-            const message = `Synchronisation terminée\n\n` +
-                `Réussies: ${successCount}\n` +
+            // Afficher le resultat
+            const message = `Synchronisation terminee\n\n` +
+                `Reussies: ${successCount}\n` +
                 `Erreurs: ${errorCount}` +
                 (errors.length > 0 ? `\n\nErreurs:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n... et ${errors.length - 5} autres` : ''}` : '');
             
             showNotification(message, errorCount > 0 ? 'warning' : 'success');
-            console.log(`✅ ${message}`);
+            console.log(` ${message}`);
         }
     };
 
@@ -4421,20 +4421,20 @@ export default function App() {
      * 
      * Processus :
      * 1. Charge tous les tickers actifs depuis Supabase (avec fallback sur plusieurs APIs)
-     * 2. Filtre par capitalisation minimale (2B USD) pour éviter les small caps
+     * 2. Filtre par capitalisation minimale (2B USD) pour eviter les small caps
      * 3. Exclut les fonds mutuels (isMutualFund check)
-     * 4. Crée des profils "squelettes" pour affichage immédiat
-     * 5. Charge les données FMP en arrière-plan par batch (5 tickers/batch)
-     * 6. Collecte les erreurs par type et affiche un résumé groupé
+     * 4. Cree des profils "squelettes" pour affichage immediat
+     * 5. Charge les donnees FMP en arriere-plan par batch (5 tickers/batch)
+     * 6. Collecte les erreurs par type et affiche un resume groupe
      * 
      * Gestion des erreurs :
-     * - Tickers introuvables dans FMP → Résumé groupé
-     * - Capitalisation < 2B → Résumé groupé
-     * - Données invalides → Résumé groupé
-     * - Autres erreurs → Résumé groupé
+     * - Tickers introuvables dans FMP -> Resume groupe
+     * - Capitalisation < 2B -> Resume groupe
+     * - Donnees invalides -> Resume groupe
+     * - Autres erreurs -> Resume groupe
      * 
-     * @see loadAllTickersFromSupabase pour la stratégie de fallback API
-     * @see mapSourceToIsWatchlist pour le mapping source → isWatchlist
+     * @see loadAllTickersFromSupabase pour la strategie de fallback API
+     * @see mapSourceToIsWatchlist pour le mapping source -> isWatchlist
      */
     const handleSyncFromSupabase = async () => {
         setIsLoadingTickers(true);
@@ -4453,22 +4453,22 @@ export default function App() {
             let newTickersCount = 0;
             let updatedTickersCount = 0;
 
-            // ✅ MIGRATION : Créer un Map de source pour tous les tickers Supabase
+            //  MIGRATION : Creer un Map de source pour tous les tickers Supabase
             const sourceMap = new Map<string, 'team' | 'watchlist' | 'both' | 'manual'>();
             result.tickers.forEach(t => {
                 sourceMap.set(t.ticker.toUpperCase(), t.source);
             });
 
-            // Merge intelligent : ne pas écraser les profils existants
+            // Merge intelligent : ne pas ecraser les profils existants
             setLibrary(prev => {
                 const updated = { ...prev };
                 let migrationCount = 0;
 
-                // ✅ MIGRATION : Corriger TOUS les profils existants qui ne sont pas dans Supabase
+                //  MIGRATION : Corriger TOUS les profils existants qui ne sont pas dans Supabase
                 // Si un profil existe dans localStorage mais pas dans Supabase, le marquer comme 'manual' (null)
                 Object.keys(updated).forEach(symbol => {
                     if (!sourceMap.has(symbol)) {
-                        // Ticker existe localement mais pas dans Supabase → Normal (pas d'icône)
+                        // Ticker existe localement mais pas dans Supabase -> Normal (pas d'icone)
                         if (updated[symbol].isWatchlist !== null && updated[symbol].isWatchlist !== undefined) {
                             updated[symbol] = {
                                 ...updated[symbol],
@@ -4484,24 +4484,24 @@ export default function App() {
                     const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                     
                     if (updated[tickerSymbol]) {
-                        // ✅ MIGRATION FORCÉE : Toujours mettre à jour isWatchlist depuis Supabase
+                        //  MIGRATION FORCEE : Toujours mettre a jour isWatchlist depuis Supabase
                         // Les profils existants peuvent avoir un ancien isWatchlist incorrect
                         const hasValueLineUpdates = supabaseTicker.security_rank || 
                                                    supabaseTicker.earnings_predictability || 
                                                    supabaseTicker.price_growth_persistence || 
                                                    supabaseTicker.price_stability;
                         
-                        // ✅ MIGRATION FORCÉE : Toujours mettre à jour isWatchlist depuis Supabase
-                        // Même si isWatchlist semble déjà correct, forcer la mise à jour pour garantir la cohérence
+                        //  MIGRATION FORCEE : Toujours mettre a jour isWatchlist depuis Supabase
+                        // Meme si isWatchlist semble deja correct, forcer la mise a jour pour garantir la coherence
                         const needsValueLineUpdate = hasValueLineUpdates;
                         const needsIsWatchlistUpdate = updated[tickerSymbol].isWatchlist !== shouldBeWatchlist;
                         
-                        // ✅ FORCER la mise à jour si isWatchlist est différent OU s'il y a des mises à jour ValueLine
+                        //  FORCER la mise a jour si isWatchlist est different OU s'il y a des mises a jour ValueLine
                         if (needsIsWatchlistUpdate || needsValueLineUpdate) {
                             updated[tickerSymbol] = {
                                 ...updated[tickerSymbol],
-                                isWatchlist: shouldBeWatchlist, // ✅ FORCER mise à jour depuis Supabase
-                                // ⚠️ MULTI-UTILISATEUR : Supabase est la source de vérité pour les métriques ValueLine
+                                isWatchlist: shouldBeWatchlist, //  FORCER mise a jour depuis Supabase
+                                //  MULTI-UTILISATEUR : Supabase est la source de verite pour les metriques ValueLine
                                 // Toujours utiliser Supabase si disponible, sinon garder valeur existante
                                 info: {
                                     ...updated[tickerSymbol].info,
@@ -4528,7 +4528,7 @@ export default function App() {
                             }
                             updatedTickersCount++;
                             
-                            // Si c'est le profil actif, mettre à jour aussi le state local
+                            // Si c'est le profil actif, mettre a jour aussi le state local
                             if (tickerSymbol === activeId) {
                                 setInfo(updated[tickerSymbol].info);
                                 setIsWatchlist(shouldBeWatchlist ?? false);
@@ -4537,28 +4537,28 @@ export default function App() {
                         return;
                     }
 
-                    // ⚠️ RIGUEUR 100% : Ne pas créer de profil placeholder ici
-                    // Le profil sera créé uniquement si FMP réussit (voir code après)
-                    // On marque juste le ticker comme "à charger"
+                    //  RIGUEUR 100% : Ne pas creer de profil placeholder ici
+                    // Le profil sera cree uniquement si FMP reussit (voir code apres)
+                    // On marque juste le ticker comme "a charger"
                     newTickersCount++;
                 });
 
-                // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
-                        // ✅ Sauvegarder dans Supabase ET cache local
+                //  NOUVEAU : Sauvegarder dans cache avec timestamp (fire and forget)
+                        //  Sauvegarder dans Supabase ET cache local
                         saveProfiles(updated, true).catch(e => console.warn('Failed to save profiles:', e));
 
-                // ✅ DEBUG: Compter les profils avec isWatchlist=false après migration
+                //  DEBUG: Compter les profils avec isWatchlist=false apres migration
                 const portfolioCount = Object.values(updated).filter((p: any) => p.isWatchlist === false).length;
                 const watchlistCount = Object.values(updated).filter((p: any) => p.isWatchlist === true).length;
                 const normalCount = Object.values(updated).filter((p: any) => p.isWatchlist === null || p.isWatchlist === undefined).length;
                 
                 if (migrationCount > 0) {
-                    console.log(`🔄 Migration: ${migrationCount} profil(s) mis à jour avec isWatchlist depuis Supabase`);
+                    console.log(` Migration: ${migrationCount} profil(s) mis a jour avec isWatchlist depuis Supabase`);
                 }
                 
-                console.log(`📊 Après migration (handleSyncFromSupabase) - Portefeuille (⭐): ${portfolioCount}, Watchlist (👁️): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
+                console.log(` Apres migration (handleSyncFromSupabase) - Portefeuille (): ${portfolioCount}, Watchlist (): ${watchlistCount}, Normaux: ${normalCount}, Total: ${Object.keys(updated).length}`);
                 
-                // ✅ VÉRIFICATION: S'assurer que tous les team tickers ont isWatchlist=false
+                //  VERIFICATION: S'assurer que tous les team tickers ont isWatchlist=false
                 const teamTickersInSupabase = result.tickers.filter(t => {
                     const mapped = mapSourceToIsWatchlist(t.source);
                     return mapped === false; // Portefeuille
@@ -4568,7 +4568,7 @@ export default function App() {
                     return updated[symbol] && updated[symbol].isWatchlist === false;
                 });
                 
-                // Séparer les tickers manquants (pas dans localStorage) des incorrects (isWatchlist !== false)
+                // Separer les tickers manquants (pas dans localStorage) des incorrects (isWatchlist !== false)
                 const missingTickers = teamTickersInSupabase.filter(t => {
                     const symbol = t.ticker.toUpperCase();
                     return !updated[symbol];
@@ -4579,26 +4579,26 @@ export default function App() {
                 });
                 
                 if (teamTickersInSupabase.length !== teamTickersInLibrary.length) {
-                    console.warn(`⚠️ ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
+                    console.warn(` ${teamTickersInSupabase.length - teamTickersInLibrary.length} team ticker(s) manquant(s) ou incorrect(s) sur ${teamTickersInSupabase.length} attendus:`);
                     if (missingTickers.length > 0) {
-                        console.warn(`   📋 ${missingTickers.length} ticker(s) non chargé(s) depuis FMP:`, missingTickers.map(t => t.ticker).join(', '));
+                        console.warn(`    ${missingTickers.length} ticker(s) non charge(s) depuis FMP:`, missingTickers.map(t => t.ticker).join(', '));
                     }
                     if (incorrectTickers.length > 0) {
-                        console.warn(`   ❌ ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map(t => t.ticker).join(', '));
+                        console.warn(`    ${incorrectTickers.length} ticker(s) avec isWatchlist incorrect:`, incorrectTickers.map(t => t.ticker).join(', '));
                     }
-                    console.log(`   ✅ ${teamTickersInLibrary.length} ticker(s) correctement configuré(s) dans localStorage`);
+                    console.log(`    ${teamTickersInLibrary.length} ticker(s) correctement configure(s) dans localStorage`);
                 } else {
-                    console.log(`✅ Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
+                    console.log(` Tous les ${teamTickersInSupabase.length} team tickers ont isWatchlist=false`);
                 }
 
                 return updated;
             });
 
-            // ✅ FONCTION UTILITAIRE: Parser marketCap depuis format string (ex: "2.5B", "500M") vers nombre
+            //  FONCTION UTILITAIRE: Parser marketCap depuis format string (ex: "2.5B", "500M") vers nombre
             const parseMarketCapToNumber = (marketCapStr: string | null | undefined): number => {
                 if (!marketCapStr || marketCapStr === 'N/A' || marketCapStr === '0') return 0;
                 
-                // Si c'est déjà un nombre (string numérique)
+                // Si c'est deja un nombre (string numerique)
                 const numValue = parseFloat(marketCapStr);
                 if (!isNaN(numValue) && !marketCapStr.match(/[A-Za-z]/)) {
                     return numValue;
@@ -4620,56 +4620,56 @@ export default function App() {
                 }
             };
 
-            // ✅ FILTRE CAPITALISATION: Minimum 2 milliards USD
+            //  FILTRE CAPITALISATION: Minimum 2 milliards USD
             const MIN_MARKET_CAP = 2000000000; // 2 milliards
 
-            // Charger les données FMP pour les nouveaux tickers en arrière-plan
+            // Charger les donnees FMP pour les nouveaux tickers en arriere-plan
             // Exclure les fonds mutuels et les titres de moins de 2 milliards
             const newTickers = result.tickers.filter(t => {
                 const symbol = t.ticker.toUpperCase();
                 
-                // Vérifier si fonds mutuel
+                // Verifier si fonds mutuel
                 if (isMutualFund(symbol, t.company_name)) {
-                    console.warn(`⚠️ ${symbol}: Fonds mutuel détecté - exclu de la synchronisation`);
+                    console.warn(` ${symbol}: Fonds mutuel detecte - exclu de la synchronisation`);
                     return false;
                 }
 
-                // ✅ FILTRE CAPITALISATION: Vérifier market_cap depuis Supabase si disponible
+                //  FILTRE CAPITALISATION: Verifier market_cap depuis Supabase si disponible
                 if (t.market_cap) {
                     const marketCapNum = typeof t.market_cap === 'number' 
                         ? t.market_cap 
                         : parseMarketCapToNumber(String(t.market_cap));
                     
                     if (marketCapNum > 0 && marketCapNum < MIN_MARKET_CAP) {
-                        console.warn(`⚠️ ${symbol}: Capitalisation boursière trop faible (${t.market_cap} < 2B) - exclu de la synchronisation`);
+                        console.warn(` ${symbol}: Capitalisation boursiere trop faible (${t.market_cap} < 2B) - exclu de la synchronisation`);
                         return false;
                     }
                 }
 
-                // Si déjà dans library
+                // Si deja dans library
                 if (library[symbol]) {
                     const profile = library[symbol];
-                    // Vérifier si les données sont valides (au moins une année avec EPS ou CF > 0)
+                    // Verifier si les donnees sont valides (au moins une annee avec EPS ou CF > 0)
                     const hasValidData = profile.data && profile.data.length > 0 && profile.data.some(d => 
                         d.earningsPerShare !== 0 || d.cashFlowPerShare !== 0
                     );
                     
                     if (hasValidData) {
-                        return false; // Données valides, on passe
+                        return false; // Donnees valides, on passe
                     }
-                    // On laisse passer pour re-fetch FMP (pas de log individuel pour réduire le bruit)
+                    // On laisse passer pour re-fetch FMP (pas de log individuel pour reduire le bruit)
                 }
 
                 return true;
             });
 
             if (newTickers.length > 0) {
-                // ✅ Taille du batch depuis Supabase (pas de hardcoding)
+                //  Taille du batch depuis Supabase (pas de hardcoding)
                 const { getConfigValue } = await import('./services/appConfigApi');
                 const batchSize = await getConfigValue('profile_batch_size');
                 const delayBetweenBatches = 500;
                 
-                // ✅ Collecter les erreurs pour afficher un résumé à la fin
+                //  Collecter les erreurs pour afficher un resume a la fin
                 const errorSummary = {
                     notFound: [] as string[],
                     noData: [] as string[],
@@ -4693,7 +4693,7 @@ export default function App() {
                             try {
                                 const result = await fetchCompanyData(symbol);
                                 
-                                // VALIDATION STRICTE : Vérifier que les données sont valides
+                                // VALIDATION STRICTE : Verifier que les donnees sont valides
                                 if (!result.data || result.data.length === 0) {
                                     errorSummary.noData.push(symbol);
                                     return;
@@ -4713,7 +4713,7 @@ export default function App() {
                                     return;
                                 }
                                 
-                                // ✅ FILTRE CAPITALISATION: Vérifier marketCap depuis FMP
+                                //  FILTRE CAPITALISATION: Verifier marketCap depuis FMP
                                 const parseMarketCapToNumber = (marketCapStr: string | null | undefined): number => {
                                     if (!marketCapStr || marketCapStr === 'N/A' || marketCapStr === '0') return 0;
                                     const match = marketCapStr.toUpperCase().match(/^([\d.]+)([BMKT]?)$/);
@@ -4738,29 +4738,29 @@ export default function App() {
                                     }
                                 }
                                 
-                                // ✅ TOUTES LES VALIDATIONS PASSÉES - Créer le profil avec les données réelles
+                                //  TOUTES LES VALIDATIONS PASSEES - Creer le profil avec les donnees reelles
                                 const shouldBeWatchlist = mapSourceToIsWatchlist(supabaseTicker.source);
                                 
-                                // Auto-fill assumptions basées sur les données historiques FMP (fonction centralisée)
-                                // ✅ autoFillAssumptionsFromFMPData sanitis déjà les valeurs, mais on double-vérifie
+                                // Auto-fill assumptions basees sur les donnees historiques FMP (fonction centralisee)
+                                //  autoFillAssumptionsFromFMPData sanitis deja les valeurs, mais on double-verifie
                                 const autoFilledAssumptions = autoFillAssumptionsFromFMPData(
                                     result.data,
                                     result.currentPrice,
                                     INITIAL_ASSUMPTIONS,
-                                    result.currentDividend // ✅ NOUVEAU: Dividende actuel depuis l'API
+                                    result.currentDividend //  NOUVEAU: Dividende actuel depuis l'API
                                 );
                                 
-                                // ✅ SANITISER une deuxième fois pour être absolument sûr (les paramètres peuvent avoir changé)
+                                //  SANITISER une deuxieme fois pour etre absolument sur (les parametres peuvent avoir change)
                                 const sanitizedAutoFilled = sanitizeAssumptionsSync(autoFilledAssumptions);
                                 
-                                // Détecter et exclure automatiquement les métriques avec prix cibles aberrants
+                                // Detecter et exclure automatiquement les metriques avec prix cibles aberrants
                                 const tempAssumptions = {
                                     ...INITIAL_ASSUMPTIONS,
                                     ...sanitizedAutoFilled
                                 } as Assumptions;
                                 const outlierDetection = detectOutlierMetrics(result.data, tempAssumptions);
                                 
-                                // Appliquer les exclusions détectées
+                                // Appliquer les exclusions detectees
                                 const finalAssumptions = {
                                     ...tempAssumptions,
                                     excludeEPS: outlierDetection.excludeEPS,
@@ -4797,8 +4797,8 @@ export default function App() {
                                         [symbol]: newProfile
                                     };
                                     
-                                    // Sauvegarder avec IndexedDB (évite QuotaExceededError)
-                                    // ✅ Sauvegarder dans Supabase ET cache local
+                                    // Sauvegarder avec IndexedDB (evite QuotaExceededError)
+                                    //  Sauvegarder dans Supabase ET cache local
                             saveProfiles(updated, true).catch(e => {
                                         console.warn('Failed to save profiles:', e);
                                     });
@@ -4814,50 +4814,50 @@ export default function App() {
                                 } else {
                                     errorSummary.other.push({ symbol, error: errorMsg });
                                 }
-                                // ⚠️ RIGUEUR 100% : Ne pas créer de profil si FMP échoue
+                                //  RIGUEUR 100% : Ne pas creer de profil si FMP echoue
                             }
                         })
                     );
                 }
                 
-                // ✅ Afficher un résumé des erreurs au lieu de logger chaque erreur individuellement
+                //  Afficher un resume des erreurs au lieu de logger chaque erreur individuellement
                 const totalErrors = errorSummary.notFound.length + errorSummary.noData.length + 
                     errorSummary.invalidPrice.length + errorSummary.invalidData.length + 
                     errorSummary.lowMarketCap.length + errorSummary.other.length;
                 
                 if (totalErrors > 0) {
-                    console.group(`📊 Résumé synchronisation: ${successCount} succès, ${totalErrors} erreurs`);
+                    console.group(` Resume synchronisation: ${successCount} succes, ${totalErrors} erreurs`);
                     if (errorSummary.notFound.length > 0) {
-                        console.warn(`⚠️ ${errorSummary.notFound.length} ticker(s) introuvable(s) dans FMP: ${errorSummary.notFound.slice(0, 10).join(', ')}${errorSummary.notFound.length > 10 ? ` (+${errorSummary.notFound.length - 10} autres)` : ''}`);
+                        console.warn(` ${errorSummary.notFound.length} ticker(s) introuvable(s) dans FMP: ${errorSummary.notFound.slice(0, 10).join(', ')}${errorSummary.notFound.length > 10 ? ` (+${errorSummary.notFound.length - 10} autres)` : ''}`);
                     }
                     if (errorSummary.lowMarketCap.length > 0) {
-                        console.warn(`⚠️ ${errorSummary.lowMarketCap.length} ticker(s) avec capitalisation < 2B: ${errorSummary.lowMarketCap.slice(0, 10).join(', ')}${errorSummary.lowMarketCap.length > 10 ? ` (+${errorSummary.lowMarketCap.length - 10} autres)` : ''}`);
+                        console.warn(` ${errorSummary.lowMarketCap.length} ticker(s) avec capitalisation < 2B: ${errorSummary.lowMarketCap.slice(0, 10).join(', ')}${errorSummary.lowMarketCap.length > 10 ? ` (+${errorSummary.lowMarketCap.length - 10} autres)` : ''}`);
                     }
                     if (errorSummary.noData.length > 0) {
-                        console.warn(`⚠️ ${errorSummary.noData.length} ticker(s) sans données: ${errorSummary.noData.slice(0, 10).join(', ')}${errorSummary.noData.length > 10 ? ` (+${errorSummary.noData.length - 10} autres)` : ''}`);
+                        console.warn(` ${errorSummary.noData.length} ticker(s) sans donnees: ${errorSummary.noData.slice(0, 10).join(', ')}${errorSummary.noData.length > 10 ? ` (+${errorSummary.noData.length - 10} autres)` : ''}`);
                     }
                     if (errorSummary.invalidData.length > 0) {
-                        console.warn(`⚠️ ${errorSummary.invalidData.length} ticker(s) avec données invalides: ${errorSummary.invalidData.slice(0, 10).join(', ')}${errorSummary.invalidData.length > 10 ? ` (+${errorSummary.invalidData.length - 10} autres)` : ''}`);
+                        console.warn(` ${errorSummary.invalidData.length} ticker(s) avec donnees invalides: ${errorSummary.invalidData.slice(0, 10).join(', ')}${errorSummary.invalidData.length > 10 ? ` (+${errorSummary.invalidData.length - 10} autres)` : ''}`);
                     }
                     if (errorSummary.other.length > 0) {
-                        console.warn(`⚠️ ${errorSummary.other.length} autre(s) erreur(s): ${errorSummary.other.slice(0, 5).map(e => e.symbol).join(', ')}${errorSummary.other.length > 5 ? ` (+${errorSummary.other.length - 5} autres)` : ''}`);
+                        console.warn(` ${errorSummary.other.length} autre(s) erreur(s): ${errorSummary.other.slice(0, 5).map(e => e.symbol).join(', ')}${errorSummary.other.length > 5 ? ` (+${errorSummary.other.length - 5} autres)` : ''}`);
                     }
                     console.groupEnd();
                 }
             }
 
-            // Afficher un message de succès
+            // Afficher un message de succes
             const message = newTickersCount > 0 
-                ? `${newTickersCount} nouveau(x) ticker(s) ajouté(s)${updatedTickersCount > 0 ? `, ${updatedTickersCount} mis à jour` : ''}`
+                ? `${newTickersCount} nouveau(x) ticker(s) ajoute(s)${updatedTickersCount > 0 ? `, ${updatedTickersCount} mis a jour` : ''}`
                 : updatedTickersCount > 0
-                ? `${updatedTickersCount} ticker(s) mis à jour`
-                : 'Synchronisation terminée (aucun changement)';
+                ? `${updatedTickersCount} ticker(s) mis a jour`
+                : 'Synchronisation terminee (aucun changement)';
             
             showNotification(message, 'success');
-            console.log(`✅ ${message}`);
+            console.log(` ${message}`);
 
         } catch (error: any) {
-            console.error('❌ Erreur lors de la synchronisation:', error);
+            console.error(' Erreur lors de la synchronisation:', error);
             setTickersLoadError(error.message || 'Erreur inconnue');
             showNotification(`Erreur: ${error.message || 'Impossible de synchroniser avec Supabase'}`, 'error');
         } finally {
@@ -4880,8 +4880,8 @@ export default function App() {
     // Get Valuation Status
     const { recommendation, targetPrice, buyLimit, sellLimit } = calculateRecommendation(data, assumptions);
     
-    // ✅ FIX: Calculer le prix cible moyen (au lieu d'utiliser seulement le prix cible BPA)
-    // Cette logique correspond à celle de EvaluationDetails pour garantir la cohérence
+    //  FIX: Calculer le prix cible moyen (au lieu d'utiliser seulement le prix cible BPA)
+    // Cette logique correspond a celle de EvaluationDetails pour garantir la coherence
     const calculateAverageTargetPrice = useMemo(() => {
       const baseYearData = data.find(d => d.year === assumptions.baseYear) || data[data.length - 1];
       const baseValues = {
@@ -4891,7 +4891,7 @@ export default function App() {
         div: Math.max(assumptions.currentDividend || 0, 0)
       };
       
-      // ✅ FIX: Utiliser la croissance historique 5 ans si les taux sont 0 ou undefined
+      //  FIX: Utiliser la croissance historique 5 ans si les taux sont 0 ou undefined
       const safeGrowthEPS = (assumptions.growthRateEPS !== undefined && assumptions.growthRateEPS !== 0)
         ? assumptions.growthRateEPS
         : calculateHistoricalGrowth(data, 'earningsPerShare', 5);
@@ -4905,7 +4905,7 @@ export default function App() {
         ? assumptions.growthRateDiv
         : calculateHistoricalGrowth(data, 'dividendPerShare', 5);
       
-      // Calculer les projections 5 ans avec les taux sécurisés
+      // Calculer les projections 5 ans avec les taux securises
       const futureValues = {
         eps: projectFutureValue(baseValues.eps, safeGrowthEPS, 5),
         cf: projectFutureValue(baseValues.cf, safeGrowthCF, 5),
@@ -4913,7 +4913,7 @@ export default function App() {
         div: projectFutureValue(baseValues.div, safeGrowthDiv, 5)
       };
       
-      // Calculer les prix cibles pour chaque métrique
+      // Calculer les prix cibles pour chaque metrique
       const targets = {
         eps: futureValues.eps > 0 && assumptions.targetPE > 0 ? futureValues.eps * assumptions.targetPE : null,
         cf: futureValues.cf > 0 && assumptions.targetPCF > 0 ? futureValues.cf * assumptions.targetPCF : null,
@@ -4921,7 +4921,7 @@ export default function App() {
         div: futureValues.div > 0 && assumptions.targetYield > 0 ? futureValues.div / (assumptions.targetYield / 100) : null
       };
       
-      // Filtrer les métriques exclues et valides
+      // Filtrer les metriques exclues et valides
       const currentPrice = Math.max(assumptions.currentPrice || 0, 0.01);
       const maxReasonableTarget = currentPrice * 50; // Multiplicateur raisonnable
       const minReasonableTarget = currentPrice * 0.1;
@@ -4943,7 +4943,7 @@ export default function App() {
 
     const availableYears = data.map(d => d.year);
 
-    // ✅ Overlay de verrouillage pendant la synchronisation (bulk ou single)
+    //  Overlay de verrouillage pendant la synchronisation (bulk ou single)
     const isSyncing = isBulkSyncing || isLoading;
 
     if (!isInitialized) return <div className="flex items-center justify-center h-screen text-slate-500">Chargement...</div>;
@@ -4956,7 +4956,7 @@ export default function App() {
         return <LandingPage onGetStarted={() => {
             setShowLanding(false);
             localStorage.setItem('3p1-has-seen-landing', 'true');
-            // Afficher le démo après la landing page si aucun ticker n'est sélectionné
+            // Afficher le demo apres la landing page si aucun ticker n'est selectionne
             setTimeout(() => {
                 if (!activeId || Object.keys(library).length === 0) {
                     setShowDemo(true);
@@ -4986,7 +4986,7 @@ export default function App() {
     }
 
 
-    // Handler générique pour mettre à jour un profil complet (utilisé par KPIDashboard)
+    // Handler generique pour mettre a jour un profil complet (utilise par KPIDashboard)
     const handleUpdateProfile = (id: string, updates: Partial<AnalysisProfile>) => {
         setLibrary(prev => {
             if (!prev[id]) return prev;
@@ -4994,7 +4994,7 @@ export default function App() {
             const updatedProfile = { 
                 ...prev[id], 
                 ...updates,
-                // Ne pas écraser lastModified si fourni dans updates, sinon update
+                // Ne pas ecraser lastModified si fourni dans updates, sinon update
                 lastModified: updates.lastModified || Date.now()
             };
             
@@ -5004,14 +5004,14 @@ export default function App() {
             };
             
             // Persister les changements
-            // ✅ NOUVEAU : Sauvegarder dans cache avec timestamp
+            //  NOUVEAU : Sauvegarder dans cache avec timestamp
             if (typeof requestIdleCallback !== 'undefined') {
                 requestIdleCallback(() => {
-                    // ✅ Sauvegarder dans Supabase ET cache local
+                    //  Sauvegarder dans Supabase ET cache local
                     saveProfiles(updatedLibrary, true).catch(e => console.warn('Failed to save profiles:', e));
                 });
             } else {
-                // ✅ Sauvegarder dans Supabase ET cache local
+                //  Sauvegarder dans Supabase ET cache local
                 saveProfiles(updatedLibrary, true).catch(e => console.warn('Failed to save profiles:', e));
             }
             
@@ -5021,7 +5021,7 @@ export default function App() {
 
     return (
         <>
-            {/* ✅ Overlay de verrouillage pendant la synchronisation */}
+            {/*  Overlay de verrouillage pendant la synchronisation */}
             {(isBulkSyncing || isLoading) && (
                 <SyncLockOverlay
                     isActive={isBulkSyncing || isLoading}
@@ -5034,7 +5034,7 @@ export default function App() {
                 />
             )}
 
-            {/* Désactiver toutes les interactions pendant la synchronisation */}
+            {/* Desactiver toutes les interactions pendant la synchronisation */}
             <div 
                 className={`flex h-screen bg-gray-100 font-sans text-slate-800 overflow-hidden ${isSyncing ? 'pointer-events-none opacity-50' : ''}`}
                 style={isSyncing ? { cursor: 'not-allowed', userSelect: 'none' } : {}}
@@ -5165,7 +5165,7 @@ export default function App() {
                             </div>
                         </div>
 
-                        {/* Header - Affiché seulement pour les vues Analysis et Info, pas pour KPI */}
+                        {/* Header - Affiche seulement pour les vues Analysis et Info, pas pour KPI */}
                         {currentView !== 'kpi' && (
                             <Header
                                 info={info}
@@ -5209,23 +5209,23 @@ export default function App() {
                                 <div className="lg:col-span-3 order-2 lg:order-1">
                                     <div className="flex items-center justify-between mb-2 px-1">
                                         <h3 className="text-lg font-bold text-gray-700 flex items-center gap-2">
-                                            Données Historiques
+                                            Donnees Historiques
                                             {historicalCAGR_EPS != null && isFinite(historicalCAGR_EPS) && historicalCAGR_EPS > 0 && (
-                                                <span className="text-xs font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full" title="Taux de croissance annuel composé des EPS sur la période affichée">
+                                                <span className="text-xs font-normal bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full" title="Taux de croissance annuel compose des EPS sur la periode affichee">
                                                     CAGR EPS: {historicalCAGR_EPS.toFixed(1)}%
                                                 </span>
                                             )}
                                         </h3>
                                         <div className="flex gap-1 bg-white rounded-md shadow-sm border border-gray-200 p-0.5 no-print">
-                                            <button onClick={undo} disabled={pastData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" title="↶ Annuler la dernière modification\n\nAnnule la dernière modification effectuée sur les données historiques.\n\n📊 Fonctionnalités:\n• Permet de revenir en arrière sur les changements\n• Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\n• Historique illimité (tant que vous ne quittez pas la page)\n\n⌨️ Raccourci: Ctrl+Z (Cmd+Z sur Mac)" aria-label="Annuler la modification">
+                                            <button onClick={undo} disabled={pastData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" title=" Annuler la derniere modification\n\nAnnule la derniere modification effectuee sur les donnees historiques.\n\n Fonctionnalites:\n- Permet de revenir en arriere sur les changements\n- Fonctionne avec toutes les modifications (EPS, CF, BV, Dividendes, Prix)\n- Historique illimite (tant que vous ne quittez pas la page)\n\n Raccourci: Ctrl+Z (Cmd+Z sur Mac)" aria-label="Annuler la modification">
                                                 <ArrowUturnLeftIcon className="w-4 h-4" />
                                             </button>
                                             <div className="w-px bg-gray-200 my-1"></div>
-                                            <button onClick={redo} disabled={futureData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" title="↷ Rétablir la modification annulée\n\nRétablit la dernière modification que vous avez annulée.\n\n📊 Fonctionnalités:\n• Permet de refaire une action annulée\n• Fonctionne avec toutes les modifications\n• Disponible uniquement si vous avez annulé une action\n\n⌨️ Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)" aria-label="Rétablir la modification">
+                                            <button onClick={redo} disabled={futureData.length === 0} className="p-1.5 rounded hover:bg-gray-100 text-gray-600 disabled:opacity-30" title=" Retablir la modification annulee\n\nRetablit la derniere modification que vous avez annulee.\n\n Fonctionnalites:\n- Permet de refaire une action annulee\n- Fonctionne avec toutes les modifications\n- Disponible uniquement si vous avez annule une action\n\n Raccourci: Ctrl+Shift+Z (Cmd+Shift+Z sur Mac)" aria-label="Retablir la modification">
                                                 <ArrowUturnRightIcon className="w-4 h-4" />
                                             </button>
                                             <div className="w-px bg-gray-200 my-1"></div>
-                                            <button onClick={handleResetData} className="p-1.5 rounded hover:bg-red-50 text-red-600" title="🔄 Réinitialiser les données\n\nRéinitialise toutes les données historiques à leurs valeurs d'origine.\n\n⚠️ Attention:\n• Cette action est irréversible\n• Toutes vos modifications manuelles seront perdues\n• Les données seront restaurées depuis la dernière synchronisation FMP\n• Les hypothèses ne sont PAS affectées\n\n💡 Utilisation:\n• Utile si vous avez fait des erreurs de saisie\n• Permet de repartir de zéro avec les données FMP\n• Confirmation requise avant exécution" aria-label="Réinitialiser toutes les données">
+                                            <button onClick={handleResetData} className="p-1.5 rounded hover:bg-red-50 text-red-600" title=" Reinitialiser les donnees\n\nReinitialise toutes les donnees historiques a leurs valeurs d'origine.\n\n Attention:\n- Cette action est irreversible\n- Toutes vos modifications manuelles seront perdues\n- Les donnees seront restaurees depuis la derniere synchronisation FMP\n- Les hypotheses ne sont PAS affectees\n\n Utilisation:\n- Utile si vous avez fait des erreurs de saisie\n- Permet de repartir de zero avec les donnees FMP\n- Confirmation requise avant execution" aria-label="Reinitialiser toutes les donnees">
                                                 <ArrowPathIcon className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -5271,7 +5271,7 @@ export default function App() {
                                         sector={info.sector}
                                     />
 
-                                    {/* Historical Ranges Table - Aide pour les hypothèses */}
+                                    {/* Historical Ranges Table - Aide pour les hypotheses */}
                                     <HistoricalRangesTable
                                         data={data}
                                         info={profile.info}
@@ -5298,14 +5298,14 @@ export default function App() {
 
                                     {/* Summary Card */}
                                     <div className="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-3 sm:p-4 md:p-6 rounded-lg shadow-lg">
-                                        <h2 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 border-b border-slate-600 pb-2">Résumé Exécutif</h2>
+                                        <h2 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 border-b border-slate-600 pb-2">Resume Executif</h2>
                                         <p className="text-slate-300 text-sm mb-4 leading-relaxed">
-                                            L'analyse de {info.name} suggère une position <strong className="text-white uppercase">{recommendation}</strong> au prix actuel de {formatCurrency(assumptions.currentPrice)}.
+                                            L'analyse de {info.name} suggere une position <strong className="text-white uppercase">{recommendation}</strong> au prix actuel de {formatCurrency(assumptions.currentPrice)}.
                                         </p>
                                         <p className="text-slate-300 text-sm mb-4 leading-relaxed">
                                             {targetPrice && targetPrice > 0 && assumptions.currentPrice > 0 ? (
                                                 <>
-                                                    Le titre se négocie à <strong className="text-white">
+                                                    Le titre se negocie a <strong className="text-white">
                                                         {(() => {
                                                             const diff = Math.abs(1 - (assumptions.currentPrice / targetPrice)) * 100;
                                                             return isFinite(diff) && !isNaN(diff) ? formatPercent(diff) : 'N/A';
@@ -5313,11 +5313,11 @@ export default function App() {
                                                     </strong> l'objectif de prix EPS de {formatCurrency(targetPrice)}.
                                                 </>
                                             ) : (
-                                                <span className="text-slate-400">Données insuffisantes pour calculer la position relative au prix cible EPS.</span>
+                                                <span className="text-slate-400">Donnees insuffisantes pour calculer la position relative au prix cible EPS.</span>
                                             )}
                                         </p>
 
-                                        {/* Note: Les métriques ValueLine sont affichées dans le Header (barre supérieure) et dans la section Configuration ci-dessous */}
+                                        {/* Note: Les metriques ValueLine sont affichees dans le Header (barre superieure) et dans la section Configuration ci-dessous */}
                                         {info.beta !== undefined && info.beta !== null && isFinite(info.beta) && (
                                             <div className="bg-slate-700/50 p-3 rounded mt-6">
                                                 <div className="text-xs text-slate-400 uppercase">Beta</div>
@@ -5335,7 +5335,7 @@ export default function App() {
                                         </h3>
                                         <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                                             <div>
-                                                <label htmlFor="config-company-name" className="block text-xs text-gray-500 mb-1">Nom Société</label>
+                                                <label htmlFor="config-company-name" className="block text-xs text-gray-500 mb-1">Nom Societe</label>
                                                 <input
                                                     id="config-company-name"
                                                     type="text"
@@ -5366,8 +5366,8 @@ export default function App() {
                                             </div>
                                             <div>
                                                 <label className="flex text-xs text-gray-500 mb-1 items-center gap-1">
-                                                    Financial Strength (ValueLine 3 déc 2025)
-                                                    <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
+                                                    Financial Strength (ValueLine 3 dec 2025)
+                                                    <span className="text-[10px] text-blue-600" title="Synchronise depuis Supabase - Lecture seule"></span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -5375,13 +5375,13 @@ export default function App() {
                                                     readOnly
                                                     className="w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed"
                                                     placeholder="A+, A, B+, etc."
-                                                    title="Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
+                                                    title="Cette metrique est synchronisee depuis Supabase et ne peut pas etre modifiee localement"
                                                 />
                                             </div>
                                             <div>
                                                 <label className="flex text-xs text-gray-500 mb-1 items-center gap-1">
-                                                    Earnings Predictability (ValueLine 3 déc 2025)
-                                                    <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
+                                                    Earnings Predictability (ValueLine 3 dec 2025)
+                                                    <span className="text-[10px] text-blue-600" title="Synchronise depuis Supabase - Lecture seule"></span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -5389,13 +5389,13 @@ export default function App() {
                                                     readOnly
                                                     className="w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed"
                                                     placeholder="100, 95, 90, etc."
-                                                    title="Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
+                                                    title="Cette metrique est synchronisee depuis Supabase et ne peut pas etre modifiee localement"
                                                 />
                                             </div>
                                             <div>
                                                 <label className="flex text-xs text-gray-500 mb-1 items-center gap-1">
-                                                    Price Growth Persistence (ValueLine 3 déc 2025)
-                                                    <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
+                                                    Price Growth Persistence (ValueLine 3 dec 2025)
+                                                    <span className="text-[10px] text-blue-600" title="Synchronise depuis Supabase - Lecture seule"></span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -5403,13 +5403,13 @@ export default function App() {
                                                     readOnly
                                                     className="w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed"
                                                     placeholder="95, 90, 85, etc."
-                                                    title="Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
+                                                    title="Cette metrique est synchronisee depuis Supabase et ne peut pas etre modifiee localement"
                                                 />
                                             </div>
                                             <div>
                                                 <label className="flex text-xs text-gray-500 mb-1 items-center gap-1">
-                                                    Price Stability (ValueLine 3 déc 2025)
-                                                    <span className="text-[10px] text-blue-600" title="Synchronisé depuis Supabase - Lecture seule">🔒</span>
+                                                    Price Stability (ValueLine 3 dec 2025)
+                                                    <span className="text-[10px] text-blue-600" title="Synchronise depuis Supabase - Lecture seule"></span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -5417,7 +5417,7 @@ export default function App() {
                                                     readOnly
                                                     className="w-full border border-gray-300 rounded px-2 py-1 bg-gray-50 text-gray-700 cursor-not-allowed"
                                                     placeholder="100, 95, 90, etc."
-                                                    title="Cette métrique est synchronisée depuis Supabase et ne peut pas être modifiée localement"
+                                                    title="Cette metrique est synchronisee depuis Supabase et ne peut pas etre modifiee localement"
                                                 />
                                             </div>
                                             {info.beta !== undefined && info.beta !== null && (
@@ -5430,7 +5430,7 @@ export default function App() {
                                                         onChange={(e) => handleUpdateInfo('beta', parseFloat(e.target.value) || 0)}
                                                         className="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-200 outline-none"
                                                         readOnly
-                                                        title="Beta récupéré automatiquement via API FMP"
+                                                        title="Beta recupere automatiquement via API FMP"
                                                     />
                                                 </div>
                                             )}
@@ -5463,7 +5463,7 @@ export default function App() {
             )}
 
             {/* Confirmation Dialog for API Sync */}
-            {/* Ancien dialogue simple (gardé pour compatibilité) */}
+            {/* Ancien dialogue simple (garde pour compatibilite) */}
             <ConfirmSyncDialog
                 isOpen={showConfirmSync}
                 ticker={activeId}
@@ -5475,7 +5475,7 @@ export default function App() {
                 }}
             />
 
-            {/* Nouveau dialogue avancé */}
+            {/* Nouveau dialogue avance */}
             <AdvancedSyncDialog
                 isOpen={showAdvancedSyncDialog}
                 ticker={isAdvancedSyncForBulk ? undefined : activeId}
@@ -5505,20 +5505,20 @@ export default function App() {
                 <InteractiveDemo
                     onClose={() => {
                         setShowDemo(false);
-                        // ✅ Mémoriser que l'utilisateur a fermé le démo pour ne pas le réafficher
+                        //  Memoriser que l'utilisateur a ferme le demo pour ne pas le reafficher
                         localStorage.setItem('3p1-has-closed-demo', 'true');
                     }}
                     onSelectTicker={() => {
                         setIsSidebarOpen(true);
                     }}
                     onLoadDefaultTicker={async () => {
-                        // Charger ACN par défaut quand le démo se ferme
+                        // Charger ACN par defaut quand le demo se ferme
                         const defaultTicker = 'ACN';
                         const upperTicker = defaultTicker.toUpperCase();
                         
-                        // Si ACN n'existe pas dans la library, créer un profil squelette
+                        // Si ACN n'existe pas dans la library, creer un profil squelette
                         if (!library[upperTicker]) {
-                            console.log(`📝 Création profil squelette pour ${upperTicker}...`);
+                            console.log(` Creation profil squelette pour ${upperTicker}...`);
                             const skeletonProfile: AnalysisProfile = {
                                 id: upperTicker,
                                 lastModified: Date.now(),
@@ -5536,30 +5536,30 @@ export default function App() {
                             // Marquer comme squelette
                             (skeletonProfile as any)._isSkeleton = true;
                             
-                            // Ajouter à la library
+                            // Ajouter a la library
                             setLibrary(prev => {
                                 const updated = {
                                     ...prev,
                                     [upperTicker]: skeletonProfile
                                 };
-                                // ✅ Sauvegarder dans Supabase ET cache local
+                                //  Sauvegarder dans Supabase ET cache local
                                 saveProfiles(updated, true).catch(e => console.warn('Erreur sauvegarde profils:', e));
                                 return updated;
                             });
                         }
                         
-                        // Sélectionner ACN (handleSelectTicker chargera les données depuis Supabase puis FMP)
-                        // ✅ FORCER le chargement même si le profil existe déjà mais est vide
+                        // Selectionner ACN (handleSelectTicker chargera les donnees depuis Supabase puis FMP)
+                        //  FORCER le chargement meme si le profil existe deja mais est vide
                         await handleSelectTicker(upperTicker);
                         
-                        // ✅ DOUBLE VÉRIFICATION : Si après handleSelectTicker les données sont toujours vides, forcer le chargement FMP
+                        //  DOUBLE VERIFICATION : Si apres handleSelectTicker les donnees sont toujours vides, forcer le chargement FMP
                         setTimeout(async () => {
                             const currentProfile = library[upperTicker];
                             if (currentProfile && (!currentProfile.data || currentProfile.data.length === 0)) {
-                                console.log(`🔄 ${upperTicker}: Données toujours vides après handleSelectTicker - Forcer chargement FMP...`);
+                                console.log(` ${upperTicker}: Donnees toujours vides apres handleSelectTicker - Forcer chargement FMP...`);
                                 try {
                                     const { fetchCompanyData } = await import('./services/financeApi');
-                                    showNotification(`Chargement des données FMP pour ${upperTicker}...`, 'info');
+                                    showNotification(`Chargement des donnees FMP pour ${upperTicker}...`, 'info');
                                     const result = await fetchCompanyData(upperTicker);
                                     
                                     if (result.data && result.data.length > 0 && result.currentPrice > 0) {
@@ -5581,19 +5581,19 @@ export default function App() {
                                             [upperTicker]: updatedProfile
                                         }));
                                         
-                                        // Mettre à jour les states si c'est toujours le ticker actif
+                                        // Mettre a jour les states si c'est toujours le ticker actif
                                         if (activeId === upperTicker) {
                                             setData(updatedProfile.data);
                                             setAssumptions(updatedProfile.assumptions);
                                             setInfo(updatedProfile.info);
                                         }
                                         
-                                        showNotification(`✅ ${upperTicker} chargé depuis FMP`, 'success');
-                                        console.log(`✅ ${upperTicker}: Données FMP chargées avec succès`);
+                                        showNotification(` ${upperTicker} charge depuis FMP`, 'success');
+                                        console.log(` ${upperTicker}: Donnees FMP chargees avec succes`);
                                     }
                                 } catch (error) {
-                                    console.error(`❌ ${upperTicker}: Erreur chargement FMP forcé:`, error);
-                                    showNotification(`❌ Impossible de charger ${upperTicker} depuis FMP`, 'error');
+                                    console.error(` ${upperTicker}: Erreur chargement FMP force:`, error);
+                                    showNotification(` Impossible de charger ${upperTicker} depuis FMP`, 'error');
                                 }
                             }
                         }, 1000); // Attendre 1 seconde pour laisser handleSelectTicker terminer
@@ -5698,7 +5698,7 @@ export default function App() {
                                 await handleBulkSyncAllTickersWithOptions(options, failedTickers);
                             } finally {
                                 setIsBulkSyncing(false);
-                                setCurrentSyncingTicker(undefined); // ✅ Réinitialiser le ticker actuel
+                                setCurrentSyncingTicker(undefined); //  Reinitialiser le ticker actuel
                             }
                         }
                     }

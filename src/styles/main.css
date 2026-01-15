@@ -1,8 +1,8 @@
 /**
  * GOB Dashboard - Main CSS Entry Point
  * 
- * Point d'entrée unique pour tous les styles du dashboard
- * Remplace les 22 fichiers CSS dispersés par une structure organisée
+ * Point d'entree unique pour tous les styles du dashboard
+ * Remplace les 22 fichiers CSS disperses par une structure organisee
  */
 
 /* 1. Design Tokens (variables CSS) */
@@ -13,7 +13,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 3. Base Styles (migré depuis src/index.css) */
+/* 3. Base Styles (migre depuis src/index.css) */
 * {
   margin: 0;
   padding: 0;
@@ -49,14 +49,14 @@ code {
   flex-direction: column;
 }
 
-/* 4. Thèmes (importé depuis public/css/themes.css mais consolidé ici) */
-/* Note: Les styles de thèmes dynamiques sont gérés par theme-system.js */
-/* Ce fichier contient les styles statiques pour les thèmes */
+/* 4. Themes (importe depuis public/css/themes.css mais consolide ici) */
+/* Note: Les styles de themes dynamiques sont geres par theme-system.js */
+/* Ce fichier contient les styles statiques pour les themes */
 
 /* 5. Standardisation des espacements */
 @import './spacing.css';
 
-/* 6. Accessibilité */
+/* 6. Accessibilite */
 @import './accessibility.css';
 
 /* 7. Composants globaux */

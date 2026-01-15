@@ -16,12 +16,12 @@ const METRIC_COLORS = {
 }
 
 const safeToFixed = (value: number | undefined | null, decimals: number): string => {
-  if (value === undefined || value === null || isNaN(value)) return "—"
+  if (value === undefined || value === null || isNaN(value)) return "-"
   return value.toFixed(decimals)
 }
 
 const safeBps = (value: number | undefined | null): string => {
-  if (value === undefined || value === null || isNaN(value)) return "—"
+  if (value === undefined || value === null || isNaN(value)) return "-"
   return (value * 100).toFixed(1)
 }
 
@@ -30,13 +30,13 @@ export function CurveMetricsCard({ metrics, comparisonMode = false }: CurveMetri
     return (
       <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="text-foreground">Métriques de la Courbe</CardTitle>
-          <CardDescription className="text-muted-foreground">Chargement des données...</CardDescription>
+          <CardTitle className="text-foreground">Metriques de la Courbe</CardTitle>
+          <CardDescription className="text-muted-foreground">Chargement des donnees...</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8 text-muted-foreground">
             <AlertCircle className="h-5 w-5 mr-2" />
-            <span>Données en cours de chargement...</span>
+            <span>Donnees en cours de chargement...</span>
           </div>
         </CardContent>
       </Card>
@@ -53,7 +53,7 @@ export function CurveMetricsCard({ metrics, comparisonMode = false }: CurveMetri
   const getSlopeText = () => {
     const slope = metrics.slope ?? 0
     if (slope > 0.005) return "Pente Raide (Normal)"
-    if (slope < -0.005) return "Inversée"
+    if (slope < -0.005) return "Inversee"
     return "Plate"
   }
 
@@ -65,7 +65,7 @@ export function CurveMetricsCard({ metrics, comparisonMode = false }: CurveMetri
   return (
     <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-foreground">Métriques de la Courbe</CardTitle>
+        <CardTitle className="text-foreground">Metriques de la Courbe</CardTitle>
         <CardDescription className="text-muted-foreground">
           Analyse du niveau, de la pente et de la courbure
         </CardDescription>
@@ -124,7 +124,7 @@ export function CurveMetricsCard({ metrics, comparisonMode = false }: CurveMetri
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Pente 2Y-10Y</p>
-                <p className="text-xs text-muted-foreground">Indicateur clé du marché</p>
+                <p className="text-xs text-muted-foreground">Indicateur cle du marche</p>
               </div>
             </div>
             <div className="text-right">
@@ -153,7 +153,7 @@ export function CurveMetricsCard({ metrics, comparisonMode = false }: CurveMetri
                 <div>
                   <p className="text-sm font-medium text-foreground">Zone de Plus Grand Mouvement</p>
                   <p className="text-xs text-muted-foreground">
-                    {metrics.steepest_area.from} → {metrics.steepest_area.to}
+                    {metrics.steepest_area.from} -> {metrics.steepest_area.to}
                   </p>
                 </div>
               </div>
@@ -172,7 +172,7 @@ export function CurveMetricsCard({ metrics, comparisonMode = false }: CurveMetri
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Courbure</p>
-                <p className="text-xs text-muted-foreground">2×10Y - 2Y - 30Y</p>
+                <p className="text-xs text-muted-foreground">2x10Y - 2Y - 30Y</p>
               </div>
             </div>
             <div className="text-right">
@@ -188,7 +188,7 @@ export function CurveMetricsCard({ metrics, comparisonMode = false }: CurveMetri
           </div>
         </div>
 
-        {/* Légende */}
+        {/* Legende */}
         <div className="mt-4 pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground">bp = points de base | 1% = 100 bp | Exemple: 50 bp = 0.50%</p>
         </div>

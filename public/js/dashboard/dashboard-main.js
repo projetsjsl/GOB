@@ -52,7 +52,7 @@ export const BetaCombinedDashboard = () => {
     // and logic from the original monolithic BetaCombinedDashboard component.
     // For now, this is a skeleton that shows the structure.
 
-    // États principaux
+    // Etats principaux
     const [activeTab, setActiveTab] = useState('stocks-news');
     const [tickers, setTickers] = useState([]);
     const [teamTickers, setTeamTickers] = useState([]);
@@ -85,7 +85,7 @@ export const BetaCombinedDashboard = () => {
     const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
     const [showCommandsHelp, setShowCommandsHelp] = useState(false);
 
-    // États pour la gestion du cache
+    // Etats pour la gestion du cache
     const [cacheSettings, setCacheSettings] = useState(() => {
         const saved = localStorage.getItem('cacheSettings');
         return saved ? JSON.parse(saved) : {
@@ -97,26 +97,26 @@ export const BetaCombinedDashboard = () => {
     const [cacheStatus, setCacheStatus] = useState({});
     const [loadingCacheStatus, setLoadingCacheStatus] = useState(false);
 
-    // États pour l'interface Seeking Alpha
+    // Etats pour l'interface Seeking Alpha
     const [githubToken, setGithubToken] = useState('');
     const [showSettings, setShowSettings] = useState(false);
     const [showScraperPopup, setShowScraperPopup] = useState(false);
 
-    // États pour la modal de comparaison de peers
+    // Etats pour la modal de comparaison de peers
     const [showPeersModal, setShowPeersModal] = useState(false);
     const [selectedTickerForPeers, setSelectedTickerForPeers] = useState(null);
     const [peersData, setPeersData] = useState(null);
     const [loadingPeers, setLoadingPeers] = useState(false);
 
-    // États pour le scraping
+    // Etats pour le scraping
     const [scrapingStatus, setScrapingStatus] = useState('idle');
     const [scrapingProgress, setScrapingProgress] = useState(0);
     const [scrapingLogs, setScrapingLogs] = useState([]);
 
-    // États pour les logs système
+    // Etats pour les logs systeme
     const [systemLogs, setSystemLogs] = useState([]);
 
-    // État pour le thème
+    // Etat pour le theme
     const [isDarkMode, setIsDarkMode] = useState(() => {
         try {
             const saved = localStorage.getItem('theme');

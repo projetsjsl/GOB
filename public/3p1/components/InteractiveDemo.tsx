@@ -10,8 +10,8 @@ import {
 
 interface InteractiveDemoProps {
   onClose: () => void;
-  onSelectTicker?: () => void; // Callback pour guider vers la sélection d'un ticker
-  onLoadDefaultTicker?: () => void; // Callback pour charger ACN par défaut
+  onSelectTicker?: () => void; // Callback pour guider vers la selection d'un ticker
+  onLoadDefaultTicker?: () => void; // Callback pour charger ACN par defaut
 }
 
 type DemoStep = 1 | 2 | 3;
@@ -28,29 +28,29 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
   const [highlightRect, setHighlightRect] = useState<HighlightRect | null>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // Définir les éléments à mettre en évidence pour chaque étape
+  // Definir les elements a mettre en evidence pour chaque etape
   const stepConfig = {
     1: {
-      title: "Étape 1: Sélectionner un ticker",
-      description: "Commencez par choisir un titre dans la barre latérale gauche. Vous pouvez rechercher par symbole (ex: AAPL) ou par nom d'entreprise.",
+      title: "Etape 1: Selectionner un ticker",
+      description: "Commencez par choisir un titre dans la barre laterale gauche. Vous pouvez rechercher par symbole (ex: AAPL) ou par nom d'entreprise.",
       highlightSelector: '[data-demo="sidebar"]',
       elementDescription: "La sidebar contient tous vos tickers. Utilisez la barre de recherche pour trouver rapidement un titre.",
       icon: MagnifyingGlassIcon,
       color: "blue"
     },
     2: {
-      title: "Étape 2: Explorer les données historiques",
-      description: "Une fois un ticker sélectionné, vous verrez ses données financières historiques dans le tableau principal. Les couleurs indiquent la source des données (vert = FMP vérifié, bleu = FMP ajusté, orange = manuel, gris = calculé).",
+      title: "Etape 2: Explorer les donnees historiques",
+      description: "Une fois un ticker selectionne, vous verrez ses donnees financieres historiques dans le tableau principal. Les couleurs indiquent la source des donnees (vert = FMP verifie, bleu = FMP ajuste, orange = manuel, gris = calcule).",
       highlightSelector: '[data-demo="historical-table"]',
-      elementDescription: "Le tableau affiche les données annuelles: prix, bénéfices, dividendes, etc. Cliquez sur une cellule pour la modifier. Consultez la légende des couleurs au-dessus du tableau.",
+      elementDescription: "Le tableau affiche les donnees annuelles: prix, benefices, dividendes, etc. Cliquez sur une cellule pour la modifier. Consultez la legende des couleurs au-dessus du tableau.",
       icon: TableCellsIcon,
       color: "green"
     },
     3: {
-      title: "Étape 3: Utiliser les fonctionnalités avancées",
-      description: "Explorez les graphiques de valorisation, les métriques additionnelles, et synchronisez les données depuis l'API pour obtenir les informations les plus récentes.",
+      title: "Etape 3: Utiliser les fonctionnalites avancees",
+      description: "Explorez les graphiques de valorisation, les metriques additionnelles, et synchronisez les donnees depuis l'API pour obtenir les informations les plus recentes.",
       highlightSelector: '[data-demo="features"]',
-      elementDescription: "Les onglets en haut permettent d'accéder aux graphiques, métriques, et autres analyses. Le bouton de synchronisation met à jour les données depuis l'API.",
+      elementDescription: "Les onglets en haut permettent d'acceder aux graphiques, metriques, et autres analyses. Le bouton de synchronisation met a jour les donnees depuis l'API.",
       icon: PresentationChartBarIcon,
       color: "purple"
     }
@@ -59,7 +59,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
   const currentConfig = stepConfig[currentStep];
   const Icon = currentConfig.icon;
 
-  // Effet pour calculer la position de l'élément à mettre en évidence
+  // Effet pour calculer la position de l'element a mettre en evidence
   useEffect(() => {
     const updateHighlight = () => {
       const element = document.querySelector(currentConfig.highlightSelector);
@@ -71,17 +71,17 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
           width: rect.width,
           height: rect.height
         });
-        // Ajouter une classe pour mettre en évidence l'élément
+        // Ajouter une classe pour mettre en evidence l'element
         element.classList.add('demo-highlight');
       } else {
         setHighlightRect(null);
       }
     };
 
-    // Mettre à jour au montage et au changement d'étape
+    // Mettre a jour au montage et au changement d'etape
     updateHighlight();
     
-    // Mettre à jour lors du scroll ou resize
+    // Mettre a jour lors du scroll ou resize
     window.addEventListener('scroll', updateHighlight, true);
     window.addEventListener('resize', updateHighlight);
     
@@ -100,11 +100,11 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
     if (currentStep < 3) {
       setCurrentStep((prev) => (prev + 1) as DemoStep);
     } else {
-      // À la fin du démo, charger ACN par défaut
+      // A la fin du demo, charger ACN par defaut
       if (onLoadDefaultTicker) {
         onLoadDefaultTicker();
       }
-      // ✅ Mémoriser que l'utilisateur a terminé le démo
+      //  Memoriser que l'utilisateur a termine le demo
       localStorage.setItem('3p1-has-closed-demo', 'true');
       onClose();
     }
@@ -117,11 +117,11 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
   };
 
   const handleSkip = () => {
-    // Même si on skip, charger ACN par défaut
+    // Meme si on skip, charger ACN par defaut
     if (onLoadDefaultTicker) {
       onLoadDefaultTicker();
     }
-    // ✅ Mémoriser que l'utilisateur a fermé le démo
+    //  Memoriser que l'utilisateur a ferme le demo
     localStorage.setItem('3p1-has-closed-demo', 'true');
     onClose();
   };
@@ -135,18 +135,18 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
     }
   };
 
-  // Calculer le clip-path pour créer le trou dans l'overlay
+  // Calculer le clip-path pour creer le trou dans l'overlay
   const getClipPath = () => {
     if (!highlightRect) {
-      // Si pas d'élément à mettre en évidence, overlay complet
+      // Si pas d'element a mettre en evidence, overlay complet
       return 'polygon(0% 0%, 0% 100%, 100% 100%, 100% 0%)';
     }
     const { top, left, width, height } = highlightRect;
-    const padding = 12; // Padding autour de l'élément
+    const padding = 12; // Padding autour de l'element
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
-    // Créer un polygon qui couvre tout sauf la zone de l'élément
+    // Creer un polygon qui couvre tout sauf la zone de l'element
     return `polygon(
       0% 0%, 
       0% 100%, 
@@ -163,7 +163,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
 
   return (
     <>
-      {/* Overlay assombri avec trou pour l'élément mis en évidence */}
+      {/* Overlay assombri avec trou pour l'element mis en evidence */}
       <div 
         ref={overlayRef}
         className="fixed inset-0 bg-black/70 z-[9998] pointer-events-auto transition-all duration-300"
@@ -199,7 +199,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-semibold text-gray-500">Étape {currentStep} sur 3</span>
+                  <span className="text-xs font-semibold text-gray-500">Etape {currentStep} sur 3</span>
                   <div className="flex gap-1">
                     {[1, 2, 3].map((step) => (
                       <div
@@ -248,7 +248,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
               }}
             >
               <p className="text-sm text-gray-700">
-                <strong>💡 Astuce:</strong> {currentConfig.elementDescription}
+                <strong> Astuce:</strong> {currentConfig.elementDescription}
               </p>
             </div>
           </div>
@@ -265,7 +265,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
               }`}
             >
               <ChevronLeftIcon className="w-5 h-5" />
-              <span className="hidden sm:inline">Précédent</span>
+              <span className="hidden sm:inline">Precedent</span>
             </button>
 
             <div className="flex gap-2">
@@ -303,7 +303,7 @@ export const InteractiveDemo: React.FC<InteractiveDemoProps> = ({ onClose, onSel
         </div>
       </div>
 
-      {/* Styles pour mettre en évidence l'élément */}
+      {/* Styles pour mettre en evidence l'element */}
       <style>{`
         .demo-highlight {
           position: relative;
