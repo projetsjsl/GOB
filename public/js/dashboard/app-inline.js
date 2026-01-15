@@ -5326,10 +5326,10 @@ STRUCTURE JSON OBLIGATOIRE:
         // =====================================================================
         const smsEnvFieldMeta = [
             { key: 'MODE', label: 'Mode Emma SMS (MODE)', placeholder: 'test | prod_local | prod_cloud', helper: 'Choix global entre test gratuit et production.' },
-            { key: 'TEST_MODE', label: 'SMS factures ? (TEST_MODE)', placeholder: 'true/false', helper: 'true = aucun SMS reel n'est envoye.' },
+            { key: 'TEST_MODE', label: 'SMS factures ? (TEST_MODE)', placeholder: 'true/false', helper: "true = aucun SMS reel n'est envoye." },
             { key: 'EMMA_WEBHOOK_URL', label: 'Webhook Emma (n8n)', placeholder: 'https://projetsjsl.app.n8n.cloud/webhook/gob-sms-webhook-test', helper: 'URL exacte attendue par le workflow n8n Emma.' },
             { key: 'N8N_WEBHOOK_BASE_URL', label: 'n8n  Base URL', placeholder: 'https://projetsjsl.app.n8n.cloud', helper: 'Racine utilisee pour construire les webhooks.' },
-            { key: 'PUBLIC_URL', label: 'URL publique du serveur', placeholder: 'https://xxxx.ngrok.io', helper: 'Render/Railway/ngrok - exposee dans l'onglet Admin et Twilio.' },
+            { key: 'PUBLIC_URL', label: 'URL publique du serveur', placeholder: 'https://xxxx.ngrok.io', helper: "Render/Railway/ngrok - exposee dans l'onglet Admin et Twilio." },
             { key: 'PORT', label: 'Port serveur local', placeholder: '3000' },
             { key: 'TWILIO_ACCOUNT_SID', label: 'Twilio Account SID', placeholder: 'ACxxxxxxxx', helper: 'Uniquement requis pour les SMS reels.' },
             { key: 'TWILIO_AUTH_TOKEN', label: 'Twilio Auth Token', placeholder: '--------', helper: 'Ne pas modifier en mode test.' },
