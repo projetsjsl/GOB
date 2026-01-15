@@ -15,7 +15,7 @@ interface ModeSelectorProps {
 export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevGuide, onOpenGallery, customImages }) => {
   const [showMap, setShowMap] = React.useState(false);
 
-  const ModeCard = ({ mode, title, desc, icon: Icon, image, delay, filterClass }: any) => (
+  const ModeCard = ({ mode, title, desc, icon: Icon, image, delay, filterClass = "" }: any) => (
     <button 
       onClick={() => onSelect(mode)}
       className={clsx(
@@ -28,7 +28,11 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
           <img 
             src={image} 
             alt={title} 
-            className={clsx("w-full h-full object-cover transition-transform duration-700 group-hover:scale-110", filterClass)} 
+            className={clsx(
+              "w-full h-full object-cover transition-transform duration-700 group-hover:scale-110",
+              "grayscale group-hover:grayscale-0 transition-[filter] duration-700",
+              filterClass
+            )} 
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               if (!target.src.includes('emma-avatar-new.jpg')) {
@@ -110,7 +114,6 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
           icon={MessageSquareText}
           image={customImages['finance'] || AVATAR_IMAGES.chat}
           delay="animate-in fade-in slide-in-from-bottom-4 duration-700"
-          filterClass="grayscale group-hover:grayscale-0"
         />
 
         {/* 2. Live Vocal */}
@@ -121,7 +124,6 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
           icon={Mic2}
           image={customImages['finance'] || AVATAR_IMAGES.vocal}
           delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100"
-          filterClass="grayscale-0"
         />
 
         {/* Tavus */}
@@ -132,7 +134,6 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
           icon={Video}
           image={customImages['tavus'] || AVATAR_IMAGES.natural}
           delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200"
-          filterClass="grayscale-0 contrast-110"
         />
 
         {/* 3. CEO Simulator */}
@@ -143,7 +144,6 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
             icon={Building2}
             image={customImages['ceo'] || AVATAR_IMAGES.ceo}
             delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300"
-            filterClass="grayscale group-hover:grayscale-0"
         />
 
         {/* 4. Recherchiste */}
@@ -154,7 +154,6 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
             icon={Globe}
             image={customImages['researcher'] || AVATAR_IMAGES.researcher}
             delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400"
-            filterClass="sepia-[.3] group-hover:sepia-0"
         />
 
         {/* Rédactrice */}
@@ -165,7 +164,6 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
             icon={FileText}
             image={customImages['writer'] || AVATAR_IMAGES.writer}
             delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500"
-            filterClass="grayscale contrast-125"
         />
 
         {/* 5. L'Avocat du Diable */}
@@ -176,7 +174,6 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
             icon={Scale}
             image={customImages['critic'] || AVATAR_IMAGES.critic}
             delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-600"
-            filterClass="grayscale contrast-150 brightness-75"
         />
 
         {/* Emma Geek */}
@@ -187,7 +184,6 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({ onSelect, onOpenDevG
             icon={Activity}
             image={customImages['geek'] || AVATAR_IMAGES.geek}
             delay="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-700"
-            filterClass="grayscale-0"
         />
 
       </div>

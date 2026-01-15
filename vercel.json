@@ -228,6 +228,16 @@
       "source": "/bienvenue/",
       "destination": "/bienvenue/index.html",
       "permanent": false
+    },
+    {
+      "source": "/finvox---assistant-financier",
+      "destination": "/finvox-build/",
+      "permanent": false
+    },
+    {
+      "source": "/finvox---assistant-financier/(.*)",
+      "destination": "/finvox-build/$1",
+      "permanent": false
     }
   ]
 }
