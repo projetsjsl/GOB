@@ -1,0 +1,4409 @@
+{
+  "timestamp": "2026-01-15T22:54:46.051Z",
+  "stats": {
+    "total": 200,
+    "tested": 200,
+    "withConsensus": 199,
+    "withCAGROnly": 1,
+    "coherent": 71,
+    "divergent": 129,
+    "errors": 0,
+    "negativeEPS": 8
+  },
+  "results": [
+    {
+      "ticker": "AXP",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 357.37,
+      "currentEPS": 14.20617110799439,
+      "currentPE": "25.16",
+      "cagr": {
+        "rate": "11.89",
+        "projectedEPS": "24.91",
+        "targetPrice": "626.74"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "24.76",
+        "projectedEPS": "35.86",
+        "targetPrice": "902.07",
+        "corridor": "24.08 - 25.33"
+      },
+      "divergencePercent": "43.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BLK",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 1156.65,
+      "currentEPS": 49.909677419354836,
+      "currentPE": "23.17",
+      "cagr": {
+        "rate": "11.19",
+        "projectedEPS": "84.82",
+        "targetPrice": "1965.69"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "75.33",
+        "projectedEPS": "99.12",
+        "targetPrice": "2297.15",
+        "corridor": "68.08 - 79.52"
+      },
+      "divergencePercent": "16.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BOKF",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 127.69,
+      "currentEPS": 8.213491254216017,
+      "currentPE": "15.55",
+      "cagr": {
+        "rate": "7.54",
+        "projectedEPS": "11.81",
+        "targetPrice": "183.67"
+      },
+      "consensus": {
+        "analystCount": 8,
+        "estimatedEPS": "9.45",
+        "projectedEPS": "16.60",
+        "targetPrice": "258.06",
+        "corridor": "9.04 - 9.84"
+      },
+      "divergencePercent": "40.5",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CNSWF",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 2099.34,
+      "currentEPS": 34.494913769793875,
+      "currentPE": "60.86",
+      "cagr": {
+        "rate": "17.05",
+        "projectedEPS": "75.79",
+        "targetPrice": "4612.55"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "140.06",
+        "projectedEPS": "38066.46",
+        "targetPrice": "2316701.96",
+        "corridor": "136.80 - 144.08"
+      },
+      "divergencePercent": "50126.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CSCO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 75.25,
+      "currentEPS": 2.5603621730382295,
+      "currentPE": "29.39",
+      "cagr": {
+        "rate": "2.09",
+        "projectedEPS": "2.84",
+        "targetPrice": "83.45"
+      },
+      "consensus": {
+        "analystCount": 6,
+        "estimatedEPS": "4.78",
+        "projectedEPS": "12.19",
+        "targetPrice": "358.30",
+        "corridor": "4.36 - 5.15"
+      },
+      "divergencePercent": "329.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EBRZF",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 15.45,
+      "currentEPS": 2.5248259860788864,
+      "currentPE": "6.12",
+      "cagr": {
+        "rate": "26.88",
+        "projectedEPS": "8.30",
+        "targetPrice": "50.80"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.76",
+        "projectedEPS": "2.92",
+        "targetPrice": "17.87",
+        "corridor": "1.23 - 3.34"
+      },
+      "divergencePercent": "-64.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ETN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 333.46,
+      "currentEPS": 9.54225352112676,
+      "currentPE": "34.95",
+      "cagr": {
+        "rate": "9.40",
+        "projectedEPS": "14.95",
+        "targetPrice": "522.53"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "19.72",
+        "projectedEPS": "31.99",
+        "targetPrice": "1118.03",
+        "corridor": "18.92 - 20.35"
+      },
+      "divergencePercent": "114.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "GIB-A.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 128.85,
+      "currentEPS": 7.349999016253369,
+      "currentPE": "17.53",
+      "cagr": {
+        "rate": "8.57",
+        "projectedEPS": "11.09",
+        "targetPrice": "194.39"
+      },
+      "consensus": {
+        "analystCount": 7,
+        "estimatedEPS": "10.46",
+        "projectedEPS": "17.75",
+        "targetPrice": "311.10",
+        "corridor": "10.05 - 10.86"
+      },
+      "divergencePercent": "60.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "GOOGL",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 332.78,
+      "currentEPS": 8.127120707849663,
+      "currentPE": "40.95",
+      "cagr": {
+        "rate": "23.76",
+        "projectedEPS": "23.59",
+        "targetPrice": "966.00"
+      },
+      "consensus": {
+        "analystCount": 10,
+        "estimatedEPS": "17.00",
+        "projectedEPS": "27.81",
+        "targetPrice": "1138.53",
+        "corridor": "16.03 - 18.30"
+      },
+      "divergencePercent": "17.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "GWO.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 66.86,
+      "currentEPS": 4.366559747785621,
+      "currentPE": "15.31",
+      "cagr": {
+        "rate": "4.65",
+        "projectedEPS": "5.48",
+        "targetPrice": "83.92"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.81",
+        "projectedEPS": "8.92",
+        "targetPrice": "136.54",
+        "corridor": "5.81 - 5.81"
+      },
+      "divergencePercent": "62.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "IEX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 195.3,
+      "currentEPS": 6.67107001321004,
+      "currentPE": "29.28",
+      "cagr": {
+        "rate": "6.88",
+        "projectedEPS": "9.30",
+        "targetPrice": "272.33"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "11.28",
+        "projectedEPS": "16.01",
+        "targetPrice": "468.70",
+        "corridor": "11.19 - 11.47"
+      },
+      "divergencePercent": "72.1",
+      "isCoherent": false
+    },
+    {
+      "ticker": "K.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 46.19,
+      "currentEPS": 0.7721008581158884,
+      "currentPE": "59.82",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "0.77",
+        "targetPrice": "46.19"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "1.09",
+        "projectedEPS": "1.38",
+        "targetPrice": "82.35",
+        "corridor": "0.71 - 1.30"
+      },
+      "divergencePercent": "78.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "MFC-PB.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 21.98,
+      "currentEPS": 3.1652613827993257,
+      "currentPE": "6.94",
+      "cagr": {
+        "rate": "12.07",
+        "projectedEPS": "5.60",
+        "targetPrice": "38.87"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.11",
+        "projectedEPS": "10.48",
+        "targetPrice": "72.79",
+        "corridor": "5.11 - 5.11"
+      },
+      "divergencePercent": "87.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "MSI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 394.44,
+      "currentEPS": 9.454436450839328,
+      "currentPE": "41.72",
+      "cagr": {
+        "rate": "13.37",
+        "projectedEPS": "17.71",
+        "targetPrice": "738.69"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "17.54",
+        "projectedEPS": "44.32",
+        "targetPrice": "1849.12",
+        "corridor": "17.45 - 17.59"
+      },
+      "divergencePercent": "150.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "RCI-B.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 49.44,
+      "currentEPS": 3.247191011235955,
+      "currentPE": "15.23",
+      "cagr": {
+        "rate": "2.15",
+        "projectedEPS": "3.61",
+        "targetPrice": "54.99"
+      },
+      "consensus": {
+        "analystCount": 15,
+        "estimatedEPS": "5.06",
+        "projectedEPS": "9.84",
+        "targetPrice": "149.86",
+        "corridor": "4.92 - 5.78"
+      },
+      "divergencePercent": "172.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "UNH",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 338.96,
+      "currentEPS": 15.505920344456404,
+      "currentPE": "21.86",
+      "cagr": {
+        "rate": "10.92",
+        "projectedEPS": "26.04",
+        "targetPrice": "569.19"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "29.73",
+        "projectedEPS": "45.88",
+        "targetPrice": "1002.99",
+        "corridor": "27.58 - 31.10"
+      },
+      "divergencePercent": "76.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BSX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 90.03,
+      "currentEPS": 1.2599388379204892,
+      "currentPE": "71.46",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "1.26",
+        "targetPrice": "90.03"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.02",
+        "projectedEPS": "12.62",
+        "targetPrice": "902.12",
+        "corridor": "4.93 - 5.29"
+      },
+      "divergencePercent": "902.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CAT",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 647.18,
+      "currentEPS": 22.173823710704745,
+      "currentPE": "29.19",
+      "cagr": {
+        "rate": "20.22",
+        "projectedEPS": "55.69",
+        "targetPrice": "1625.28"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "28.11",
+        "projectedEPS": "40.14",
+        "targetPrice": "1171.57",
+        "corridor": "22.94 - 33.28"
+      },
+      "divergencePercent": "-27.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "AJG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 256.15,
+      "currentEPS": 6.6335600907029475,
+      "currentPE": "38.61",
+      "cagr": {
+        "rate": "13.81",
+        "projectedEPS": "12.66",
+        "targetPrice": "488.99"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "17.47",
+        "projectedEPS": "74.64",
+        "targetPrice": "2882.36",
+        "corridor": "15.54 - 19.40"
+      },
+      "divergencePercent": "489.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AKAM",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 91.53,
+      "currentEPS": 3.3351696258719086,
+      "currentPE": "27.44",
+      "cagr": {
+        "rate": "7.08",
+        "projectedEPS": "4.70",
+        "targetPrice": "128.87"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "9.75",
+        "projectedEPS": "19.93",
+        "targetPrice": "547.07",
+        "corridor": "9.59 - 10.11"
+      },
+      "divergencePercent": "324.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ALC",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 79.67,
+      "currentEPS": 2.059061488673139,
+      "currentPE": "38.69",
+      "cagr": {
+        "rate": "14.55",
+        "projectedEPS": "4.06",
+        "targetPrice": "157.15"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "5.16",
+        "projectedEPS": "9.52",
+        "targetPrice": "368.31",
+        "corridor": "5.10 - 5.23"
+      },
+      "divergencePercent": "134.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ALL",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 195.44,
+      "currentEPS": 17.6579644343549,
+      "currentPE": "11.07",
+      "cagr": {
+        "rate": "14.04",
+        "projectedEPS": "34.06",
+        "targetPrice": "376.97"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "24.47",
+        "projectedEPS": "39.93",
+        "targetPrice": "441.95",
+        "corridor": "15.17 - 33.78"
+      },
+      "divergencePercent": "17.2",
+      "isCoherent": true
+    },
+    {
+      "ticker": "ALGN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 171.47,
+      "currentEPS": 5.627388917825233,
+      "currentPE": "30.47",
+      "cagr": {
+        "rate": "13.50",
+        "projectedEPS": "10.60",
+        "targetPrice": "322.97"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "13.86",
+        "projectedEPS": "53.52",
+        "targetPrice": "1630.94",
+        "corridor": "13.17 - 14.54"
+      },
+      "divergencePercent": "405.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ALSN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 111.55,
+      "currentEPS": 8.402298850574713,
+      "currentPE": "13.28",
+      "cagr": {
+        "rate": "26.20",
+        "projectedEPS": "26.90",
+        "targetPrice": "357.11"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "12.21",
+        "projectedEPS": "21.41",
+        "targetPrice": "284.25",
+        "corridor": "10.24 - 14.19"
+      },
+      "divergencePercent": "-20.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "ALLE",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 163.49,
+      "currentEPS": 6.852064220183486,
+      "currentPE": "23.86",
+      "cagr": {
+        "rate": "17.50",
+        "projectedEPS": "15.35",
+        "targetPrice": "366.20"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "11.30",
+        "projectedEPS": "23.94",
+        "targetPrice": "571.15",
+        "corridor": "11.05 - 11.43"
+      },
+      "divergencePercent": "56.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ALLY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 43.65,
+      "currentEPS": 2.1765125621918915,
+      "currentPE": "20.06",
+      "cagr": {
+        "rate": "-5.05",
+        "projectedEPS": "1.68",
+        "targetPrice": "33.69"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.63",
+        "projectedEPS": "23.42",
+        "targetPrice": "469.73",
+        "corridor": "5.35 - 5.78"
+      },
+      "divergencePercent": "1294.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AM",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 17.84,
+      "currentEPS": 0.8337638460802542,
+      "currentPE": "21.40",
+      "cagr": {
+        "rate": "80.04",
+        "projectedEPS": "15.77",
+        "targetPrice": "337.47"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "1.52",
+        "projectedEPS": "2.27",
+        "targetPrice": "48.54",
+        "corridor": "1.44 - 1.63"
+      },
+      "divergencePercent": "-85.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ALV",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 129.58,
+      "currentEPS": 8.054862842892769,
+      "currentPE": "16.09",
+      "cagr": {
+        "rate": "5.03",
+        "projectedEPS": "10.29",
+        "targetPrice": "165.61"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "15.65",
+        "projectedEPS": "24.36",
+        "targetPrice": "391.95",
+        "corridor": "15.37 - 15.94"
+      },
+      "divergencePercent": "136.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AMCR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 44.16,
+      "currentEPS": 0.32158590308370044,
+      "currentPE": "137.32",
+      "cagr": {
+        "rate": "7.30",
+        "projectedEPS": "0.46",
+        "targetPrice": "62.81"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "0.92",
+        "projectedEPS": "1.86",
+        "targetPrice": "255.86",
+        "corridor": "0.90 - 0.96"
+      },
+      "divergencePercent": "307.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AME",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 215.02,
+      "currentEPS": 5.950652091188985,
+      "currentPE": "36.13",
+      "cagr": {
+        "rate": "10.30",
+        "projectedEPS": "9.71",
+        "targetPrice": "351.01"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "9.71",
+        "projectedEPS": "20.25",
+        "targetPrice": "731.81",
+        "corridor": "9.60 - 9.82"
+      },
+      "divergencePercent": "108.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AMKR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 49.2,
+      "currentEPS": 1.4362706913339824,
+      "currentPE": "34.26",
+      "cagr": {
+        "rate": "21.82",
+        "projectedEPS": "3.85",
+        "targetPrice": "132.01"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.50",
+        "projectedEPS": "5.74",
+        "targetPrice": "196.66",
+        "corridor": "2.41 - 2.59"
+      },
+      "divergencePercent": "49.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "AMGN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 330.03,
+      "currentEPS": 7.56007393715342,
+      "currentPE": "43.65",
+      "cagr": {
+        "rate": "-2.10",
+        "projectedEPS": "6.80",
+        "targetPrice": "296.75"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "24.93",
+        "projectedEPS": "55.23",
+        "targetPrice": "2411.15",
+        "corridor": "23.79 - 25.82"
+      },
+      "divergencePercent": "712.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AMP",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 508.1,
+      "currentEPS": 33.67326732673267,
+      "currentPE": "15.09",
+      "cagr": {
+        "rate": "16.38",
+        "projectedEPS": "71.90",
+        "targetPrice": "1084.85"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "58.77",
+        "projectedEPS": "85.19",
+        "targetPrice": "1285.41",
+        "corridor": "57.04 - 59.83"
+      },
+      "divergencePercent": "18.5",
+      "isCoherent": true
+    },
+    {
+      "ticker": "AN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 214.35,
+      "currentEPS": 17.348370927318296,
+      "currentPE": "12.36",
+      "cagr": {
+        "rate": "18.07",
+        "projectedEPS": "39.81",
+        "targetPrice": "491.85"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "36.13",
+        "projectedEPS": "58.92",
+        "targetPrice": "728.01",
+        "corridor": "35.24 - 36.89"
+      },
+      "divergencePercent": "48.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "AMX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 19.89,
+      "currentEPS": 0.4640655737704918,
+      "currentPE": "42.86",
+      "cagr": {
+        "rate": "-1.49",
+        "projectedEPS": "0.43",
+        "targetPrice": "18.45"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "0.00",
+        "projectedEPS": "-0.31",
+        "targetPrice": "-13.26",
+        "corridor": "0.00 - 0.00"
+      },
+      "divergencePercent": "-171.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ANET",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 130.59,
+      "currentEPS": 2.270195963871773,
+      "currentPE": "57.52",
+      "cagr": {
+        "rate": "39.33",
+        "projectedEPS": "11.92",
+        "targetPrice": "685.64"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.99",
+        "projectedEPS": "11.44",
+        "targetPrice": "657.93",
+        "corridor": "5.82 - 6.47"
+      },
+      "divergencePercent": "-4.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "AOS",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 71.99,
+      "currentEPS": 3.6300060545453308,
+      "currentPE": "19.83",
+      "cagr": {
+        "rate": "9.47",
+        "projectedEPS": "5.71",
+        "targetPrice": "113.16"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.33",
+        "projectedEPS": "6.89",
+        "targetPrice": "136.55",
+        "corridor": "5.27 - 5.40"
+      },
+      "divergencePercent": "20.7",
+      "isCoherent": true
+    },
+    {
+      "ticker": "APA",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 26.01,
+      "currentEPS": 2.2776203966005664,
+      "currentPE": "11.42",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "2.28",
+        "targetPrice": "26.01"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "5.52",
+        "projectedEPS": "9.96",
+        "targetPrice": "113.74",
+        "corridor": "4.97 - 5.92"
+      },
+      "divergencePercent": "337.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "APH",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 154.26,
+      "currentEPS": 2.013623525502575,
+      "currentPE": "76.61",
+      "cagr": {
+        "rate": "14.03",
+        "projectedEPS": "3.88",
+        "targetPrice": "297.45"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "6.50",
+        "projectedEPS": "37.68",
+        "targetPrice": "2886.23",
+        "corridor": "6.11 - 7.07"
+      },
+      "divergencePercent": "870.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "APPF",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 219.67,
+      "currentEPS": 5.629151495089926,
+      "currentPE": "39.02",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "5.63",
+        "targetPrice": "219.67"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "8.05",
+        "projectedEPS": "33.65",
+        "targetPrice": "1312.98",
+        "corridor": "7.29 - 9.63"
+      },
+      "divergencePercent": "497.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 31.78,
+      "currentEPS": 0.18490479467767837,
+      "currentPE": "171.87",
+      "cagr": {
+        "rate": "-27.72",
+        "projectedEPS": "0.04",
+        "targetPrice": "6.27"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "4.87",
+        "projectedEPS": "43.11",
+        "targetPrice": "7409.49",
+        "corridor": "4.35 - 5.50"
+      },
+      "divergencePercent": "118084.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AQN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 6.44,
+      "currentEPS": -1.886670669675614,
+      "currentPE": "15.00",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "-1.89",
+        "targetPrice": "-28.30"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "0.44",
+        "projectedEPS": "3.94",
+        "targetPrice": "59.07",
+        "corridor": "0.43 - 0.47"
+      },
+      "divergencePercent": "0.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "SFTBY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 12.71,
+      "currentEPS": 198.44223810067848,
+      "currentPE": "0.06",
+      "cagr": {
+        "rate": "16.47",
+        "projectedEPS": "425.33",
+        "targetPrice": "27.24"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "63.35",
+        "projectedEPS": "47.62",
+        "targetPrice": "3.05",
+        "corridor": "60.16 - 65.91"
+      },
+      "divergencePercent": "-88.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "REYN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 24.31,
+      "currentEPS": 1.675392670157068,
+      "currentPE": "14.51",
+      "cagr": {
+        "rate": "19.99",
+        "projectedEPS": "4.17",
+        "targetPrice": "60.47"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.02",
+        "projectedEPS": "2.28",
+        "targetPrice": "33.07",
+        "corridor": "2.00 - 2.03"
+      },
+      "divergencePercent": "-45.3",
+      "isCoherent": true
+    },
+    {
+      "ticker": "ARES",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 169.57,
+      "currentEPS": 2.3414873922727444,
+      "currentPE": "72.42",
+      "cagr": {
+        "rate": "28.79",
+        "projectedEPS": "8.30",
+        "targetPrice": "600.82"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "9.78",
+        "projectedEPS": "25.38",
+        "targetPrice": "1837.82",
+        "corridor": "8.87 - 10.96"
+      },
+      "divergencePercent": "205.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ARMK",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 39.01,
+      "currentEPS": 1.2369828282100939,
+      "currentPE": "31.54",
+      "cagr": {
+        "rate": "0.45",
+        "projectedEPS": "1.27",
+        "targetPrice": "39.90"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "3.53",
+        "projectedEPS": "4.59",
+        "targetPrice": "144.69",
+        "corridor": "3.49 - 3.58"
+      },
+      "divergencePercent": "262.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ARW",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 118.65,
+      "currentEPS": 7.358470027401374,
+      "currentPE": "16.12",
+      "cagr": {
+        "rate": "3.80",
+        "projectedEPS": "8.87",
+        "targetPrice": "142.96"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "15.41",
+        "projectedEPS": "46.70",
+        "targetPrice": "753.02",
+        "corridor": "15.32 - 15.54"
+      },
+      "divergencePercent": "426.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AVTR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 12.02,
+      "currentEPS": 1.0458621196530942,
+      "currentPE": "11.49",
+      "cagr": {
+        "rate": "43.54",
+        "projectedEPS": "6.37",
+        "targetPrice": "73.25"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "1.27",
+        "projectedEPS": "1.46",
+        "targetPrice": "16.72",
+        "corridor": "1.26 - 1.30"
+      },
+      "divergencePercent": "-77.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AWI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 196.5,
+      "currentEPS": 6.0617848741418765,
+      "currentPE": "32.42",
+      "cagr": {
+        "rate": "22.92",
+        "projectedEPS": "17.01",
+        "targetPrice": "551.50"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "9.49",
+        "projectedEPS": "57.00",
+        "targetPrice": "1847.61",
+        "corridor": "9.33 - 9.69"
+      },
+      "divergencePercent": "235.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AVY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 189.08,
+      "currentEPS": 8.767412935323383,
+      "currentPE": "21.57",
+      "cagr": {
+        "rate": "12.45",
+        "projectedEPS": "15.77",
+        "targetPrice": "340.01"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "13.15",
+        "projectedEPS": "24.18",
+        "targetPrice": "521.43",
+        "corridor": "12.38 - 13.93"
+      },
+      "divergencePercent": "53.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ATZ.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 126.52,
+      "currentEPS": 1.81667523567228,
+      "currentPE": "69.64",
+      "cagr": {
+        "rate": "21.71",
+        "projectedEPS": "4.85",
+        "targetPrice": "337.89"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "6.00",
+        "projectedEPS": "8.09",
+        "targetPrice": "563.32",
+        "corridor": "5.84 - 6.21"
+      },
+      "divergencePercent": "66.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AU",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 98.55,
+      "currentEPS": 2.334167185887123,
+      "currentPE": "42.22",
+      "cagr": {
+        "rate": "46.37",
+        "projectedEPS": "15.68",
+        "targetPrice": "662.15"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "4.95",
+        "projectedEPS": "8.17",
+        "targetPrice": "344.97",
+        "corridor": "4.50 - 5.24"
+      },
+      "divergencePercent": "-47.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "ATRL.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 94.45,
+      "currentEPS": 1.6205770526243677,
+      "currentPE": "58.28",
+      "cagr": {
+        "rate": "-5.43",
+        "projectedEPS": "1.23",
+        "targetPrice": "71.43"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.94",
+        "projectedEPS": "41.68",
+        "targetPrice": "2429.37",
+        "corridor": "5.82 - 6.13"
+      },
+      "divergencePercent": "3300.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "AWK",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 133.35,
+      "currentEPS": 5.38974358974359,
+      "currentPE": "24.74",
+      "cagr": {
+        "rate": "8.17",
+        "projectedEPS": "7.98",
+        "targetPrice": "197.44"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "7.70",
+        "projectedEPS": "9.76",
+        "targetPrice": "241.39",
+        "corridor": "7.32 - 8.06"
+      },
+      "divergencePercent": "22.3",
+      "isCoherent": true
+    },
+    {
+      "ticker": "AXS",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 100.34,
+      "currentEPS": 12.853157488267094,
+      "currentPE": "7.81",
+      "cagr": {
+        "rate": "7.86",
+        "projectedEPS": "18.76",
+        "targetPrice": "146.46"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "15.78",
+        "projectedEPS": "21.46",
+        "targetPrice": "167.49",
+        "corridor": "15.63 - 16.00"
+      },
+      "divergencePercent": "14.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "AXTA",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 33.61,
+      "currentEPS": 1.7829457364341086,
+      "currentPE": "18.85",
+      "cagr": {
+        "rate": "18.34",
+        "projectedEPS": "4.14",
+        "targetPrice": "78.00"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "3.36",
+        "projectedEPS": "5.13",
+        "targetPrice": "96.64",
+        "corridor": "3.30 - 3.40"
+      },
+      "divergencePercent": "23.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BABA",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 170.93,
+      "currentEPS": 6.924006173168006,
+      "currentPE": "24.69",
+      "cagr": {
+        "rate": "7.43",
+        "projectedEPS": "9.91",
+        "targetPrice": "244.54"
+      },
+      "consensus": {
+        "analystCount": 8,
+        "estimatedEPS": "83.06",
+        "projectedEPS": "435.23",
+        "targetPrice": "10744.31",
+        "corridor": "72.05 - 88.71"
+      },
+      "divergencePercent": "4293.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BAC",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 52.565,
+      "currentEPS": 4.1586443807791005,
+      "currentPE": "12.64",
+      "cagr": {
+        "rate": "10.21",
+        "projectedEPS": "6.76",
+        "targetPrice": "85.49"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "6.82",
+        "projectedEPS": "9.48",
+        "targetPrice": "119.88",
+        "corridor": "6.60 - 7.05"
+      },
+      "divergencePercent": "40.2",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BBY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 68.14,
+      "currentEPS": 4.307620817843866,
+      "currentPE": "15.82",
+      "cagr": {
+        "rate": "5.82",
+        "projectedEPS": "5.72",
+        "targetPrice": "90.42"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "9.85",
+        "projectedEPS": "12.11",
+        "targetPrice": "191.60",
+        "corridor": "9.73 - 10.03"
+      },
+      "divergencePercent": "111.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BDX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 208.35,
+      "currentEPS": 5.854604831619053,
+      "currentPE": "35.59",
+      "cagr": {
+        "rate": "2.74",
+        "projectedEPS": "6.70",
+        "targetPrice": "238.55"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "19.64",
+        "projectedEPS": "26.58",
+        "targetPrice": "945.91",
+        "corridor": "19.44 - 20.01"
+      },
+      "divergencePercent": "296.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BEN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 25.97,
+      "currentEPS": 1.0202137998056366,
+      "currentPE": "25.46",
+      "cagr": {
+        "rate": "-11.15",
+        "projectedEPS": "0.56",
+        "targetPrice": "14.38"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "3.07",
+        "projectedEPS": "6.41",
+        "targetPrice": "163.27",
+        "corridor": "2.97 - 3.24"
+      },
+      "divergencePercent": "1035.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 108.83,
+      "currentEPS": 8.143118115520036,
+      "currentPE": "13.36",
+      "cagr": {
+        "rate": "4.35",
+        "projectedEPS": "10.07",
+        "targetPrice": "134.64"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "10.35",
+        "projectedEPS": "27.05",
+        "targetPrice": "361.52",
+        "corridor": "9.82 - 11.04"
+      },
+      "divergencePercent": "168.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BFAM",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 97.01,
+      "currentEPS": 2.419923358420217,
+      "currentPE": "40.09",
+      "cagr": {
+        "rate": "5.12",
+        "projectedEPS": "3.11",
+        "targetPrice": "124.52"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "6.29",
+        "projectedEPS": "26.35",
+        "targetPrice": "1056.14",
+        "corridor": "6.24 - 6.36"
+      },
+      "divergencePercent": "748.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BIO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 322.06,
+      "currentEPS": -65.36471255405118,
+      "currentPE": "15.00",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "-65.36",
+        "targetPrice": "-980.47"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "13.85",
+        "projectedEPS": "132.67",
+        "targetPrice": "1990.08",
+        "corridor": "13.69 - 14.03"
+      },
+      "divergencePercent": "0.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BHP",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 66.03,
+      "currentEPS": 1.7778434851172875,
+      "currentPE": "37.14",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "1.78",
+        "targetPrice": "66.03"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "3.34",
+        "projectedEPS": "3.91",
+        "targetPrice": "145.23",
+        "corridor": "3.10 - 3.61"
+      },
+      "divergencePercent": "119.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BKH",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 73.14,
+      "currentEPS": 3.9126074498567336,
+      "currentPE": "18.69",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "3.91",
+        "targetPrice": "73.14"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.16",
+        "projectedEPS": "6.20",
+        "targetPrice": "115.81",
+        "corridor": "5.16 - 5.16"
+      },
+      "divergencePercent": "58.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BK",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 123.97,
+      "currentEPS": 7.813545073974516,
+      "currentPE": "15.87",
+      "cagr": {
+        "rate": "9.95",
+        "projectedEPS": "12.56",
+        "targetPrice": "199.23"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "10.85",
+        "projectedEPS": "13.50",
+        "targetPrice": "214.24",
+        "corridor": "10.62 - 11.11"
+      },
+      "divergencePercent": "7.5",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BLDR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 128.96,
+      "currentEPS": 9.131788068249207,
+      "currentPE": "14.12",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "9.13",
+        "targetPrice": "128.96"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "10.05",
+        "projectedEPS": "11.60",
+        "targetPrice": "163.86",
+        "corridor": "9.70 - 10.49"
+      },
+      "divergencePercent": "27.1",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BLD",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 500.68,
+      "currentEPS": 20.410503540519276,
+      "currentPE": "24.53",
+      "cagr": {
+        "rate": "28.77",
+        "projectedEPS": "72.27",
+        "targetPrice": "1772.93"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "27.15",
+        "projectedEPS": "41.65",
+        "targetPrice": "1021.76",
+        "corridor": "26.50 - 28.05"
+      },
+      "divergencePercent": "-42.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BMI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 170.56,
+      "currentEPS": 4.2560975609756095,
+      "currentPE": "40.07",
+      "cagr": {
+        "rate": "18.82",
+        "projectedEPS": "10.08",
+        "targetPrice": "403.86"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "7.72",
+        "projectedEPS": "11.48",
+        "targetPrice": "460.14",
+        "corridor": "7.53 - 7.88"
+      },
+      "divergencePercent": "13.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BMY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 56.62,
+      "currentEPS": -4.414405525407005,
+      "currentPE": "15.00",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "-4.41",
+        "targetPrice": "-66.22"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "5.02",
+        "projectedEPS": "11.31",
+        "targetPrice": "169.63",
+        "corridor": "4.77 - 5.56"
+      },
+      "divergencePercent": "0.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BMO.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 187.44,
+      "currentEPS": 12.063563301501816,
+      "currentPE": "15.54",
+      "cagr": {
+        "rate": "6.34",
+        "projectedEPS": "16.40",
+        "targetPrice": "254.84"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "16.74",
+        "projectedEPS": "27.36",
+        "targetPrice": "425.11",
+        "corridor": "16.23 - 17.25"
+      },
+      "divergencePercent": "66.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BMRN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 55.07,
+      "currentEPS": 2.246307103727365,
+      "currentPE": "24.52",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "2.25",
+        "targetPrice": "55.07"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "6.98",
+        "projectedEPS": "14.87",
+        "targetPrice": "364.51",
+        "corridor": "6.54 - 7.96"
+      },
+      "divergencePercent": "561.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 47.33,
+      "currentEPS": 0.28272135847392216,
+      "currentPE": "167.41",
+      "cagr": {
+        "rate": "-13.39",
+        "projectedEPS": "0.14",
+        "targetPrice": "23.06"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "3.33",
+        "projectedEPS": "64094.28",
+        "targetPrice": "10729937.24",
+        "corridor": "2.82 - 3.84"
+      },
+      "divergencePercent": "46521356.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BNS.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 102.18,
+      "currentEPS": 6.261254019292605,
+      "currentPE": "16.32",
+      "cagr": {
+        "rate": "0.64",
+        "projectedEPS": "6.46",
+        "targetPrice": "105.50"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "9.88",
+        "projectedEPS": "19.61",
+        "targetPrice": "319.96",
+        "corridor": "9.15 - 10.62"
+      },
+      "divergencePercent": "203.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "IFF",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 70.83,
+      "currentEPS": 0.94921875,
+      "currentPE": "74.62",
+      "cagr": {
+        "rate": "-17.24",
+        "projectedEPS": "0.37",
+        "targetPrice": "27.50"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.53",
+        "projectedEPS": "77.67",
+        "targetPrice": "5796.01",
+        "corridor": "5.35 - 5.68"
+      },
+      "divergencePercent": "20976.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "KLAC",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 1544.96,
+      "currentEPS": 30.53178230474329,
+      "currentPE": "50.60",
+      "cagr": {
+        "rate": "23.65",
+        "projectedEPS": "88.24",
+        "targetPrice": "4465.29"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "48.01",
+        "projectedEPS": "64.91",
+        "targetPrice": "3284.64",
+        "corridor": "45.31 - 53.56"
+      },
+      "divergencePercent": "-26.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CCA.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 70.86,
+      "currentEPS": 7.663903458750452,
+      "currentPE": "9.25",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "7.66",
+        "targetPrice": "70.86"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "8.03",
+        "projectedEPS": "8.61",
+        "targetPrice": "79.63",
+        "corridor": "7.88 - 8.14"
+      },
+      "divergencePercent": "12.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 219.36,
+      "currentEPS": 7.169086251067464,
+      "currentPE": "30.60",
+      "cagr": {
+        "rate": "11.93",
+        "projectedEPS": "12.60",
+        "targetPrice": "385.42"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "13.00",
+        "projectedEPS": "15.09",
+        "targetPrice": "461.59",
+        "corridor": "12.92 - 13.09"
+      },
+      "divergencePercent": "19.8",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BP",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 35.15,
+      "currentEPS": 0.023364205074780896,
+      "currentPE": "1504.44",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "0.02",
+        "targetPrice": "35.15"
+      },
+      "consensus": {
+        "analystCount": 10,
+        "estimatedEPS": "3.43",
+        "projectedEPS": "95.38",
+        "targetPrice": "143497.06",
+        "corridor": "2.99 - 3.85"
+      },
+      "divergencePercent": "408142.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BPOP",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 128.84,
+      "currentEPS": 8.57945831179897,
+      "currentPE": "15.02",
+      "cagr": {
+        "rate": "-0.15",
+        "projectedEPS": "8.52",
+        "targetPrice": "127.88"
+      },
+      "consensus": {
+        "analystCount": 6,
+        "estimatedEPS": "15.54",
+        "projectedEPS": "167.47",
+        "targetPrice": "2515.00",
+        "corridor": "15.33 - 15.87"
+      },
+      "divergencePercent": "1866.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BRK-B",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 492.7,
+      "currentEPS": 41.26672787469048,
+      "currentPE": "11.94",
+      "cagr": {
+        "rate": "17.36",
+        "projectedEPS": "91.87",
+        "targetPrice": "1096.92"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "22.23",
+        "projectedEPS": "1.87",
+        "targetPrice": "22.33",
+        "corridor": "21.89 - 22.56"
+      },
+      "divergencePercent": "-98.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BRK-A",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 738691,
+      "currentEPS": 41.26672787469048,
+      "currentPE": "17900.40",
+      "cagr": {
+        "rate": "17.36",
+        "projectedEPS": "91.87",
+        "targetPrice": "1644580.89"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "33321.33",
+        "projectedEPS": "14164837236301358.00",
+        "targetPrice": "253556274553526550528.00",
+        "corridor": "32817.25 - 33825.41"
+      },
+      "divergencePercent": "15417683394805322.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BRKR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 49.41,
+      "currentEPS": 0.7590604026845638,
+      "currentPE": "65.09",
+      "cagr": {
+        "rate": "2.57",
+        "projectedEPS": "0.86",
+        "targetPrice": "56.10"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "3.07",
+        "projectedEPS": "7.78",
+        "targetPrice": "506.37",
+        "corridor": "3.03 - 3.14"
+      },
+      "divergencePercent": "802.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BSY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 39.07,
+      "currentEPS": 0.7456230330245454,
+      "currentPE": "52.40",
+      "cagr": {
+        "rate": "5.39",
+        "projectedEPS": "0.97",
+        "targetPrice": "50.81"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "1.35",
+        "projectedEPS": "3.29",
+        "targetPrice": "172.34",
+        "corridor": "1.31 - 1.37"
+      },
+      "divergencePercent": "239.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BTI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 58.08,
+      "currentEPS": 1.3857271906052393,
+      "currentPE": "41.91",
+      "cagr": {
+        "rate": "-3.47",
+        "projectedEPS": "1.16",
+        "targetPrice": "48.69"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "4.34",
+        "projectedEPS": "9.31",
+        "targetPrice": "390.00",
+        "corridor": "4.28 - 4.42"
+      },
+      "divergencePercent": "701.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BUD",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 68.72,
+      "currentEPS": 2.923115327009486,
+      "currentPE": "23.51",
+      "cagr": {
+        "rate": "-5.90",
+        "projectedEPS": "2.16",
+        "targetPrice": "50.72"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "6.21",
+        "projectedEPS": "10.25",
+        "targetPrice": "241.04",
+        "corridor": "6.03 - 6.40"
+      },
+      "divergencePercent": "375.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BURL",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 306.28,
+      "currentEPS": 7.914621114498538,
+      "currentPE": "38.70",
+      "cagr": {
+        "rate": "16.32",
+        "projectedEPS": "16.85",
+        "targetPrice": "652.16"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "16.42",
+        "projectedEPS": "19.71",
+        "targetPrice": "762.60",
+        "corridor": "16.11 - 16.71"
+      },
+      "divergencePercent": "16.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "BWA",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 48.6,
+      "currentEPS": 1.512304250559284,
+      "currentPE": "32.14",
+      "cagr": {
+        "rate": "-6.30",
+        "projectedEPS": "1.09",
+        "targetPrice": "35.10"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "6.30",
+        "projectedEPS": "16.30",
+        "targetPrice": "523.71",
+        "corridor": "6.19 - 6.41"
+      },
+      "divergencePercent": "1392.1",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CACC",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 473.49,
+      "currentEPS": 20.11685466201412,
+      "currentPE": "23.54",
+      "cagr": {
+        "rate": "3.83",
+        "projectedEPS": "24.27",
+        "targetPrice": "571.34"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "51.83",
+        "projectedEPS": "2283.38",
+        "targetPrice": "53743.81",
+        "corridor": "47.65 - 59.75"
+      },
+      "divergencePercent": "9306.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "BYD",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 89.56,
+      "currentEPS": 6.193625822491802,
+      "currentPE": "14.46",
+      "cagr": {
+        "rate": "34.89",
+        "projectedEPS": "27.66",
+        "targetPrice": "400.03"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "8.25",
+        "projectedEPS": "25.99",
+        "targetPrice": "375.88",
+        "corridor": "7.35 - 8.95"
+      },
+      "divergencePercent": "-6.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "C",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 117.46,
+      "currentEPS": 0,
+      "currentPE": "15.00",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "0.00",
+        "targetPrice": "0.00"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "17.60",
+        "projectedEPS": "22.00",
+        "targetPrice": "330.00",
+        "corridor": "16.84 - 17.99"
+      },
+      "divergencePercent": "0.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CAG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 17.38,
+      "currentEPS": 2.409366506376751,
+      "currentPE": "7.21",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "2.41",
+        "targetPrice": "17.38"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.07",
+        "projectedEPS": "2.00",
+        "targetPrice": "14.39",
+        "corridor": "2.05 - 2.09"
+      },
+      "divergencePercent": "-17.2",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CACI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 627.5,
+      "currentEPS": 22.46729896165775,
+      "currentPE": "27.93",
+      "cagr": {
+        "rate": "16.05",
+        "projectedEPS": "47.29",
+        "targetPrice": "1320.72"
+      },
+      "consensus": {
+        "analystCount": 6,
+        "estimatedEPS": "34.65",
+        "projectedEPS": "66.36",
+        "targetPrice": "1853.39",
+        "corridor": "31.39 - 40.67"
+      },
+      "divergencePercent": "40.3",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CAJPY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 30.26,
+      "currentEPS": 165.52660786562996,
+      "currentPE": "0.18",
+      "cagr": {
+        "rate": "-2.17",
+        "projectedEPS": "148.33",
+        "targetPrice": "27.12"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "475.80",
+        "projectedEPS": "961.89",
+        "targetPrice": "175.84",
+        "corridor": "460.20 - 501.47"
+      },
+      "divergencePercent": "548.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CCLLF",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 63.09,
+      "currentEPS": 4.731200897867565,
+      "currentPE": "13.33",
+      "cagr": {
+        "rate": "12.05",
+        "projectedEPS": "8.35",
+        "targetPrice": "111.41"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.81",
+        "projectedEPS": "7.92",
+        "targetPrice": "105.65",
+        "corridor": "5.70 - 5.90"
+      },
+      "divergencePercent": "-5.2",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CARR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 55.55,
+      "currentEPS": 6.2391449565798265,
+      "currentPE": "8.90",
+      "cagr": {
+        "rate": "23.59",
+        "projectedEPS": "17.99",
+        "targetPrice": "160.18"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.37",
+        "projectedEPS": "4.86",
+        "targetPrice": "43.26",
+        "corridor": "5.22 - 5.78"
+      },
+      "divergencePercent": "-73.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CB",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 301.11,
+      "currentEPS": 22.697674418604652,
+      "currentPE": "13.27",
+      "cagr": {
+        "rate": "11.24",
+        "projectedEPS": "38.66",
+        "targetPrice": "512.83"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "32.99",
+        "projectedEPS": "57.83",
+        "targetPrice": "767.14",
+        "corridor": "26.65 - 39.34"
+      },
+      "divergencePercent": "49.6",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CASY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 637.37,
+      "currentEPS": 14.724647052484103,
+      "currentPE": "43.29",
+      "cagr": {
+        "rate": "10.92",
+        "projectedEPS": "24.73",
+        "targetPrice": "1070.31"
+      },
+      "consensus": {
+        "analystCount": 5,
+        "estimatedEPS": "24.24",
+        "projectedEPS": "27.46",
+        "targetPrice": "1188.51",
+        "corridor": "23.54 - 24.91"
+      },
+      "divergencePercent": "11.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CBRE",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 170.83,
+      "currentEPS": 3.164857009275516,
+      "currentPE": "53.98",
+      "cagr": {
+        "rate": "7.54",
+        "projectedEPS": "4.55",
+        "targetPrice": "245.73"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "11.26",
+        "projectedEPS": "26.24",
+        "targetPrice": "1416.46",
+        "corridor": "10.77 - 11.82"
+      },
+      "divergencePercent": "476.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CBSH",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 54.56,
+      "currentEPS": 3.916298969455709,
+      "currentPE": "13.93",
+      "cagr": {
+        "rate": "9.66",
+        "projectedEPS": "6.21",
+        "targetPrice": "86.50"
+      },
+      "consensus": {
+        "analystCount": 7,
+        "estimatedEPS": "4.47",
+        "projectedEPS": "7.55",
+        "targetPrice": "105.12",
+        "corridor": "4.33 - 4.60"
+      },
+      "divergencePercent": "21.5",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CCEP",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 89.24,
+      "currentEPS": 3.0799973935141947,
+      "currentPE": "28.97",
+      "cagr": {
+        "rate": "2.52",
+        "projectedEPS": "3.49",
+        "targetPrice": "101.05"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "7.03",
+        "projectedEPS": "12.19",
+        "targetPrice": "353.34",
+        "corridor": "6.97 - 7.16"
+      },
+      "divergencePercent": "249.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CCO.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 156.73,
+      "currentEPS": 0.3951824683238669,
+      "currentPE": "396.60",
+      "cagr": {
+        "rate": "10.19",
+        "projectedEPS": "0.64",
+        "targetPrice": "254.66"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "3.87",
+        "projectedEPS": "17.73",
+        "targetPrice": "7031.05",
+        "corridor": "3.25 - 4.57"
+      },
+      "divergencePercent": "2661.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CDW",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 132.29,
+      "currentEPS": 8.055306427503737,
+      "currentPE": "16.42",
+      "cagr": {
+        "rate": "14.58",
+        "projectedEPS": "15.91",
+        "targetPrice": "261.23"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "11.54",
+        "projectedEPS": "19.78",
+        "targetPrice": "324.89",
+        "corridor": "11.28 - 11.84"
+      },
+      "divergencePercent": "24.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CFG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 60.61,
+      "currentEPS": 3.348288578541664,
+      "currentPE": "18.10",
+      "cagr": {
+        "rate": "8.79",
+        "projectedEPS": "5.10",
+        "targetPrice": "92.37"
+      },
+      "consensus": {
+        "analystCount": 16,
+        "estimatedEPS": "6.10",
+        "projectedEPS": "67.23",
+        "targetPrice": "1217.07",
+        "corridor": "5.65 - 6.44"
+      },
+      "divergencePercent": "1217.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "HPQ",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 20.61,
+      "currentEPS": 2.6733615221987317,
+      "currentPE": "7.71",
+      "cagr": {
+        "rate": "7.09",
+        "projectedEPS": "3.77",
+        "targetPrice": "29.03"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "3.69",
+        "projectedEPS": "4.57",
+        "targetPrice": "35.22",
+        "corridor": "3.61 - 3.79"
+      },
+      "divergencePercent": "21.3",
+      "isCoherent": true
+    },
+    {
+      "ticker": "LAMR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 132.79,
+      "currentEPS": 3.538738392681468,
+      "currentPE": "37.52",
+      "cagr": {
+        "rate": "2.94",
+        "projectedEPS": "4.09",
+        "targetPrice": "153.51"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "6.30",
+        "projectedEPS": "63.35",
+        "targetPrice": "2377.17",
+        "corridor": "6.20 - 6.41"
+      },
+      "divergencePercent": "1448.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 66.12,
+      "currentEPS": 2.845635673471093,
+      "currentPE": "23.24",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "2.85",
+        "targetPrice": "66.12"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "6.06",
+        "projectedEPS": "10.04",
+        "targetPrice": "233.24",
+        "corridor": "5.74 - 6.62"
+      },
+      "divergencePercent": "252.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CGNX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 40.59,
+      "currentEPS": 0.6192967720108727,
+      "currentPE": "65.54",
+      "cagr": {
+        "rate": "-6.03",
+        "projectedEPS": "0.45",
+        "targetPrice": "29.74"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "1.93",
+        "projectedEPS": "4.13",
+        "targetPrice": "270.77",
+        "corridor": "1.88 - 2.09"
+      },
+      "divergencePercent": "810.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CHDN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 107.49,
+      "currentEPS": 5.767567567567568,
+      "currentPE": "18.64",
+      "cagr": {
+        "rate": "27.88",
+        "projectedEPS": "19.72",
+        "targetPrice": "367.54"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "9.18",
+        "projectedEPS": "18.43",
+        "targetPrice": "343.55",
+        "corridor": "9.05 - 9.28"
+      },
+      "divergencePercent": "-6.5",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CHE",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 458.93,
+      "currentEPS": 20.10110489882854,
+      "currentPE": "22.83",
+      "cagr": {
+        "rate": "13.29",
+        "projectedEPS": "37.52",
+        "targetPrice": "856.61"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "27.39",
+        "projectedEPS": "94.34",
+        "targetPrice": "2153.83",
+        "corridor": "27.12 - 27.61"
+      },
+      "divergencePercent": "151.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CHKP",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 188.54,
+      "currentEPS": 7.646473779385172,
+      "currentPE": "24.66",
+      "cagr": {
+        "rate": "7.99",
+        "projectedEPS": "11.23",
+        "targetPrice": "276.95"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "12.35",
+        "projectedEPS": "25.35",
+        "targetPrice": "625.05",
+        "corridor": "11.13 - 13.57"
+      },
+      "divergencePercent": "125.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CHWY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 32.77,
+      "currentEPS": 0.9320922461320846,
+      "currentPE": "35.16",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "0.93",
+        "targetPrice": "32.77"
+      },
+      "consensus": {
+        "analystCount": 6,
+        "estimatedEPS": "1.43",
+        "projectedEPS": "1.59",
+        "targetPrice": "55.95",
+        "corridor": "1.41 - 1.45"
+      },
+      "divergencePercent": "70.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CLH",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 267,
+      "currentEPS": 7.463526399762532,
+      "currentPE": "35.77",
+      "cagr": {
+        "rate": "28.97",
+        "projectedEPS": "26.63",
+        "targetPrice": "952.62"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "11.56",
+        "projectedEPS": "15.48",
+        "targetPrice": "553.61",
+        "corridor": "11.29 - 11.84"
+      },
+      "divergencePercent": "-41.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CLX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 111.23,
+      "currentEPS": 6.557377049180328,
+      "currentPE": "16.96",
+      "cagr": {
+        "rate": "3.05",
+        "projectedEPS": "7.62",
+        "targetPrice": "129.24"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "7.33",
+        "projectedEPS": "7.54",
+        "targetPrice": "127.93",
+        "corridor": "7.20 - 7.46"
+      },
+      "divergencePercent": "-1.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CM.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 127.99,
+      "currentEPS": 9.011368714546267,
+      "currentPE": "14.20",
+      "cagr": {
+        "rate": "5.84",
+        "projectedEPS": "11.97",
+        "targetPrice": "170.00"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "11.28",
+        "projectedEPS": "13.10",
+        "targetPrice": "186.08",
+        "corridor": "10.16 - 12.00"
+      },
+      "divergencePercent": "9.5",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CMC",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 75.8,
+      "currentEPS": 0.7492584963140778,
+      "currentPE": "101.17",
+      "cagr": {
+        "rate": "5.19",
+        "projectedEPS": "0.96",
+        "targetPrice": "97.61"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "6.30",
+        "projectedEPS": "153.46",
+        "targetPrice": "15524.61",
+        "corridor": "4.99 - 7.14"
+      },
+      "divergencePercent": "15805.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CMA",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 91.51,
+      "currentEPS": 5.2481203007518795,
+      "currentPE": "17.44",
+      "cagr": {
+        "rate": "6.57",
+        "projectedEPS": "7.21",
+        "targetPrice": "125.78"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.30",
+        "projectedEPS": "5.38",
+        "targetPrice": "93.79",
+        "corridor": "5.09 - 5.48"
+      },
+      "divergencePercent": "-25.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CME",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 272.59,
+      "currentEPS": 9.810539554633003,
+      "currentPE": "27.79",
+      "cagr": {
+        "rate": "11.41",
+        "projectedEPS": "16.84",
+        "targetPrice": "467.96"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "14.44",
+        "projectedEPS": "18.68",
+        "targetPrice": "519.10",
+        "corridor": "13.67 - 15.21"
+      },
+      "divergencePercent": "10.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CMCSA",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 28.35,
+      "currentEPS": 4.143295803480041,
+      "currentPE": "6.84",
+      "cagr": {
+        "rate": "10.59",
+        "projectedEPS": "6.85",
+        "targetPrice": "46.90"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "5.00",
+        "projectedEPS": "5.66",
+        "targetPrice": "38.76",
+        "corridor": "4.84 - 5.18"
+      },
+      "divergencePercent": "-17.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CMG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 40.36,
+      "currentEPS": 1.1211443329632995,
+      "currentPE": "36.00",
+      "cagr": {
+        "rate": "15.52",
+        "projectedEPS": "2.31",
+        "targetPrice": "83.04"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "1.96",
+        "projectedEPS": "2.84",
+        "targetPrice": "102.25",
+        "corridor": "1.93 - 2.02"
+      },
+      "divergencePercent": "23.1",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CNQ.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 47.44,
+      "currentEPS": 2.8723250120895436,
+      "currentPE": "16.52",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "2.87",
+        "targetPrice": "47.44"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.66",
+        "projectedEPS": "8.90",
+        "targetPrice": "146.93",
+        "corridor": "5.29 - 6.13"
+      },
+      "divergencePercent": "209.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CNQ",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 34.1,
+      "currentEPS": 2.8723250120895436,
+      "currentPE": "11.87",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "2.87",
+        "targetPrice": "34.10"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.59",
+        "projectedEPS": "8.72",
+        "targetPrice": "103.50",
+        "corridor": "5.24 - 6.09"
+      },
+      "divergencePercent": "203.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CNP",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 39.31,
+      "currentEPS": 1.584357309111376,
+      "currentPE": "24.81",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "1.58",
+        "targetPrice": "39.31"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.44",
+        "projectedEPS": "3.26",
+        "targetPrice": "80.82",
+        "corridor": "2.21 - 2.74"
+      },
+      "divergencePercent": "105.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CNX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 35.9,
+      "currentEPS": -0.5980859979115171,
+      "currentPE": "15.00",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "-0.60",
+        "targetPrice": "-8.97"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "4.52",
+        "projectedEPS": "7.93",
+        "targetPrice": "118.98",
+        "corridor": "3.83 - 5.04"
+      },
+      "divergencePercent": "0.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "COF",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 236.97,
+      "currentEPS": 12.411810817873008,
+      "currentPE": "19.09",
+      "cagr": {
+        "rate": "5.80",
+        "projectedEPS": "16.45",
+        "targetPrice": "314.08"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "29.89",
+        "projectedEPS": "111.67",
+        "targetPrice": "2132.10",
+        "corridor": "29.02 - 30.80"
+      },
+      "divergencePercent": "578.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "COLB",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 29.25,
+      "currentEPS": 2.5600466269793682,
+      "currentPE": "11.43",
+      "cagr": {
+        "rate": "10.86",
+        "projectedEPS": "4.29",
+        "targetPrice": "48.97"
+      },
+      "consensus": {
+        "analystCount": 11,
+        "estimatedEPS": "3.26",
+        "projectedEPS": "8.60",
+        "targetPrice": "98.23",
+        "corridor": "3.03 - 3.47"
+      },
+      "divergencePercent": "100.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "COR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 355.35,
+      "currentEPS": 8.01862036941492,
+      "currentPE": "44.32",
+      "cagr": {
+        "rate": "1.97",
+        "projectedEPS": "8.84",
+        "targetPrice": "391.71"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "26.46",
+        "projectedEPS": "35.66",
+        "targetPrice": "1580.41",
+        "corridor": "25.78 - 27.04"
+      },
+      "divergencePercent": "303.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "COP",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 98.93,
+      "currentEPS": 7.819020798697113,
+      "currentPE": "12.65",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "7.82",
+        "targetPrice": "98.93"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "10.24",
+        "projectedEPS": "12.27",
+        "targetPrice": "155.21",
+        "corridor": "9.28 - 11.41"
+      },
+      "divergencePercent": "56.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CPAY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 330.77,
+      "currentEPS": 14.27174361234733,
+      "currentPE": "23.18",
+      "cagr": {
+        "rate": "15.67",
+        "projectedEPS": "29.55",
+        "targetPrice": "684.93"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "32.61",
+        "projectedEPS": "112.63",
+        "targetPrice": "2610.42",
+        "corridor": "32.05 - 33.64"
+      },
+      "divergencePercent": "281.1",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CP.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 100.63,
+      "currentEPS": 3.984994640943194,
+      "currentPE": "25.25",
+      "cagr": {
+        "rate": "9.98",
+        "projectedEPS": "6.41",
+        "targetPrice": "161.90"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.62",
+        "projectedEPS": "7.08",
+        "targetPrice": "178.71",
+        "corridor": "5.44 - 5.94"
+      },
+      "divergencePercent": "10.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CRBG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 30.45,
+      "currentEPS": 3.729096989966555,
+      "currentPE": "8.17",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "3.73",
+        "targetPrice": "30.45"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "6.78",
+        "projectedEPS": "16.63",
+        "targetPrice": "135.80",
+        "corridor": "6.54 - 7.21"
+      },
+      "divergencePercent": "346.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "MDLZ",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 57.3,
+      "currentEPS": 3.4384787472035794,
+      "currentPE": "16.66",
+      "cagr": {
+        "rate": "-2.92",
+        "projectedEPS": "2.96",
+        "targetPrice": "49.40"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "3.87",
+        "projectedEPS": "4.18",
+        "targetPrice": "69.71",
+        "corridor": "3.79 - 3.94"
+      },
+      "divergencePercent": "41.1",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CMS",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 71.28,
+      "currentEPS": 3.370295698924731,
+      "currentPE": "21.15",
+      "cagr": {
+        "rate": "6.61",
+        "projectedEPS": "4.64",
+        "targetPrice": "98.15"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "4.81",
+        "projectedEPS": "6.11",
+        "targetPrice": "129.15",
+        "corridor": "4.56 - 5.19"
+      },
+      "divergencePercent": "31.6",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CMI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 574.84,
+      "currentEPS": 28.552821997105642,
+      "currentPE": "20.13",
+      "cagr": {
+        "rate": "15.41",
+        "projectedEPS": "58.47",
+        "targetPrice": "1177.06"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "33.12",
+        "projectedEPS": "41.38",
+        "targetPrice": "833.01",
+        "corridor": "26.35 - 37.12"
+      },
+      "divergencePercent": "-29.2",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CNA",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 46.42,
+      "currentEPS": 3.5348322889789903,
+      "currentPE": "13.13",
+      "cagr": {
+        "rate": "7.97",
+        "projectedEPS": "5.19",
+        "targetPrice": "68.11"
+      },
+      "consensus": {
+        "analystCount": 6,
+        "estimatedEPS": "5.50",
+        "projectedEPS": "32.14",
+        "targetPrice": "422.06",
+        "corridor": "4.87 - 6.21"
+      },
+      "divergencePercent": "519.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CNH",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 10.82,
+      "currentEPS": 0.9936204146730463,
+      "currentPE": "10.89",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "0.99",
+        "targetPrice": "10.82"
+      },
+      "consensus": {
+        "analystCount": 10,
+        "estimatedEPS": "0.83",
+        "projectedEPS": "0.74",
+        "targetPrice": "8.02",
+        "corridor": "0.81 - 0.88"
+      },
+      "divergencePercent": "-25.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CRUS",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 123.28,
+      "currentEPS": 6.238957372729839,
+      "currentPE": "19.76",
+      "cagr": {
+        "rate": "13.75",
+        "projectedEPS": "11.88",
+        "targetPrice": "234.81"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "8.01",
+        "projectedEPS": "11.64",
+        "targetPrice": "230.01",
+        "corridor": "7.36 - 8.65"
+      },
+      "divergencePercent": "-2.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CSL",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 366.17,
+      "currentEPS": 28.210752688172043,
+      "currentPE": "12.98",
+      "cagr": {
+        "rate": "21.39",
+        "projectedEPS": "74.35",
+        "targetPrice": "965.03"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "31.67",
+        "projectedEPS": "37.67",
+        "targetPrice": "488.95",
+        "corridor": "30.89 - 32.60"
+      },
+      "divergencePercent": "-49.3",
+      "isCoherent": true
+    },
+    {
+      "ticker": "RRC",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 33.6,
+      "currentEPS": 1.1065732127351062,
+      "currentPE": "30.36",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "1.11",
+        "targetPrice": "33.60"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.00",
+        "projectedEPS": "13.67",
+        "targetPrice": "414.94",
+        "corridor": "4.34 - 5.51"
+      },
+      "divergencePercent": "1135.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CSX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 36.3,
+      "currentEPS": 1.7923553719008265,
+      "currentPE": "20.25",
+      "cagr": {
+        "rate": "11.61",
+        "projectedEPS": "3.10",
+        "targetPrice": "62.86"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.53",
+        "projectedEPS": "3.18",
+        "targetPrice": "64.39",
+        "corridor": "2.48 - 2.58"
+      },
+      "divergencePercent": "2.4",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CTSH",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 84.82,
+      "currentEPS": 4.516129032258065,
+      "currentPE": "18.78",
+      "cagr": {
+        "rate": "6.03",
+        "projectedEPS": "6.05",
+        "targetPrice": "113.69"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "6.36",
+        "projectedEPS": "10.61",
+        "targetPrice": "199.29",
+        "corridor": "5.78 - 6.73"
+      },
+      "divergencePercent": "75.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CTC.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 220,
+      "currentEPS": 15.958398072379397,
+      "currentPE": "13.79",
+      "cagr": {
+        "rate": "7.03",
+        "projectedEPS": "22.41",
+        "targetPrice": "308.98"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "15.10",
+        "projectedEPS": "12.08",
+        "targetPrice": "166.59",
+        "corridor": "14.80 - 15.61"
+      },
+      "divergencePercent": "-46.1",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CVE.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 25.15,
+      "currentEPS": 1.7001842497571744,
+      "currentPE": "14.79",
+      "cagr": {
+        "rate": "9.44",
+        "projectedEPS": "2.67",
+        "targetPrice": "39.49"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "3.99",
+        "projectedEPS": "7.06",
+        "targetPrice": "104.38",
+        "corridor": "3.61 - 4.74"
+      },
+      "divergencePercent": "164.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CTVA",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 70.5,
+      "currentEPS": 1.3074816202969584,
+      "currentPE": "53.92",
+      "cagr": {
+        "rate": "8.69",
+        "projectedEPS": "1.98",
+        "targetPrice": "106.95"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "4.49",
+        "projectedEPS": "10.22",
+        "targetPrice": "551.07",
+        "corridor": "4.34 - 4.57"
+      },
+      "divergencePercent": "415.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CVX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 166.16,
+      "currentEPS": 9.757458563535911,
+      "currentPE": "17.03",
+      "cagr": {
+        "rate": "16.57",
+        "projectedEPS": "21.00",
+        "targetPrice": "357.60"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "12.27",
+        "projectedEPS": "14.29",
+        "targetPrice": "243.37",
+        "corridor": "10.68 - 15.81"
+      },
+      "divergencePercent": "-31.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "CW",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 660.66,
+      "currentEPS": 10.6145781458863,
+      "currentPE": "62.24",
+      "cagr": {
+        "rate": "14.57",
+        "projectedEPS": "20.96",
+        "targetPrice": "1304.38"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "20.84",
+        "projectedEPS": "32.66",
+        "targetPrice": "2032.96",
+        "corridor": "20.40 - 21.46"
+      },
+      "divergencePercent": "55.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 12.35,
+      "currentEPS": 0.06489982779693261,
+      "currentPE": "190.29",
+      "cagr": {
+        "rate": "33.64",
+        "projectedEPS": "0.28",
+        "targetPrice": "52.65"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "0.00",
+        "projectedEPS": "-0.04",
+        "targetPrice": "-8.23",
+        "corridor": "0.00 - 0.00"
+      },
+      "divergencePercent": "-115.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "D",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 60.34,
+      "currentEPS": 2.530981887511916,
+      "currentPE": "23.84",
+      "cagr": {
+        "rate": "-2.59",
+        "projectedEPS": "2.22",
+        "targetPrice": "52.92"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "4.30",
+        "projectedEPS": "6.12",
+        "targetPrice": "145.96",
+        "corridor": "4.00 - 4.65"
+      },
+      "divergencePercent": "175.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DAR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 40.43,
+      "currentEPS": 1.7450176766886714,
+      "currentPE": "23.17",
+      "cagr": {
+        "rate": "15.53",
+        "projectedEPS": "3.59",
+        "targetPrice": "83.23"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.65",
+        "projectedEPS": "12.37",
+        "targetPrice": "286.50",
+        "corridor": "5.43 - 5.89"
+      },
+      "divergencePercent": "244.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DANOY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 17.71,
+      "currentEPS": 3.141692104734669,
+      "currentPE": "5.64",
+      "cagr": {
+        "rate": "4.56",
+        "projectedEPS": "3.93",
+        "targetPrice": "22.14"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "0.98",
+        "projectedEPS": "0.45",
+        "targetPrice": "2.56",
+        "corridor": "0.98 - 0.99"
+      },
+      "divergencePercent": "-88.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DCI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 100.73,
+      "currentEPS": 3.091828138163437,
+      "currentPE": "32.58",
+      "cagr": {
+        "rate": "8.98",
+        "projectedEPS": "4.75",
+        "targetPrice": "154.84"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.17",
+        "projectedEPS": "7.28",
+        "targetPrice": "237.29",
+        "corridor": "5.10 - 5.23"
+      },
+      "divergencePercent": "53.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DD",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 43.39,
+      "currentEPS": 1.6770038167938932,
+      "currentPE": "25.87",
+      "cagr": {
+        "rate": "-24.19",
+        "projectedEPS": "0.42",
+        "targetPrice": "10.87"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.79",
+        "projectedEPS": "5.99",
+        "targetPrice": "154.90",
+        "corridor": "2.75 - 2.82"
+      },
+      "divergencePercent": "1325.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DE",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 515.04,
+      "currentEPS": 18.556662975267628,
+      "currentPE": "27.75",
+      "cagr": {
+        "rate": "16.12",
+        "projectedEPS": "39.18",
+        "targetPrice": "1087.32"
+      },
+      "consensus": {
+        "analystCount": 11,
+        "estimatedEPS": "25.88",
+        "projectedEPS": "42.64",
+        "targetPrice": "1183.56",
+        "corridor": "20.31 - 36.67"
+      },
+      "divergencePercent": "8.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "DDS",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 665.24,
+      "currentEPS": 36.81612903225806,
+      "currentPE": "18.07",
+      "cagr": {
+        "rate": "20.43",
+        "projectedEPS": "93.27",
+        "targetPrice": "1685.40"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "32.59",
+        "projectedEPS": "27.14",
+        "targetPrice": "490.37",
+        "corridor": "32.29 - 32.88"
+      },
+      "divergencePercent": "-70.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 151.73,
+      "currentEPS": 5.117647593882034,
+      "currentPE": "29.65",
+      "cagr": {
+        "rate": "2.90",
+        "projectedEPS": "5.90",
+        "targetPrice": "175.00"
+      },
+      "consensus": {
+        "analystCount": 6,
+        "estimatedEPS": "8.74",
+        "projectedEPS": "9.99",
+        "targetPrice": "296.23",
+        "corridor": "8.61 - 8.85"
+      },
+      "divergencePercent": "69.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DHI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 161,
+      "currentEPS": 11.621393841166936,
+      "currentPE": "13.85",
+      "cagr": {
+        "rate": "19.22",
+        "projectedEPS": "27.99",
+        "targetPrice": "387.72"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "15.20",
+        "projectedEPS": "22.75",
+        "targetPrice": "315.16",
+        "corridor": "10.91 - 18.98"
+      },
+      "divergencePercent": "-18.7",
+      "isCoherent": true
+    },
+    {
+      "ticker": "DGX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 190.26,
+      "currentEPS": 7.846846846846847,
+      "currentPE": "24.25",
+      "cagr": {
+        "rate": "5.31",
+        "projectedEPS": "10.17",
+        "targetPrice": "246.49"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "12.70",
+        "projectedEPS": "17.51",
+        "targetPrice": "424.48",
+        "corridor": "12.52 - 12.95"
+      },
+      "divergencePercent": "72.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DKS",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 212.88,
+      "currentEPS": 14.481632450166526,
+      "currentPE": "14.70",
+      "cagr": {
+        "rate": "19.72",
+        "projectedEPS": "35.61",
+        "targetPrice": "523.46"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "21.88",
+        "projectedEPS": "24.26",
+        "targetPrice": "356.59",
+        "corridor": "19.54 - 22.44"
+      },
+      "divergencePercent": "-31.9",
+      "isCoherent": true
+    },
+    {
+      "ticker": "DIS",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 113.41,
+      "currentEPS": 6.875831485587583,
+      "currentPE": "16.49",
+      "cagr": {
+        "rate": "1.98",
+        "projectedEPS": "7.58",
+        "targetPrice": "125.07"
+      },
+      "consensus": {
+        "analystCount": 6,
+        "estimatedEPS": "10.25",
+        "projectedEPS": "11.32",
+        "targetPrice": "186.79",
+        "corridor": "9.75 - 10.59"
+      },
+      "divergencePercent": "49.3",
+      "isCoherent": true
+    },
+    {
+      "ticker": "DLB",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 63.36,
+      "currentEPS": 2.660095130804857,
+      "currentPE": "23.82",
+      "cagr": {
+        "rate": "4.15",
+        "projectedEPS": "3.26",
+        "targetPrice": "77.63"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.01",
+        "projectedEPS": "12.95",
+        "targetPrice": "308.44",
+        "corridor": "4.94 - 5.10"
+      },
+      "divergencePercent": "297.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DLTR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 141.21,
+      "currentEPS": -14.0477515067223,
+      "currentPE": "15.00",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "-14.05",
+        "targetPrice": "-210.72"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "7.48",
+        "projectedEPS": "12.86",
+        "targetPrice": "192.93",
+        "corridor": "7.36 - 7.59"
+      },
+      "divergencePercent": "0.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "DOV",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 205.86,
+      "currentEPS": 19.58199440955458,
+      "currentPE": "10.51",
+      "cagr": {
+        "rate": "15.11",
+        "projectedEPS": "39.58",
+        "targetPrice": "416.05"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "13.01",
+        "projectedEPS": "7.04",
+        "targetPrice": "74.00",
+        "corridor": "12.76 - 13.25"
+      },
+      "divergencePercent": "-82.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DPZ",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 409.09,
+      "currentEPS": 16.821112392195882,
+      "currentPE": "24.32",
+      "cagr": {
+        "rate": "17.74",
+        "projectedEPS": "38.06",
+        "targetPrice": "925.66"
+      },
+      "consensus": {
+        "analystCount": 5,
+        "estimatedEPS": "22.80",
+        "projectedEPS": "35.98",
+        "targetPrice": "874.93",
+        "corridor": "22.42 - 23.19"
+      },
+      "divergencePercent": "-5.5",
+      "isCoherent": true
+    },
+    {
+      "ticker": "DRI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 214.33,
+      "currentEPS": 8.932765957446808,
+      "currentPE": "23.99",
+      "cagr": {
+        "rate": "13.13",
+        "projectedEPS": "16.55",
+        "targetPrice": "397.13"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "14.70",
+        "projectedEPS": "16.65",
+        "targetPrice": "399.48",
+        "corridor": "14.59 - 14.86"
+      },
+      "divergencePercent": "0.6",
+      "isCoherent": true
+    },
+    {
+      "ticker": "DOX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 84.29,
+      "currentEPS": 5.108271028457808,
+      "currentPE": "16.50",
+      "cagr": {
+        "rate": "7.15",
+        "projectedEPS": "7.21",
+        "targetPrice": "119.04"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "10.71",
+        "projectedEPS": "12.89",
+        "targetPrice": "212.65",
+        "corridor": "10.60 - 10.77"
+      },
+      "divergencePercent": "78.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DT",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 39.38,
+      "currentEPS": 1.6210118505013673,
+      "currentPE": "24.29",
+      "cagr": {
+        "rate": "121.10",
+        "projectedEPS": "85.65",
+        "targetPrice": "2080.62"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "2.43",
+        "projectedEPS": "2.69",
+        "targetPrice": "65.32",
+        "corridor": "2.40 - 2.48"
+      },
+      "divergencePercent": "-96.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "CNC",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 47.27,
+      "currentEPS": 6.333965771670595,
+      "currentPE": "7.46",
+      "cagr": {
+        "rate": "17.44",
+        "projectedEPS": "14.15",
+        "targetPrice": "105.61"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "8.49",
+        "projectedEPS": "10.32",
+        "targetPrice": "77.03",
+        "corridor": "7.69 - 9.30"
+      },
+      "divergencePercent": "-27.1",
+      "isCoherent": true
+    },
+    {
+      "ticker": "DUK",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 118.9,
+      "currentEPS": 5.841968911917099,
+      "currentPE": "20.35",
+      "cagr": {
+        "rate": "3.95",
+        "projectedEPS": "7.09",
+        "targetPrice": "144.31"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "8.13",
+        "projectedEPS": "10.14",
+        "targetPrice": "206.38",
+        "corridor": "7.75 - 8.42"
+      },
+      "divergencePercent": "43.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "DY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 365.65,
+      "currentEPS": 8.01748359839247,
+      "currentPE": "45.61",
+      "cagr": {
+        "rate": "8.08",
+        "projectedEPS": "11.82",
+        "targetPrice": "539.27"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "19.22",
+        "projectedEPS": "34.43",
+        "targetPrice": "1570.09",
+        "corridor": "17.89 - 19.89"
+      },
+      "divergencePercent": "191.1",
+      "isCoherent": false
+    },
+    {
+      "ticker": "DVN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 36.32,
+      "currentEPS": 4.640449438202247,
+      "currentPE": "7.83",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "4.64",
+        "targetPrice": "36.32"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "6.16",
+        "projectedEPS": "7.44",
+        "targetPrice": "58.22",
+        "corridor": "4.96 - 7.00"
+      },
+      "divergencePercent": "60.3",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EBAY",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 96.07,
+      "currentEPS": 3.9818548387096775,
+      "currentPE": "24.13",
+      "cagr": {
+        "rate": "12.07",
+        "projectedEPS": "7.04",
+        "targetPrice": "169.83"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "7.90",
+        "projectedEPS": "12.47",
+        "targetPrice": "300.95",
+        "corridor": "7.67 - 8.23"
+      },
+      "divergencePercent": "77.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EBBNF",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 24.308,
+      "currentEPS": 2.5248259860788864,
+      "currentPE": "9.63",
+      "cagr": {
+        "rate": "26.88",
+        "projectedEPS": "8.30",
+        "targetPrice": "79.92"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.76",
+        "projectedEPS": "2.92",
+        "targetPrice": "28.12",
+        "corridor": "1.23 - 3.34"
+      },
+      "divergencePercent": "-64.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ED",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 102.58,
+      "currentEPS": 5.2601156069364166,
+      "currentPE": "19.50",
+      "cagr": {
+        "rate": "2.89",
+        "projectedEPS": "6.06",
+        "targetPrice": "118.26"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "7.12",
+        "projectedEPS": "8.70",
+        "targetPrice": "169.75",
+        "corridor": "6.89 - 7.43"
+      },
+      "divergencePercent": "43.5",
+      "isCoherent": true
+    },
+    {
+      "ticker": "ECL",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 277.73,
+      "currentEPS": 7.430179387970454,
+      "currentPE": "37.38",
+      "cagr": {
+        "rate": "9.14",
+        "projectedEPS": "11.51",
+        "targetPrice": "430.13"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "10.57",
+        "projectedEPS": "17.94",
+        "targetPrice": "670.60",
+        "corridor": "10.30 - 10.84"
+      },
+      "divergencePercent": "55.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EHC",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 102.8,
+      "currentEPS": 4.561561561561562,
+      "currentPE": "22.54",
+      "cagr": {
+        "rate": "9.31",
+        "projectedEPS": "7.12",
+        "targetPrice": "160.40"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "6.87",
+        "projectedEPS": "12.70",
+        "targetPrice": "286.15",
+        "corridor": "6.85 - 6.89"
+      },
+      "divergencePercent": "78.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 321.21,
+      "currentEPS": 32.15456674473068,
+      "currentPE": "9.99",
+      "cagr": {
+        "rate": "4.16",
+        "projectedEPS": "39.41",
+        "targetPrice": "393.73"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "72.61",
+        "projectedEPS": "246.35",
+        "targetPrice": "2460.96",
+        "corridor": "69.05 - 80.65"
+      },
+      "divergencePercent": "525.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EFX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 219.21,
+      "currentEPS": 4.879644588045235,
+      "currentPE": "44.92",
+      "cagr": {
+        "rate": "3.39",
+        "projectedEPS": "5.76",
+        "targetPrice": "258.96"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "18.08",
+        "projectedEPS": "43.29",
+        "targetPrice": "1944.81",
+        "corridor": "17.63 - 19.30"
+      },
+      "divergencePercent": "651.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ELV",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 381.93,
+      "currentEPS": 25.680004809633008,
+      "currentPE": "14.87",
+      "cagr": {
+        "rate": "11.30",
+        "projectedEPS": "43.86",
+        "targetPrice": "652.26"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "48.75",
+        "projectedEPS": "74.74",
+        "targetPrice": "1111.57",
+        "corridor": "46.46 - 51.72"
+      },
+      "divergencePercent": "70.4",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EMA",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 48.84,
+      "currentEPS": 1.9619377162629759,
+      "currentPE": "24.89",
+      "cagr": {
+        "rate": "-4.35",
+        "projectedEPS": "1.57",
+        "targetPrice": "39.09"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.70",
+        "projectedEPS": "3.34",
+        "targetPrice": "83.16",
+        "corridor": "2.37 - 3.44"
+      },
+      "divergencePercent": "112.7",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EMA.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 67.91,
+      "currentEPS": 1.9619377162629759,
+      "currentPE": "34.61",
+      "cagr": {
+        "rate": "-4.35",
+        "projectedEPS": "1.57",
+        "targetPrice": "54.36"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "3.75",
+        "projectedEPS": "5.78",
+        "targetPrice": "199.91",
+        "corridor": "3.30 - 4.78"
+      },
+      "divergencePercent": "267.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EMN",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 70.23,
+      "currentEPS": 7.754927163667523,
+      "currentPE": "9.06",
+      "cagr": {
+        "rate": "3.47",
+        "projectedEPS": "9.20",
+        "targetPrice": "83.28"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "8.01",
+        "projectedEPS": "8.41",
+        "targetPrice": "76.20",
+        "corridor": "7.82 - 8.16"
+      },
+      "divergencePercent": "-8.5",
+      "isCoherent": true
+    },
+    {
+      "ticker": "EMBJ",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 73.93,
+      "currentEPS": 1.9193260829588135,
+      "currentPE": "38.52",
+      "cagr": {
+        "rate": "2.84",
+        "projectedEPS": "2.21",
+        "targetPrice": "85.03"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "3.08",
+        "projectedEPS": "6.26",
+        "targetPrice": "241.17",
+        "corridor": "2.98 - 3.23"
+      },
+      "divergencePercent": "183.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EMR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 148.02,
+      "currentEPS": 4.046232574554438,
+      "currentPE": "36.58",
+      "cagr": {
+        "rate": "5.32",
+        "projectedEPS": "5.24",
+        "targetPrice": "191.77"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "8.95",
+        "projectedEPS": "15.19",
+        "targetPrice": "555.83",
+        "corridor": "8.74 - 9.14"
+      },
+      "divergencePercent": "189.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ENB.TO",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 65.08,
+      "currentEPS": 2.5248259860788864,
+      "currentPE": "25.78",
+      "cagr": {
+        "rate": "26.88",
+        "projectedEPS": "8.30",
+        "targetPrice": "213.97"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.79",
+        "projectedEPS": "2.98",
+        "targetPrice": "76.71",
+        "corridor": "1.25 - 3.38"
+      },
+      "divergencePercent": "-64.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ENTG",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 113.54,
+      "currentEPS": 1.9396804155128324,
+      "currentPE": "58.54",
+      "cagr": {
+        "rate": "14.53",
+        "projectedEPS": "3.82",
+        "targetPrice": "223.74"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.29",
+        "projectedEPS": "10.33",
+        "targetPrice": "604.45",
+        "corridor": "5.15 - 5.42"
+      },
+      "divergencePercent": "170.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ENS",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 167.14,
+      "currentEPS": 9.148034506174392,
+      "currentPE": "18.27",
+      "cagr": {
+        "rate": "12.87",
+        "projectedEPS": "16.76",
+        "targetPrice": "306.22"
+      },
+      "consensus": {
+        "analystCount": 3,
+        "estimatedEPS": "12.03",
+        "projectedEPS": "35.90",
+        "targetPrice": "655.94",
+        "corridor": "11.80 - 12.31"
+      },
+      "divergencePercent": "114.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EPAM",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 215.24,
+      "currentEPS": 7.93417469627147,
+      "currentPE": "27.13",
+      "cagr": {
+        "rate": "18.41",
+        "projectedEPS": "18.47",
+        "targetPrice": "501.09"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "15.06",
+        "projectedEPS": "39.37",
+        "targetPrice": "1068.13",
+        "corridor": "14.59 - 15.53"
+      },
+      "divergencePercent": "113.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EQH",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 47.31,
+      "currentEPS": 4.069115815691158,
+      "currentPE": "11.63",
+      "cagr": {
+        "rate": "23.85",
+        "projectedEPS": "11.86",
+        "targetPrice": "137.85"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "10.69",
+        "projectedEPS": "45.52",
+        "targetPrice": "529.22",
+        "corridor": "9.73 - 11.27"
+      },
+      "divergencePercent": "283.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EQT",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 49.92,
+      "currentEPS": 0.4524693041756525,
+      "currentPE": "110.33",
+      "cagr": {
+        "rate": "-2.32",
+        "projectedEPS": "0.40",
+        "targetPrice": "44.39"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "6.18",
+        "projectedEPS": "35.31",
+        "targetPrice": "3895.89",
+        "corridor": "5.51 - 6.60"
+      },
+      "divergencePercent": "8675.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EQIX",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 801.82,
+      "currentEPS": 8.537875692720283,
+      "currentPE": "93.91",
+      "cagr": {
+        "rate": "11.33",
+        "projectedEPS": "14.60",
+        "targetPrice": "1371.42"
+      },
+      "consensus": {
+        "analystCount": 2,
+        "estimatedEPS": "18.66",
+        "projectedEPS": "31.43",
+        "targetPrice": "2951.30",
+        "corridor": "18.37 - 19.16"
+      },
+      "divergencePercent": "115.2",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ES",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 69.69,
+      "currentEPS": 2.270466230467793,
+      "currentPE": "30.69",
+      "cagr": {
+        "rate": "-2.18",
+        "projectedEPS": "2.03",
+        "targetPrice": "62.42"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "5.77",
+        "projectedEPS": "10.73",
+        "targetPrice": "329.46",
+        "corridor": "5.35 - 6.61"
+      },
+      "divergencePercent": "427.8",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ERIE",
+      "status": "ok",
+      "method": "cagr",
+      "currentPrice": 283.07,
+      "currentEPS": 12.996891643827917,
+      "currentPE": "21.78",
+      "cagr": {
+        "rate": "16.34",
+        "projectedEPS": "27.69",
+        "targetPrice": "603.18"
+      },
+      "consensus": null,
+      "divergencePercent": "0.0",
+      "isCoherent": true
+    },
+    {
+      "ticker": "ESAB",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 121.81,
+      "currentEPS": 4.382769560468657,
+      "currentPE": "27.79",
+      "cagr": {
+        "rate": "8.75",
+        "projectedEPS": "6.67",
+        "targetPrice": "185.25"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "8.40",
+        "projectedEPS": "12.96",
+        "targetPrice": "360.22",
+        "corridor": "8.22 - 8.52"
+      },
+      "divergencePercent": "94.5",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ESE",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 218.86,
+      "currentEPS": 11.548552682362022,
+      "currentPE": "18.95",
+      "cagr": {
+        "rate": "23.06",
+        "projectedEPS": "32.59",
+        "targetPrice": "617.70"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "8.79",
+        "projectedEPS": "2.95",
+        "targetPrice": "55.91",
+        "corridor": "8.79 - 8.79"
+      },
+      "divergencePercent": "-90.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ESI",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 29.38,
+      "currentEPS": 1.0086741016109046,
+      "currentPE": "29.13",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "1.01",
+        "targetPrice": "29.38"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "2.05",
+        "projectedEPS": "5.94",
+        "targetPrice": "173.01",
+        "corridor": "1.90 - 2.21"
+      },
+      "divergencePercent": "488.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ESLT",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 720.43,
+      "currentEPS": 7.220153783893161,
+      "currentPE": "99.78",
+      "cagr": {
+        "rate": "4.78",
+        "projectedEPS": "9.12",
+        "targetPrice": "910.04"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "15.34",
+        "projectedEPS": "47.51",
+        "targetPrice": "4740.12",
+        "corridor": "15.09 - 15.69"
+      },
+      "divergencePercent": "420.9",
+      "isCoherent": false
+    },
+    {
+      "ticker": "ETR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 95.67,
+      "currentEPS": 2.481065574345414,
+      "currentPE": "38.56",
+      "cagr": {
+        "rate": "0.00",
+        "projectedEPS": "2.48",
+        "targetPrice": "95.67"
+      },
+      "consensus": {
+        "analystCount": 4,
+        "estimatedEPS": "6.01",
+        "projectedEPS": "10.83",
+        "targetPrice": "417.66",
+        "corridor": "5.54 - 6.44"
+      },
+      "divergencePercent": "336.6",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EW",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 84.49,
+      "currentEPS": 6.98444035469299,
+      "currentPE": "12.10",
+      "cagr": {
+        "rate": "27.85",
+        "projectedEPS": "23.85",
+        "targetPrice": "288.56"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "4.08",
+        "projectedEPS": "2.85",
+        "targetPrice": "34.49",
+        "corridor": "3.97 - 4.16"
+      },
+      "divergencePercent": "-88.0",
+      "isCoherent": false
+    },
+    {
+      "ticker": "EVR",
+      "status": "ok",
+      "method": "consensus",
+      "currentPrice": 383.12,
+      "currentEPS": 9.860002606542421,
+      "currentPE": "38.86",
+      "cagr": {
+        "rate": "26.92",
+        "projectedEPS": "32.48",
+        "targetPrice": "1261.96"
+      },
+      "consensus": {
+        "analystCount": 1,
+        "estimatedEPS": "19.47",
+        "projectedEPS": "30.64",
+        "targetPrice": "1190.52",
+        "corridor": "18.29 - 20.29"
+      },
+      "divergencePercent": "-5.7",
+      "isCoherent": true
+    }
+  ]
+}

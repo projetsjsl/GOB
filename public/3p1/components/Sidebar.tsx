@@ -117,7 +117,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
     if (recommendationCacheRef.current.has(cacheKey)) {
       return recommendationCacheRef.current.get(cacheKey)!;
     }
-    const rec = calculateRecommendation(profile.data, profile.assumptions).recommendation;
+    const rec = calculateRecommendation(
+      profile.data,
+      profile.assumptions,
+      profile.info.analysisData?.analystEstimates
+    ).recommendation;
     recommendationCacheRef.current.set(cacheKey, rec);
     //  Limite du cache depuis Supabase (pas de hardcoding)
     (async () => {
@@ -559,8 +563,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ profiles, currentId, onSelect,
           </div>
         ) : (
           filteredAndSortedProfiles.map(profile => {
-            // Calculate status on the fly
-            const { recommendation } = calculateRecommendation(profile.data, profile.assumptions);
+            // Calculate status on the fly (with analyst consensus when available)
+            const { recommendation } = calculateRecommendation(
+              profile.data,
+              profile.assumptions,
+              profile.info.analysisData?.analystEstimates
+            );
 
             const isSelected = selectedTickers.has(profile.id);
             

@@ -1,3 +1,5 @@
+import type { FMPAnalystEstimate } from './types/fmp';
+
 export interface AnnualData {
   year: number;
   priceHigh: number;
@@ -72,7 +74,12 @@ export interface CompanyInfo {
   priceGrowthPersistence?: string; // Price Growth Persistence (note numerique 5-100, mesure la croissance persistante du prix sur 10 ans)
   priceStability?: string; // Price Stability
   financials?: any; // Raw financial statements (Income, Balance, CashFlow)
-  analysisData?: any; // Premium data (Estimates, Insider, etc.)
+  analysisData?: {
+    analystEstimates?: FMPAnalystEstimate[];
+    insiderTrading?: unknown[];
+    institutionalHolders?: unknown[];
+    earningsSurprises?: unknown[];
+  };
 }
 
 export enum Recommendation {

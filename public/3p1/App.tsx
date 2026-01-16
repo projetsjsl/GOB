@@ -4877,8 +4877,20 @@ export default function App() {
     const firstYearData = data[0];
     const historicalCAGR_EPS = calculateCAGR(firstYearData?.earningsPerShare || 0, baseEPS, effectiveBaseYear - (firstYearData?.year || effectiveBaseYear));
 
-    // Get Valuation Status
-    const { recommendation, targetPrice, buyLimit, sellLimit } = calculateRecommendation(data, assumptions);
+    // Get Valuation Status (Enhanced with analyst consensus when available)
+    // Returns BOTH consensus and CAGR projections for complete display
+    const {
+      recommendation,
+      targetPrice,
+      targetPriceLow,
+      targetPriceHigh,
+      buyLimit,
+      sellLimit,
+      projectionMethod,
+      analystConfidence,
+      analystCount,
+      projections  // Contains both consensus and CAGR projections
+    } = calculateRecommendation(data, assumptions, info.analysisData?.analystEstimates);
     
     //  FIX: Calculer le prix cible moyen (au lieu d'utiliser seulement le prix cible BPA)
     // Cette logique correspond a celle de EvaluationDetails pour garantir la coherence

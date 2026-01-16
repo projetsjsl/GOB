@@ -78,7 +78,11 @@ export const SyncSelectionDialog: React.FC<SyncSelectionDialogProps> = ({
       }
 
       // Calculer Ratio 3:1
-      const { recommendation, targetPrice } = calculateRecommendation(profile.data, profile.assumptions);
+      const { recommendation, targetPrice } = calculateRecommendation(
+        profile.data,
+        profile.assumptions,
+        profile.info.analysisData?.analystEstimates
+      );
       const upsidePotential = targetPrice > 0 && currentPrice > 0 
         ? ((targetPrice - currentPrice) / currentPrice) * 100 
         : 0;

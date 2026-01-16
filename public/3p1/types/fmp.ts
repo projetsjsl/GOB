@@ -246,3 +246,41 @@ export const isValidFMPHistoricalPrices = (data: unknown): data is FMPHistorical
     first.low > 0
   );
 };
+
+/**
+ * FMP Analyst Estimates Response
+ * Source: https://financialmodelingprep.com/api/v3/analyst-estimates/{symbol}
+ */
+export interface FMPAnalystEstimate {
+  symbol: string;
+  date: string;  // Format: "2025-12-31"
+  estimatedRevenueAvg: number;
+  estimatedRevenueHigh: number;
+  estimatedRevenueLow: number;
+  estimatedEbitdaAvg: number;
+  estimatedEbitdaHigh: number;
+  estimatedEbitdaLow: number;
+  estimatedNetIncomeAvg: number;
+  estimatedNetIncomeHigh: number;
+  estimatedNetIncomeLow: number;
+  estimatedSgaExpenseAvg: number;
+  estimatedEpsAvg: number;      // Consensus EPS moyen
+  estimatedEpsHigh: number;     // EPS haut (corridor)
+  estimatedEpsLow: number;      // EPS bas (corridor)
+  numberAnalystEstimatedRevenue: number;
+  numberAnalystsEstimatedEps: number;  // Nombre d'analystes (pour confidence)
+}
+
+/**
+ * Type guard for analyst estimates
+ */
+export const isValidFMPAnalystEstimate = (data: unknown): data is FMPAnalystEstimate => {
+  if (!data || typeof data !== 'object') return false;
+  const estimate = data as Record<string, unknown>;
+
+  return (
+    typeof estimate.symbol === 'string' &&
+    typeof estimate.date === 'string' &&
+    typeof estimate.estimatedEpsAvg === 'number'
+  );
+};

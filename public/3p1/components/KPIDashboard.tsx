@@ -225,7 +225,11 @@ export const KPIDashboard: React.FC<KPIDashboardProps> = ({ profiles, currentId,
         };
       }
       
-      const { recommendation, targetPrice } = calculateRecommendation(profile.data, profile.assumptions);
+      const { recommendation, targetPrice } = calculateRecommendation(
+        profile.data,
+        profile.assumptions,
+        profile.info.analysisData?.analystEstimates
+      );
       
       // VALIDATION: Verifier que currentPrice est valide
       const currentPrice = Math.max(profile.assumptions.currentPrice || 0, 0.01); // Minimum 0.01 pour eviter division par zero
