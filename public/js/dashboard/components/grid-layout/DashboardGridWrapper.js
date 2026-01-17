@@ -128,6 +128,8 @@
         });
         return validLayout;
     };
+    
+    const isLayoutUsable = (layout) => Array.isArray(layout) && layout.length >= 3;
 
     // Helper to get UserPreferencesService (with fallback)
     const getUserPreferencesService = () => {
@@ -261,50 +263,93 @@
     // LAZY HEAVY WIDGET WRAPPER
     // ===================================
     // Heavy widgets require click to load - prevents Chrome crash from TradingView overload
+    const ensureTradingViewWidgets = () => {
+        if (window.TradingViewWidgets) return Promise.resolve();
+        if (window.__TV_WIDGETS_PROMISE__) return window.__TV_WIDGETS_PROMISE__;
+
+        window.__TV_WIDGETS_PROMISE__ = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.type = 'text/babel';
+            script.src = '/js/dashboard/components/TradingViewWidgets.js?lazy=' + Date.now();
+            script.async = true;
+
+            script.onload = () => {
+                resolve();
+            };
+            script.onerror = reject;
+
+            document.body.appendChild(script);
+        });
+
+        return window.__TV_WIDGETS_PROMISE__;
+    };
     // BUG #6 FIX: Lazy load automatique au scroll au lieu de clic manuel
     const LazyHeavyWidget = ({ children, widgetId, delay = 500, isDarkMode }) => {
         const [shouldRender, setShouldRender] = React.useState(false);
         const [isLoading, setIsLoading] = React.useState(false);
         const containerRef = React.useRef(null);
 
-        // BUG #6 FIX: Auto-load avec IntersectionObserver
+        const loadWidgets = () => {
+            setIsLoading(true);
+            const doLoad = () => {
+                ensureTradingViewWidgets().then(() => {
+                    setTimeout(() => {
+                        setShouldRender(true);
+                        console.log(` LazyHeavyWidget: Auto-loaded ${widgetId} on scroll`);
+                    }, delay);
+                }).catch((error) => {
+                    console.warn(' LazyHeavyWidget: failed to load TradingViewWidgets', error);
+                    setIsLoading(false);
+                });
+            };
+            if (!window.__DASH_READY__) {
+                setTimeout(doLoad, 1500);
+                return;
+            }
+            doLoad();
+        };
+
+        // Auto-load lourd (par defaut) avec priorite basse
         React.useEffect(() => {
             if (shouldRender) return;
+            const autoLoadEnabled = window.AUTO_LOAD_HEAVY_WIDGETS !== false;
+            if (!autoLoadEnabled) return;
 
-            const observer = new IntersectionObserver(
-                ([entry]) => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
                     if (entry.isIntersecting && !shouldRender) {
-                        setIsLoading(true);
-                        // Small delay to show loading state before heavy render
-                        setTimeout(() => {
-                            setShouldRender(true);
-                            console.log(` LazyHeavyWidget: Auto-loaded ${widgetId} on scroll`);
-                        }, delay);
+                        const schedule = window.requestIdleCallback || ((cb) => setTimeout(cb, 800));
+                        schedule(() => loadWidgets(), { timeout: 2000 });
                     }
                 },
                 { 
                     threshold: 0.1, 
-                    rootMargin: '100px' // Preload 100px avant que le widget soit visible
+                    rootMargin: '50px' // Preload proche pour reduire le travail initial
                 }
             );
 
-            if (containerRef.current) {
-                observer.observe(containerRef.current);
-            }
+        if (containerRef.current) {
+            observer.observe(containerRef.current);
+        }
 
-            return () => {
-                if (containerRef.current) {
-                    observer.unobserve(containerRef.current);
-                }
-            };
-        }, [shouldRender, widgetId, delay]);
+        return () => {
+            if (containerRef.current) {
+                observer.unobserve(containerRef.current);
+            }
+        };
+    }, [shouldRender, widgetId, delay]);
 
         const handleLoadClick = () => {
             setIsLoading(true);
-            setTimeout(() => {
-                setShouldRender(true);
-                console.log(` LazyHeavyWidget: User manually loaded ${widgetId}`);
-            }, 300);
+            ensureTradingViewWidgets().then(() => {
+                setTimeout(() => {
+                    setShouldRender(true);
+                    console.log(` LazyHeavyWidget: User manually loaded ${widgetId}`);
+                }, 300);
+            }).catch((error) => {
+                console.warn(' LazyHeavyWidget: failed to load TradingViewWidgets', error);
+                setIsLoading(false);
+            });
         };
 
         return (
@@ -331,7 +376,7 @@
                                     </p>
                                     {/* BUG #A5 FIX: Texte complet sans troncature */}
                                     <p className={`text-xs mb-4 px-2 ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`} style={{ wordBreak: 'break-word', maxWidth: '100%' }}>
-                                        Chargement automatique au scroll...
+                                        Chargement automatique au scroll (ou cliquez pour forcer).
                                     </p>
                                     <button
                                         onClick={handleLoadClick}
@@ -625,6 +670,18 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
             };
         }, []);
         
+        const updateLayoutConfig = useCallback((updater) => {
+            const baseConfig = normalizeDashboardLayoutConfig(layoutConfig || {});
+            baseConfig.scopeMode = layoutScopeMode || baseConfig.scopeMode;
+            baseConfig.showAllWidgetsInDock = typeof showAllWidgetsInDock === 'boolean'
+                ? showAllWidgetsInDock
+                : baseConfig.showAllWidgetsInDock;
+            const nextConfig = typeof updater === 'function'
+                ? updater(baseConfig)
+                : { ...baseConfig, ...updater };
+            scheduleConfigSave(nextConfig);
+        }, [layoutConfig, layoutScopeMode, scheduleConfigSave, showAllWidgetsInDock]);
+
         const persistHiddenWidgets = useCallback((nextHidden) => {
             setHiddenWidgets(nextHidden);
             if (isAdmin) {
@@ -641,18 +698,6 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                 }
             }
         }, [isAdmin, updateLayoutConfig]);
-
-        const updateLayoutConfig = useCallback((updater) => {
-            const baseConfig = normalizeDashboardLayoutConfig(layoutConfig || {});
-            baseConfig.scopeMode = layoutScopeMode || baseConfig.scopeMode;
-            baseConfig.showAllWidgetsInDock = typeof showAllWidgetsInDock === 'boolean'
-                ? showAllWidgetsInDock
-                : baseConfig.showAllWidgetsInDock;
-            const nextConfig = typeof updater === 'function'
-                ? updater(baseConfig)
-                : { ...baseConfig, ...updater };
-            scheduleConfigSave(nextConfig);
-        }, [layoutConfig, layoutScopeMode, scheduleConfigSave, showAllWidgetsInDock]);
 
         const persistLayoutForScope = useCallback(async (scopeId, nextLayout, saveToRemote = false) => {
             if (!scopeId) return;
@@ -747,6 +792,32 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
             };
         }, []);
 
+        const resetLayoutToDefault = useCallback((reason) => {
+            const seedLayout = getDefaultLayout();
+            const sanitized = sanitizeLayout(seedLayout);
+            console.warn(` Layout reset to default (${reason}) for scope: ${layoutScopeId}`);
+            setLayout(seedLayout);
+            setHiddenWidgets([]);
+            if (ENABLE_LOCAL_LAYOUT_CACHE) {
+                try {
+                    const fallbackKeys = getLayoutFallbackKeys(layoutScopeId, mainTab);
+                    fallbackKeys.forEach((key) => key && localStorage.removeItem(key));
+                    const storageKey = getLayoutStorageKey(layoutScopeId);
+                    localStorage.setItem(storageKey, JSON.stringify(sanitized));
+                } catch (e) {
+                    // ignore storage errors
+                }
+            }
+            const service = getUserPreferencesService();
+            if (layoutScopeId && service.savePreferencesWithFallback) {
+                service.savePreferencesWithFallback(
+                    'dashboard',
+                    getLayoutStorageKey(layoutScopeId),
+                    { layouts: { [layoutScopeId]: sanitized } }
+                ).catch(() => {});
+            }
+        }, [layoutScopeId, mainTab]);
+
         useEffect(() => {
             if (!layoutConfigLoaded) return;
             
@@ -757,17 +828,27 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
                 const fallbackKeys = getLayoutFallbackKeys(layoutScopeId, mainTab);
                 const fromStorage = await loadLayoutFromStorage(fallbackKeys, layoutScopeId);
                 if (isActive && fromStorage && fromStorage.length > 0) {
-                    console.log(` Layout restaure depuis Supabase/localStorage pour scope: ${layoutScopeId}`);
-                    setLayout(fromStorage);
-                    return;
+                    if (!isLayoutUsable(fromStorage)) {
+                        resetLayoutToDefault('storage too short');
+                        return;
+                    } else {
+                        console.log(` Layout restaure depuis Supabase/localStorage pour scope: ${layoutScopeId}`);
+                        setLayout(fromStorage);
+                        return;
+                    }
                 }
                 
                 // Priority 2: Load from remote config (if admin and available)
                 const fromConfig = getLayoutFromConfig(layoutConfig, layoutScopeId, mainTab);
                 if (isActive && fromConfig && fromConfig.length > 0) {
-                    console.log(` Layout restaure depuis config remote pour scope: ${layoutScopeId}`);
-                    setLayout(fromConfig);
-                    return;
+                    if (!isLayoutUsable(fromConfig)) {
+                        resetLayoutToDefault('config too short');
+                        return;
+                    } else {
+                        console.log(` Layout restaure depuis config remote pour scope: ${layoutScopeId}`);
+                        setLayout(fromConfig);
+                        return;
+                    }
                 }
 
                 // Priority 3: Fallback to presets or default
@@ -1307,11 +1388,11 @@ const MissingComponentCard = ({ componentName, isDarkMode }) => {
         layout.filter(item => validIds.includes(item.i)).forEach(item => {
             existingMap[item.i] = item;
         });
+        const visibleIds = validIds.filter(id => !hiddenWidgetSet.has(id));
+        const finalIds = visibleIds.length > 0 ? visibleIds : validIds;
 
         // Generate layout for ALL widgets in this tab, using existing positions or defaults
-        return validIds
-            .filter(id => !hiddenWidgetSet.has(id))
-            .map((id, idx) => {
+        return finalIds.map((id, idx) => {
             // Use existing position if available
             if (existingMap[id]) return existingMap[id];
 

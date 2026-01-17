@@ -166,6 +166,15 @@
     async function loadV0Component(componentPath, componentName) {
         if (window[componentName]) return window[componentName];
         try {
+            if (!window.Babel) {
+                await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://unpkg.com/@babel/standalone@7.23.6/babel.min.js';
+                    script.onload = resolve;
+                    script.onerror = () => reject(new Error('Echec chargement Babel Standalone'));
+                    document.head.appendChild(script);
+                });
+            }
             await loadDependencies();
             const res = await fetch(componentPath);
             if (!res.ok) throw new Error(`HTTP ${res.status}`);

@@ -81,3 +81,6 @@ screenshot_*.png
 .env*.local
 .env.temp_migration
 .start-context.json
+*.bak*
+debug-*.js
+test-*.js

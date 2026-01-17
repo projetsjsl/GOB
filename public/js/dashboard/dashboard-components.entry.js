@@ -1,0 +1,41 @@
+// Bundled entry for dashboard components (precompiled to avoid in-browser Babel)
+if (typeof window !== "undefined") {
+    window.__DASH_COMPONENTS_COMPILED__ = true;
+}
+import "./components/ThemeSelector.js";
+import "./components/SecondaryNavBar.js";
+import "./components/NewsBanner.js";
+import "./components/tabs/FinVoxTab.js";
+import "./components/tabs/EmmAIATab.js";
+import "./components/tabs/TerminalEmmaIATab.js";
+import "./components/tabs/FastGraphsTab.js";
+import "./components/tabs/GroupChatTab.js";
+import "./components/tabs/AdminJSLaiTab.js";
+import "./components/tabs/PlusTab.js";
+import "./components/tabs/JLabTab.js";
+import "./components/tabs/JLabUnifiedTab.js";
+import "./components/tabs/StocksNewsTab.js";
+import "./components/ErrorBoundary.js";
+import "./components/tabs/MarketsEconomyTab.js";
+import "./components/tabs/AskEmmaTab.js";
+import "./components/tabs/VoiceAssistantTab.js";
+import "./components/CurveWatch/RateCards.js";
+import "./components/CurveWatch/YieldCurveChart.js";
+import "./components/CurveWatch/SpreadChart.js";
+import "./components/CurveWatch/HistoricalCompare.js";
+import "./components/CurveWatch/CurveWatchContainer.js";
+import "./components/CurveWatch/index.js";
+import "./components/tabs/YieldCurveTab.js";
+import "./components/tabs/YieldCurveLiteTab.js";
+import "./components/tabs/EconomicCalendarTab.js";
+import "./components/tabs/DansWatchlistTab.js";
+import "./components/tabs/EmailBriefingsTab.js";
+import "./components/tabs/SeekingAlphaTab.js";
+import "./components/tabs/ScrappingSATab.js";
+import "./components/tabs/AdvancedAnalysisModals.js";
+import "./components/tabs/AdvancedAnalysisTab.js";
+import "./components/tabs/CurveWatchTab.js";
+import "./components/tabs/MarketsEconomyTabRGL.js";
+import "./components/grid-layout/RglDashboard.js";
+import "./components/grid-layout/DashboardGridWrapper.js";
+import "./components/TradingViewTicker.js";

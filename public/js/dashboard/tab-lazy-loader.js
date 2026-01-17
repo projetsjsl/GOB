@@ -39,8 +39,8 @@
         'emma-group': '/js/dashboard/components/tabs/ChatGPTGroupTab.js',
         
         // Markets tabs
-        'markets-economy': '/js/dashboard/components/tabs/MarketsEconomyTab.js',
-        'marches-global': '/js/dashboard/components/tabs/MarketsEconomyTab.js',
+        'markets-economy': null, // Deja defini dans app-inline.js
+        'marches-global': null, // Deja defini dans app-inline.js
         'marches-flex': '/js/dashboard/components/tabs/MarketsEconomyTabRGL.js',
         'economic-calendar': '/js/dashboard/components/tabs/EconomicCalendarTab.js',
         'marches-calendar': '/js/dashboard/components/tabs/EconomicCalendarTab.js',
@@ -84,7 +84,8 @@
     };
 
     // Scripts that should be pre-loaded (essential for initial experience)
-    const PRELOAD_TABS = ['markets-economy', 'marches-global', 'ask-emma', 'admin-scraping'];
+    // Keep minimal to speed first paint; enable more via window.PRELOAD_TABS_OVERRIDE.
+    const PRELOAD_TABS = window.PRELOAD_TABS_OVERRIDE || [];
 
     /**
      * Load a tab's script dynamically
@@ -92,6 +93,9 @@
      * @returns {Promise} - Resolves when script is loaded
      */
     function loadTabScript(tabId) {
+        if (window.__DASH_COMPONENTS_COMPILED__) {
+            return Promise.resolve();
+        }
         const scriptPath = TAB_SCRIPTS[tabId];
         
         // Si scriptPath est null, le composant est deja disponible (ex: dans app-inline.js)
@@ -126,17 +130,11 @@
             script.async = true;
             
             script.onload = () => {
-                // Wait for Babel to transpile (increased delay for complex scripts)
-                setTimeout(() => {
-                    // Force Babel to process if needed
-                    if (window.Babel && window.Babel.transformScriptTags) {
-                        window.Babel.transformScriptTags();
-                    }
-                    loadedTabs.add(scriptPath);
-                    loadingTabs.delete(scriptPath);
-                    console.log(`[LazyLoader]  Loaded: ${scriptPath}`);
-                    resolve();
-                }, 500); // Increased from 100ms to 500ms for better Babel processing
+                // Babel processes text/babel scripts automatically on load
+                loadedTabs.add(scriptPath);
+                loadingTabs.delete(scriptPath);
+                console.log(`[LazyLoader]  Loaded: ${scriptPath}`);
+                resolve();
             };
             
             script.onerror = (error) => {

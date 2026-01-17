@@ -28,13 +28,7 @@
     <!-- ont ete extraits vers des fichiers CSS separes et importes via gob-design-system.css -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Note: Babel Standalone utilise intentionnellement pour ce fichier standalone -->
-    <!-- PRODUCTION NOTE: Babel Standalone is intentionally used for this standalone file -->
-    <!-- The console warning "You are using the in-browser Babel transformer" is expected and can be ignored -->
-    <!-- For production optimization, consider precompiling with: npm run build:babel -->
-    <script src="https://unpkg.com/@babel/standalone@7.23.6/babel.min.js"></script>
-
-    <!-- Fix for "exports is not defined" error when Babel transpiles modules -->
+    <!-- Fix for "exports is not defined" error when UMD scripts run -->
     <script>
         // Polyfill for CommonJS to prevent Babel and UMD errors
         // MUST run before React Grid Layout and any Babel transpilation
@@ -350,35 +344,7 @@
     <!--  ESSENTIAL COMPONENTS (Load first - required for initial view) -->
     <!-- Auto-Expand: Ajoute boutons fullscreen a TOUTES les sections -->
     <script src="js/dashboard/components/shared/auto-expand-init.js"></script>
-    <!-- Theme Selector Component -->
-    <script type="text/babel" src="js/dashboard/components/ThemeSelector.js"></script>
-    <script type="text/babel" src="js/dashboard/components/SecondaryNavBar.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/NewsBanner.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/FinVoxTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/EmmAIATab.js"></script>
-    <!-- Terminal Emma IA Tab -->
-    <script type="text/babel" src="js/dashboard/components/tabs/TerminalEmmaIATab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/FastGraphsTab.js"></script>
-    <!-- GroupChat Tab (JSLAI RobotWeb Ultimate v5.0) -->
-    <script type="text/babel" src="js/dashboard/components/tabs/GroupChatTab.js"></script>
-    <!-- ChatGPT Group Tab (ChatGPT Group Chat Integration) -->
-    <!-- <script type="text/babel" src="js/dashboard/components/tabs/ChatGPTGroupTab.js"></script> -->
-    <!-- AdminJSLai Tab -->
-    <script type="text/babel" src="js/dashboard/components/tabs/AdminJSLaiTab.js"></script>
-    <!-- PlusTab Component -->
-    <script type="text/babel" src="js/dashboard/components/tabs/PlusTab.js"></script>
-    <!-- JLab Tabs -->
-    <script type="text/babel" src="js/dashboard/components/tabs/JLabTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/JLabUnifiedTab.js"></script>
-
-    <!-- Components needed by Grid Layout (load these first) -->
-    <script type="text/babel" src="js/dashboard/components/tabs/StocksNewsTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/TradingViewWidgets.js"></script>
-    <!-- TECH #1 FIX: Error Boundaries pour widgets -->
-    <script type="text/babel" src="js/dashboard/components/ErrorBoundary.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/AskEmmaTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/VoiceAssistantTab.js"></script>
+    <!-- Dashboard components bundle is loaded later (after Recharts setup) -->
     
     <!-- Script de test GOD MODE (disponible en console) -->
     <!-- <script src="/js/dashboard/test-god-mode-console.js"></script> -->
@@ -454,26 +420,38 @@
 
 
     <!-- Iconoir - Beautiful open source icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css" id="iconoir-css">
+    <script>
+        // Fallback if Iconoir CDN is blocked or slow
+        (function ensureIconoir() {
+            const test = document.createElement('i');
+            test.className = 'iconoir-globe';
+            test.style.position = 'absolute';
+            test.style.visibility = 'hidden';
+            document.head.appendChild(test);
+            const check = () => {
+                const styles = window.getComputedStyle(test);
+                const fontFamily = styles.getPropertyValue('font-family') || '';
+                if (!fontFamily.toLowerCase().includes('iconoir')) {
+                    if (!document.getElementById('iconoir-css-fallback')) {
+                        const link = document.createElement('link');
+                        link.id = 'iconoir-css-fallback';
+                        link.rel = 'stylesheet';
+                        link.href = 'https://unpkg.com/iconoir@latest/iconoir.css';
+                        document.head.appendChild(link);
+                    }
+                }
+                test.remove();
+            };
+            if (document.readyState === 'complete') {
+                check();
+            } else {
+                window.addEventListener('load', check, { once: true });
+            }
+        })();
+    </script>
     
-    <!-- CurveWatch Components (custom yield curve visualization) -->
-    <script type="text/babel" src="js/dashboard/components/CurveWatch/RateCards.js"></script>
-    <script type="text/babel" src="js/dashboard/components/CurveWatch/YieldCurveChart.js"></script>
-    <script type="text/babel" src="js/dashboard/components/CurveWatch/SpreadChart.js"></script>
-    <script type="text/babel" src="js/dashboard/components/CurveWatch/HistoricalCompare.js"></script>
-    <script type="text/babel" src="js/dashboard/components/CurveWatch/CurveWatchContainer.js"></script>
-    <script type="text/babel" src="js/dashboard/components/CurveWatch/index.js"></script>
-
-    <!-- Scripts Tab Seeking Alpha & Scraping -->
-    <script type="text/babel" src="js/dashboard/components/tabs/YieldCurveTab.js"></script>
-    <!-- YieldCurveLiteTab - Version simplifiee pour la grille DashboardGridWrapper -->
-    <script type="text/babel" src="js/dashboard/components/tabs/YieldCurveLiteTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/EconomicCalendarTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/DansWatchlistTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/EmailBriefingsTab.js"></script>
-
-    <script type="text/babel" src="js/dashboard/components/tabs/SeekingAlphaTab.js"></script>
-    <script type="text/babel" src="js/dashboard/components/tabs/ScrappingSATab.js"></script>
+    <!-- CurveWatch + Tabs are bundled in dashboard-components.compiled.js -->
     
     <!-- Styles des themes -->
     <link rel="stylesheet" href="/css/themes.css">
@@ -934,32 +912,23 @@
 
     <!-- <script src="/js/dashboard/pdfExporter.js"></script> -->
 
-    <!-- Main Tabs Components -->
-    <!-- DUPLICATE REMOVED: EconomicCalendarTab.js & FastGraphsTab.js already loaded above -->
-    <!-- <script type="text/babel" src="/js/dashboard/components/tabs/EconomicCalendarTab.js"></script> -->
-    <!-- <script type="text/babel" src="/js/dashboard/components/tabs/FastGraphsTab.js"></script> -->
-    <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisModals.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/tabs/AdvancedAnalysisTab.js"></script>
+    <!-- Main Tabs + Grid Layout Components are bundled in dashboard-components.compiled.js -->
     <!-- V0 Integration Wrapper - Permet d'integrer directement les composants v0 -->
     <script src="/js/dashboard/components/v0-integration-wrapper.js"></script>
-    <script type="text/babel" src="/js/dashboard/components/tabs/CurveWatchTab.js"></script>
-
-    <!-- Grid Layout Components (MUST load AFTER all tab components) -->
-    <script type="text/babel" src="js/dashboard/components/tabs/MarketsEconomyTabRGL.js"></script>
-    <script type="text/babel" src="js/dashboard/components/grid-layout/RglDashboard.js"></script>
-    <script type="text/babel" src="js/dashboard/components/grid-layout/DashboardGridWrapper.js"></script>
 
     <!-- Announcement Bars System (Gemini-powered) -->
     <!-- <script type="text/babel" src="/js/dashboard/components/AnnouncementBar.js"></script> -->
     <!-- <script type="text/babel" src="/js/dashboard/components/AnnouncementBarManager.js"></script> -->
     <!-- DUPLICATE REMOVED: ThemeSelector.js already loaded above -->
-    <!-- <script type="text/babel" src="/js/dashboard/components/ThemeSelector.js"></script> -->
-    <script type="text/babel" src="/js/dashboard/components/TradingViewTicker.js"></script>
+    <!-- TradingViewTicker is bundled in dashboard-components.compiled.js -->
     <!-- <script type="text/babel" src="/js/dashboard/components/MobileNavOverlay.js"></script> -->
     <!-- <script type="text/babel" src="/js/dashboard/components/SecondaryNavEditor.js"></script> -->
     <!-- <script type="text/babel" src="js/dashboard/components/ComponentManager.js"></script> -->
 
 
+
+    <!-- Dashboard components bundle (precompiled to avoid in-browser Babel) -->
+    <script src="/js/dashboard/dashboard-components.compiled.js?v=3.2"></script>
 
     <!-- Signal that all components are loaded -->
     <script>
@@ -969,10 +938,8 @@
         console.log(' All component scripts loaded, components-ready event dispatched');
     </script>
 
-    <!-- Inline bundle - Using Babel Standalone (intentional for standalone file) -->
-    <!-- PRODUCTION NOTE: This file is >500KB and compiled by Babel in-browser -->
-    <!-- The warning about file size is expected. For optimization, use precompiled version -->
-    <script type="text/babel" data-presets="react" src="/js/dashboard/app-inline.js?v=3.2"></script>
+    <!-- Inline bundle - precompiled to avoid in-browser Babel cost -->
+    <script src="/js/dashboard/app-inline.compiled.js?v=3.2"></script>
 
     <!-- Global Real-time Sync (must load after app-inline to dispatch events) -->
     <script src="/js/dashboard/realtime-sync.js"></script>

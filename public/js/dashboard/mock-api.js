@@ -12,15 +12,43 @@
 
     const originalFetch = window.fetch;
 
+    // FIX: Rate limiting to prevent console flooding from infinite loops
+    const apiCallCounts = {};
+    const API_CALL_LIMIT = 5; // Max calls per endpoint before throttling logs
+    const API_CALL_RESET_INTERVAL = 5000; // Reset counts every 5 seconds
+    setInterval(() => {
+        Object.keys(apiCallCounts).forEach(key => {
+            if (apiCallCounts[key] > API_CALL_LIMIT) {
+                console.warn(` INFINITE LOOP DETECTED: ${key} was called ${apiCallCounts[key]} times in 5s!`);
+            }
+            apiCallCounts[key] = 0;
+        });
+    }, API_CALL_RESET_INTERVAL);
+
     window.fetch = async function(url, options) {
         const urlStr = url.toString();
-        
+
         // Pass through non-API requests
         if (!urlStr.includes('/api/')) {
             return originalFetch(url, options);
         }
 
-        console.log(` Mocking API call: ${urlStr}`);
+        // Rate limit logging - use full URL for marketdata (different endpoints are legitimate)
+        // For other APIs, strip query params to detect true duplicates
+        let endpoint = urlStr.split('?')[0];
+        if (urlStr.includes('/api/marketdata')) {
+            // Include the endpoint param to distinguish quote vs fundamentals vs intraday
+            const match = urlStr.match(/endpoint=([^&]+)/);
+            if (match) endpoint = `/api/marketdata?endpoint=${match[1]}`;
+        }
+        apiCallCounts[endpoint] = (apiCallCounts[endpoint] || 0) + 1;
+
+        // Only log first few calls, then throttle
+        if (apiCallCounts[endpoint] <= API_CALL_LIMIT) {
+            console.log(` Mocking API call: ${urlStr}`);
+        } else if (apiCallCounts[endpoint] === API_CALL_LIMIT + 1) {
+            console.warn(` Throttling logs for ${endpoint} - too many calls (possible infinite loop)`);
+        }
         
         // Simulate network delay
         await new Promise(r => setTimeout(r, 200));
@@ -43,11 +71,27 @@
                 volume: 1000000,
                 timestamp: Date.now()
             };
-        } else if (urlStr.includes('/api/emma-agent') || urlStr.includes('/api/ai-services')) {
+        } else if (urlStr.includes('/api/emma-agent')) {
             responseBody = {
                 reply: "Je suis en mode simulation locale. Le backend n'est pas connecte.",
                 usage: { total_tokens: 0 }
             };
+        } else if (urlStr.includes('/api/ai-services')) {
+            // Handle different ai-services types
+            if (urlStr.includes('service=supabase-briefings')) {
+                responseBody = {
+                    success: true,
+                    data: [
+                        { id: 1, type: 'morning', created_at: new Date().toISOString(), subject: 'Mock Morning Briefing', html_content: '<p>Test briefing content</p>' },
+                        { id: 2, type: 'midday', created_at: new Date(Date.now() - 86400000).toISOString(), subject: 'Mock Midday Update', html_content: '<p>Test update content</p>' }
+                    ]
+                };
+            } else {
+                responseBody = {
+                    reply: "Je suis en mode simulation locale. Le backend n'est pas connecte.",
+                    usage: { total_tokens: 0 }
+                };
+            }
         } else if (urlStr.includes('/api/supabase-watchlist')) {
             responseBody = { tickers: ['AAPL', 'MSFT'] };
         } else if (urlStr.includes('/api/yield-curve')) {
@@ -108,6 +152,32 @@
                     publishedDate: new Date().toISOString()
                 }
             ];
+        } else if (urlStr.includes('/api/briefing-prompts')) {
+            responseBody = {
+                success: true,
+                prompts: {
+                    morning: { prompt: 'Mock morning prompt', name: 'Morning Briefing', tone: 'professional', length: 'medium' },
+                    midday: { prompt: 'Mock midday prompt', name: 'Midday Update', tone: 'concise', length: 'short' },
+                    evening: { prompt: 'Mock evening prompt', name: 'Evening Summary', tone: 'analytical', length: 'long' }
+                }
+            };
+        } else if (urlStr.includes('/api/briefing-schedule')) {
+            responseBody = {
+                success: true,
+                schedule: {
+                    morning: { enabled: true, hour: 7, minute: 20 },
+                    midday: { enabled: true, hour: 11, minute: 50 },
+                    evening: { enabled: true, hour: 16, minute: 20 }
+                }
+            };
+        } else if (urlStr.includes('/api/email-recipients')) {
+            responseBody = {
+                success: true,
+                recipients: [
+                    { id: 1, email: 'test@example.com', label: 'Test User', active: true, morning: true, midday: false, evening: true }
+                ],
+                preview_email: 'projetsjsl@gmail.com'
+            };
         }
 
         // Return a Response object

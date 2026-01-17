@@ -24,7 +24,8 @@
     "qa": "npm run lint && npm run build",
     "verify-3p1": "node scripts/verify-3p1-build.js",
     "test-3p1": "cd public/3p1 && npm run build && cd ../.. && node scripts/verify-3p1-build.js",
-    "build:dashboard": "esbuild public/js/dashboard/app-inline.js --bundle --outfile=public/js/dashboard/app-inline.compiled.js --format=iife --loader:.js=jsx --target=es2020 --minify"
+    "build:dashboard": "esbuild public/js/dashboard/app-inline.js --bundle --outfile=public/js/dashboard/app-inline.compiled.js --format=iife --loader:.js=jsx --target=es2020 --minify --jsx=transform --jsx-factory=React.createElement --jsx-fragment=React.Fragment --external:react --external:react-dom --external:react/jsx-runtime",
+    "build:dashboard-components": "esbuild public/js/dashboard/dashboard-components.entry.js --bundle --outfile=public/js/dashboard/dashboard-components.compiled.js --format=iife --loader:.js=jsx --target=es2020 --minify --jsx=transform --jsx-factory=React.createElement --jsx-fragment=React.Fragment --external:react --external:react-dom --external:react/jsx-runtime"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.17.0",
@@ -37,7 +38,6 @@
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.0",
     "dotenv": "^17.2.3",
-    "esbuild": "^0.27.2",
     "express": "^5.1.0",
     "formidable": "^3.5.4",
     "playwright-core": "^1.40.0",
@@ -66,6 +66,7 @@
     "@typescript-eslint/parser": "^8.20.0",
     "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.17",
+    "esbuild": "^0.25.12",
     "eslint": "^8.57.0",
     "jsdom": "^27.4.0",
     "pg": "^8.16.3",

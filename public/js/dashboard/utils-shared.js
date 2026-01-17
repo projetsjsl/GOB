@@ -196,7 +196,7 @@
             { pattern: /aEUR"/g, value: '-' },
             { pattern: /aEUR/g, value: '-' },
             { pattern: /aEURTM/g, value: "'" },
-            { pattern: /aEUR /g, value: ''' },
+            { pattern: /aEUR\u2019/g, value: "'" },
             { pattern: /aEUR/g, value: '"' },
             { pattern: /aEUR/g, value: '"' },
             { pattern: /A/g, value: 'e' },

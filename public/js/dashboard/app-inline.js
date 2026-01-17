@@ -7,6 +7,9 @@ if (typeof window.showSlashSuggestions === "undefined") {
 if (typeof window.setShowSlashSuggestions === "undefined") {
     window.setShowSlashSuggestions = function() {};
 }
+if (typeof window.NewsBanner === "undefined") {
+    window.NewsBanner = () => null;
+}
 
 // MIGRATION: Force grid mode to prevent Chrome crashes from TradingView widget overload
 // This migration runs once to clear old 'tabs' preference
@@ -54,6 +57,23 @@ window.Icon = ({ emoji, size = 20, className = '' }) => {
  * - After edits, run a quick parse check locally (e.g. with @babel/parser or another linter) before deploying.
  * Keeping this block at the top as a reminder to reduce future syntax regressions.
  */
+// Throttle console.log to prevent UI freezes from log storms (enable with window.DEBUG_DASHBOARD = true)
+if (typeof window !== 'undefined' && !window.DEBUG_DASHBOARD && !window.__GOB_LOG_THROTTLE__) {
+    window.__GOB_LOG_THROTTLE__ = true;
+    const LOG_WINDOW_MS = 5000;
+    const LOG_MAX = 200;
+    let logCount = 0;
+    const originalLog = console.log.bind(console);
+    setInterval(() => {
+        logCount = 0;
+    }, LOG_WINDOW_MS);
+    console.log = (...args) => {
+        if (logCount < LOG_MAX) {
+            logCount += 1;
+            originalLog(...args);
+        }
+    };
+}
 // Log immediat pour confirmer que le script se charge
 console.log(' app-inline.js: Script en cours de chargement...');
 
@@ -63,22 +83,8 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     window.__GOB_DASHBOARD_MOUNTED = true;
     console.log(' app-inline.js: Initialisation du dashboard...');
 
-    // Verification que Babel fonctionne
-    console.log(' Babel charge:', typeof Babel !== 'undefined');
     console.log(' React charge:', typeof React !== 'undefined');
     console.log(' ReactDOM charge:', typeof ReactDOM !== 'undefined');
-
-    // Gestion d'erreur si Babel ne fonctionne pas
-    if (typeof Babel === 'undefined') {
-        document.getElementById('root').innerHTML = `
-                <div style="padding: 20px; background: #fee; border: 1px solid #fcc; margin: 20px;">
-                    <h2> Erreur de Chargement</h2>
-                    <p>Babel n'est pas charge. Verifiez votre connexion internet.</p>
-                    <p>Rafraichissez la page ou essayez en navigation privee.</p>
-                </div>
-            `;
-        throw new Error('Babel non charge');
-    }
 
     // Version simplifiee de l'API hybride qui fonctionne sans Supabase
     const fetchHybridData = window.fetchHybridData = async (symbol, dataType) => {
@@ -320,6 +326,44 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
     // Ensure ReactDOM and supabase are available globally
     window.ReactDOM = window.ReactDOM || ReactDOM;
     if (typeof supabase !== 'undefined') window.supabaseClient = window.supabase;
+
+    const LABEL_EXCEPTIONS = {
+        'ia': 'IA',
+        'ai': 'AI',
+        'emma': 'Emma',
+        'jlab': 'JLab',
+        'gob': 'GOB',
+        'jslai': 'JSLAI',
+        'jsla': 'JSLA',
+        'fmp': 'FMP',
+        'api': 'API',
+        'apis': 'APIs',
+        'us': 'US',
+        'tsx': 'TSX',
+        'nasdaq': 'NASDAQ',
+        'nyse': 'NYSE',
+        's&p': 'S&P',
+        'v0': 'v0'
+    };
+
+    const formatLabel = (label) => {
+        if (!label) return label;
+        const text = String(label).trim();
+        if (!text) return text;
+        const words = text.split(' ');
+        return words.map((word, index) => {
+            if (!word) return word;
+            const cleaned = word.replace(/^[^A-Za-z0-9À-ÿ]+|[^A-Za-z0-9À-ÿ&/.-]+$/g, '');
+            const lower = cleaned.toLowerCase();
+            if (LABEL_EXCEPTIONS[lower]) {
+                return cleaned ? word.replace(cleaned, LABEL_EXCEPTIONS[lower]) : word;
+            }
+            if (index === 0) {
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            }
+            return word.toLowerCase();
+        }).join(' ');
+    };
 
 
     // Professional Mode System - Toggle entre emojis et icones Iconoir
@@ -1069,84 +1113,36 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         }, [gridWrapperReady]);
 
         // PERF #16 FIX: State persistence pour eviter rechargement complet
-        const [activeTab, setActiveTab] = useState(() => {
+        const DEFAULT_ACTIVE_TAB = 'marches-global';
+        const DATA_HEAVY_TABS = new Set([
+            'nouvelles',
+            'nouvelles-main',
+            'stocks-news',
+            'jlab-terminal',
+            'jlab-advanced',
+            'advanced-analysis',
+            'emma-terminal',
+            'terminal-emmaia'
+        ]);
+        const [activeTab, setActiveTab] = useState(DEFAULT_ACTIVE_TAB);
+        const dataPreloadStartedRef = useRef(false);
+
+        // Nettoyer l'ancien etat persiste pour eviter de reutiliser des tabs lourds
+        useEffect(() => {
             if (typeof window !== 'undefined') {
-                // 1. Verifier URL params
-                const params = new URLSearchParams(window.location.search);
-                const tab = params.get('tab');
-                if (tab) return tab;
-                
-                // 2. Verifier state persistence
-                if (window.getTabState) {
-                    const savedState = window.getTabState('activeTab');
-                    if (savedState) return savedState;
+                if (window.clearTabState) {
+                    window.clearTabState('activeTab');
                 }
-                
-                // 3. Verifier localStorage direct (fallback)
                 try {
-                    const saved = localStorage.getItem('gob-active-tab');
-                    if (saved) return saved;
+                    localStorage.removeItem('gob-active-tab');
                 } catch (e) {
-                    console.warn('[StatePersistence] Error reading activeTab from localStorage:', e);
+                    console.warn('[StatePersistence] Error clearing activeTab from localStorage:', e);
                 }
             }
-            return 'marches-global';
-        }); // Onglet par defaut: Marches Globaux
-        
-        //  FIX BUG-021: Synchroniser activeTab avec l'URL (bidirectionnel)
-        useEffect(() => {
-            // Lire l'URL au chargement initial
-            if (typeof window !== 'undefined') {
-                const params = new URLSearchParams(window.location.search);
-                const urlTab = params.get('tab');
-                if (urlTab && urlTab !== activeTab) {
-                    console.log(`[Routing] Tab depuis URL: ${urlTab}, activeTab actuel: ${activeTab}`);
-                    // Si l'URL a un tab different, le synchroniser
-                    const mapping = TAB_ID_MAPPING[urlTab];
-                    if (mapping || MAIN_TABS.find(t => t.id === urlTab) || Object.values(SUB_TABS).flat().find(s => s.id === urlTab)) {
-                        handleNewTabChange(urlTab);
-                    }
-                }
-            }
-        }, []); // Seulement au montage
-        
-        //  FIX BUG-021: Ecouter les changements d'URL (popstate pour bouton retour navigateur)
-        useEffect(() => {
-            const handlePopState = (event) => {
-                const params = new URLSearchParams(window.location.search);
-                const urlTab = params.get('tab');
-                if (urlTab && urlTab !== activeTab) {
-                    console.log(`[Routing] URL changee (popstate): ${urlTab}`);
-                    handleNewTabChange(urlTab);
-                }
-            };
-            window.addEventListener('popstate', handlePopState);
-            return () => window.removeEventListener('popstate', handlePopState);
-        }, [activeTab]);
+        }, []);
         
         // PERF #16 FIX: Sauvegarder activeTab quand il change
-        useEffect(() => {
-            if (typeof window !== 'undefined' && activeTab) {
-                // Sauvegarder dans state persistence
-                if (window.saveTabState) {
-                    window.saveTabState('activeTab', activeTab);
-                }
-                // Sauvegarder aussi dans localStorage (fallback)
-                try {
-                    localStorage.setItem('gob-active-tab', activeTab);
-                } catch (e) {
-                    console.warn('[StatePersistence] Error saving activeTab to localStorage:', e);
-                }
-                //  FIX BUG-021: Mettre a jour l'URL sans recharger la page
-                const url = new URL(window.location);
-                const currentTab = url.searchParams.get('tab');
-                if (currentTab !== activeTab) {
-                    url.searchParams.set('tab', activeTab);
-                    window.history.replaceState({}, '', url);
-                    console.log(`[Routing] URL mise a jour: tab=${activeTab}`);
-                }
-            }
-        }, [activeTab]);
+        // Desactive pour forcer l'ouverture sur Marches et eviter les tabs lourds au chargement.
 
         // New navigation state for 6-tab structure
         const [mainTab, setMainTab] = useState(() => {
@@ -1360,6 +1356,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         };
         const stocksLoadingRef = useRef(false); // Pour eviter les chargements multiples
         const batchLoadedRef = useRef(false); // Pour suivre si le batch a deja charge les donnees
+        const newsFetchingRef = useRef(false); // FIX: Pour eviter les appels multiples fetchNews
         
         // Etats pour le composant expandable du TickerBanner
         const [tickerExpandableOpen, setTickerExpandableOpen] = useState(false);
@@ -4124,18 +4121,6 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
             console.log(' Initialisation du dashboard');
 
-            // Charger les tickers et nouvelles pour l'onglet d'accueil (stocks-news)
-            // car c'est l'onglet par defaut et les utilisateurs s'attendent a voir des donnees
-            console.log(' Chargement initial des donnees pour stocks-news (onglet par defaut)...');
-            loadTickersFromSupabase().then(() => {
-                // Une fois les tickers charges, charger les nouvelles
-                fetchNews();
-                // Le chargement des stocks sera declenche automatiquement par le useEffect qui surveille tickers.length
-                // Les news par ticker seront chargees automatiquement par le useEffect qui surveille tickers.length
-            }).catch(error => {
-                console.error(' Erreur lors du chargement initial:', error);
-            });
-
             // Desactiver l'ecran de chargement apres un court delai
             setTimeout(() => {
                 setShowLoadingScreen(false);
@@ -4144,6 +4129,23 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }, 500);
 
         }, []); // Dependance vide = une seule fois au montage
+
+        // Charger les tickers/news uniquement quand l'utilisateur ouvre un tab lourd
+        useEffect(() => {
+            if (dataPreloadStartedRef.current) return;
+            if (!DATA_HEAVY_TABS.has(activeTab)) return;
+
+            dataPreloadStartedRef.current = true;
+            console.log(' Chargement initial des donnees pour tab lourd...');
+            loadTickersFromSupabase().then(() => {
+                // Une fois les tickers charges, charger les nouvelles
+                fetchNews();
+                // Le chargement des stocks sera declenche automatiquement par le useEffect qui surveille tickers.length
+                // Les news par ticker seront chargees automatiquement par le useEffect qui surveille tickers.length
+            }).catch(error => {
+                console.error(' Erreur lors du chargement initial:', error);
+            });
+        }, [activeTab]);
 
         //  Real-time Sync Integration
         // Listens for 'tickersUpdated' event from realtime-sync.js
@@ -4217,18 +4219,20 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
         // Charger les news par ticker quand les tickers changent ET que les news generales sont disponibles
         useEffect(() => {
+            if (!DATA_HEAVY_TABS.has(activeTab)) return;
             if (tickers.length > 0 && Object.keys(stockData).length > 0 && newsData.length > 0) {
                 console.log(' Chargement des news pour les tickers disponibles (news generales pretes)...');
                 fetchLatestNewsForTickers().catch(err => {
                     console.error('Erreur chargement news par ticker:', err);
                 });
             }
-        }, [tickers.length, newsData.length]); // Se declenche quand le nombre de tickers change OU quand les news generales sont chargees
+        }, [activeTab, tickers.length, newsData.length]); // Se declenche quand le nombre de tickers change OU quand les news generales sont chargees
 
         // Charger automatiquement les donnees de stocks des que les tickers sont disponibles
         // Ce useEffect est un fallback si le batch ne charge pas les donnees
         // Il se declenche seulement si les donnees ne sont pas completes apres un delai
         useEffect(() => {
+            if (!DATA_HEAVY_TABS.has(activeTab)) return;
             if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminee
             if (tickers.length === 0) return; // Pas de tickers a charger
             if (stocksLoadingRef.current) return; // Deja en cours de chargement
@@ -4264,7 +4268,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }, 3000); // Attendre 3 secondes pour laisser le batch charger d'abord
 
             return () => clearTimeout(checkAndLoad);
-        }, [tickers.length, initialLoadComplete]); // Se declenche quand les tickers sont charges
+        }, [activeTab, tickers.length, initialLoadComplete]); // Se declenche quand les tickers sont charges
 
         // Intro Emma: premiere visite de session (separe du chargement)
         useEffect(() => {
@@ -4277,6 +4281,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
 
         // Chargement automatique des tickers et nouvelles (en arriere-plan, meme si l'onglet n'est pas actif)
         useEffect(() => {
+            if (!DATA_HEAVY_TABS.has(activeTab)) return;
             if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminee
 
             console.log(' Verification des donnees (chargement en arriere-plan)...');
@@ -4291,10 +4296,15 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
             }
 
             // Charger les nouvelles si la liste est vide (independamment de l'onglet actif)
-            if (newsData.length === 0) {
-                console.log(' Chargement automatique des nouvelles (en arriere-plan)...');
-                fetchNews().catch(err => {
+            // FIX: Utiliser une ref pour eviter les appels multiples pendant le fetch async
+            if (newsData.length === 0 && !newsFetchingRef.current) {
+                newsFetchingRef.current = true; // Marquer AVANT l'appel async
+                console.log(' Chargement automatique des nouvelles (en arriere-plan, une seule fois)...');
+                fetchNews().then(() => {
+                    newsFetchingRef.current = false;
+                }).catch(err => {
                     console.error(' Erreur chargement nouvelles:', err);
+                    newsFetchingRef.current = false;
                 });
             }
 
@@ -4306,11 +4316,12 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
                     console.error(' Erreur chargement news par ticker:', err);
                 });
             }
-        }, [initialLoadComplete, newsData.length]); // Se declenche apres l'initialisation ET quand les news generales sont chargees
+        }, [activeTab, initialLoadComplete, newsData.length]); // Se declenche apres l'initialisation ET quand les news generales sont chargees
 
         // Rafraichir les donnees tickers lors de la navigation si elles sont anciennes
         // Note: Les news ne sont PAS rafraichies automatiquement (utilisent le cache configure)
         useEffect(() => {
+            if (!DATA_HEAVY_TABS.has(activeTab)) return;
             if (!initialLoadComplete) return; // Attendre que l'initialisation soit terminee
             if (tickers.length === 0) return; // Pas de tickers a rafraichir
             if (Object.keys(stockData).length === 0) return; // Pas de donnees a verifier
@@ -4334,6 +4345,7 @@ if (window.__GOB_DASHBOARD_MOUNTED) {
         // Charger les donnees de stocks une fois que les tickers sont disponibles (methode batch optimisee)
         // Charger TOUS les tickers pour que les sections Top Movers, Top Gainers, Top Losers et Analyses fonctionnent
         useEffect(() => {
+            if (!DATA_HEAVY_TABS.has(activeTab)) return;
             // Combiner tous les tickers (portefeuille + watchlist) pour charger les donnees
             const allTickers = [...new Set([...teamTickers, ...watchlistTickers])]; // Utiliser Set pour eviter les doublons
 
@@ -9142,6 +9154,11 @@ STRUCTURE JSON OBLIGATOIRE:
 
             // Charger les destinataires depuis Supabase
             const loadRecipients = async () => {
+                // FIX: Utiliser un flag window pour eviter les appels multiples (survit aux remontages)
+                if (window.__RECIPIENTS_LOADING__ || window.__RECIPIENTS_LOADED__) {
+                    return;
+                }
+                window.__RECIPIENTS_LOADING__ = true;
                 setLoading(true);
                 try {
                     const response = await fetch('/api/email-recipients');
@@ -9149,12 +9166,14 @@ STRUCTURE JSON OBLIGATOIRE:
                     if (result.success) {
                         setRecipients(result.recipients || []);
                         setPreviewEmail(result.preview_email || 'projetsjsl@gmail.com');
+                        window.__RECIPIENTS_LOADED__ = true; // FIX: Marquer comme charge (survit aux remontages)
                     }
                 } catch (error) {
                     console.error('Erreur chargement destinataires:', error);
                     alert(' Erreur lors du chargement: ' + error.message);
                 } finally {
                     setLoading(false);
+                    window.__RECIPIENTS_LOADING__ = false; // FIX: Permettre retry apres erreur
                 }
             };
 
@@ -9545,6 +9564,11 @@ STRUCTURE JSON OBLIGATOIRE:
 
             // Charger la configuration
             const loadSchedule = async () => {
+                // FIX: Utiliser un flag window pour eviter les appels multiples (survit aux remontages)
+                if (window.__SCHEDULE_LOADING__ || window.__SCHEDULE_LOADED__) {
+                    return;
+                }
+                window.__SCHEDULE_LOADING__ = true;
                 setLoading(true);
                 try {
                     const response = await fetch('/api/briefing-schedule');
@@ -9555,12 +9579,14 @@ STRUCTURE JSON OBLIGATOIRE:
                             midday: result.schedule.midday || schedule.midday,
                             evening: result.schedule.evening || schedule.evening
                         });
+                        window.__SCHEDULE_LOADED__ = true; // FIX: Marquer comme charge (survit aux remontages)
                     }
                 } catch (error) {
                     console.error('Erreur chargement horaires:', error);
                     alert(' Erreur lors du chargement: ' + error.message);
                 } finally {
                     setLoading(false);
+                    window.__SCHEDULE_LOADING__ = false; // FIX: Permettre retry apres erreur
                 }
             };
 
@@ -10005,7 +10031,7 @@ STRUCTURE JSON OBLIGATOIRE:
         };
 
         // Composant PromptManager pour gerer les prompts de briefing
-        const PromptManager = window.PromptManager = () => {
+        const PromptManager = () => {
             const [prompts, setPrompts] = useState({
                 morning: { prompt: '', name: '', tone: '', length: '' },
                 midday: { prompt: '', name: '', tone: '', length: '' },
@@ -10018,6 +10044,11 @@ STRUCTURE JSON OBLIGATOIRE:
 
             // Charger les prompts depuis l'API
             const loadPrompts = async () => {
+                // FIX: Utiliser un flag window pour eviter les appels multiples (survit aux remontages)
+                if (window.__PROMPTS_LOADING__ || window.__PROMPTS_LOADED__) {
+                    return;
+                }
+                window.__PROMPTS_LOADING__ = true;
                 setLoading(true);
                 try {
                     const response = await fetch('/api/briefing-prompts');
@@ -10028,11 +10059,13 @@ STRUCTURE JSON OBLIGATOIRE:
                             midday: result.prompts.midday || prompts.midday,
                             evening: result.prompts.evening || prompts.evening
                         });
+                        window.__PROMPTS_LOADED__ = true; // FIX: Marquer comme charge (survit aux remontages)
                     }
                 } catch (error) {
                     console.error('Erreur chargement prompts:', error);
                 } finally {
                     setLoading(false);
+                    window.__PROMPTS_LOADING__ = false; // FIX: Permettre retry apres erreur
                 }
             };
 
@@ -12161,15 +12194,23 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
 
             // Fonction pour charger l'historique
             const loadBriefingHistory = async () => {
+                // FIX: Utiliser un flag window pour eviter les appels multiples (survit aux remontages)
+                if (window.__BRIEFING_HISTORY_LOADING__ || window.__BRIEFING_HISTORY_LOADED__) {
+                    return;
+                }
+                window.__BRIEFING_HISTORY_LOADING__ = true;
                 try {
                     const response = await fetch('/api/ai-services?service=supabase-briefings&limit=20');
                     const result = await response.json();
 
                     if (result.success) {
                         setBriefingHistory(result.data);
+                        window.__BRIEFING_HISTORY_LOADED__ = true; // FIX: Marquer comme charge (survit aux remontages)
                     }
                 } catch (error) {
                     console.error('Erreur chargement historique:', error);
+                } finally {
+                    window.__BRIEFING_HISTORY_LOADING__ = false; // FIX: Permettre retry apres erreur
                 }
             };
 
@@ -12348,7 +12389,7 @@ ${selectedSections.map((s, i) => `${i + 1}. ${s.title}`).join('\n')}`;
                             Modifiez les prompts utilises pour les briefings automatises. Les changements sont synchronises avec n8n et GitHub.
                         </p>
 
-                        {window.PromptManager ? <window.PromptManager /> : <div className="p-4 text-red-500">Erreur: PromptManager non charge</div>}
+                        <PromptManager />
                     </div>
 
                     {/* SECTION 2.5.5: GESTION DES HORAIRES ET AUTOMATISATIONS */}
@@ -23918,7 +23959,7 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
         const NouvellesTab = () => {
             //  FIX: Acceder aux variables du scope parent
             const LucideIcon = typeof window !== 'undefined' ? (window.LucideIcon || window.IconoirIcon) : (({ name, className = '' }) => <span className={className}>{name}</span>);
-            
+
             const [localFrenchOnly, setLocalFrenchOnly] = useState(false);
             const [selectedSource, setSelectedSource] = useState('all'); // Filtre source
             const [selectedMarket, setSelectedMarket] = useState('all'); // Filtre marche
@@ -23926,22 +23967,18 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
             const [localFilteredNews, setLocalFilteredNews] = useState([]);
             const [isLoadingNews, setIsLoadingNews] = useState(false);
 
-            //  FIX: Charger les news automatiquement si vides quand l'onglet devient actif
+            // FIX: Use window-level flag to survive component remounts and prevent infinite loops
+            // This is necessary because React may remount components multiple times (StrictMode, HMR, parent re-renders)
+
+            // DISABLED: Auto-fetch is now handled by the parent component (line 4294-4296)
+            // NouvellesTab should NOT auto-fetch to avoid duplicate API calls
+            // Users can manually refresh using the "Actualiser" button if needed
+
+            /*
             React.useEffect(() => {
-                if (activeTab === 'nouvelles-main' || activeTab === 'nouvelles') {
-                    if ((!newsData || newsData.length === 0) && typeof fetchNews === 'function' && !loading && !isLoadingNews) {
-                        console.log(' NouvellesTab: newsData vide, chargement automatique...');
-                        setIsLoadingNews(true);
-                        // Utiliser fetchNews du scope parent avec parametres
-                        fetchNews('general', 100).then(() => {
-                            setIsLoadingNews(false);
-                        }).catch(err => {
-                            console.error('Erreur chargement news:', err);
-                            setIsLoadingNews(false);
-                        });
-                    }
-                }
-            }, [activeTab, newsData, fetchNews, loading, isLoadingNews]);
+                // ... disabled auto-fetch logic ...
+            }, [activeTab]);
+            */
 
             // Listes de filtres
             const sources = ['Bloomberg', 'Reuters', 'WSJ', 'CNBC', 'MarketWatch', 'La Presse', 'Les Affaires'];
@@ -25674,7 +25711,7 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
                                     }`}
                                 >
                                     <i className={`${tab.icon} text-lg`}></i>
-                                    <span className="hidden md:inline">{tab.label}</span>
+                                    <span className="hidden md:inline">{formatLabel(tab.label)}</span>
                                 </button>
                             ))}
                         </div>
@@ -27722,7 +27759,7 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
                                     <React.Fragment key={tab}>
                                         {idx > 0 && <span className="mx-1 text-gray-500">/</span>}
                                         <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                                            {tabConfig?.label || tab}
+                                            {formatLabel(tabConfig?.label || tab)}
                                         </span>
                                     </React.Fragment>
                                 );
@@ -27830,7 +27867,7 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
                                                             ) : (
                                                                 <span className="text-lg"></span>
                                                             )}
-                                                            <span className="font-medium">{hiddenTab.label}</span>
+                                                            <span className="font-medium">{formatLabel(hiddenTab.label)}</span>
                                                             {isActive && (
                                                                 <span className={`ml-auto w-2 h-2 rounded-full ${isDarkMode ? 'bg-green-400' : 'bg-green-600'}`}></span>
                                                             )}
@@ -27864,7 +27901,7 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
                                             ? 'text-gray-400 hover:text-green-300 hover:bg-gray-800/50'
                                             : 'text-gray-600 hover:text-green-700 hover:bg-gray-100')
                                         }`}
-                                    title={tab.label}
+                                    title={formatLabel(tab.label)}
                                 >
                                     {/* Active indicator - top bar with glow */}
                                     {isActive && (
@@ -27904,7 +27941,7 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
                                     {/* Label */}
                                     <span className={`text-[10px] font-semibold text-center leading-tight transition-all duration-300 whitespace-nowrap ${isActive ? 'font-bold' : ''
                                         }`}>
-                                        {tab.label.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim().split(' ')[0]}
+                                        {formatLabel(tab.label).replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim().split(' ')[0]}
                                     </span>
 
                                     {/* Active dot indicator with pulse */}
@@ -27989,7 +28026,7 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
                                                 <i className={iconClass}></i>
                                             </span>
                                             <span className={`font-medium truncate ${isActive ? 'font-bold' : ''}`}>
-                                                {tab.label}
+                                                {formatLabel(tab.label)}
                                             </span>
                                             
                                             {isActive && (
@@ -28125,7 +28162,7 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
                                                     }`}
                                                 >
                                                     <LucideIcon name={tab.icon} className="w-4 h-4" />
-                                                    <span>{tab.label}</span>
+                                                    <span>{formatLabel(tab.label)}</span>
                                                 </button>
                                             );
                                         })}
@@ -28155,7 +28192,7 @@ Prete a accompagner l'equipe dans leurs decisions d'investissement ?`;
                                                         {subTab.icon && (
                                                             <LucideIcon name={subTab.icon} className="w-4 h-4" />
                                                         )}
-                                                        <span>{subTab.label}</span>
+                                                        <span>{formatLabel(subTab.label)}</span>
                                                     </button>
                                                 );
                                             })}
