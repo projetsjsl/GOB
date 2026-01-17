@@ -65,3 +65,15 @@ En attendant la configuration MCP, vous pouvez exécuter les migrations manuelle
 
 
 
+
+See shared rules: /Users/projetsjsl/.gemini-configs/AGENT_CONSTITUTION.md
+
+### Repo Safety (ABSOLUTE)
+- Never run `git` or `gh` from: `~`, `~/Documents`, or `~/Documents/GitHub` (container folders).
+- Before any `git`/`gh` command, detect repo root with:
+  `git rev-parse --show-toplevel`
+  - If it fails: STOP and ask for the target repo path (or `cd` to an explicit repo path provided by the user).
+  - If it succeeds: `cd` to that toplevel and run commands from there.
+- For `gh` commands in this environment, always neutralize auth overrides:
+  prefix with: `env -u GITHUB_TOKEN -u GH_TOKEN -u GH_HOST -u GITHUB_HOST`
+
